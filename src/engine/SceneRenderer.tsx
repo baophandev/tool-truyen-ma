@@ -1,55 +1,124 @@
 import React, { useState, useRef, useEffect } from "react";
-import type { DirectorSceneScript, SlotId, GroundSlotId } from "./types";
-import { CANVAS_WIDTH, CANVAS_HEIGHT, GROUND_Y, ALL_SLOTS, GROUND_SLOTS, AIR_SLOTS } from "./constants";
+import type {
+  DirectorSceneScript,
+  GroundSlotId,
+  SelectedEntity,
+  SlotId,
+} from "./types";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, GROUND_Y, ALL_SLOTS } from "./constants";
 import { getSlotCoordinates } from "./layoutRouter";
+import {
+  STRUCTURE_RULES,
+  DETAIL_RULES,
+  coordsToSlotAssignment,
+  findNearestAllowedSlot,
+  getAllowedSlotsForActor,
+  getAllowedSlotsForDetail,
+  getAllowedSlotsForStructure,
+  getSlotType,
+  isSlotAllowed,
+  supportsContinuousAirPlacement,
+  supportsContinuousGroundPlacement,
+} from "./placementRules";
 import { SvgDefs } from "./graphics/SvgDefs";
 import { SkyLayer, BackgroundLayer, MainGroundLayer, ForegroundLayer } from "./graphics/Environments";
 import { StructureRenderer } from "./graphics/Structures";
 import { CharacterRig } from "./graphics/CharacterRig";
+import { DetailRenderer } from "./graphics/Details";
 import { soundEngine } from "./AudioSynthesizer";
+
+export type DragSnapMode = "strict_slot" | "allowed_offset";
 
 interface SceneRendererProps {
   script: DirectorSceneScript;
   showGizmo?: boolean;
   showSubtitles?: boolean;
+  selectedEntity?: SelectedEntity;
   activeActorId?: string | null;
   interactiveDrag?: boolean;
+  dragSnapMode?: DragSnapMode;
+  onSelectEntity?: (entity: SelectedEntity) => void;
   onSelectActor?: (actorId: string) => void;
   onSelectSlot?: (slotId: SlotId) => void;
   onUpdateActorPosition?: (actorId: string, slot: SlotId, offsetX: number, offsetY: number) => void;
   onUpdateStructurePosition?: (structIndex: number, slot: GroundSlotId, offsetX: number, offsetY: number) => void;
+  onUpdateDetailPosition?: (detailId: string, slot: SlotId, offsetX: number, offsetY: number) => void;
   svgRef?: React.RefObject<SVGSVGElement | null>;
 }
 
 interface DragSession {
-  type: "actor" | "structure";
-  id: string; // actorId or structure index
+  type: "actor" | "structure" | "detail";
+  id: string; // actorId, detailId, or String(index)
   index?: number;
+  entityLabel: string;
+  allowedSlots: SlotId[];
+  ruleReason: string;
   initialPointerSvg: { x: number; y: number };
   initialEntityCoords: { x: number; y: number };
   currentCoords: { x: number; y: number };
   candidateSlot: SlotId;
+  offsetX: number;
+  offsetY: number;
   isSnapped: boolean;
+  isOverAllowedZone: boolean;
+  hasMoved: boolean;
 }
 
 export const SceneRenderer: React.FC<SceneRendererProps> = ({
   script,
   showGizmo = false,
   showSubtitles = true,
+  selectedEntity,
   activeActorId = null,
   interactiveDrag = true,
+  dragSnapMode = "allowed_offset",
+  onSelectEntity,
   onSelectActor,
   onSelectSlot,
   onUpdateActorPosition,
   onUpdateStructurePosition,
+  onUpdateDetailPosition,
   svgRef: externalSvgRef,
 }) => {
-  const { theme, lighting, environment_items = [], actors = [], dialogue } = script;
+  const { theme, lighting, environment_items = [], actors = [], details = [], dialogue } = script;
   const internalSvgRef = useRef<SVGSVGElement | null>(null);
   const activeSvgRef = externalSvgRef || internalSvgRef;
 
   const [dragSession, setDragSession] = useState<DragSession | null>(null);
+  const dragSessionRef = useRef<DragSession | null>(null);
   const lastSnapRef = useRef<boolean>(false);
+
+  const effectiveSelection: SelectedEntity =
+    selectedEntity !== undefined
+      ? selectedEntity
+      : activeActorId
+      ? { type: "actor", id: activeActorId }
+      : null;
+
+  const getSelectionRuleInfo = (
+    entity: SelectedEntity
+  ): { allowedSlots: SlotId[]; reason: string; label: string } | null => {
+    if (!entity) return null;
+    if (entity.type === "actor") {
+      const actor = actors.find((a) => a.id === entity.id);
+      if (!actor) return null;
+      const rule = getAllowedSlotsForActor(actor);
+      return { ...rule, label: `Nhân vật: ${actor.id}` };
+    }
+    if (entity.type === "structure") {
+      const struct = environment_items[entity.index];
+      if (!struct) return null;
+      const rule = getAllowedSlotsForStructure(struct.asset_id);
+      return { ...rule, label: `Công trình: ${STRUCTURE_RULES[struct.asset_id].name}` };
+    }
+    const detail = details.find((d) => d.id === entity.id);
+    if (!detail) return null;
+    const rule = getAllowedSlotsForDetail(detail.asset_id);
+    return { ...rule, label: `Chi tiết: ${DETAIL_RULES[detail.asset_id].name}` };
+  };
+
+  const activeSelectionRules = getSelectionRuleInfo(effectiveSelection);
+  const activeRuleAllowedSlots = dragSession?.allowedSlots ?? activeSelectionRules?.allowedSlots ?? null;
 
   // Helper: Convert client PointerEvent to SVG ViewBox (0..1920, 0..1080) coordinates
   const getSvgCoordinates = (e: React.PointerEvent | PointerEvent): { x: number; y: number } => {
@@ -76,6 +145,53 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
     };
   };
 
+  const selectAndStartDrag = (
+    e: React.PointerEvent,
+    entity: Exclude<SelectedEntity, null>,
+    entityCoords: { x: number; y: number },
+    currentSlot: SlotId,
+    offsetX = 0,
+    offsetY = 0
+  ) => {
+    const rule = getSelectionRuleInfo(entity);
+    if (!rule) return;
+
+    if (onSelectEntity) onSelectEntity(entity);
+    if (entity.type === "actor" && onSelectActor) onSelectActor(entity.id);
+
+    const svgPt = getSvgCoordinates(e);
+
+    try {
+      (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    } catch {
+      // In case element capture is not supported
+    }
+
+    const session: DragSession = {
+      type: entity.type,
+      id: entity.type === "structure" ? String(entity.index) : entity.id,
+      index: entity.type === "structure" ? entity.index : undefined,
+      entityLabel: rule.label,
+      allowedSlots: rule.allowedSlots,
+      ruleReason: rule.reason,
+      initialPointerSvg: svgPt,
+      initialEntityCoords: entityCoords,
+      currentCoords: entityCoords,
+      candidateSlot: isSlotAllowed(currentSlot, rule.allowedSlots)
+        ? currentSlot
+        : findNearestAllowedSlot(entityCoords.x, entityCoords.y, rule.allowedSlots).slot.id,
+      offsetX,
+      offsetY,
+      isSnapped: offsetX === 0 && offsetY === 0,
+      isOverAllowedZone: true,
+      hasMoved: false,
+    };
+
+    dragSessionRef.current = session;
+    setDragSession(session);
+    lastSnapRef.current = false;
+  };
+
   // Start dragging Actor
   const handleActorPointerDown = (e: React.PointerEvent, actorId: string) => {
     if (!interactiveDrag) return;
@@ -84,27 +200,15 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
     const actor = actors.find((a) => a.id === actorId);
     if (!actor) return;
 
-    if (onSelectActor) onSelectActor(actorId);
-
-    const svgPt = getSvgCoordinates(e);
     const actorCoords = getSlotCoordinates(actor.slot, actor.offsetX, actor.offsetY);
-
-    try {
-      (e.currentTarget as Element).setPointerCapture(e.pointerId);
-    } catch {
-      // In case element capture is not supported
-    }
-
-    setDragSession({
-      type: "actor",
-      id: actorId,
-      initialPointerSvg: svgPt,
-      initialEntityCoords: actorCoords,
-      currentCoords: actorCoords,
-      candidateSlot: actor.slot,
-      isSnapped: (actor.offsetX || 0) === 0 && (actor.offsetY || 0) === 0,
-    });
-    lastSnapRef.current = false;
+    selectAndStartDrag(
+      e,
+      { type: "actor", id: actorId },
+      actorCoords,
+      actor.slot,
+      actor.offsetX || 0,
+      actor.offsetY || 0
+    );
   };
 
   // Start dragging Structure
@@ -115,161 +219,221 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
     const struct = environment_items[index];
     if (!struct) return;
 
-    const svgPt = getSvgCoordinates(e);
     const structCoords = getSlotCoordinates(struct.slot, struct.offsetX, struct.offsetY);
-
-    try {
-      (e.currentTarget as Element).setPointerCapture(e.pointerId);
-    } catch {
-      // In case element capture is not supported
-    }
-
-    setDragSession({
-      type: "structure",
-      id: String(index),
-      index,
-      initialPointerSvg: svgPt,
-      initialEntityCoords: structCoords,
-      currentCoords: structCoords,
-      candidateSlot: struct.slot,
-      isSnapped: (struct.offsetX || 0) === 0 && (struct.offsetY || 0) === 0,
-    });
-    lastSnapRef.current = false;
+    selectAndStartDrag(
+      e,
+      { type: "structure", index },
+      structCoords,
+      struct.slot,
+      struct.offsetX || 0,
+      struct.offsetY || 0
+    );
   };
 
-  // Move drag handler
+  // Start dragging Detail / Scene Prop
+  const handleDetailPointerDown = (e: React.PointerEvent, detailId: string) => {
+    if (!interactiveDrag) return;
+    e.stopPropagation();
+
+    const detail = details.find((d) => d.id === detailId);
+    if (!detail) return;
+
+    const detailCoords = getSlotCoordinates(detail.slot, detail.offsetX, detail.offsetY);
+    selectAndStartDrag(
+      e,
+      { type: "detail", id: detailId },
+      detailCoords,
+      detail.slot,
+      detail.offsetX || 0,
+      detail.offsetY || 0
+    );
+  };
+
+  // Commit drag to parent state ONLY on release and strictly within allowed slots
+  const commitDragSession = () => {
+    const session = dragSessionRef.current;
+    if (!session) return;
+
+    dragSessionRef.current = null;
+    setDragSession(null);
+
+    if (!session.hasMoved) return;
+
+    const finalSlot = session.candidateSlot;
+    const useZeroOffset = dragSnapMode === "strict_slot" || !session.isOverAllowedZone;
+    const finalOffsetX = useZeroOffset ? 0 : session.offsetX;
+    const finalOffsetY =
+      useZeroOffset || getSlotType(finalSlot) === "ground" ? 0 : session.offsetY;
+
+    if (useZeroOffset) {
+      soundEngine.triggerSnapClick();
+    }
+
+    if (session.type === "actor" && onUpdateActorPosition) {
+      onUpdateActorPosition(session.id, finalSlot, finalOffsetX, finalOffsetY);
+    } else if (
+      session.type === "structure" &&
+      onUpdateStructurePosition &&
+      session.index !== undefined
+    ) {
+      onUpdateStructurePosition(session.index, finalSlot as GroundSlotId, finalOffsetX, 0);
+    } else if (session.type === "detail" && onUpdateDetailPosition) {
+      onUpdateDetailPosition(session.id, finalSlot, finalOffsetX, finalOffsetY);
+    }
+  };
+
+  // Click anywhere along continuous Ground Line Y = 800px to place selected actor/detail there
+  const handleGroundRunwayClick = (e: React.MouseEvent) => {
+    if (!interactiveDrag || !effectiveSelection || !activeRuleAllowedSlots) return;
+    if (!supportsContinuousGroundPlacement(activeRuleAllowedSlots)) return;
+    e.stopPropagation();
+
+    const pt = getSvgCoordinates(e as unknown as React.PointerEvent);
+    const clickX = Math.max(80, Math.min(1840, Math.round(pt.x)));
+    const assigned =
+      dragSnapMode === "strict_slot"
+        ? { slot: findNearestAllowedSlot(clickX, GROUND_Y, activeRuleAllowedSlots).slot.id, offsetX: 0, offsetY: 0 }
+        : coordsToSlotAssignment(clickX, GROUND_Y, activeRuleAllowedSlots);
+
+    soundEngine.triggerSnapClick();
+
+    if (effectiveSelection.type === "actor" && onUpdateActorPosition) {
+      onUpdateActorPosition(effectiveSelection.id, assigned.slot, assigned.offsetX, 0);
+    } else if (effectiveSelection.type === "detail" && onUpdateDetailPosition) {
+      onUpdateDetailPosition(effectiveSelection.id, assigned.slot, assigned.offsetX, 0);
+    }
+  };
+
+  // Move drag handler (supports continuous ground/air placement & constrained structure slots)
   const handleSvgPointerMove = (e: React.PointerEvent) => {
-    if (!dragSession) return;
+    const session = dragSessionRef.current;
+    if (!session) return;
     e.preventDefault();
 
     const currSvg = getSvgCoordinates(e);
-    const dx = currSvg.x - dragSession.initialPointerSvg.x;
-    const dy = currSvg.y - dragSession.initialPointerSvg.y;
+    const dx = currSvg.x - session.initialPointerSvg.x;
+    const dy = currSvg.y - session.initialPointerSvg.y;
+    const hasMoved = session.hasMoved || Math.hypot(dx, dy) > 4;
 
-    let targetX = dragSession.initialEntityCoords.x + dx;
-    let targetY = dragSession.initialEntityCoords.y + dy;
+    const targetX = Math.max(80, Math.min(1840, session.initialEntityCoords.x + dx));
+    let targetY = Math.max(130, Math.min(GROUND_Y + 60, session.initialEntityCoords.y + dy));
 
-    // Boundary constraints
-    targetX = Math.max(120, Math.min(1800, targetX));
+    const hasGroundAllowed = session.allowedSlots.some((s) => getSlotType(s) === "ground");
+    const hasAirAllowed = session.allowedSlots.some((s) => getSlotType(s) === "air");
+    const isContinuousGround = supportsContinuousGroundPlacement(session.allowedSlots);
+    const isContinuousAir = supportsContinuousAirPlacement(session.allowedSlots);
 
-    if (dragSession.type === "structure") {
-      // Structures are strictly grounded on Ground Plane Y = 800
+    // Lock entity onto its allowed height/plane
+    if (hasGroundAllowed && !hasAirAllowed) {
       targetY = GROUND_Y;
-
-      // Scan closest ground slot
-      const slots = Object.values(GROUND_SLOTS);
-      let closestSlot = slots[0];
-      let minDist = Infinity;
-
-      for (const slot of slots) {
-        const dist = Math.abs(targetX - slot.x);
-        if (dist < minDist) {
-          minDist = dist;
-          closestSlot = slot;
-        }
-      }
-
-      // Magnetic snap threshold: 85px
-      const isSnapped = minDist < 85;
-      const finalX = isSnapped ? closestSlot.x : targetX;
-      const offsetX = isSnapped ? 0 : Math.round(targetX - closestSlot.x);
-
-      if (isSnapped && !lastSnapRef.current) {
-        soundEngine.triggerSnapClick();
-      }
-      lastSnapRef.current = isSnapped;
-
-      setDragSession((prev) =>
-        prev
-          ? {
-              ...prev,
-              currentCoords: { x: finalX, y: GROUND_Y },
-              candidateSlot: closestSlot.id,
-              isSnapped,
-            }
-          : null
-      );
-
-      if (onUpdateStructurePosition && dragSession.index !== undefined) {
-        onUpdateStructurePosition(dragSession.index, closestSlot.id as GroundSlotId, offsetX, 0);
-      }
+    } else if (hasAirAllowed && !hasGroundAllowed) {
+      targetY = Math.max(140, Math.min(480, targetY));
+    } else if (targetY > 640) {
+      targetY = GROUND_Y;
     } else {
-      // Dragging Actor
-      const actor = actors.find((a) => a.id === dragSession.id);
-      const isGhost = actor?.base === "ghost_wraith" || actor?.pose === "pose_floating";
-
-      // If actor is dragged into upper zone or is ghost, check air slots
-      let candidateSlots = Object.values(ALL_SLOTS);
-      if (!isGhost && targetY > 580) {
-        // Prioritize ground slots for ground characters
-        candidateSlots = Object.values(GROUND_SLOTS);
-        // Magnetic snap towards Ground Y=800 if within 60px of ground line
-        if (Math.abs(targetY - GROUND_Y) < 60) {
-          targetY = GROUND_Y;
-        }
-      } else if (targetY <= 520) {
-        // Prioritize air slots in upper space
-        candidateSlots = Object.values(AIR_SLOTS);
-      }
-
-      let closestSlot = candidateSlots[0];
-      let minDist = Infinity;
-
-      for (const slot of candidateSlots) {
-        const dist = Math.hypot(targetX - slot.x, targetY - slot.y);
-        if (dist < minDist) {
-          minDist = dist;
-          closestSlot = slot;
-        }
-      }
-
-      // Magnetic snap threshold: 80px
-      const isSnapped = minDist < 80;
-      const finalX = isSnapped ? closestSlot.x : targetX;
-      const finalY = isSnapped ? closestSlot.y : targetY;
-      const offsetX = isSnapped ? 0 : Math.round(targetX - closestSlot.x);
-      const offsetY = isSnapped ? 0 : Math.round(targetY - closestSlot.y);
-
-      if (isSnapped && !lastSnapRef.current) {
-        soundEngine.triggerSnapClick();
-      }
-      lastSnapRef.current = isSnapped;
-
-      setDragSession((prev) =>
-        prev
-          ? {
-              ...prev,
-              currentCoords: { x: finalX, y: finalY },
-              candidateSlot: closestSlot.id,
-              isSnapped,
-            }
-          : null
-      );
-
-      if (onUpdateActorPosition) {
-        onUpdateActorPosition(dragSession.id, closestSlot.id, offsetX, offsetY);
-      }
+      targetY = Math.max(140, Math.min(580, targetY));
     }
+
+    const isOnContinuousPlane =
+      (targetY === GROUND_Y && isContinuousGround) ||
+      (targetY < GROUND_Y && isContinuousAir);
+
+    // Closest ALLOWED slot
+    const { slot: closestAllowed, distance: allowedDist } = findNearestAllowedSlot(
+      targetX,
+      targetY,
+      session.allowedSlots
+    );
+
+    // Detect hover near a FORBIDDEN slot (only when not moving along a continuous allowed plane)
+    const hoveringDisallowed = isOnContinuousPlane
+      ? false
+      : Object.values(ALL_SLOTS).some(
+          (s) =>
+            !isSlotAllowed(s.id, session.allowedSlots) &&
+            Math.hypot(targetX - s.x, targetY - s.y) < 115
+        );
+
+    const isSnapped =
+      dragSnapMode === "strict_slot"
+        ? allowedDist < 130 && !hoveringDisallowed
+        : false;
+
+    const isOverAllowedZone =
+      dragSnapMode === "strict_slot"
+        ? !hoveringDisallowed && allowedDist < 240
+        : isOnContinuousPlane || !hoveringDisallowed;
+
+    let finalX: number;
+    let finalY: number;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (isSnapped) {
+      finalX = closestAllowed.x;
+      finalY = closestAllowed.y;
+    } else if (dragSnapMode === "strict_slot") {
+      // Smooth cursor preview while showing snap target back to closestAllowed
+      finalX = targetX;
+      finalY = targetY;
+    } else if (isOnContinuousPlane) {
+      // Free continuous placement ANYWHERE along Ground Line Y=800 (or continuous Air space)
+      const assigned = coordsToSlotAssignment(targetX, targetY, session.allowedSlots);
+      finalX = targetX;
+      finalY = targetY;
+      offsetX = assigned.offsetX;
+      offsetY = assigned.offsetY;
+    } else {
+      // Partially constrained asset (e.g. structure or incense bowl limited to specific anchors)
+      const clampedX = Math.max(-200, Math.min(200, Math.round(targetX - closestAllowed.x)));
+      const clampedY =
+        getSlotType(closestAllowed.id) === "ground"
+          ? 0
+          : Math.max(-160, Math.min(180, Math.round(targetY - closestAllowed.y)));
+      finalX = Math.max(80, Math.min(1840, closestAllowed.x + clampedX));
+      finalY = closestAllowed.y + clampedY;
+      offsetX = Math.round(finalX - closestAllowed.x);
+      offsetY = clampedY;
+    }
+
+    if (isSnapped && !lastSnapRef.current) {
+      soundEngine.triggerSnapClick();
+    }
+    lastSnapRef.current = isSnapped;
+
+    const nextSession: DragSession = {
+      ...session,
+      currentCoords: { x: finalX, y: finalY },
+      candidateSlot: closestAllowed.id,
+      offsetX,
+      offsetY,
+      isSnapped,
+      isOverAllowedZone,
+      hasMoved,
+    };
+
+    dragSessionRef.current = nextSession;
+    setDragSession(nextSession);
   };
 
   // End drag
   const handleSvgPointerUp = (e: React.PointerEvent) => {
-    if (dragSession) {
+    if (dragSessionRef.current) {
       try {
         (e.currentTarget as Element).releasePointerCapture(e.pointerId);
       } catch {
         // Safe catch
       }
-      setDragSession(null);
+      commitDragSession();
     }
   };
 
   // Cleanup drag if pointer leaves or cancels
   useEffect(() => {
-    const handleGlobalUp = () => setDragSession(null);
+    const handleGlobalUp = () => commitDragSession();
     window.addEventListener("pointerup", handleGlobalUp);
     return () => window.removeEventListener("pointerup", handleGlobalUp);
-  }, []);
+  });
 
   return (
     <div
@@ -309,10 +473,28 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
           {/* Main Ground Surface */}
           <MainGroundLayer />
 
+          {/* Interactive Click-Anywhere Ground Line Runway (underneath entities so drags always take priority) */}
+          {interactiveDrag &&
+            activeRuleAllowedSlots &&
+            supportsContinuousGroundPlacement(activeRuleAllowedSlots) && (
+              <rect
+                x="60"
+                y={GROUND_Y - 22}
+                width="1800"
+                height="44"
+                rx="8"
+                fill="rgba(16, 185, 129, 0.08)"
+                className="cursor-crosshair"
+                onClick={handleGroundRunwayClick}
+              />
+            )}
+
           {/* Environment Structures */}
           <g id="structures-group">
             {environment_items.map((item, index) => {
               const coords = getSlotCoordinates(item.slot, item.offsetX, item.offsetY);
+              const isSelected =
+                effectiveSelection?.type === "structure" && effectiveSelection.index === index;
               const isBeingDragged = dragSession?.type === "structure" && dragSession.index === index;
               const displayCoords = isBeingDragged ? dragSession.currentCoords : coords;
 
@@ -323,17 +505,27 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                   className={`${interactiveDrag ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}`}
                   onPointerDown={(e) => handleStructurePointerDown(e, index)}
                 >
-                  {/* Subtle drag highlight */}
-                  {isBeingDragged && (
+                  {interactiveDrag && (
+                    <rect x="-130" y="-280" width="260" height="290" fill="transparent" />
+                  )}
+
+                  {/* Selection / Drag Highlight Ring */}
+                  {(isSelected || isBeingDragged) && (
                     <ellipse
                       cx="0"
                       cy="0"
-                      rx="70"
-                      ry="15"
+                      rx="82"
+                      ry="18"
                       fill="none"
-                      stroke="#10B981"
-                      strokeWidth="3"
-                      strokeDasharray="6,4"
+                      stroke={
+                        isBeingDragged
+                          ? dragSession.isOverAllowedZone
+                            ? "#10B981"
+                            : "#EF4444"
+                          : "#34D399"
+                      }
+                      strokeWidth="3.5"
+                      strokeDasharray="7,4"
                       className="anim-pulse-slow"
                     />
                   )}
@@ -341,8 +533,23 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                   <StructureRenderer
                     id={item.asset_id}
                     scale={item.scale || 1}
-                    showAnchor={showGizmo || isBeingDragged}
+                    showAnchor={showGizmo || isSelected || isBeingDragged}
                   />
+
+                  {(showGizmo || isSelected) && !isBeingDragged && (
+                    <text
+                      x="0"
+                      y="-240"
+                      textAnchor="middle"
+                      fill="#A7F3D0"
+                      fontSize="13"
+                      fontWeight="bold"
+                      fontFamily="monospace"
+                      filter="drop-shadow(0 2px 4px rgba(0,0,0,0.95))"
+                    >
+                      #{index + 1} {item.asset_id} ({item.slot})
+                    </text>
+                  )}
                 </g>
               );
             })}
@@ -352,7 +559,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
           <g id="actors-group">
             {actors.map((actor) => {
               const coords = getSlotCoordinates(actor.slot, actor.offsetX, actor.offsetY);
-              const isSelected = activeActorId === actor.id;
+              const isSelected = effectiveSelection?.type === "actor" && effectiveSelection.id === actor.id;
               const isBeingDragged = dragSession?.type === "actor" && dragSession.id === actor.id;
               const displayCoords = isBeingDragged ? dragSession.currentCoords : coords;
 
@@ -363,15 +570,25 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                   className={`${interactiveDrag ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}`}
                   onPointerDown={(e) => handleActorPointerDown(e, actor.id)}
                 >
+                  {interactiveDrag && (
+                    <rect x="-60" y="-305" width="120" height="320" fill="transparent" />
+                  )}
+
                   {/* Selection / Drag Highlight Ring */}
                   {(isSelected || isBeingDragged) && (
                     <ellipse
                       cx="0"
                       cy="0"
-                      rx="48"
-                      ry="14"
+                      rx="52"
+                      ry="15"
                       fill="none"
-                      stroke={isBeingDragged ? "#10B981" : "#EF4444"}
+                      stroke={
+                        isBeingDragged
+                          ? dragSession.isOverAllowedZone
+                            ? "#10B981"
+                            : "#EF4444"
+                          : "#EF4444"
+                      }
                       strokeWidth="3.5"
                       strokeDasharray="6,4"
                       className="anim-pulse-slow"
@@ -382,6 +599,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                   <CharacterRig
                     id={actor.id}
                     base={actor.base}
+                    costume={actor.costume}
                     face={actor.face}
                     pose={actor.pose}
                     facing={actor.facing}
@@ -409,6 +627,70 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
               );
             })}
           </g>
+
+          {/* Scene Details / Horror Props */}
+          <g id="details-group">
+            {details.map((detail) => {
+              const coords = getSlotCoordinates(detail.slot, detail.offsetX, detail.offsetY);
+              const isSelected = effectiveSelection?.type === "detail" && effectiveSelection.id === detail.id;
+              const isBeingDragged = dragSession?.type === "detail" && dragSession.id === detail.id;
+              const displayCoords = isBeingDragged ? dragSession.currentCoords : coords;
+
+              return (
+                <g
+                  key={`detail-${detail.id}`}
+                  transform={`translate(${displayCoords.x}, ${displayCoords.y})`}
+                  className={`${interactiveDrag ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}`}
+                  onPointerDown={(e) => handleDetailPointerDown(e, detail.id)}
+                >
+                  {interactiveDrag && (
+                    <rect x="-70" y="-140" width="140" height="165" fill="transparent" />
+                  )}
+
+                  {(isSelected || isBeingDragged) && (
+                    <ellipse
+                      cx="0"
+                      cy="0"
+                      rx="42"
+                      ry="12"
+                      fill="none"
+                      stroke={
+                        isBeingDragged
+                          ? dragSession.isOverAllowedZone
+                            ? "#10B981"
+                            : "#EF4444"
+                          : "#F59E0B"
+                      }
+                      strokeWidth="3"
+                      strokeDasharray="5,4"
+                      className="anim-pulse-slow"
+                    />
+                  )}
+
+                  <DetailRenderer
+                    id={detail.asset_id}
+                    scale={detail.scale || 1}
+                    showAnchor={showGizmo || isSelected || isBeingDragged}
+                  />
+
+                  {(showGizmo || isSelected) && !isBeingDragged && (
+                    <text
+                      x="0"
+                      y="-118"
+                      textAnchor="middle"
+                      fill="#FDE68A"
+                      fontSize="12"
+                      fontWeight="bold"
+                      fontFamily="monospace"
+                      filter="drop-shadow(0 2px 4px rgba(0,0,0,0.95))"
+                    >
+                      {DETAIL_RULES[detail.asset_id].name} ({detail.slot})
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+          </g>
         </g>
 
         {/* LAYER 3 (z-index 30): FOREGROUND MIST, DRY BRANCHES, VIGNETTE */}
@@ -419,9 +701,24 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
           />
         </g>
 
-        {/* DEBUG GIZMO OVERLAY: GROUND PLANE & SLOT MARKERS */}
-        {(showGizmo || Boolean(dragSession)) && (
+        {/* DEBUG GIZMO OVERLAY: GROUND PLANE & ALLOWED/LOCKED SLOT MARKERS */}
+        {(showGizmo || Boolean(dragSession) || (interactiveDrag && Boolean(activeRuleAllowedSlots))) && (
           <g id="debug-gizmo-layer" pointerEvents="all">
+            {/* Continuous Ground Runway Glow when Ground Line placement is allowed anywhere */}
+            {activeRuleAllowedSlots && supportsContinuousGroundPlacement(activeRuleAllowedSlots) && (
+              <line
+                x1="80"
+                y1={GROUND_Y}
+                x2="1840"
+                y2={GROUND_Y}
+                stroke="#10B981"
+                strokeWidth="10"
+                strokeLinecap="round"
+                opacity="0.28"
+                pointerEvents="none"
+              />
+            )}
+
             {/* Ground Plane Guide Line Y = 800px */}
             <line
               x1="0"
@@ -431,128 +728,280 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
               stroke="#10B981"
               strokeWidth="2.5"
               strokeDasharray="8,6"
-              opacity={dragSession ? 0.95 : 0.85}
+              opacity={dragSession ? 0.95 : 0.8}
+              pointerEvents="none"
             />
-            <rect x="20" y={GROUND_Y - 26} width="190" height="22" fill="#064E3B" rx="4" opacity="0.9" />
-            <text x="28" y={GROUND_Y - 10} fill="#6EE7B7" fontSize="13" fontFamily="monospace" fontWeight="bold">
-              GROUND PLANE Y = 800px
-            </text>
+            <g pointerEvents="none">
+              <rect x="20" y={GROUND_Y - 26} width="245" height="22" fill="#064E3B" rx="4" opacity="0.92" />
+              <text x="28" y={GROUND_Y - 10} fill="#6EE7B7" fontSize="12" fontFamily="monospace" fontWeight="bold">
+                {activeRuleAllowedSlots && supportsContinuousGroundPlacement(activeRuleAllowedSlots)
+                  ? "LINE Y = 800px (ĐỨNG MỌI NƠI)"
+                  : "GROUND PLANE Y = 800px"}
+              </text>
+            </g>
 
             {/* Slot Anchors Markers */}
             {Object.values(ALL_SLOTS).map((slot) => {
               const isGround = slot.type === "ground";
+              const hasRule = Boolean(activeRuleAllowedSlots);
+              const allowed = hasRule ? isSlotAllowed(slot.id, activeRuleAllowedSlots!) : true;
               const isTargetOfDrag = dragSession?.candidateSlot === slot.id;
-              const color = isTargetOfDrag ? "#EF4444" : isGround ? "#10B981" : "#8B5CF6";
+              const isForbiddenHovered = Boolean(
+                dragSession &&
+                  !allowed &&
+                  Math.hypot(dragSession.currentCoords.x - slot.x, dragSession.currentCoords.y - slot.y) < 115
+              );
+
+              const color = !allowed
+                ? isForbiddenHovered
+                  ? "#EF4444"
+                  : "#991B1B"
+                : hasRule
+                ? "#10B981"
+                : isGround
+                ? "#10B981"
+                : "#8B5CF6";
 
               return (
                 <g
                   key={`gizmo-slot-${slot.id}`}
                   transform={`translate(${slot.x}, ${slot.y})`}
-                  className="cursor-pointer"
-                  onClick={() => onSelectSlot && onSelectSlot(slot.id)}
+                  opacity={allowed ? 1 : isForbiddenHovered ? 0.95 : 0.45}
+                  className={allowed ? "cursor-pointer" : "cursor-not-allowed"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (allowed && onSelectSlot) {
+                      soundEngine.triggerSnapClick();
+                      onSelectSlot(slot.id);
+                    }
+                  }}
                 >
-                  {/* Magnet Active Pulse Ring when target of drag */}
-                  {isTargetOfDrag && (
+                  {/* Allowed Zone Drop Pad Highlight when an entity is selected or dragged */}
+                  {allowed && hasRule && (
+                    isGround ? (
+                      <ellipse
+                        cx="0"
+                        cy="0"
+                        rx="64"
+                        ry="18"
+                        fill={isTargetOfDrag ? "rgba(16, 185, 129, 0.28)" : "rgba(16, 185, 129, 0.12)"}
+                        stroke="#10B981"
+                        strokeWidth={isTargetOfDrag ? "3" : "1.8"}
+                        strokeDasharray="6,4"
+                      />
+                    ) : (
+                      <circle
+                        cx="0"
+                        cy="0"
+                        r="48"
+                        fill={isTargetOfDrag ? "rgba(16, 185, 129, 0.22)" : "rgba(16, 185, 129, 0.08)"}
+                        stroke="#10B981"
+                        strokeWidth={isTargetOfDrag ? "3" : "1.8"}
+                        strokeDasharray="6,4"
+                      />
+                    )
+                  )}
+
+                  {/* Forbidden Slot Hover Warning Ring */}
+                  {isForbiddenHovered && (
                     <circle
                       cx="0"
                       cy="0"
-                      r="42"
-                      fill="none"
-                      stroke={dragSession.isSnapped ? "#10B981" : "#F59E0B"}
+                      r="44"
+                      fill="rgba(239, 68, 68, 0.18)"
+                      stroke="#EF4444"
                       strokeWidth="3"
+                      strokeDasharray="5,4"
+                    />
+                  )}
+
+                  {/* Magnet Active Pulse Ring on destination allowed slot during drag */}
+                  {isTargetOfDrag && allowed && (
+                    <circle
+                      cx="0"
+                      cy="0"
+                      r="36"
+                      fill="none"
+                      stroke={dragSession?.isSnapped ? "#34D399" : "#F59E0B"}
+                      strokeWidth="3.5"
                       strokeDasharray="5,5"
                       className="anim-pulse-slow"
                     />
                   )}
 
-                  {/* Slot Crosshair & Pin */}
-                  <circle cx="0" cy="0" r={isTargetOfDrag ? "18" : "14"} fill={color} opacity="0.3" />
+                  {/* Slot Crosshair or Forbidden Cross */}
+                  <circle cx="0" cy="0" r={isTargetOfDrag ? "18" : "14"} fill={color} opacity="0.28" />
                   <circle cx="0" cy="0" r={isTargetOfDrag ? "7" : "5"} fill={color} />
-                  <line x1="-15" y1="0" x2="15" y2="0" stroke={color} strokeWidth="2" />
-                  <line x1="0" y1="-15" x2="0" y2="15" stroke={color} strokeWidth="2" />
+                  {allowed ? (
+                    <>
+                      <line x1="-15" y1="0" x2="15" y2="0" stroke={color} strokeWidth="2" />
+                      <line x1="0" y1="-15" x2="0" y2="15" stroke={color} strokeWidth="2" />
+                    </>
+                  ) : (
+                    <>
+                      <line x1="-11" y1="-11" x2="11" y2="11" stroke="#EF4444" strokeWidth="2.5" />
+                      <line x1="11" y1="-11" x2="-11" y2="11" stroke="#EF4444" strokeWidth="2.5" />
+                    </>
+                  )}
 
                   {/* Slot Tag Pill */}
-                  <g transform={`translate(0, ${isGround ? 25 : -25})`}>
+                  <g transform={`translate(0, ${isGround ? 28 : -28})`}>
                     <rect
-                      x="-65"
-                      y="-12"
-                      width="130"
-                      height="24"
-                      fill="#0B0F19"
+                      x="-74"
+                      y="-13"
+                      width="148"
+                      height="26"
+                      fill={!allowed ? "#1C0B0E" : "#071310"}
                       stroke={color}
-                      strokeWidth={isTargetOfDrag ? "2.5" : "1.5"}
-                      rx="4"
-                      opacity="0.95"
+                      strokeWidth={isTargetOfDrag || isForbiddenHovered ? "2.5" : "1.5"}
+                      rx="5"
+                      opacity="0.96"
                     />
                     <text
                       x="0"
                       y="4"
                       textAnchor="middle"
-                      fill="#F3F4F6"
+                      fill={!allowed ? "#FCA5A5" : hasRule ? "#6EE7B7" : "#F3F4F6"}
                       fontSize="11"
                       fontFamily="monospace"
                       fontWeight="bold"
                     >
-                      {slot.id} ({slot.x},{slot.y})
+                      {!allowed
+                        ? `✕ ${slot.id} (KHÓA)`
+                        : hasRule
+                        ? `✓ ${slot.id}`
+                        : `${slot.id} (${slot.x},${slot.y})`}
                     </text>
                   </g>
                 </g>
               );
             })}
+
+            {/* Rule Hint Banner inside stage when an entity is selected */}
+            {interactiveDrag && activeSelectionRules && !dragSession && (
+              <g transform={`translate(${CANVAS_WIDTH / 2}, 28)`} pointerEvents="none">
+                <rect
+                  x="-385"
+                  y="-16"
+                  width="770"
+                  height="32"
+                  rx="8"
+                  fill="rgba(7, 10, 18, 0.88)"
+                  stroke="rgba(16, 185, 129, 0.55)"
+                  strokeWidth="1.5"
+                />
+                <text
+                  x="0"
+                  y="4"
+                  textAnchor="middle"
+                  fill="#A7F3D0"
+                  fontSize="12"
+                  fontFamily="monospace"
+                  fontWeight="bold"
+                >
+                  {supportsContinuousGroundPlacement(activeSelectionRules.allowedSlots)
+                    ? `${activeSelectionRules.label} — Kéo hoặc bấm bất kỳ điểm nào trên Line Xanh Y=800px`
+                    : `${activeSelectionRules.label} — Bấm vùng ✓ Xanh hoặc Kéo Thả để đổi vị trí`}
+                </text>
+              </g>
+            )}
           </g>
         )}
 
-        {/* ACTIVE DRAG HUD & GROUND ANCHOR LASER GUIDE */}
+        {/* ACTIVE DRAG HUD & TETHER GUIDE */}
         {dragSession && (
           <g id="drag-feedback-hud" pointerEvents="none">
+            {/* Only draw snap-back tether if over forbidden zone or in strict 5-slot snap mode */}
+            {(!dragSession.isOverAllowedZone || dragSnapMode === "strict_slot") && (
+              <line
+                x1={dragSession.currentCoords.x}
+                y1={dragSession.currentCoords.y}
+                x2={ALL_SLOTS[dragSession.candidateSlot].x}
+                y2={ALL_SLOTS[dragSession.candidateSlot].y}
+                stroke={dragSession.isOverAllowedZone ? "#10B981" : "#EF4444"}
+                strokeWidth="2.5"
+                strokeDasharray="6,4"
+                opacity="0.85"
+              />
+            )}
+
+            {/* Vertical Ground Projection Line */}
+            {dragSession.currentCoords.y < GROUND_Y && (
+              <line
+                x1={dragSession.currentCoords.x}
+                y1={dragSession.currentCoords.y}
+                x2={dragSession.currentCoords.x}
+                y2={GROUND_Y}
+                stroke={dragSession.isOverAllowedZone ? "#10B981" : "#EF4444"}
+                strokeWidth="1.8"
+                strokeDasharray="4,4"
+                opacity="0.65"
+              />
+            )}
+
             {/* Ground Contact Ripple at Y=800 */}
             <ellipse
               cx={dragSession.currentCoords.x}
               cy={GROUND_Y}
-              rx="35"
+              rx="34"
               ry="10"
-              fill={dragSession.isSnapped ? "rgba(16, 185, 129, 0.4)" : "rgba(239, 68, 68, 0.35)"}
-              stroke={dragSession.isSnapped ? "#10B981" : "#EF4444"}
+              fill={dragSession.isOverAllowedZone ? "rgba(16, 185, 129, 0.35)" : "rgba(239, 68, 68, 0.35)"}
+              stroke={dragSession.isOverAllowedZone ? "#10B981" : "#EF4444"}
               strokeWidth="2"
             />
 
-            {/* Vertical Laser Guide Line connecting entity to Ground Plane */}
-            <line
-              x1={dragSession.currentCoords.x}
-              y1={dragSession.currentCoords.y}
-              x2={dragSession.currentCoords.x}
-              y2={GROUND_Y}
-              stroke={dragSession.isSnapped ? "#10B981" : "#EF4444"}
-              strokeWidth="2.5"
-              strokeDasharray="6,4"
-              opacity="0.9"
-            />
-
-            {/* Floating Info Badge HUD above the dragged entity */}
-            <g transform={`translate(${dragSession.currentCoords.x}, ${dragSession.currentCoords.y - 330})`}>
+            {/* Floating Info Badge HUD (clamped within 1920x1080 viewport) */}
+            <g
+              transform={`translate(${Math.max(210, Math.min(1710, dragSession.currentCoords.x))}, ${Math.max(
+                44,
+                Math.min(920, dragSession.currentCoords.y - (dragSession.type === "detail" ? 160 : 240))
+              )})`}
+            >
               <rect
-                x="-140"
-                y="-18"
-                width="280"
-                height="36"
+                x="-210"
+                y="-20"
+                width="420"
+                height="40"
                 fill="#070A12"
-                stroke={dragSession.isSnapped ? "#10B981" : "#F59E0B"}
+                stroke={
+                  dragSession.isSnapped || (dragSnapMode === "allowed_offset" && dragSession.isOverAllowedZone)
+                    ? "#10B981"
+                    : dragSession.isOverAllowedZone
+                    ? "#F59E0B"
+                    : "#EF4444"
+                }
                 strokeWidth="2"
                 rx="8"
-                filter="drop-shadow(0 4px 10px rgba(0,0,0,0.8))"
+                filter="drop-shadow(0 4px 10px rgba(0,0,0,0.85))"
               />
               <text
                 x="0"
                 y="5"
                 textAnchor="middle"
-                fill={dragSession.isSnapped ? "#34D399" : "#FBBF24"}
+                fill={
+                  dragSession.isSnapped || (dragSnapMode === "allowed_offset" && dragSession.isOverAllowedZone)
+                    ? "#34D399"
+                    : dragSession.isOverAllowedZone
+                    ? "#FBBF24"
+                    : "#FCA5A5"
+                }
                 fontSize="12"
                 fontFamily="monospace"
                 fontWeight="bold"
               >
                 {dragSession.isSnapped
-                  ? `🎯 ĐÃ HÚT: ${dragSession.candidateSlot.toUpperCase()}`
-                  : `📍 X: ${Math.round(dragSession.currentCoords.x)} | Y: ${Math.round(dragSession.currentCoords.y)}`}
+                  ? `🎯 HÚT VÀO ĐIỂM NEO: ${dragSession.candidateSlot.toUpperCase()}`
+                  : !dragSession.isOverAllowedZone
+                  ? `⚠ VÙNG BỊ KHÓA — TRẢ VỀ: ${dragSession.candidateSlot.toUpperCase()}`
+                  : dragSnapMode === "allowed_offset"
+                  ? `📍 ĐỨNG TẠI LINE: X=${Math.round(dragSession.currentCoords.x)}px (${
+                      dragSession.currentCoords.y === GROUND_Y
+                        ? "Y=800"
+                        : `Y=${Math.round(dragSession.currentCoords.y)}`
+                    })`
+                  : `✓ ĐÍCH GẦN NHẤT: ${dragSession.candidateSlot.toUpperCase()} (X:${Math.round(
+                      dragSession.currentCoords.x
+                    )})`}
               </text>
             </g>
           </g>

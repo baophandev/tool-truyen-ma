@@ -16,6 +16,14 @@ export type StructureId =
   | "creepy_well"
   | "haunted_gallows_tree";
 
+export type DetailId =
+  | "detail_black_crow"
+  | "detail_will_o_wisp"
+  | "detail_blood_lantern"
+  | "detail_incense_bowl"
+  | "detail_skull_pile"
+  | "detail_hanging_talisman";
+
 export type CharacterBaseId =
   | "male_adult"
   | "female_adult"
@@ -72,6 +80,15 @@ export interface EnvironmentItemConfig {
   scale?: number;   // Optional scaling factor
 }
 
+export interface DetailItemConfig {
+  id: string;
+  asset_id: DetailId;
+  slot: SlotId;
+  offsetX?: number;
+  offsetY?: number;
+  scale?: number;
+}
+
 export interface ActorConfig {
   id: string;
   base: CharacterBaseId;
@@ -101,6 +118,7 @@ export interface DirectorSceneScript {
   lighting: DirectorLightingConfig;
   environment_items: EnvironmentItemConfig[];
   actors: ActorConfig[];
+  details?: DetailItemConfig[];
   dialogue?: string;
   narrative_note?: string;
 }
@@ -127,3 +145,9 @@ export interface RigSockets {
   neck: [number, number];         // [0, -210]
   head: [number, number];         // [0, -250]
 }
+
+export type SelectedEntity =
+  | { type: "actor"; id: string }
+  | { type: "structure"; index: number }
+  | { type: "detail"; id: string }
+  | null;

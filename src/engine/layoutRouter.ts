@@ -8,11 +8,18 @@ import type {
   CharacterFaceId,
   CharacterPoseId,
   CostumeId,
+  DetailId,
   FacingDirection,
   StructureId,
   ThemeId,
   SkyPresetId,
 } from "./types";
+import {
+  DETAIL_RULES,
+  STRUCTURE_RULES,
+  getAllowedSlotsForActor,
+  isSlotAllowed,
+} from "./placementRules";
 
 /**
  * Returns accurate absolute [X, Y] world coordinate for any slot
@@ -104,6 +111,14 @@ const VALID_POSES: CharacterPoseId[] = [
   "pose_reaching",
   "pose_hanging",
 ];
+const VALID_DETAILS: DetailId[] = [
+  "detail_black_crow",
+  "detail_will_o_wisp",
+  "detail_blood_lantern",
+  "detail_incense_bowl",
+  "detail_skull_pile",
+  "detail_hanging_talisman",
+];
 const VALID_FACINGS: FacingDirection[] = ["left", "right"];
 const VALID_SLOTS: SlotId[] = [
   "far_left",
@@ -152,8 +167,11 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     script.environment_items.forEach((item: any, idx: number) => {
       if (!VALID_STRUCTURES.includes(item.asset_id)) {
         errors.push(`environment_items[${idx}].asset_id "${item.asset_id}" không hợp lệ`);
-      }
-      if (!["far_left", "mid_left", "center", "mid_right", "far_right"].includes(item.slot)) {
+      } else if (!isSlotAllowed(item.slot, STRUCTURE_RULES[item.asset_id as StructureId].allowedSlots)) {
+        errors.push(
+          `environment_items[${idx}].slot "${item.slot}" không hợp lệ cho "${item.asset_id}". Cho phép: ${STRUCTURE_RULES[item.asset_id as StructureId].allowedSlots.join(" | ")}`
+        );
+      } else if (!["far_left", "mid_left", "center", "mid_right", "far_right"].includes(item.slot)) {
         errors.push(`environment_items[${idx}].slot "${item.slot}" không phải là GroundSlot hợp lệ`);
       }
     });
@@ -171,8 +189,36 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       if (!VALID_FACES.includes(actor.face)) errors.push(`actors[${idx}].face "${actor.face}" không hợp lệ`);
       if (!VALID_POSES.includes(actor.pose)) errors.push(`actors[${idx}].pose "${actor.pose}" không hợp lệ`);
       if (!VALID_FACINGS.includes(actor.facing)) errors.push(`actors[${idx}].facing "${actor.facing}" không hợp lệ (chỉ nhận "left" hoặc "right")`);
-      if (!VALID_SLOTS.includes(actor.slot)) errors.push(`actors[${idx}].slot "${actor.slot}" không hợp lệ`);
+      if (!VALID_SLOTS.includes(actor.slot)) {
+        errors.push(`actors[${idx}].slot "${actor.slot}" không hợp lệ`);
+      } else if (VALID_BASES.includes(actor.base) && VALID_POSES.includes(actor.pose)) {
+        const actorRule = getAllowedSlotsForActor({ base: actor.base, pose: actor.pose });
+        if (!isSlotAllowed(actor.slot, actorRule.allowedSlots)) {
+          errors.push(
+            `actors[${idx}].slot "${actor.slot}" không phù hợp với pose "${actor.pose}". Cho phép: ${actorRule.allowedSlots.join(" | ")}`
+          );
+        }
+      }
     });
+  }
+
+  if (script.details !== undefined) {
+    if (!Array.isArray(script.details)) {
+      errors.push('details phải là mảng Array nếu được khai báo');
+    } else {
+      script.details.forEach((detail: any, idx: number) => {
+        if (!detail.id) errors.push(`details[${idx}] thiếu id`);
+        if (!VALID_DETAILS.includes(detail.asset_id)) {
+          errors.push(`details[${idx}].asset_id "${detail.asset_id}" không hợp lệ`);
+        } else if (!VALID_SLOTS.includes(detail.slot)) {
+          errors.push(`details[${idx}].slot "${detail.slot}" không hợp lệ`);
+        } else if (!isSlotAllowed(detail.slot, DETAIL_RULES[detail.asset_id as DetailId].allowedSlots)) {
+          errors.push(
+            `details[${idx}].slot "${detail.slot}" không được phép cho "${detail.asset_id}". Cho phép: ${DETAIL_RULES[detail.asset_id as DetailId].allowedSlots.join(" | ")}`
+          );
+        }
+      });
+    }
   }
 
   if (errors.length > 0) {
@@ -210,6 +256,16 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       scale: Number(ac.scale) || 1,
       opacity: ac.opacity !== undefined ? Number(ac.opacity) : 1,
     })),
+    details: Array.isArray(script.details)
+      ? script.details.map((dt: any, idx: number) => ({
+          id: dt.id || `detail_${idx + 1}`,
+          asset_id: dt.asset_id,
+          slot: dt.slot,
+          offsetX: Number(dt.offsetX) || 0,
+          offsetY: Number(dt.offsetY) || 0,
+          scale: Number(dt.scale) || 1,
+        }))
+      : [],
     dialogue: script.dialogue || "",
     narrative_note: script.narrative_note || "",
   };

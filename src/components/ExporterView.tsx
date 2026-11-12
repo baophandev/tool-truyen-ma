@@ -100,8 +100,15 @@ Hệ thống đồ họa 2D thuần code có các tài nguyên và tọa độ c
 - Themes: "rural_graveyard" | "abandoned_village" | "cursed_swamp"
 - Sky presets: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss"
 - Structures: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree"
+- Details (Props): "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman"
 - Ground Slots (Y=800): "far_left" (250), "mid_left" (600), "center" (960), "mid_right" (1320), "far_right" (1670)
 - Air Slots: "air_left" (400, 350), "air_center" (960, 280), "air_right" (1520, 350)
+- Placement Constraints:
+  * "creepy_banyan_tree", "haunted_gallows_tree" -> chỉ đặt ở far_left | far_right
+  * "ancient_tomb", "abandoned_shrine", "creepy_well" -> chỉ đặt ở mid_left | center | mid_right
+  * "dilapidated_hut", "broken_wooden_bridge" -> chỉ đặt ở far_left | center | far_right
+  * "detail_incense_bowl" -> mid_left | center | mid_right; "detail_skull_pile" -> 5 Ground Slots; "detail_hanging_talisman" -> 3 Air Slots; "detail_blood_lantern" -> Ground hoặc air_left | air_right
+  * Nhân vật "pose_floating" | "pose_hanging" -> Air Slots; các tư thế khác -> Ground Slots (Y=800)
 - Actor Bases: "male_adult" | "female_adult" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow"
 - Actor Costumes: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas"
 - Actor Faces: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered"
@@ -131,6 +138,10 @@ HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc Direct
       "facing": "left",
       "slot": "mid_right"
     }
+  ],
+  "details": [
+    { "id": "detail_1", "asset_id": "detail_hanging_talisman", "slot": "air_center" },
+    { "id": "detail_2", "asset_id": "detail_incense_bowl", "slot": "center", "offsetX": 80 }
   ],
   "dialogue": "Lời thoại rùng rợn...",
   "narrative_note": "Mô tả bối cảnh..."
@@ -183,6 +194,7 @@ HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc Direct
               script={currentScene}
               showGizmo={false}
               showSubtitles={true}
+              interactiveDrag={false}
               svgRef={{
                 get current() {
                   return svgRef;

@@ -1,6 +1,6 @@
 {
-  "version": "1.1",
-  "name": "Silhouette Horror 2D Procedural Graphics Library - Extended Assets",
+  "version": "1.2",
+  "name": "Silhouette Horror 2D Procedural Graphics Library - Extended Assets & Placement Rules",
   "style": "Silhouette Minimalist Horror (Limbo / Badland / U Linh Kỳ Truyện)",
   "standard_resolution": {
     "viewBox": "0 0 1920 1080",
@@ -339,5 +339,49 @@
         "desc": "Bị treo thắt cổ lơ lửng, đầu gục bất động, thân đung đưa kẽo kẹt"
       }
     ]
-  }
+  },
+  "details": [
+    {
+      "id": "detail_black_crow",
+      "name": "Quạ đen mắt trắng",
+      "semantic_role": "Điềm báo xui xẻo, có thể đậu đất hoặc bay trên cao",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right", "air_left", "air_center", "air_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_will_o_wisp",
+      "name": "Đốm ma trơi lân tinh",
+      "semantic_role": "Ngọn lửa hồn ma bay lơ lửng hoặc là là giữa bãi tha ma",
+      "allowed_slots": ["air_left", "air_center", "air_right", "mid_left", "center", "mid_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_blood_lantern",
+      "name": "Đèn lồng giấy đỏ rách",
+      "semantic_role": "Ánh sáng ma mị hắt đỏ rực một góc, đặt đất hoặc treo hai rìa trên cao",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right", "air_left", "air_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_incense_bowl",
+      "name": "Bát hương tàn & Nến cầu hồn",
+      "semantic_role": "Khói hương nghi ngút đặt tiếp đất trước mộ hoặc miếu giữa sân khấu",
+      "allowed_slots": ["mid_left", "center", "mid_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_skull_pile",
+      "name": "Đống đầu lâu & Xương khô",
+      "semantic_role": "Tàn tích rùng rợn đặt trên mặt đất Y=800px",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_hanging_talisman",
+      "name": "Dây bùa trấn yểm",
+      "semantic_role": "Dây bùa chú đỏ vàng giăng ngang trên không trung",
+      "allowed_slots": ["air_left", "air_center", "air_right"],
+      "anchor": "bottom-center"
+    }
+  ]
 }
