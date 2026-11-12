@@ -43,30 +43,54 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   const activeScene = scenes[currentSceneIndex] || scenes[0];
   const sceneDuration = activeScene?.duration_sec || 6;
 
-  // Auto playback loop
+  // Reset timeline when switching scenes
   useEffect(() => {
-    let interval: number | null = null;
-    if (isPlaying) {
-      interval = window.setInterval(() => {
-        setCurrentTime((prev) => {
-          const next = prev + 0.1 * playbackSpeed;
-          if (next >= sceneDuration) {
-            // Transition to next scene
-            setIsTransitioning(true);
-            setTimeout(() => {
-              const nextIndex = (currentSceneIndex + 1) % scenes.length;
-              onSelectScene(nextIndex);
-              setIsTransitioning(false);
-            }, 300);
+    setCurrentTime(0);
+  }, [currentSceneIndex]);
+
+  // Smooth ~60fps requestAnimationFrame playback loop for A -> B motion
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    let rafId: number | null = null;
+    let transitionTimer: number | null = null;
+    let lastTimestamp = performance.now();
+    let hasTriggeredAdvance = false;
+
+    const tick = (now: number) => {
+      const dt = Math.min(0.1, Math.max(0, (now - lastTimestamp) / 1000));
+      lastTimestamp = now;
+
+      setCurrentTime((prev) => {
+        const next = prev + dt * playbackSpeed;
+        if (next >= sceneDuration) {
+          if (scenes.length > 1) {
+            if (!hasTriggeredAdvance) {
+              hasTriggeredAdvance = true;
+              setIsTransitioning(true);
+              transitionTimer = window.setTimeout(() => {
+                const nextIndex = (currentSceneIndex + 1) % scenes.length;
+                onSelectScene(nextIndex);
+                setIsTransitioning(false);
+              }, 300);
+            }
             return 0;
           }
-          return next;
-        });
-      }, 100);
-    }
+          return next % sceneDuration;
+        }
+        return next;
+      });
+
+      if (!hasTriggeredAdvance) {
+        rafId = window.requestAnimationFrame(tick);
+      }
+    };
+
+    rafId = window.requestAnimationFrame(tick);
 
     return () => {
-      if (interval) clearInterval(interval);
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+      if (transitionTimer !== null) window.clearTimeout(transitionTimer);
     };
   }, [isPlaying, currentSceneIndex, scenes.length, sceneDuration, playbackSpeed, onSelectScene]);
 
@@ -163,6 +187,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             script={activeScene}
             showGizmo={showGizmo}
             showSubtitles={true}
+            currentTime={currentTime}
             interactiveDrag={false}
           />
         </div>

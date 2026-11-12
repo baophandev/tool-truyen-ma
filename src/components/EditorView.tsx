@@ -12,6 +12,8 @@ import type {
   ThemeId,
   SkyPresetId,
   ActorConfig,
+  ActorMotionConfig,
+  EasingType,
   EnvironmentItemConfig,
   DetailItemConfig,
   SelectedEntity,
@@ -47,6 +49,9 @@ import {
   Lock,
   CheckCircle2,
   Magnet,
+  Play,
+  Pause,
+  ArrowRight,
 } from "lucide-react";
 
 interface EditorViewProps {
@@ -67,6 +72,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
     if (scene.details && scene.details.length > 0) return { type: "detail", id: scene.details[0].id };
     return null;
   });
+  const [activeMotionHandle, setActiveMotionHandle] = useState<"start" | "target">("start");
+  const [previewTime, setPreviewTime] = useState<number | null>(null);
+  const [isPreviewPlaying, setIsPreviewPlaying] = useState<boolean>(false);
   const [selectedActorId, setSelectedActorId] = useState<string | null>(
     scene.actors.length > 0 ? scene.actors[0].id : null
   );
@@ -100,22 +108,60 @@ export const EditorView: React.FC<EditorViewProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scene.scene_id]);
 
+  const sceneDuration = scene.duration_sec || 6;
+
+  // Reset timeline preview & motion handle when changing scenes
+  useEffect(() => {
+    setIsPreviewPlaying(false);
+    setPreviewTime(null);
+    setActiveMotionHandle("start");
+  }, [scene.scene_id]);
+
+  // Smooth ~60fps requestAnimationFrame preview loop in Studio
+  useEffect(() => {
+    if (!isPreviewPlaying) return;
+    let rafId: number | null = null;
+    let lastTs = performance.now();
+
+    const tick = (now: number) => {
+      const dt = Math.min(0.1, Math.max(0, (now - lastTs) / 1000));
+      lastTs = now;
+      setPreviewTime((prev) => {
+        const base = prev === null ? 0 : prev;
+        const next = base + dt;
+        return next >= sceneDuration ? 0 : next;
+      });
+      rafId = window.requestAnimationFrame(tick);
+    };
+
+    rafId = window.requestAnimationFrame(tick);
+    return () => {
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+    };
+  }, [isPreviewPlaying, sceneDuration]);
+
   const selectEntityUnified = (entity: SelectedEntity) => {
     setSelectedEntity(entity);
     if (!entity) return;
     if (entity.type === "actor") {
       setSelectedActorId(entity.id);
       setActiveTab("actors");
+      const matched = scene.actors.find((a) => a.id === entity.id);
+      if (!matched?.motion) {
+        setActiveMotionHandle("start");
+      }
     } else if (entity.type === "structure") {
       setSelectedStructureIdx(entity.index);
       setActiveTab("structures");
+      setActiveMotionHandle("start");
     } else {
       setSelectedDetailId(entity.id);
       setActiveTab("details");
+      setActiveMotionHandle("start");
     }
   };
 
-  // Update Actor helper (auto-migrates slot if pose plane switches Ground <-> Air)
+  // Update Actor helper (auto-migrates slot & motion target if pose plane switches Ground <-> Air)
   const updateActor = (actorId: string, updates: Partial<ActorConfig>) => {
     const updatedActors = scene.actors.map((ac) => {
       if (ac.id !== actorId) return ac;
@@ -129,6 +175,34 @@ export const EditorView: React.FC<EditorViewProps> = ({
           merged.offsetX = 0;
           merged.offsetY = 0;
         }
+        if (merged.motion) {
+          const updatedMotion: ActorMotionConfig = { ...merged.motion };
+          if (!isSlotAllowed(updatedMotion.targetSlot, rule.allowedSlots)) {
+            const targetCoords = getSlotCoordinates(
+              updatedMotion.targetSlot,
+              updatedMotion.targetOffsetX,
+              updatedMotion.targetOffsetY
+            );
+            const nearestTarget = findNearestAllowedSlot(
+              targetCoords.x,
+              targetCoords.y,
+              rule.allowedSlots
+            );
+            updatedMotion.targetSlot = nearestTarget.slot.id;
+            updatedMotion.targetOffsetX = 0;
+            updatedMotion.targetOffsetY = 0;
+          }
+          if (!isAirPose(merged.pose) && updatedMotion.targetOffsetY) {
+            updatedMotion.targetOffsetY = 0;
+          }
+          if (
+            updatedMotion.movingPose &&
+            isAirPose(updatedMotion.movingPose) !== isAirPose(merged.pose)
+          ) {
+            updatedMotion.movingPose = isAirPose(merged.pose) ? "pose_floating" : "pose_walking";
+          }
+          merged.motion = updatedMotion;
+        }
       }
       if (!isAirPose(merged.pose) && merged.offsetY) {
         merged.offsetY = 0;
@@ -136,6 +210,76 @@ export const EditorView: React.FC<EditorViewProps> = ({
       return merged;
     });
     onChangeScene({ ...scene, actors: updatedActors });
+  };
+
+  // Update / Toggle Actor A -> B motion config
+  const updateActorMotion = (
+    actorId: string,
+    motionUpdates: Partial<ActorMotionConfig> | null
+  ) => {
+    const targetActor = scene.actors.find((a) => a.id === actorId);
+    if (!targetActor) return;
+
+    if (motionUpdates === null) {
+      const updatedActors = scene.actors.map((ac) => {
+        if (ac.id !== actorId) return ac;
+        const { motion: _removed, ...rest } = ac;
+        return rest;
+      });
+      setActiveMotionHandle("start");
+      onChangeScene({ ...scene, actors: updatedActors });
+      return;
+    }
+
+    if (!targetActor.motion) {
+      const rule = getAllowedSlotsForActor(targetActor);
+      const startCoords = getSlotCoordinates(
+        targetActor.slot,
+        targetActor.offsetX,
+        targetActor.offsetY
+      );
+      const deltaX = targetActor.facing === "left" ? -380 : 380;
+      const defaultTargetX = Math.max(140, Math.min(1780, startCoords.x + deltaX));
+      const assigned = coordsToSlotAssignment(
+        defaultTargetX,
+        startCoords.y,
+        rule.allowedSlots
+      );
+      const defaultMotion: ActorMotionConfig = {
+        targetSlot: assigned.slot,
+        targetOffsetX: assigned.offsetX,
+        targetOffsetY: isAirPose(targetActor.pose) ? assigned.offsetY : 0,
+        startTimeSec: 0,
+        endTimeSec: Math.max(1.5, Math.round(sceneDuration * 0.85 * 10) / 10),
+        easing: "ease_in_out",
+        autoFaceTarget: true,
+        movingPose: isAirPose(targetActor.pose) ? targetActor.pose : "pose_walking",
+        ...motionUpdates,
+      };
+      updateActor(actorId, { motion: defaultMotion });
+      return;
+    }
+
+    updateActor(actorId, {
+      motion: {
+        ...targetActor.motion,
+        ...motionUpdates,
+      },
+    });
+  };
+
+  // Direct Point B coordinate commit from canvas drag or Ground Runway click
+  const updateActorTargetPosition = (
+    actorId: string,
+    targetSlot: SlotId,
+    targetOffsetX: number,
+    targetOffsetY: number
+  ) => {
+    updateActorMotion(actorId, {
+      targetSlot,
+      targetOffsetX,
+      targetOffsetY,
+    });
   };
 
   // Add Actor helper (auto-places cleanly along Ground Line without stacking)
@@ -499,13 +643,19 @@ export const EditorView: React.FC<EditorViewProps> = ({
           script={scene}
           showGizmo={showGizmo}
           showSubtitles={true}
+          currentTime={previewTime ?? undefined}
           selectedEntity={selectedEntity}
-          interactiveDrag={true}
+          activeMotionHandle={activeMotionHandle}
+          interactiveDrag={previewTime === null}
           dragSnapMode={dragSnapMode}
           onSelectEntity={selectEntityUnified}
           onSelectSlot={(slotId) => moveSelectedEntityToSlot(slotId)}
           onUpdateActorPosition={(actorId, slot, offsetX, offsetY) => {
             updateActor(actorId, { slot, offsetX, offsetY });
+            selectEntityUnified({ type: "actor", id: actorId });
+          }}
+          onUpdateActorTargetPosition={(actorId, targetSlot, targetOffsetX, targetOffsetY) => {
+            updateActorTargetPosition(actorId, targetSlot, targetOffsetX, targetOffsetY);
             selectEntityUnified({ type: "actor", id: actorId });
           }}
           onUpdateStructurePosition={(idx, slot, offsetX, offsetY) => {
@@ -517,6 +667,75 @@ export const EditorView: React.FC<EditorViewProps> = ({
             selectEntityUnified({ type: "detail", id: detailId });
           }}
         />
+
+        {/* Inline Studio Timeline Scrubber for A -> B Motion Preview */}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-neutral-950/95 border-t border-neutral-800/80 text-xs">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                if (isPreviewPlaying) {
+                  setIsPreviewPlaying(false);
+                } else {
+                  if (previewTime === null) setPreviewTime(0);
+                  setIsPreviewPlaying(true);
+                }
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                isPreviewPlaying
+                  ? "bg-amber-600 hover:bg-amber-500 text-white"
+                  : "bg-cyan-700 hover:bg-cyan-600 text-white"
+              }`}
+              title="Xem thử chuyển động A -> B ngay trong Studio"
+            >
+              {isPreviewPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              <span>{isPreviewPlaying ? "Tạm Dừng" : "Xem Thử A → B"}</span>
+            </button>
+
+            {previewTime !== null && (
+              <button
+                onClick={() => {
+                  setIsPreviewPlaying(false);
+                  setPreviewTime(null);
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-800/80 hover:bg-emerald-700 text-emerald-100 border border-emerald-600/50 font-medium transition-all"
+                title="Quay lại chế độ kéo thả vị trí A và Đích B"
+              >
+                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Trở Về Sửa A/B</span>
+              </button>
+            )}
+          </div>
+
+          <div className="flex-1 min-w-[200px] flex items-center gap-3">
+            <span className="font-mono text-cyan-400 w-24 text-right shrink-0">
+              {(previewTime ?? 0).toFixed(2)}s / {sceneDuration.toFixed(1)}s
+            </span>
+            <input
+              type="range"
+              min="0"
+              max={sceneDuration}
+              step="0.05"
+              value={previewTime ?? 0}
+              onChange={(e) => {
+                setIsPreviewPlaying(false);
+                setPreviewTime(parseFloat(e.target.value));
+              }}
+              className="flex-1 accent-cyan-400 cursor-pointer"
+            />
+          </div>
+
+          <div className="text-[11px] font-mono text-neutral-400">
+            {previewTime === null ? (
+              <span className="text-emerald-400">
+                ● Chế độ Sửa Vị Trí ({selectedActor?.motion && activeMotionHandle === "target" ? "Đích B" : "Điểm A"})
+              </span>
+            ) : (
+              <span className="text-cyan-300">
+                ● Đang xem Timeline ({Math.round(((previewTime ?? 0) / sceneDuration) * 100)}%)
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Interactive Controls Tabs */}
@@ -629,6 +848,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               </div>
 
               {selectedActor ? (
+                <div className="flex flex-col gap-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="flex flex-col gap-4">
                     {/* Character Base */}
@@ -914,6 +1134,317 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       <span>Xóa nhân vật này</span>
                     </button>
                   </div>
+                </div>
+
+                {/* FULL-WIDTH A -> B MOTION KEYFRAME CARD */}
+                <div className="bg-cyan-950/20 border border-cyan-800/50 rounded-2xl p-4 flex flex-col gap-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded bg-cyan-900/70 border border-cyan-500/40 text-cyan-200 font-mono text-[11px] font-bold">
+                        A → B
+                      </span>
+                      <span className="text-xs font-bold text-cyan-200">
+                        Chuyển Động Di Chuyển Từ Điểm A Sang Điểm B
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {selectedActor.motion && (
+                        <>
+                          <button
+                            onClick={() => {
+                              setIsPreviewPlaying(true);
+                              setPreviewTime(0);
+                            }}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-cyan-700 hover:bg-cyan-600 text-white text-[11px] font-semibold transition-all"
+                          >
+                            <Play className="w-3 h-3" />
+                            <span>Chạy Thử Ngay</span>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              const m = selectedActor.motion;
+                              if (!m) return;
+                              updateActor(selectedActor.id, {
+                                slot: m.targetSlot,
+                                offsetX: m.targetOffsetX ?? 0,
+                                offsetY: m.targetOffsetY ?? 0,
+                                motion: {
+                                  ...m,
+                                  targetSlot: selectedActor.slot,
+                                  targetOffsetX: selectedActor.offsetX ?? 0,
+                                  targetOffsetY: selectedActor.offsetY ?? 0,
+                                },
+                              });
+                            }}
+                            className="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-cyan-200 border border-cyan-800/50 text-[11px] font-medium transition-all"
+                            title="Đảo vị trí Xuất Phát (A) và Đích Đến (B)"
+                          >
+                            ⇄ Đảo A ↔ B
+                          </button>
+                        </>
+                      )}
+
+                      <button
+                        onClick={() => {
+                          if (selectedActor.motion) {
+                            updateActorMotion(selectedActor.id, null);
+                          } else {
+                            updateActorMotion(selectedActor.id, {});
+                            setActiveMotionHandle("target");
+                            setIsPreviewPlaying(false);
+                            setPreviewTime(null);
+                          }
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                          selectedActor.motion
+                            ? "bg-red-950/60 hover:bg-red-900/70 text-red-200 border-red-800/60"
+                            : "bg-cyan-600 hover:bg-cyan-500 text-white border-cyan-400"
+                        }`}
+                      >
+                        {selectedActor.motion ? "Tắt Di Chuyển" : "+ Bật Di Chuyển A → B"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {selectedActor.motion ? (
+                    (() => {
+                      const motion = selectedActor.motion;
+                      const actorRule = getAllowedSlotsForActor(selectedActor);
+                      const pointACoords = getSlotCoordinates(
+                        selectedActor.slot,
+                        selectedActor.offsetX,
+                        selectedActor.offsetY
+                      );
+                      const pointBCoords = getSlotCoordinates(
+                        motion.targetSlot,
+                        motion.targetOffsetX,
+                        motion.targetOffsetY
+                      );
+                      const startTime = motion.startTimeSec ?? 0;
+                      const endTime = motion.endTimeSec ?? sceneDuration;
+
+                      return (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-cyan-900/40">
+                          {/* Column A: Active Drag Handle + Destination Coords */}
+                          <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-1.5">
+                              <span className="text-[11px] font-semibold text-neutral-300">
+                                Chọn điểm thao tác khi bấm lên đường Line sân khấu:
+                              </span>
+                              <div className="grid grid-cols-2 gap-2">
+                                <button
+                                  onClick={() => {
+                                    setIsPreviewPlaying(false);
+                                    setPreviewTime(null);
+                                    setActiveMotionHandle("start");
+                                  }}
+                                  className={`py-2 px-3 rounded-lg text-xs font-semibold border transition-all ${
+                                    activeMotionHandle === "start"
+                                      ? "bg-emerald-700 border-emerald-400 text-white shadow"
+                                      : "bg-neutral-900 border-neutral-800 text-neutral-300 hover:bg-neutral-800"
+                                  }`}
+                                >
+                                  📍 Điểm A (X:{Math.round(pointACoords.x)})
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setIsPreviewPlaying(false);
+                                    setPreviewTime(null);
+                                    setActiveMotionHandle("target");
+                                  }}
+                                  className={`py-2 px-3 rounded-lg text-xs font-semibold border transition-all ${
+                                    activeMotionHandle === "target"
+                                      ? "bg-cyan-600 border-cyan-300 text-white shadow"
+                                      : "bg-neutral-900 border-neutral-800 text-neutral-300 hover:bg-neutral-800"
+                                  }`}
+                                >
+                                  🏁 Đích B (X:{Math.round(pointBCoords.x)})
+                                </button>
+                              </div>
+                              <p className="text-[11px] text-cyan-300/80">
+                                Mẹo: Có thể kéo trực tiếp bóng mờ <strong>ĐÍCH B</strong> màu xanh ngọc trên khung hình!
+                              </p>
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                              <div className="flex justify-between text-xs text-neutral-300">
+                                <span>Tọa độ ngang Đích B (Line X):</span>
+                                <span className="font-mono text-cyan-300">
+                                  {Math.round(pointBCoords.x)}px (gần {motion.targetSlot})
+                                </span>
+                              </div>
+                              <input
+                                type="range"
+                                min="80"
+                                max="1840"
+                                step="5"
+                                value={Math.round(pointBCoords.x)}
+                                onChange={(e) => {
+                                  const targetX = parseInt(e.target.value, 10);
+                                  const targetY = isAirPose(selectedActor.pose)
+                                    ? pointBCoords.y
+                                    : GROUND_Y;
+                                  const assigned = coordsToSlotAssignment(
+                                    targetX,
+                                    targetY,
+                                    actorRule.allowedSlots
+                                  );
+                                  updateActorTargetPosition(
+                                    selectedActor.id,
+                                    assigned.slot,
+                                    assigned.offsetX,
+                                    isAirPose(selectedActor.pose) ? assigned.offsetY : 0
+                                  );
+                                }}
+                                className="w-full accent-cyan-400"
+                              />
+                            </div>
+
+                            {isAirPose(selectedActor.pose) && (
+                              <div className="flex flex-col gap-1">
+                                <div className="flex justify-between text-xs text-neutral-300">
+                                  <span>Độ cao Y Đích B (Air Offset):</span>
+                                  <span className="font-mono text-cyan-300">
+                                    {motion.targetOffsetY || 0}px
+                                  </span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="-160"
+                                  max="180"
+                                  step="5"
+                                  value={motion.targetOffsetY || 0}
+                                  onChange={(e) =>
+                                    updateActorMotion(selectedActor.id, {
+                                      targetOffsetY: parseInt(e.target.value, 10),
+                                    })
+                                  }
+                                  className="w-full accent-cyan-400"
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Column B: Timing, Moving Pose & Easing */}
+                          <div className="flex flex-col gap-3">
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="flex flex-col gap-1">
+                                <div className="flex justify-between text-xs text-neutral-300">
+                                  <span>Bắt đầu rời A:</span>
+                                  <span className="font-mono text-cyan-300">{startTime.toFixed(1)}s</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max={Math.max(0.5, sceneDuration - 0.5)}
+                                  step="0.1"
+                                  value={startTime}
+                                  onChange={(e) => {
+                                    const val = parseFloat(e.target.value);
+                                    updateActorMotion(selectedActor.id, {
+                                      startTimeSec: val,
+                                      endTimeSec: Math.max(val + 0.3, endTime),
+                                    });
+                                  }}
+                                  className="w-full accent-cyan-400"
+                                />
+                              </div>
+
+                              <div className="flex flex-col gap-1">
+                                <div className="flex justify-between text-xs text-neutral-300">
+                                  <span>Chạm Đích B:</span>
+                                  <span className="font-mono text-cyan-300">{endTime.toFixed(1)}s</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min={Math.min(sceneDuration, startTime + 0.3)}
+                                  max={sceneDuration}
+                                  step="0.1"
+                                  value={endTime}
+                                  onChange={(e) =>
+                                    updateActorMotion(selectedActor.id, {
+                                      endTimeSec: parseFloat(e.target.value),
+                                    })
+                                  }
+                                  className="w-full accent-cyan-400"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="flex flex-col gap-1">
+                                <label className="text-xs text-neutral-300">Tư thế khi di chuyển:</label>
+                                <select
+                                  value={motion.movingPose || selectedActor.pose}
+                                  onChange={(e) =>
+                                    updateActorMotion(selectedActor.id, {
+                                      movingPose: e.target.value as CharacterPoseId,
+                                    })
+                                  }
+                                  className="bg-black border border-neutral-800 rounded-lg p-2 text-xs text-neutral-200 focus:outline-none focus:border-cyan-500"
+                                >
+                                  {isAirPose(selectedActor.pose) ? (
+                                    <>
+                                      <option value="pose_floating">Bay lơ lửng (pose_floating)</option>
+                                      <option value="pose_hanging">Đung đưa trên cao (pose_hanging)</option>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <option value="pose_walking">Bước đi (pose_walking)</option>
+                                      <option value="pose_crawling">Bò trườn (pose_crawling)</option>
+                                      <option value="pose_reaching">Vươn vuốt tiến tới (pose_reaching)</option>
+                                      <option value="pose_shivering">Run rẩy tiến bước (pose_shivering)</option>
+                                      <option value="pose_standing">Trượt giữ nguyên dáng (pose_standing)</option>
+                                    </>
+                                  )}
+                                </select>
+                              </div>
+
+                              <div className="flex flex-col gap-1">
+                                <label className="text-xs text-neutral-300">Nhịp gia tốc (Easing):</label>
+                                <select
+                                  value={motion.easing || "ease_in_out"}
+                                  onChange={(e) =>
+                                    updateActorMotion(selectedActor.id, {
+                                      easing: e.target.value as EasingType,
+                                    })
+                                  }
+                                  className="bg-black border border-neutral-800 rounded-lg p-2 text-xs text-neutral-200 focus:outline-none focus:border-cyan-500"
+                                >
+                                  <option value="ease_in_out">Mượt hai đầu (ease_in_out)</option>
+                                  <option value="linear">Đều đặn (linear)</option>
+                                  <option value="ease_in">Nhanh dần (ease_in)</option>
+                                  <option value="ease_out">Chậm dần khi tới B (ease_out)</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <label className="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer select-none pt-1">
+                              <input
+                                type="checkbox"
+                                checked={motion.autoFaceTarget !== false}
+                                onChange={(e) =>
+                                  updateActorMotion(selectedActor.id, {
+                                    autoFaceTarget: e.target.checked,
+                                  })
+                                }
+                                className="w-4 h-4 accent-cyan-400 rounded"
+                              />
+                              <span>Tự động quay mặt về hướng Điểm B khi di chuyển</span>
+                            </label>
+                          </div>
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <p className="text-xs text-neutral-400">
+                      Hiện tại nhân vật đang đứng tĩnh tại Điểm A. Bấm{" "}
+                      <strong className="text-cyan-300">+ Bật Di Chuyển A → B</strong> để thiết lập đường chạy hoặc lướt ma mị theo thời gian cảnh.
+                    </p>
+                  )}
+                </div>
                 </div>
               ) : (
                 <div className="p-8 text-center text-xs text-neutral-500">

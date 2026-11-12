@@ -1,5 +1,5 @@
 {
-  "version": "1.2",
+  "version": "1.3",
   "name": "Silhouette Horror 2D Procedural Graphics Library - Extended Assets & Placement Rules",
   "style": "Silhouette Minimalist Horror (Limbo / Badland / U Linh Kỳ Truyện)",
   "standard_resolution": {
@@ -383,5 +383,18 @@
       "allowed_slots": ["air_left", "air_center", "air_right"],
       "anchor": "bottom-center"
     }
-  ]
+  ],
+  "actor_motion_schema": {
+    "description": "Cơ chế chuyển động keyframe từ Điểm A (slot/offsetX/offsetY) sang Điểm B (targetSlot/targetOffsetX/targetOffsetY) theo thời gian cảnh",
+    "fields": {
+      "targetSlot": "SlotId hợp lệ theo quy tắc Ground/Air của nhân vật",
+      "targetOffsetX": "Tinh chỉnh tọa độ X tại Điểm B (ví dụ di chuyển tự do trên Ground Line X=80..1840)",
+      "targetOffsetY": "Tinh chỉnh tọa độ Y tại Điểm B (chỉ dùng cho pose trên không; pose tiếp đất luôn khóa Y=800)",
+      "startTimeSec": "Thời điểm bắt đầu rời Điểm A (giây, mặc định 0)",
+      "endTimeSec": "Thời điểm chạm Điểm B (giây, mặc định duration_sec)",
+      "easing": ["linear", "ease_in_out", "ease_in", "ease_out"],
+      "autoFaceTarget": "Boolean - tự quay mặt về phía Điểm B khi di chuyển (mặc định true)",
+      "movingPose": "CharacterPoseId dùng trong lúc đang di chuyển (ví dụ pose_walking hoặc pose_floating)"
+    }
+  }
 }

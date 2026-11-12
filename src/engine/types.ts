@@ -89,6 +89,19 @@ export interface DetailItemConfig {
   scale?: number;
 }
 
+export type EasingType = "linear" | "ease_in_out" | "ease_in" | "ease_out";
+
+export interface ActorMotionConfig {
+  targetSlot: SlotId;
+  targetOffsetX?: number;
+  targetOffsetY?: number;
+  startTimeSec?: number;  // Default: 0
+  endTimeSec?: number;    // Default: scene duration
+  easing?: EasingType;    // Default: "ease_in_out"
+  autoFaceTarget?: boolean; // Automatically turn toward destination when moving (default: true)
+  movingPose?: CharacterPoseId; // Optional pose override while actively moving (e.g. pose_walking / pose_floating)
+}
+
 export interface ActorConfig {
   id: string;
   base: CharacterBaseId;
@@ -101,6 +114,7 @@ export interface ActorConfig {
   offsetY?: number; // Optional fine-tuning in px
   scale?: number;   // Optional scaling factor
   opacity?: number; // e.g. 0.0 - 1.0 for spectral ghost
+  motion?: ActorMotionConfig; // Optional A -> B keyframe movement
 }
 
 export interface DirectorLightingConfig {

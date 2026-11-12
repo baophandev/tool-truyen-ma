@@ -26,6 +26,7 @@ import { StructureRenderer } from "./graphics/Structures";
 import { CharacterRig } from "./graphics/CharacterRig";
 import { DetailRenderer } from "./graphics/Details";
 import { soundEngine } from "./AudioSynthesizer";
+import { evaluateActorAtTime } from "./motionUtils";
 
 export type DragSnapMode = "strict_slot" | "allowed_offset";
 
@@ -33,21 +34,24 @@ interface SceneRendererProps {
   script: DirectorSceneScript;
   showGizmo?: boolean;
   showSubtitles?: boolean;
+  currentTime?: number;
   selectedEntity?: SelectedEntity;
   activeActorId?: string | null;
+  activeMotionHandle?: "start" | "target";
   interactiveDrag?: boolean;
   dragSnapMode?: DragSnapMode;
   onSelectEntity?: (entity: SelectedEntity) => void;
   onSelectActor?: (actorId: string) => void;
   onSelectSlot?: (slotId: SlotId) => void;
   onUpdateActorPosition?: (actorId: string, slot: SlotId, offsetX: number, offsetY: number) => void;
+  onUpdateActorTargetPosition?: (actorId: string, targetSlot: SlotId, targetOffsetX: number, targetOffsetY: number) => void;
   onUpdateStructurePosition?: (structIndex: number, slot: GroundSlotId, offsetX: number, offsetY: number) => void;
   onUpdateDetailPosition?: (detailId: string, slot: SlotId, offsetX: number, offsetY: number) => void;
   svgRef?: React.RefObject<SVGSVGElement | null>;
 }
 
 interface DragSession {
-  type: "actor" | "structure" | "detail";
+  type: "actor" | "actor_target" | "structure" | "detail";
   id: string; // actorId, detailId, or String(index)
   index?: number;
   entityLabel: string;
@@ -68,14 +72,17 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
   script,
   showGizmo = false,
   showSubtitles = true,
+  currentTime,
   selectedEntity,
   activeActorId = null,
+  activeMotionHandle = "start",
   interactiveDrag = true,
   dragSnapMode = "allowed_offset",
   onSelectEntity,
   onSelectActor,
   onSelectSlot,
   onUpdateActorPosition,
+  onUpdateActorTargetPosition,
   onUpdateStructurePosition,
   onUpdateDetailPosition,
   svgRef: externalSvgRef,
@@ -151,7 +158,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
     entityCoords: { x: number; y: number },
     currentSlot: SlotId,
     offsetX = 0,
-    offsetY = 0
+    offsetY = 0,
+    sessionTypeOverride?: DragSession["type"]
   ) => {
     const rule = getSelectionRuleInfo(entity);
     if (!rule) return;
@@ -167,11 +175,16 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
       // In case element capture is not supported
     }
 
+    const sessionType = sessionTypeOverride || entity.type;
+
     const session: DragSession = {
-      type: entity.type,
+      type: sessionType,
       id: entity.type === "structure" ? String(entity.index) : entity.id,
       index: entity.type === "structure" ? entity.index : undefined,
-      entityLabel: rule.label,
+      entityLabel:
+        sessionType === "actor_target" && entity.type === "actor"
+          ? `Đích B: ${entity.id}`
+          : rule.label,
       allowedSlots: rule.allowedSlots,
       ruleReason: rule.reason,
       initialPointerSvg: svgPt,
@@ -192,7 +205,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
     lastSnapRef.current = false;
   };
 
-  // Start dragging Actor
+  // Start dragging Actor (Point A)
   const handleActorPointerDown = (e: React.PointerEvent, actorId: string) => {
     if (!interactiveDrag) return;
     e.stopPropagation();
@@ -208,6 +221,30 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
       actor.slot,
       actor.offsetX || 0,
       actor.offsetY || 0
+    );
+  };
+
+  // Start dragging Actor Motion Destination (Point B)
+  const handleActorTargetPointerDown = (e: React.PointerEvent, actorId: string) => {
+    if (!interactiveDrag) return;
+    e.stopPropagation();
+
+    const actor = actors.find((a) => a.id === actorId);
+    if (!actor || !actor.motion) return;
+
+    const targetCoords = getSlotCoordinates(
+      actor.motion.targetSlot,
+      actor.motion.targetOffsetX,
+      actor.motion.targetOffsetY
+    );
+    selectAndStartDrag(
+      e,
+      { type: "actor", id: actorId },
+      targetCoords,
+      actor.motion.targetSlot,
+      actor.motion.targetOffsetX || 0,
+      actor.motion.targetOffsetY || 0,
+      "actor_target"
     );
   };
 
@@ -271,6 +308,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
 
     if (session.type === "actor" && onUpdateActorPosition) {
       onUpdateActorPosition(session.id, finalSlot, finalOffsetX, finalOffsetY);
+    } else if (session.type === "actor_target" && onUpdateActorTargetPosition) {
+      onUpdateActorTargetPosition(session.id, finalSlot, finalOffsetX, finalOffsetY);
     } else if (
       session.type === "structure" &&
       onUpdateStructurePosition &&
@@ -282,7 +321,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
     }
   };
 
-  // Click anywhere along continuous Ground Line Y = 800px to place selected actor/detail there
+  // Click anywhere along continuous Ground Line Y = 800px to place selected actor (Point A/B) or detail there
   const handleGroundRunwayClick = (e: React.MouseEvent) => {
     if (!interactiveDrag || !effectiveSelection || !activeRuleAllowedSlots) return;
     if (!supportsContinuousGroundPlacement(activeRuleAllowedSlots)) return;
@@ -297,8 +336,12 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
 
     soundEngine.triggerSnapClick();
 
-    if (effectiveSelection.type === "actor" && onUpdateActorPosition) {
-      onUpdateActorPosition(effectiveSelection.id, assigned.slot, assigned.offsetX, 0);
+    if (effectiveSelection.type === "actor") {
+      if (activeMotionHandle === "target" && onUpdateActorTargetPosition) {
+        onUpdateActorTargetPosition(effectiveSelection.id, assigned.slot, assigned.offsetX, 0);
+      } else if (onUpdateActorPosition) {
+        onUpdateActorPosition(effectiveSelection.id, assigned.slot, assigned.offsetX, 0);
+      }
     } else if (effectiveSelection.type === "detail" && onUpdateDetailPosition) {
       onUpdateDetailPosition(effectiveSelection.id, assigned.slot, assigned.offsetX, 0);
     }
@@ -555,13 +598,80 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
             })}
           </g>
 
+          {/* Motion Trajectories (A -> B Path Lines in Editor/Gizmo Mode) */}
+          {(interactiveDrag || showGizmo) && (
+            <g id="motion-trajectories-group" pointerEvents="none">
+              {actors.map((actor) => {
+                if (!actor.motion) return null;
+                const evaluated = evaluateActorAtTime(actor, currentTime, script.duration_sec || 6);
+                const isSelected = effectiveSelection?.type === "actor" && effectiveSelection.id === actor.id;
+                const isDraggingA = dragSession?.type === "actor" && dragSession.id === actor.id;
+                const isDraggingB = dragSession?.type === "actor_target" && dragSession.id === actor.id;
+
+                const startPt = isDraggingA ? dragSession.currentCoords : evaluated.pointA;
+                const endPt = isDraggingB ? dragSession.currentCoords : evaluated.pointB;
+                const dx = endPt.x - startPt.x;
+                const dy = endPt.y - startPt.y;
+                const dist = Math.hypot(dx, dy);
+
+                return (
+                  <g key={`motion-path-${actor.id}`} opacity={isSelected || isDraggingA || isDraggingB ? 0.95 : 0.45}>
+                    {/* Dashed Path from A to B */}
+                    <line
+                      x1={startPt.x}
+                      y1={startPt.y - 110}
+                      x2={endPt.x}
+                      y2={endPt.y - 110}
+                      stroke="#22D3EE"
+                      strokeWidth={isSelected || isDraggingB ? "3" : "2"}
+                      strokeDasharray="10,7"
+                    />
+                    <line
+                      x1={startPt.x}
+                      y1={startPt.y}
+                      x2={endPt.x}
+                      y2={endPt.y}
+                      stroke="#22D3EE"
+                      strokeWidth="1.5"
+                      strokeDasharray="5,5"
+                      opacity="0.6"
+                    />
+
+                    {/* Start Marker A */}
+                    <circle cx={startPt.x} cy={startPt.y} r="7" fill="#10B981" stroke="#022C22" strokeWidth="2" />
+                    <text
+                      x={startPt.x}
+                      y={startPt.y + 24}
+                      textAnchor="middle"
+                      fill="#6EE7B7"
+                      fontSize="11"
+                      fontWeight="bold"
+                      fontFamily="monospace"
+                    >
+                      A ({Math.round(startPt.x)})
+                    </text>
+
+                    {/* Midpoint Arrow Direction Indicator */}
+                    {dist > 40 && (
+                      <g
+                        transform={`translate(${(startPt.x + endPt.x) / 2}, ${(startPt.y + endPt.y) / 2 - 110}) rotate(${(Math.atan2(dy, dx) * 180) / Math.PI})`}
+                      >
+                        <polygon points="-8,-6 10,0 -8,6 -4,0" fill="#22D3EE" />
+                      </g>
+                    )}
+                  </g>
+                );
+              })}
+            </g>
+          )}
+
           {/* Actors / Modular Character Rigs */}
           <g id="actors-group">
             {actors.map((actor) => {
-              const coords = getSlotCoordinates(actor.slot, actor.offsetX, actor.offsetY);
+              const evaluated = evaluateActorAtTime(actor, currentTime, script.duration_sec || 6);
               const isSelected = effectiveSelection?.type === "actor" && effectiveSelection.id === actor.id;
               const isBeingDragged = dragSession?.type === "actor" && dragSession.id === actor.id;
-              const displayCoords = isBeingDragged ? dragSession.currentCoords : coords;
+              const displayCoords = isBeingDragged ? dragSession.currentCoords : evaluated.coords;
 
               return (
                 <g
@@ -601,8 +711,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                     base={actor.base}
                     costume={actor.costume}
                     face={actor.face}
-                    pose={actor.pose}
-                    facing={actor.facing}
+                    pose={evaluated.pose}
+                    facing={evaluated.facing}
                     scale={actor.scale || 1}
                     opacity={actor.opacity !== undefined ? actor.opacity : 1}
                     showSockets={showGizmo || isSelected || isBeingDragged}
@@ -620,13 +730,94 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                       fontFamily="monospace"
                       filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))"
                     >
-                      {actor.id} ({actor.slot})
+                      {actor.id} ({actor.slot}{evaluated.hasMotion ? " → B" : ""})
                     </text>
                   )}
                 </g>
               );
             })}
           </g>
+
+          {/* Draggable Destination Handles (Point B Ghosts in Interactive Editor Mode) */}
+          {interactiveDrag && (
+            <g id="motion-targets-group">
+              {actors.map((actor) => {
+                if (!actor.motion) return null;
+                const evaluated = evaluateActorAtTime(actor, currentTime, script.duration_sec || 6);
+                const isSelected = effectiveSelection?.type === "actor" && effectiveSelection.id === actor.id;
+                const isDraggingB = dragSession?.type === "actor_target" && dragSession.id === actor.id;
+                const displayB = isDraggingB ? dragSession.currentCoords : evaluated.pointB;
+                const ghostFacing =
+                  actor.motion.autoFaceTarget !== false && Math.abs(displayB.x - evaluated.pointA.x) > 4
+                    ? displayB.x >= evaluated.pointA.x
+                      ? "right"
+                      : "left"
+                    : actor.facing;
+
+                return (
+                  <g
+                    key={`motion-target-${actor.id}`}
+                    transform={`translate(${displayB.x}, ${displayB.y})`}
+                    className="cursor-grab active:cursor-grabbing"
+                    onPointerDown={(e) => handleActorTargetPointerDown(e, actor.id)}
+                  >
+                    <rect x="-56" y="-305" width="112" height="320" fill="transparent" />
+
+                    {/* Ghost Silhouette at Point B */}
+                    <CharacterRig
+                      id={`ghost-b-${actor.id}`}
+                      base={actor.base}
+                      costume={actor.costume}
+                      face={actor.face}
+                      pose={actor.motion.movingPose || actor.pose}
+                      facing={ghostFacing}
+                      scale={actor.scale || 1}
+                      opacity={isSelected || isDraggingB ? 0.36 : 0.18}
+                      showSockets={false}
+                    />
+
+                    {/* Target Ring & Pin */}
+                    <ellipse
+                      cx="0"
+                      cy="0"
+                      rx="46"
+                      ry="13"
+                      fill="rgba(34, 211, 238, 0.14)"
+                      stroke={isDraggingB && !dragSession.isOverAllowedZone ? "#EF4444" : "#22D3EE"}
+                      strokeWidth={isSelected || isDraggingB ? "3" : "2"}
+                      strokeDasharray="6,4"
+                    />
+                    <circle cx="0" cy="0" r="8" fill="#22D3EE" stroke="#083344" strokeWidth="2.5" />
+
+                    {/* Interactive Handle Badge */}
+                    <g transform="translate(0, -312)">
+                      <rect
+                        x="-58"
+                        y="-16"
+                        width="116"
+                        height="24"
+                        rx="6"
+                        fill={isSelected && activeMotionHandle === "target" ? "#0891B2" : "#082F49"}
+                        stroke="#22D3EE"
+                        strokeWidth="1.8"
+                      />
+                      <text
+                        x="0"
+                        y="0"
+                        textAnchor="middle"
+                        fill="#ECFEFF"
+                        fontSize="11"
+                        fontWeight="bold"
+                        fontFamily="monospace"
+                      >
+                        {`ĐÍCH B (${Math.round(displayB.x)})`}
+                      </text>
+                    </g>
+                  </g>
+                );
+              })}
+            </g>
+          )}
 
           {/* Scene Details / Horror Props */}
           <g id="details-group">
@@ -993,6 +1184,14 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                   ? `🎯 HÚT VÀO ĐIỂM NEO: ${dragSession.candidateSlot.toUpperCase()}`
                   : !dragSession.isOverAllowedZone
                   ? `⚠ VÙNG BỊ KHÓA — TRẢ VỀ: ${dragSession.candidateSlot.toUpperCase()}`
+                  : dragSession.type === "actor_target"
+                  ? `🏁 ĐÍCH B (Tới ${dragSession.candidateSlot.toUpperCase()}): X=${Math.round(
+                      dragSession.currentCoords.x
+                    )}px${
+                      dragSession.currentCoords.y === GROUND_Y
+                        ? ", Y=800"
+                        : `, Y=${Math.round(dragSession.currentCoords.y)}`
+                    }`
                   : dragSnapMode === "allowed_offset"
                   ? `📍 ĐỨNG TẠI LINE: X=${Math.round(dragSession.currentCoords.x)}px (${
                       dragSession.currentCoords.y === GROUND_Y

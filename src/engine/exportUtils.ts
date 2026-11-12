@@ -73,7 +73,8 @@ export async function exportPngSnapshot(
 export async function recordSvgToVideo(
   svgElement: SVGSVGElement,
   durationSec: number,
-  onProgress?: (progressPercent: number) => void
+  onProgress?: (progressPercent: number) => void,
+  onTimeStep?: (timeSec: number) => Promise<void> | void
 ): Promise<Blob> {
   const width = 1920;
   const height = 1080;
@@ -96,8 +97,8 @@ export async function recordSvgToVideo(
   };
 
   const serializer = new XMLSerializer();
-  const totalFrames = Math.floor(durationSec * 30);
-  let frameCount = 0;
+  const fps = 30;
+  const totalFrames = Math.max(1, Math.floor(durationSec * fps));
 
   return new Promise((resolve, reject) => {
     recorder.onstop = () => {
@@ -106,38 +107,64 @@ export async function recordSvgToVideo(
     };
 
     recorder.onerror = (e) => reject(e);
-    recorder.start();
 
-    const intervalTime = 1000 / 30;
-    const interval = setInterval(async () => {
-      frameCount++;
-      if (onProgress) onProgress(Math.min(100, Math.round((frameCount / totalFrames) * 100)));
+    const runCapture = async () => {
+      recorder.start();
+      const frameDurationMs = 1000 / fps;
 
-      try {
-        const svgString = serializer.serializeToString(svgElement);
-        const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
-        const url = URL.createObjectURL(svgBlob);
-        const img = new Image();
+      for (let frameIdx = 0; frameIdx < totalFrames; frameIdx++) {
+        const frameStart = performance.now();
+        const timeSec = frameIdx / fps;
 
-        await new Promise((res, rej) => {
-          img.onload = res;
-          img.onerror = rej;
-          img.src = url;
-        });
+        if (onTimeStep) {
+          await onTimeStep(timeSec);
+          // Let React commit updated SVG actor transforms before serialization
+          await new Promise<void>((res) => {
+            const fallback = window.setTimeout(res, 50);
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                window.clearTimeout(fallback);
+                res();
+              });
+            });
+          });
+        }
 
-        ctx.fillStyle = "#0A0A0C";
-        ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
-        URL.revokeObjectURL(url);
-      } catch (err) {
-        console.warn("Frame capture error:", err);
+        if (onProgress) {
+          onProgress(Math.min(100, Math.round(((frameIdx + 1) / totalFrames) * 100)));
+        }
+
+        try {
+          const svgString = serializer.serializeToString(svgElement);
+          const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+          const url = URL.createObjectURL(svgBlob);
+          const img = new Image();
+
+          await new Promise((res, rej) => {
+            img.onload = res;
+            img.onerror = rej;
+            img.src = url;
+          });
+
+          ctx.fillStyle = "#0A0A0C";
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          console.warn("Frame capture error:", err);
+        }
+
+        const elapsed = performance.now() - frameStart;
+        const waitMs = Math.max(0, frameDurationMs - elapsed);
+        if (waitMs > 0) {
+          await new Promise((res) => setTimeout(res, waitMs));
+        }
       }
 
-      if (frameCount >= totalFrames) {
-        clearInterval(interval);
-        setTimeout(() => recorder.stop(), 200);
-      }
-    }, intervalTime);
+      setTimeout(() => recorder.stop(), 200);
+    };
+
+    runCapture().catch(reject);
   });
 }
 

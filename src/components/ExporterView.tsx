@@ -40,16 +40,26 @@ export const ExporterView: React.FC<ExporterViewProps> = ({
   const [importErrors, setImportErrors] = useState<string[]>([]);
   const [importSuccess, setImportSuccess] = useState<boolean>(false);
 
+  const [exportTime, setExportTime] = useState<number>(0);
+
   // Handle Video Recording
   const handleRecordVideo = async () => {
     if (!svgRef) return;
     try {
       setIsRecording(true);
       setRecordProgress(0);
+      setExportTime(0);
 
-      const videoBlob = await recordSvgToVideo(svgRef, recordDuration, (pct) => {
-        setRecordProgress(pct);
-      });
+      const videoBlob = await recordSvgToVideo(
+        svgRef,
+        recordDuration,
+        (pct) => {
+          setRecordProgress(pct);
+        },
+        (timeSec) => {
+          setExportTime(timeSec);
+        }
+      );
 
       const filename = `${currentScene.scene_id || "horror_film"}_${recordDuration}s.webm`;
       const url = URL.createObjectURL(videoBlob);
@@ -114,6 +124,8 @@ Hệ thống đồ họa 2D thuần code có các tài nguyên và tọa độ c
 - Actor Faces: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered"
 - Actor Poses: "pose_standing" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging"
 - Actor Facing: "left" | "right"
+- Actor Motion (Tùy chọn di chuyển từ Điểm A -> Điểm B trong cảnh):
+  "motion": { "targetSlot": SlotId, "targetOffsetX": number, "targetOffsetY": number, "startTimeSec": number, "endTimeSec": number, "easing": "linear"|"ease_in_out"|"ease_in"|"ease_out", "autoFaceTarget": true, "movingPose": CharacterPoseId }
 
 HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc DirectorSceneScript:
 {
@@ -194,6 +206,7 @@ HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc Direct
               script={currentScene}
               showGizmo={false}
               showSubtitles={true}
+              currentTime={isRecording ? exportTime : undefined}
               interactiveDrag={false}
               svgRef={{
                 get current() {

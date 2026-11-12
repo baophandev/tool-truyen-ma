@@ -198,6 +198,28 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
             `actors[${idx}].slot "${actor.slot}" không phù hợp với pose "${actor.pose}". Cho phép: ${actorRule.allowedSlots.join(" | ")}`
           );
         }
+        if (actor.motion !== undefined) {
+          if (!actor.motion || typeof actor.motion !== "object") {
+            errors.push(`actors[${idx}].motion phải là một Object hợp lệ`);
+          } else {
+            if (!VALID_SLOTS.includes(actor.motion.targetSlot)) {
+              errors.push(`actors[${idx}].motion.targetSlot "${actor.motion.targetSlot}" không hợp lệ`);
+            } else if (!isSlotAllowed(actor.motion.targetSlot, actorRule.allowedSlots)) {
+              errors.push(
+                `actors[${idx}].motion.targetSlot "${actor.motion.targetSlot}" không phù hợp quy tắc vùng của pose "${actor.pose}". Cho phép: ${actorRule.allowedSlots.join(" | ")}`
+              );
+            }
+            if (
+              actor.motion.easing !== undefined &&
+              !["linear", "ease_in_out", "ease_in", "ease_out"].includes(actor.motion.easing)
+            ) {
+              errors.push(`actors[${idx}].motion.easing "${actor.motion.easing}" không hợp lệ`);
+            }
+            if (actor.motion.movingPose !== undefined && !VALID_POSES.includes(actor.motion.movingPose)) {
+              errors.push(`actors[${idx}].motion.movingPose "${actor.motion.movingPose}" không hợp lệ`);
+            }
+          }
+        }
       }
     });
   }
@@ -255,6 +277,29 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       offsetY: Number(ac.offsetY) || 0,
       scale: Number(ac.scale) || 1,
       opacity: ac.opacity !== undefined ? Number(ac.opacity) : 1,
+      ...(ac.motion
+        ? {
+            motion: {
+              targetSlot: ac.motion.targetSlot,
+              targetOffsetX: Number(ac.motion.targetOffsetX) || 0,
+              targetOffsetY:
+                ac.pose === "pose_floating" || ac.pose === "pose_hanging"
+                  ? Number(ac.motion.targetOffsetY) || 0
+                  : 0,
+              startTimeSec:
+                ac.motion.startTimeSec !== undefined
+                  ? Math.max(0, Number(ac.motion.startTimeSec) || 0)
+                  : 0,
+              endTimeSec:
+                ac.motion.endTimeSec !== undefined
+                  ? Math.max(0, Number(ac.motion.endTimeSec))
+                  : undefined,
+              easing: ac.motion.easing || "ease_in_out",
+              autoFaceTarget: ac.motion.autoFaceTarget !== false,
+              movingPose: ac.motion.movingPose,
+            },
+          }
+        : {}),
     })),
     details: Array.isArray(script.details)
       ? script.details.map((dt: any, idx: number) => ({
