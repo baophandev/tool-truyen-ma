@@ -1,0 +1,268 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #06070a;
+    color: #e2e8f0;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+}
+
+/* =========================================================
+   PROCEDURAL SVG HORROR KEYFRAME ANIMATIONS
+   ========================================================= */
+
+/* 1. Character Idle Breathing */
+@keyframes rig-breathe {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.rig-idle {
+  animation: rig-breathe 4s ease-in-out infinite;
+}
+
+/* 2. Character Shivering / Trembling in Terror */
+@keyframes rig-shiver {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-1.5px, 0.8px); }
+  40% { transform: translate(1.2px, -1px); }
+  60% { transform: translate(-0.8px, 1.2px); }
+  80% { transform: translate(1.4px, -0.6px); }
+  100% { transform: translate(0, 0); }
+}
+
+.rig-shivering {
+  animation: rig-shiver 0.12s linear infinite;
+}
+
+/* 3. Character Walking Cycle */
+@keyframes rig-walk-sway {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(1.5deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(-1.5deg);
+  }
+}
+
+.rig-walking {
+  animation: rig-walk-sway 1.2s ease-in-out infinite;
+}
+
+/* 4. Ghost Floating Bobbing */
+@keyframes rig-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-24px);
+  }
+}
+
+.rig-floating {
+  animation: rig-float 3.5s ease-in-out infinite;
+}
+
+/* 4b. Crawling on Ground */
+@keyframes rig-crawl-sway {
+  0%, 100% { transform: translateY(12px) skewX(2deg); }
+  50% { transform: translateY(8px) skewX(-2deg); }
+}
+
+.rig-crawling {
+  animation: rig-crawl-sway 1.4s ease-in-out infinite;
+}
+
+/* 4c. Hanging Pendulum Sway */
+@keyframes rig-hang-swing {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+.rig-hanging {
+  animation: rig-hang-swing 4s ease-in-out infinite;
+  transform-origin: 0 -250px;
+}
+
+/* 4d. Reaching Arm Lunge */
+@keyframes arms-reaching {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(8px); }
+}
+
+.anim-arms-reaching {
+  animation: arms-reaching 2s ease-in-out infinite;
+}
+
+/* 4e. Jiangshi Hop / Rigid bob */
+@keyframes jiangshi-rigid {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.anim-arms-rigid {
+  animation: jiangshi-rigid 1s steps(2) infinite;
+}
+
+/* 5. Ghost Tail Flutter */
+@keyframes ghost-tail-flutter {
+  0%, 100% {
+    transform: scaleX(1) skewX(0deg);
+  }
+  50% {
+    transform: scaleX(1.08) skewX(4deg);
+  }
+}
+
+.anim-ghost-tail {
+  animation: ghost-tail-flutter 2.8s ease-in-out infinite;
+  transform-origin: 0 -90px;
+}
+
+/* 6. Cloud Drifting */
+@keyframes cloud-drift-slow {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-350px); }
+}
+
+@keyframes cloud-drift-fast {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-500px); }
+}
+
+.anim-cloud-drift-slow {
+  animation: cloud-drift-slow 40s linear infinite alternate;
+}
+
+.anim-cloud-drift-fast {
+  animation: cloud-drift-fast 25s linear infinite alternate;
+}
+
+/* 7. Creeping Ground Fog Wave */
+@keyframes fog-wave-slow {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(-120px) translateY(-8px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes fog-wave-fast {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(140px) translateY(6px); }
+  100% { transform: translateX(0); }
+}
+
+.anim-fog-wave-slow {
+  animation: fog-wave-slow 16s ease-in-out infinite;
+}
+
+.anim-fog-wave-fast {
+  animation: fog-wave-fast 12s ease-in-out infinite;
+}
+
+/* 8. Lightning Flash */
+@keyframes lightning-flash {
+  0%, 88%, 93%, 100% { opacity: 0; }
+  89% { opacity: 0.75; }
+  90% { opacity: 0.2; }
+  91% { opacity: 0.85; }
+  92% { opacity: 0.1; }
+}
+
+.anim-lightning-flash {
+  animation: lightning-flash 7s infinite;
+}
+
+/* 9. Incense Ember Flicker */
+@keyframes flicker-ember {
+  0%, 100% { opacity: 0.8; filter: drop-shadow(0 0 2px #dc2626); }
+  50% { opacity: 1; filter: drop-shadow(0 0 6px #ef4444); }
+}
+
+.anim-flicker-ember {
+  animation: flicker-ember 1.5s ease-in-out infinite;
+}
+
+/* 10. Incense Smoke Rise */
+@keyframes smoke-rise {
+  0% { transform: translateY(0) scaleX(1); opacity: 0.35; }
+  50% { transform: translateY(-15px) scaleX(1.3); opacity: 0.2; }
+  100% { transform: translateY(-30px) scaleX(1.6); opacity: 0; }
+}
+
+.anim-smoke-rise {
+  animation: smoke-rise 4s ease-out infinite;
+}
+
+/* 11. Bamboo Sway */
+@keyframes bamboo-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-1.5deg); }
+}
+
+.anim-bamboo-sway {
+  animation: bamboo-sway 5s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* 12. Subtle Tree Roots Sway */
+@keyframes sway-subtle {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(1deg); }
+}
+
+.anim-sway-subtle {
+  animation: sway-subtle 4s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+/* 13. Moon Pulse Glow */
+@keyframes moon-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.anim-moon-pulse {
+  animation: moon-pulse 6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* 14. Eerie Pulse */
+@keyframes pulse-eerie {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.anim-pulse-eerie {
+  animation: pulse-eerie 2.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Custom Scrollbar for horror studio */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #090a0f;
+}
+::-webkit-scrollbar-thumb {
+  background: #232733;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7f1d1d;
+}

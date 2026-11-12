@@ -1,0 +1,343 @@
+{
+  "version": "1.1",
+  "name": "Silhouette Horror 2D Procedural Graphics Library - Extended Assets",
+  "style": "Silhouette Minimalist Horror (Limbo / Badland / U Linh Kỳ Truyện)",
+  "standard_resolution": {
+    "viewBox": "0 0 1920 1080",
+    "width": 1920,
+    "height": 1080,
+    "ground_y": 800,
+    "aspect_ratio": "16:9"
+  },
+  "environments": {
+    "themes": [
+      {
+        "id": "rural_graveyard",
+        "name": "Bãi tha ma nông thôn",
+        "desc": "Khu nghĩa địa âm u hoang tàn, bia đá rêu phong nghiêng ngả, rặng tre ma mị và sương mù dày đặc",
+        "sky_options": ["blood_moon", "foggy_night", "eclipse_abyss"]
+      },
+      {
+        "id": "abandoned_village",
+        "name": "Đường làng hoang vắng",
+        "desc": "Con đường đất quanh co vắng lặng, lều tranh xiêu vẹo rách nát, cây đa cổ thụ u uất",
+        "sky_options": ["stormy_dark", "foggy_night", "blood_moon"]
+      },
+      {
+        "id": "cursed_swamp",
+        "name": "Đầm lầy u minh",
+        "desc": "Vùng nước chết tĩnh mịch ngập chìm trong sương độc, lau sậy khẳng khiu, cây khô mục và bãi tha ma sình lầy",
+        "sky_options": ["eclipse_abyss", "foggy_night", "stormy_dark"]
+      }
+    ],
+    "sky_presets": [
+      {
+        "id": "blood_moon",
+        "name": "Trăng Máu U Uất",
+        "palette": {
+          "top": "#2B0808",
+          "bottom": "#0D0202",
+          "moon": "#DC2626",
+          "moon_glow": "#991B1B",
+          "fog": "rgba(153, 27, 27, 0.28)"
+        }
+      },
+      {
+        "id": "foggy_night",
+        "name": "Đêm Sương Lạnh Buốt",
+        "palette": {
+          "top": "#06070B",
+          "bottom": "#141724",
+          "moon": "#E2E8F0",
+          "moon_glow": "#94A3B8",
+          "fog": "rgba(226, 232, 240, 0.22)"
+        }
+      },
+      {
+        "id": "stormy_dark",
+        "name": "Bão Đêm Sấm Chớp",
+        "palette": {
+          "top": "#030408",
+          "bottom": "#0B0E17",
+          "moon": "#64748B",
+          "moon_glow": "#334155",
+          "fog": "rgba(30, 41, 59, 0.35)"
+        }
+      },
+      {
+        "id": "eclipse_abyss",
+        "name": "Nhật Thực Hắc Ám & Ma Trơi",
+        "palette": {
+          "top": "#021A12",
+          "bottom": "#04090E",
+          "moon": "#06070A",
+          "moon_glow": "rgba(16, 185, 129, 0.45)",
+          "fog": "rgba(16, 185, 129, 0.25)"
+        }
+      }
+    ],
+    "structures": [
+      {
+        "id": "creepy_banyan_tree",
+        "name": "Cây đa cổ thụ cành trơ trụi",
+        "semantic_role": "Tạo vẻ thê lương, nơi trú ngụ của bóng ma",
+        "allowed_slots": ["far_left", "far_right"],
+        "layer": "midground",
+        "width": 520,
+        "height": 650,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "ancient_tomb",
+        "name": "Ngôi mộ cổ nứt nẻ và bia đá",
+        "semantic_role": "Tâm điểm hiện tượng dị thường",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 320,
+        "height": 260,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "dilapidated_hut",
+        "name": "Căn lều tranh xiêu vẹo",
+        "semantic_role": "Nơi trú ẩn hoặc nguồn cơn rùng rợn",
+        "allowed_slots": ["far_left", "center", "far_right"],
+        "layer": "midground",
+        "width": 500,
+        "height": 380,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "abandoned_shrine",
+        "name": "Miếu hoang cô hồn cổ kính",
+        "semantic_role": "Nơi thờ cúng quỷ dị bị bỏ hoang, đèn lồng rách và bàn thờ nghi ngút âm khí",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 420,
+        "height": 340,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "broken_wooden_bridge",
+        "name": "Cầu khỉ gãy nhịp qua đầm lầy",
+        "semantic_role": "Chặn lối thoái lui, tay ma vươn lên từ nước đen",
+        "allowed_slots": ["far_left", "center", "far_right"],
+        "layer": "midground",
+        "width": 460,
+        "height": 210,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "scarecrow_of_the_damned",
+        "name": "Bù nhìn rơm bị quỷ ám",
+        "semantic_role": "Vật canh giữ kỳ quái, đầu bao rách nát và quạ vây quanh",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 240,
+        "height": 330,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "creepy_well",
+        "name": "Giếng cạn oan hồn",
+        "semantic_role": "Nơi xuất hiện bóng ma trồi lên từ đáy giếng sâu",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 260,
+        "height": 220,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "haunted_gallows_tree",
+        "name": "Cây treo cổ rủ cành liễu ma mị",
+        "semantic_role": "Khơi gợi án mạng thê lương, thòng lọng đung đưa kẽo kẹt",
+        "allowed_slots": ["far_left", "far_right"],
+        "layer": "midground",
+        "width": 450,
+        "height": 580,
+        "anchor": "bottom-center"
+      }
+    ]
+  },
+  "layout_slots": {
+    "ground": {
+      "ground_y": 800,
+      "slots": [
+        { "id": "far_left", "x": 250, "y": 800, "desc": "Cạnh trái mặt đất" },
+        { "id": "mid_left", "x": 600, "y": 800, "desc": "Nửa trái mặt đất" },
+        { "id": "center", "x": 960, "y": 800, "desc": "Trung tâm mặt đất" },
+        { "id": "mid_right", "x": 1320, "y": 800, "desc": "Nửa phải mặt đất" },
+        { "id": "far_right", "x": 1670, "y": 800, "desc": "Cạnh phải mặt đất" }
+      ]
+    },
+    "air": {
+      "slots": [
+        { "id": "air_left", "x": 400, "y": 350, "desc": "Khoảng không trên cao bên trái" },
+        { "id": "air_center", "x": 960, "y": 280, "desc": "Khoảng không trên cao chính giữa" },
+        { "id": "air_right", "x": 1520, "y": 350, "desc": "Khoảng không trên cao bên phải" }
+      ]
+    }
+  },
+  "characters": {
+    "rig_specification": {
+      "standard_height": 300,
+      "anchor": "bottom-center [0, 0]",
+      "sockets": {
+        "ground": [0, 0],
+        "hip": [0, -90],
+        "shoulder_left": [-25, -190],
+        "shoulder_right": [25, -190],
+        "neck": [0, -210],
+        "head": [0, -250]
+      }
+    },
+    "bases": [
+      {
+        "id": "male_adult",
+        "name": "Nam thanh niên (dáng người gầy, bước đi)",
+        "features": "Dáng gầy, áo sờn rách, chuyển động chân tay cơ học, thở gấp"
+      },
+      {
+        "id": "female_adult",
+        "name": "Nữ thanh niên (tà áo dài/váy buông)",
+        "features": "Tà áo dài/váy buông thõng rách mép phất phơ theo gió, tóc đen xõa dài"
+      },
+      {
+        "id": "ghost_wraith",
+        "name": "Bóng ma bay lượn (tà áo rách, không chân, bay lơ lửng)",
+        "features": "Không chân, vạt áo rách tan biến vào hư không dạng khói sương, hào quang lân tinh u ám"
+      },
+      {
+        "id": "creepy_child",
+        "name": "Đứa trẻ ma (ôm búp bê rách / che mặt)",
+        "features": "Thân hình nhỏ thó dị dạng (~180px), đầu to bất thường, tay buông thõng hoặc ôm búp bê"
+      },
+      {
+        "id": "jiangshi_corpse",
+        "name": "Cương thi áo quan (mũ chóp quan viên, lá bùa)",
+        "features": "Mũ chóp quan lại thời phong kiến, lá bùa trấn yểm trên trán, tay duỗi thẳng móng vuốt nhọn"
+      },
+      {
+        "id": "demon_shadow",
+        "name": "Quỷ bóng đen dị hình (sừng cong, vuốt dài)",
+        "features": "Thực thể khổng lồ đồ sộ, sừng nhọn hoắt, móng vuốt dài ngoằng, gai nhọn dọc sống lưng"
+      }
+    ],
+    "costumes": [
+      {
+        "id": "outfit_tattered_tunic",
+        "name": "Áo tơi / Áo nông phu sờn rách",
+        "desc": "Trang phục áo vải thô nông dân rách mép, dây thừng quấn ngang lưng, ống quần xắn cao tơi tả"
+      },
+      {
+        "id": "outfit_flowing_ao_dai",
+        "name": "Áo dài cổ truyền tà rách ma mị",
+        "desc": "Áo dài / áo tứ thân Việt Nam với hai tà áo buông dài xé rách mép phất phơ theo gió, quần lụa đen"
+      },
+      {
+        "id": "outfit_shrouded_cloak",
+        "name": "Áo choàng trùm đầu tăm tối (Reaper / Cultist Cloak)",
+        "desc": "Mũ trùm đầu sâu che khuất mặt, vạt áo choàng đen phủ dài chấm đất bay bồng bềnh như làn khói"
+      },
+      {
+        "id": "outfit_mandarin_court",
+        "name": "Quan phục triều đình / Triều bào phong kiến",
+        "desc": "Bộ triều phục quan lại phong kiến cứng nhắc, thêu bổ tử trước ngực, đai ngọc và ống tay thụng rộng"
+      },
+      {
+        "id": "outfit_monk_cassock",
+        "name": "Áo cà sa pháp sư / Đạo bào trừ tà",
+        "desc": "Đạo bào pháp sư trừ tà quấn chéo ngực, tràng hạt lớn đeo trước ngực, dải lụa yểm bùa phấp phới"
+      },
+      {
+        "id": "outfit_shredded_burial",
+        "name": "Vải liệm oan hồn / Áo niệm tử thi",
+        "desc": "Băng vải liệm quấn chằng chịt quanh thân và tứ chi, các dải vải tang trắng đục rủ lòng thòng đẫm âm khí"
+      },
+      {
+        "id": "outfit_ancient_armor",
+        "name": "Giáp tướng cổ vỡ nát / Chiến bào tử sĩ",
+        "desc": "Tấm giáp phiến kim loại vỡ nứt, hộ tâm phiến trước ngực, đai giáp đầu thú và tà váy giáp rách tả tơi"
+      },
+      {
+        "id": "outfit_child_pajamas",
+        "name": "Yếm hoa / Bộ đồ trẻ thơ vương vết ố",
+        "desc": "Chiếc áo yếm trẻ thơ hoặc áo cộc nút thắt truyền thống, ống tay ngắn để lộ cánh tay nhỏ thó gầy guộc"
+      }
+    ],
+    "faces": [
+      {
+        "id": "face_calm",
+        "name": "Mặt vô hồn",
+        "semantic": "Bình thường, mắt đen nhỏ vô hồn"
+      },
+      {
+        "id": "face_scared",
+        "name": "Kinh hãi tột cùng",
+        "semantic": "Kinh hãi, tròng mắt trắng toát trợn ngược, miệng há hốc run rẩy"
+      },
+      {
+        "id": "face_creepy_smile",
+        "name": "Nụ cười ma quái",
+        "semantic": "Nụ cười ma quái xé dài tới mang tai rợn người"
+      },
+      {
+        "id": "face_bleeding_eyes",
+        "name": "Mắt chảy máu",
+        "semantic": "Mắt trắng dã chảy hai vệt máu đen rỉ xuống cằm"
+      },
+      {
+        "id": "face_faceless",
+        "name": "Mặt trắng trơn vô diện (No-Face)",
+        "semantic": "Khuôn mặt trắng nhợt nhạt hoàn toàn không ngũ quan, toát lên sự bất an tột độ"
+      },
+      {
+        "id": "face_glowing_hollow",
+        "name": "Hốc mắt miệng rực lửa ma trơi",
+        "semantic": "Hốc mắt và miệng rỗng tuếch phát ra ánh sáng vàng lân tinh cháy rực"
+      },
+      {
+        "id": "face_talisman_covered",
+        "name": "Dán lá bùa vàng che trán",
+        "semantic": "Lá bùa đạo sĩ màu vàng viết chữ son đỏ dán che sụp từ trán xuống miệng, bay phấp phới"
+      }
+    ],
+    "poses": [
+      {
+        "id": "pose_standing",
+        "type": "ground",
+        "desc": "Đứng thẳng quan sát, ngực phập phồng nhẹ"
+      },
+      {
+        "id": "pose_shivering",
+        "type": "ground",
+        "desc": "Run rẩy, co ro hai tay trước ngực, chân khuỵu nhẹ, người run bần bật"
+      },
+      {
+        "id": "pose_walking",
+        "type": "ground",
+        "desc": "Bước đi chậm rãi, hai chân luân phiên, tay đung đưa theo chu kỳ"
+      },
+      {
+        "id": "pose_floating",
+        "type": "air",
+        "desc": "Bay lơ lửng, vạt áo lay động dập dềnh bồng bềnh trong không trung"
+      },
+      {
+        "id": "pose_crawling",
+        "type": "ground",
+        "desc": "Bò trườn sát mặt đất, chân tay co quắp như nhện hoặc ma nữ chui lên"
+      },
+      {
+        "id": "pose_reaching",
+        "type": "ground",
+        "desc": "Vươn cánh tay khẳng khiu về phía trước với móng vuốt bắt hồn"
+      },
+      {
+        "id": "pose_hanging",
+        "type": "air",
+        "desc": "Bị treo thắt cổ lơ lửng, đầu gục bất động, thân đung đưa kẽo kẹt"
+      }
+    ]
+  }
+}
