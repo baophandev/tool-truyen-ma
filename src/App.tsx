@@ -1,5 +1,5 @@
-import { useState } from "react";
-import type { DirectorSceneScript } from "./engine/types";
+import { useState, useEffect } from "react";
+import type { DirectorSceneScript, ThemeId, SkyPresetId, CharacterBaseId, CostumeId, CharacterFaceId, CharacterPoseId, StructureId } from "./engine/types";
 import { DEFAULT_HORROR_SCENES } from "./engine/defaultScenes";
 import { PlayerView } from "./components/PlayerView";
 import { EditorView } from "./components/EditorView";
@@ -9,9 +9,94 @@ import {
   Sliders,
   Download,
   Skull,
+  Plus,
+  Copy,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
 } from "lucide-react";
 
 type ActiveTab = "player" | "editor" | "exporter";
+
+function createTemplateScene(sceneNumber: number): DirectorSceneScript {
+  const presets: Array<{
+    theme: ThemeId;
+    sky: SkyPresetId;
+    structure: StructureId;
+    structSlot: "far_left" | "center" | "far_right";
+    base: CharacterBaseId;
+    costume: CostumeId;
+    face: CharacterFaceId;
+    pose: CharacterPoseId;
+  }> = [
+    {
+      theme: "rural_graveyard",
+      sky: "foggy_night",
+      structure: "ancient_tomb",
+      structSlot: "center",
+      base: "female_adult",
+      costume: "outfit_flowing_ao_dai",
+      face: "face_creepy_smile",
+      pose: "pose_standing",
+    },
+    {
+      theme: "abandoned_village",
+      sky: "stormy_dark",
+      structure: "dilapidated_hut",
+      structSlot: "far_left",
+      base: "creepy_child",
+      costume: "outfit_child_pajamas",
+      face: "face_faceless",
+      pose: "pose_shivering",
+    },
+    {
+      theme: "cursed_swamp",
+      sky: "eclipse_abyss",
+      structure: "creepy_well",
+      structSlot: "center",
+      base: "jiangshi_corpse",
+      costume: "outfit_mandarin_court",
+      face: "face_talisman_covered",
+      pose: "pose_reaching",
+    },
+  ];
+
+  const pick = presets[(sceneNumber - 1) % presets.length];
+  return {
+    scene_id: `scene_${String(sceneNumber).padStart(2, "0")}_${Date.now().toString().slice(-4)}`,
+    title: `Cảnh ${sceneNumber}: Khung Hình Mới`,
+    duration_sec: 6,
+    theme: pick.theme,
+    lighting: {
+      sky_preset: pick.sky,
+      fog_density: 0.65,
+      thunder_flash: false,
+    },
+    environment_items: [
+      {
+        asset_id: pick.structure,
+        slot: pick.structSlot,
+        scale: 1,
+      },
+    ],
+    actors: [
+      {
+        id: `actor_${sceneNumber}_1`,
+        base: pick.base,
+        costume: pick.costume,
+        face: pick.face,
+        pose: pick.pose,
+        facing: "right",
+        slot: "mid_left",
+        scale: 1,
+      },
+    ],
+    details: [],
+    dialogue: `Cảnh ${sceneNumber}... Một bóng đen mới xuất hiện trong sương mù.`,
+    narrative_note: "",
+  };
+}
 
 export function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("player");
@@ -19,24 +104,80 @@ export function App() {
   const [currentSceneIndex, setCurrentSceneIndex] = useState<number>(0);
   const [showGizmo, setShowGizmo] = useState<boolean>(false);
 
-  const currentScene = scenes[currentSceneIndex] || scenes[0];
+  const safeSceneIndex = Math.min(currentSceneIndex, Math.max(0, scenes.length - 1));
+  const currentScene = scenes[safeSceneIndex] || scenes[0];
+
+  useEffect(() => {
+    if (safeSceneIndex !== currentSceneIndex) {
+      setCurrentSceneIndex(safeSceneIndex);
+    }
+  }, [safeSceneIndex, currentSceneIndex]);
 
   const handleUpdateCurrentScene = (updated: DirectorSceneScript) => {
-    const newScenes = [...scenes];
-    newScenes[currentSceneIndex] = updated;
-    setScenes(newScenes);
+    setScenes((prev) => {
+      const next = [...prev];
+      next[safeSceneIndex] = updated;
+      return next;
+    });
   };
 
   const handleResetCurrentScene = () => {
-    const defaultScene = DEFAULT_HORROR_SCENES[currentSceneIndex] || DEFAULT_HORROR_SCENES[0];
-    handleUpdateCurrentScene(JSON.parse(JSON.stringify(defaultScene)));
+    const defaultScene = DEFAULT_HORROR_SCENES[safeSceneIndex];
+    if (defaultScene) {
+      handleUpdateCurrentScene(JSON.parse(JSON.stringify(defaultScene)));
+    } else {
+      handleUpdateCurrentScene(createTemplateScene(safeSceneIndex + 1));
+    }
+  };
+
+  const handleAddScene = () => {
+    const newScene = createTemplateScene(scenes.length + 1);
+    const nextIdx = scenes.length;
+    setScenes((prev) => [...prev, newScene]);
+    setCurrentSceneIndex(nextIdx);
+    setActiveTab("editor");
+  };
+
+  const handleDuplicateCurrentScene = () => {
+    const cloned: DirectorSceneScript = JSON.parse(JSON.stringify(currentScene));
+    cloned.scene_id = `${currentScene.scene_id}_copy_${Date.now().toString().slice(-4)}`;
+    cloned.title = `${currentScene.title || `Cảnh ${safeSceneIndex + 1}`} (Bản sao)`;
+    const insertAt = safeSceneIndex + 1;
+    setScenes((prev) => [
+      ...prev.slice(0, insertAt),
+      cloned,
+      ...prev.slice(insertAt),
+    ]);
+    setCurrentSceneIndex(insertAt);
+    setActiveTab("editor");
+  };
+
+  const handleDeleteCurrentScene = () => {
+    if (scenes.length <= 1) return;
+    setScenes((prev) => prev.filter((_, idx) => idx !== safeSceneIndex));
+    setCurrentSceneIndex((prevIdx) => Math.max(0, Math.min(prevIdx, scenes.length - 2)));
+  };
+
+  const handleMoveCurrentScene = (direction: -1 | 1) => {
+    const targetIdx = safeSceneIndex + direction;
+    if (targetIdx < 0 || targetIdx >= scenes.length) return;
+    setScenes((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(safeSceneIndex, 1);
+      next.splice(targetIdx, 0, moved);
+      return next;
+    });
+    setCurrentSceneIndex(targetIdx);
   };
 
   const handleImportScene = (newScene: DirectorSceneScript) => {
+    const nextIdx = scenes.length;
     setScenes((prev) => [...prev, newScene]);
-    setCurrentSceneIndex(scenes.length);
+    setCurrentSceneIndex(nextIdx);
     setActiveTab("player");
   };
+
+  const totalFilmDuration = scenes.reduce((sum, s) => sum + (s.duration_sec || 6), 0);
 
   return (
     <div className="min-h-screen bg-[#07080c] text-neutral-200 flex flex-col font-sans selection:bg-red-800 selection:text-white pb-16">
@@ -107,13 +248,101 @@ export function App() {
         </div>
       </header>
 
+      {/* SCENE SEQUENCER BAR (GLOBAL ACROSS ALL TABS) */}
+      <div className="border-b border-neutral-800/70 bg-[#080a10]/95 px-4 md:px-8 py-2.5">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
+            <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider shrink-0 mr-1">
+              Chuỗi Cảnh ({scenes.length}):
+            </span>
+
+            {scenes.map((sc, idx) => {
+              const isActive = idx === safeSceneIndex;
+              const dur = sc.duration_sec || 6;
+              return (
+                <button
+                  key={`${sc.scene_id}-${idx}`}
+                  onClick={() => setCurrentSceneIndex(idx)}
+                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border transition-all ${
+                    isActive
+                      ? "bg-red-800/80 border-red-500 text-white font-semibold shadow-md shadow-red-950/50"
+                      : "bg-neutral-900/90 border-neutral-800 text-neutral-300 hover:bg-neutral-800 hover:text-white"
+                  }`}
+                  title={sc.title || sc.scene_id}
+                >
+                  <span>Cảnh {idx + 1}</span>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-cyan-300">
+                    {dur}s
+                  </span>
+                  <span className="text-[10px] text-neutral-400 font-mono">
+                    {sc.actors.length}NV
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+            <span className="flex items-center gap-1 text-[11px] font-mono text-neutral-400 mr-2">
+              <Clock className="w-3.5 h-3.5 text-cyan-400" />
+              Tổng: {totalFilmDuration.toFixed(1)}s
+            </span>
+
+            <button
+              onClick={handleAddScene}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold transition-all shadow"
+              title="Tạo một Scene mới với bối cảnh & nhân vật riêng"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Thêm Cảnh Mới</span>
+            </button>
+
+            <button
+              onClick={handleDuplicateCurrentScene}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-xs transition-all"
+              title="Nhân bản cảnh hiện tại thành một cảnh tiếp theo"
+            >
+              <Copy className="w-3.5 h-3.5" />
+              <span>Nhân bản</span>
+            </button>
+
+            <button
+              onClick={() => handleMoveCurrentScene(-1)}
+              disabled={safeSceneIndex === 0}
+              className="p-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 disabled:opacity-35 text-neutral-300 border border-neutral-700 transition-all"
+              title="Đẩy cảnh hiện tại lên trước"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              onClick={() => handleMoveCurrentScene(1)}
+              disabled={safeSceneIndex >= scenes.length - 1}
+              className="p-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 disabled:opacity-35 text-neutral-300 border border-neutral-700 transition-all"
+              title="Đẩy cảnh hiện tại ra sau"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              onClick={handleDeleteCurrentScene}
+              disabled={scenes.length <= 1}
+              className="p-1.5 rounded-lg bg-red-950/60 hover:bg-red-900/80 disabled:opacity-35 text-red-300 border border-red-800/50 transition-all"
+              title="Xóa cảnh hiện tại"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* MAIN VIEW CONTAINER */}
       <main className="flex-1 px-4 md:px-8 py-6 max-w-7xl mx-auto w-full">
         {/* VIEW 1: FILM PLAYER */}
         {activeTab === "player" && (
           <PlayerView
             scenes={scenes}
-            currentSceneIndex={currentSceneIndex}
+            currentSceneIndex={safeSceneIndex}
             onSelectScene={(idx) => setCurrentSceneIndex(idx)}
             showGizmo={showGizmo}
             onToggleGizmo={() => setShowGizmo(!showGizmo)}

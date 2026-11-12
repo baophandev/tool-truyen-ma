@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { DirectorSceneScript } from "../engine/types";
 import { SceneRenderer } from "../engine/SceneRenderer";
 import {
@@ -33,7 +33,8 @@ export const ExporterView: React.FC<ExporterViewProps> = ({
   const [svgRef, setSvgRef] = useState<SVGSVGElement | null>(null);
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [recordProgress, setRecordProgress] = useState<number>(0);
-  const [recordDuration, setRecordDuration] = useState<number>(5);
+  const sceneDuration = currentScene.duration_sec || 6;
+  const [recordDuration, setRecordDuration] = useState<number>(sceneDuration);
   const [copiedScript, setCopiedScript] = useState<boolean>(false);
   const [copiedPrompt, setCopiedPrompt] = useState<boolean>(false);
   const [importJsonText, setImportJsonText] = useState<string>("");
@@ -41,6 +42,13 @@ export const ExporterView: React.FC<ExporterViewProps> = ({
   const [importSuccess, setImportSuccess] = useState<boolean>(false);
 
   const [exportTime, setExportTime] = useState<number>(0);
+
+  // Sync export duration when switching scenes or changing duration_sec
+  useEffect(() => {
+    if (!isRecording) {
+      setRecordDuration(currentScene.duration_sec || 6);
+    }
+  }, [currentScene.scene_id, currentScene.duration_sec, isRecording]);
 
   // Handle Video Recording
   const handleRecordVideo = async () => {
@@ -236,10 +244,10 @@ HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc Direct
           </div>
 
           <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between text-xs text-neutral-300">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-300">
               <span>Thời lượng ghi hình:</span>
               <div className="flex items-center gap-1 font-mono">
-                {[3, 5, 10].map((sec) => (
+                {Array.from(new Set([sceneDuration, 3, 5, 10])).map((sec) => (
                   <button
                     key={sec}
                     onClick={() => setRecordDuration(sec)}
@@ -248,8 +256,9 @@ HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc Direct
                         ? "bg-red-700 text-white font-bold"
                         : "bg-neutral-800 text-neutral-400 hover:text-white"
                     }`}
+                    title={sec === sceneDuration ? "Đúng bằng duration_sec của cảnh hiện tại" : undefined}
                   >
-                    {sec}s
+                    {sec === sceneDuration ? `Cảnh (${sec}s)` : `${sec}s`}
                   </button>
                 ))}
               </div>

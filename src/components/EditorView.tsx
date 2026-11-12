@@ -110,6 +110,29 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
   const sceneDuration = scene.duration_sec || 6;
 
+  // Update Scene Duration (clamps [1, 60] seconds and keeps actor motion keyframes within bounds)
+  const updateSceneDuration = (rawSec: number) => {
+    if (Number.isNaN(rawSec)) return;
+    const clamped = Math.max(1, Math.min(60, Math.round(rawSec * 2) / 2));
+    const adjustedActors = scene.actors.map((ac) => {
+      if (!ac.motion) return ac;
+      const start = Math.min(ac.motion.startTimeSec ?? 0, Math.max(0, clamped - 0.5));
+      const end = Math.min(clamped, Math.max(start + 0.3, ac.motion.endTimeSec ?? clamped));
+      return {
+        ...ac,
+        motion: {
+          ...ac.motion,
+          startTimeSec: Math.round(start * 10) / 10,
+          endTimeSec: Math.round(end * 10) / 10,
+        },
+      };
+    });
+    if (previewTime !== null && previewTime > clamped) {
+      setPreviewTime(clamped);
+    }
+    onChangeScene({ ...scene, duration_sec: clamped, actors: adjustedActors });
+  };
+
   // Reset timeline preview & motion handle when changing scenes
   useEffect(() => {
     setIsPreviewPlaying(false);
@@ -724,7 +747,21 @@ export const EditorView: React.FC<EditorViewProps> = ({
             />
           </div>
 
-          <div className="text-[11px] font-mono text-neutral-400">
+          <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono text-neutral-400">
+            <label className="flex items-center gap-1.5 bg-neutral-900 border border-neutral-800 px-2.5 py-1 rounded-lg text-neutral-300">
+              <span>Thời lượng cảnh:</span>
+              <input
+                type="number"
+                min="1"
+                max="60"
+                step="0.5"
+                value={sceneDuration}
+                onChange={(e) => updateSceneDuration(parseFloat(e.target.value))}
+                className="w-12 bg-black border border-neutral-700 rounded px-1.5 py-0.5 text-center text-cyan-300 font-bold focus:outline-none focus:border-cyan-400"
+              />
+              <span>giây</span>
+            </label>
+
             {previewTime === null ? (
               <span className="text-emerald-400">
                 ● Chế độ Sửa Vị Trí ({selectedActor?.motion && activeMotionHandle === "target" ? "Đích B" : "Điểm A"})
@@ -1956,6 +1993,59 @@ export const EditorView: React.FC<EditorViewProps> = ({
           {/* TAB 4: STORY & DIALOGUE */}
           {activeTab === "story" && (
             <div className="flex flex-col gap-4">
+              {/* Scene Duration Control */}
+              <div className="bg-cyan-950/20 border border-cyan-800/40 rounded-xl p-4 flex flex-col gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <label className="text-xs font-bold text-cyan-200 block">
+                      Thời Lượng Cảnh Này (duration_sec):
+                    </label>
+                    <span className="text-[11px] text-neutral-400">
+                      Quy định thời gian phát trước khi tự chuyển cảnh, tổng chiều dài timeline A → B và thời lượng xuất video.
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 font-mono">
+                    <input
+                      type="number"
+                      min="1"
+                      max="60"
+                      step="0.5"
+                      value={sceneDuration}
+                      onChange={(e) => updateSceneDuration(parseFloat(e.target.value))}
+                      className="w-16 bg-black border border-cyan-700/70 rounded-lg px-2 py-1 text-center text-xs font-bold text-cyan-300 focus:outline-none focus:border-cyan-400"
+                    />
+                    <span className="text-xs text-neutral-300">giây</span>
+                  </div>
+                </div>
+
+                <input
+                  type="range"
+                  min="1"
+                  max="30"
+                  step="0.5"
+                  value={Math.min(30, sceneDuration)}
+                  onChange={(e) => updateSceneDuration(parseFloat(e.target.value))}
+                  className="w-full accent-cyan-400"
+                />
+
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[11px] text-neutral-400 mr-1">Mốc nhanh:</span>
+                  {[3, 5, 6, 8, 10, 15].map((sec) => (
+                    <button
+                      key={`dur-preset-${sec}`}
+                      onClick={() => updateSceneDuration(sec)}
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-mono border transition-all ${
+                        sceneDuration === sec
+                          ? "bg-cyan-700 border-cyan-400 text-white font-bold"
+                          : "bg-neutral-900 border-neutral-800 text-neutral-300 hover:bg-neutral-800"
+                      }`}
+                    >
+                      {sec}s
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-neutral-300">
                   Tiêu Đề Cảnh:
