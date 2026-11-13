@@ -31,11 +31,32 @@ export function exportSvgFile(svgElement: SVGSVGElement, filename: string) {
   downloadFile(source, filename, "image/svg+xml;charset=utf-8");
 }
 
+function drawCinemaSubtitle(
+  ctx: CanvasRenderingContext2D,
+  text?: string,
+  width = 1920,
+  height = 1080
+) {
+  if (!text || !text.trim()) return;
+  ctx.save();
+  ctx.font = "normal 30px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.fillStyle = "#FFFFFF";
+  ctx.shadowColor = "#000000";
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 2;
+  ctx.fillText(text.trim(), width / 2, height - 55);
+  ctx.restore();
+}
+
 export async function exportPngSnapshot(
   svgElement: SVGSVGElement,
   filename: string,
   width = 1920,
-  height = 1080
+  height = 1080,
+  dialogue?: string
 ): Promise<void> {
   const serializer = new XMLSerializer();
   const source = serializer.serializeToString(svgElement);
@@ -58,6 +79,7 @@ export async function exportPngSnapshot(
   ctx.fillStyle = "#0A0A0C";
   ctx.fillRect(0, 0, width, height);
   ctx.drawImage(img, 0, 0, width, height);
+  drawCinemaSubtitle(ctx, dialogue, width, height);
   URL.revokeObjectURL(url);
 
   canvas.toBlob((blob) => {
@@ -74,7 +96,8 @@ export async function recordSvgToVideo(
   svgElement: SVGSVGElement,
   durationSec: number,
   onProgress?: (progressPercent: number) => void,
-  onTimeStep?: (timeSec: number) => Promise<void> | void
+  onTimeStep?: (timeSec: number) => Promise<void> | void,
+  dialogue?: string
 ): Promise<Blob> {
   const width = 1920;
   const height = 1080;
@@ -149,6 +172,7 @@ export async function recordSvgToVideo(
           ctx.fillStyle = "#0A0A0C";
           ctx.fillRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
+          drawCinemaSubtitle(ctx, dialogue, width, height);
           URL.revokeObjectURL(url);
         } catch (err) {
           console.warn("Frame capture error:", err);

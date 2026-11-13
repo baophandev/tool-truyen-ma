@@ -68,7 +68,8 @@ export const ExporterView: React.FC<ExporterViewProps> = ({
         },
         (timeSec) => {
           setExportTime(timeSec);
-        }
+        },
+        currentScene.dialogue
       );
 
       const filename = `${currentScene.scene_id || "horror_film"}_${recordDuration}s.webm`;
@@ -93,7 +94,13 @@ export const ExporterView: React.FC<ExporterViewProps> = ({
   const handleSnapshotPng = async () => {
     if (!svgRef) return;
     try {
-      await exportPngSnapshot(svgRef, `${currentScene.scene_id || "scene"}_frame.png`);
+      await exportPngSnapshot(
+        svgRef,
+        `${currentScene.scene_id || "scene"}_frame.png`,
+        1920,
+        1080,
+        currentScene.dialogue
+      );
     } catch (err) {
       console.error(err);
       alert("Không thể xuất PNG.");

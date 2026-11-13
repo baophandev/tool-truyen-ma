@@ -1212,14 +1212,20 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
         )}
       </svg>
 
-      {/* HORROR SUBTITLE OVERLAY */}
+      {/* PROFESSIONAL CINEMATIC SUBTITLE OVERLAY */}
       {showSubtitles && dialogue && (
-        <div className="absolute bottom-8 inset-x-0 flex justify-center pointer-events-none px-6">
-          <div className="max-w-3xl bg-neutral-950/80 backdrop-blur-sm border-y border-red-950/70 px-8 py-3 text-center rounded">
-            <p className="text-red-100/90 text-lg md:text-xl font-serif tracking-wider italic drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-              "{dialogue}"
-            </p>
-          </div>
+        <div className="absolute bottom-6 md:bottom-8 inset-x-0 flex justify-center pointer-events-none px-6 z-20">
+          <p
+            className="max-w-4xl text-center text-white text-xs sm:text-sm md:text-base font-normal tracking-wide select-none leading-relaxed"
+            style={{
+              fontFamily:
+                "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+              textShadow:
+                "0 1px 2px #000000, 0 0 4px #000000, 0 0 8px rgba(0,0,0,0.95)",
+            }}
+          >
+            {dialogue}
+          </p>
         </div>
       )}
     </div>
