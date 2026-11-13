@@ -24,11 +24,13 @@ import {
 interface ExporterViewProps {
   currentScene: DirectorSceneScript;
   onImportScene: (newScene: DirectorSceneScript) => void;
+  onOpenAiDirector?: (mode?: "full_film" | "re_direct_scene" | "append_scene") => void;
 }
 
 export const ExporterView: React.FC<ExporterViewProps> = ({
   currentScene,
   onImportScene,
+  onOpenAiDirector,
 }) => {
   const [svgRef, setSvgRef] = useState<SVGSVGElement | null>(null);
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -382,18 +384,29 @@ HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc Direct
 
         {/* Right: Import & Validate Script JSON */}
         <div className="bg-neutral-900/60 border border-neutral-800/80 p-5 rounded-2xl flex flex-col gap-3">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-neutral-100 font-semibold text-sm">
               <Sparkles className="w-5 h-5 text-red-400" />
               <span>Nạp & Render Kịch Bản Từ Gemini</span>
             </div>
-            <button
-              onClick={handleImport}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-800 hover:bg-red-700 text-xs font-semibold text-white transition-all shadow-md shadow-red-950/40"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Nạp & Render Ngay</span>
-            </button>
+            <div className="flex items-center gap-2">
+              {onOpenAiDirector && (
+                <button
+                  onClick={() => onOpenAiDirector("full_film")}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-purple-800 to-red-800 hover:from-purple-700 hover:to-red-700 text-xs font-semibold text-white transition-all border border-purple-500/50 shadow"
+                >
+                  <Bot className="w-3.5 h-3.5 text-purple-300" />
+                  <span>✨ Mở AI Đạo Diễn</span>
+                </button>
+              )}
+              <button
+                onClick={handleImport}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-800 hover:bg-red-700 text-xs font-semibold text-white transition-all shadow-md shadow-red-950/40"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Nạp & Render Ngay</span>
+              </button>
+            </div>
           </div>
 
           <textarea

@@ -4,6 +4,7 @@ import { DEFAULT_HORROR_SCENES } from "./engine/defaultScenes";
 import { PlayerView } from "./components/PlayerView";
 import { EditorView } from "./components/EditorView";
 import { ExporterView } from "./components/ExporterView";
+import { AiDirectorModal, type AiModalMode } from "./components/AiDirectorModal";
 import {
   Film,
   Sliders,
@@ -15,6 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Sparkles,
+  Compass,
 } from "lucide-react";
 
 type ActiveTab = "player" | "editor" | "exporter";
@@ -103,6 +106,8 @@ export function App() {
   const [scenes, setScenes] = useState<DirectorSceneScript[]>(DEFAULT_HORROR_SCENES);
   const [currentSceneIndex, setCurrentSceneIndex] = useState<number>(0);
   const [showGizmo, setShowGizmo] = useState<boolean>(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState<boolean>(false);
+  const [aiModalMode, setAiModalMode] = useState<AiModalMode>("description_film");
 
   const safeSceneIndex = Math.min(currentSceneIndex, Math.max(0, scenes.length - 1));
   const currentScene = scenes[safeSceneIndex] || scenes[0];
@@ -119,6 +124,33 @@ export function App() {
       next[safeSceneIndex] = updated;
       return next;
     });
+  };
+
+  const handleOpenAiDirector = (mode: AiModalMode = "description_film") => {
+    setAiModalMode(mode);
+    setIsAiModalOpen(true);
+  };
+
+  const handleApplyNewFilm = (newScenes: DirectorSceneScript[]) => {
+    if (!newScenes || newScenes.length === 0) return;
+    setScenes(newScenes);
+    setCurrentSceneIndex(0);
+    setActiveTab("player");
+    setIsAiModalOpen(false);
+  };
+
+  const handleApplySingleScene = (updatedScene: DirectorSceneScript) => {
+    handleUpdateCurrentScene(updatedScene);
+    setActiveTab("player");
+    setIsAiModalOpen(false);
+  };
+
+  const handleAppendScene = (newScene: DirectorSceneScript) => {
+    const nextIdx = scenes.length;
+    setScenes((prev) => [...prev, newScene]);
+    setCurrentSceneIndex(nextIdx);
+    setActiveTab("player");
+    setIsAiModalOpen(false);
   };
 
   const handleResetCurrentScene = () => {
@@ -204,47 +236,59 @@ export function App() {
             </div>
           </div>
 
-          {/* Tab Navigation Switches */}
-          <nav className="flex items-center bg-black/60 p-1.5 rounded-xl border border-neutral-800/80">
-            {/* Tab 1: Xem Phim */}
+          {/* Quick AI Director Launcher & Tab Navigation */}
+          <div className="flex flex-wrap items-center gap-3">
             <button
-              onClick={() => setActiveTab("player")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === "player"
-                  ? "bg-red-700 text-white shadow-lg shadow-red-950/50"
-                  : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50"
-              }`}
+              onClick={() => handleOpenAiDirector("description_film")}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-amber-600 to-purple-600 hover:from-red-500 hover:via-amber-500 hover:to-purple-500 text-white shadow-lg shadow-red-950/50 border border-amber-400/40 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+              title="Cỗ máy tạo video 2D theo mô tả trực tiếp & khóa bối cảnh chung dùng lại"
             >
-              <Film className="w-4 h-4" />
-              <span>1. Xem Đoạn Phim</span>
+              <Compass className="w-4 h-4 text-amber-300 animate-pulse" />
+              <span>✨ Cỗ Máy Video 2D (Gemini)</span>
             </button>
 
-            {/* Tab 2: Điều Chỉnh Cảnh Vật */}
-            <button
-              onClick={() => setActiveTab("editor")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === "editor"
-                  ? "bg-red-700 text-white shadow-lg shadow-red-950/50"
-                  : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50"
-              }`}
-            >
-              <Sliders className="w-4 h-4" />
-              <span>2. Điều Chỉnh Vị Trí Cảnh</span>
-            </button>
+            {/* Tab Navigation Switches */}
+            <nav className="flex items-center bg-black/60 p-1.5 rounded-xl border border-neutral-800/80">
+              {/* Tab 1: Xem Phim */}
+              <button
+                onClick={() => setActiveTab("player")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+                  activeTab === "player"
+                    ? "bg-red-700 text-white shadow-lg shadow-red-950/50"
+                    : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50"
+                }`}
+              >
+                <Film className="w-4 h-4" />
+                <span>1. Xem Đoạn Phim</span>
+              </button>
 
-            {/* Tab 3: Xuất Phim */}
-            <button
-              onClick={() => setActiveTab("exporter")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === "exporter"
-                  ? "bg-red-700 text-white shadow-lg shadow-red-950/50"
-                  : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50"
-              }`}
-            >
-              <Download className="w-4 h-4" />
-              <span>3. Xuất Phim & Video</span>
-            </button>
-          </nav>
+              {/* Tab 2: Điều Chỉnh Cảnh Vật */}
+              <button
+                onClick={() => setActiveTab("editor")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+                  activeTab === "editor"
+                    ? "bg-red-700 text-white shadow-lg shadow-red-950/50"
+                    : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50"
+                }`}
+              >
+                <Sliders className="w-4 h-4" />
+                <span>2. Điều Chỉnh Vị Trí Cảnh</span>
+              </button>
+
+              {/* Tab 3: Xuất Phim */}
+              <button
+                onClick={() => setActiveTab("exporter")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+                  activeTab === "exporter"
+                    ? "bg-red-700 text-white shadow-lg shadow-red-950/50"
+                    : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50"
+                }`}
+              >
+                <Download className="w-4 h-4" />
+                <span>3. Xuất Phim & Video</span>
+              </button>
+            </nav>
+          </div>
         </div>
       </header>
 
@@ -287,6 +331,24 @@ export function App() {
               <Clock className="w-3.5 h-3.5 text-cyan-400" />
               Tổng: {totalFilmDuration.toFixed(1)}s
             </span>
+
+            <button
+              onClick={() => handleOpenAiDirector("environments_manager")}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-amber-300 border border-amber-800/60 text-xs font-semibold transition-all shadow"
+              title="Mở thư viện các bối cảnh chung dùng lại để áp dụng cho cảnh"
+            >
+              <Compass className="w-3.5 h-3.5" />
+              <span>Thư Viện Bối Cảnh</span>
+            </button>
+
+            <button
+              onClick={() => handleOpenAiDirector("description_film")}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-purple-800 to-red-800 hover:from-purple-700 hover:to-red-700 text-white text-xs font-semibold transition-all shadow border border-purple-500/40"
+              title="Tạo phân cảnh video từ mô tả hành động nhân vật"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>Tạo Video Theo Mô Tả</span>
+            </button>
 
             <button
               onClick={handleAddScene}
@@ -355,6 +417,7 @@ export function App() {
             scene={currentScene}
             onChangeScene={handleUpdateCurrentScene}
             onResetScene={handleResetCurrentScene}
+            onOpenAiDirector={handleOpenAiDirector}
           />
         )}
 
@@ -363,9 +426,23 @@ export function App() {
           <ExporterView
             currentScene={currentScene}
             onImportScene={handleImportScene}
+            onOpenAiDirector={handleOpenAiDirector}
           />
         )}
       </main>
+
+      {/* GEMINI AI DIRECTOR MODAL */}
+      <AiDirectorModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        currentScene={currentScene}
+        currentSceneIndex={safeSceneIndex}
+        totalScenesCount={scenes.length}
+        onApplyNewFilm={handleApplyNewFilm}
+        onApplySingleScene={handleApplySingleScene}
+        onAppendScene={handleAppendScene}
+        initialMode={aiModalMode}
+      />
 
       {/* FOOTER SPECS */}
       <footer className="mt-auto border-t border-neutral-900 bg-[#06070a] px-6 py-4 text-center text-xs text-neutral-500 font-mono">

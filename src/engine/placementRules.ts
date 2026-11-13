@@ -67,6 +67,31 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ["far_left", "mid_left", "center", "mid_right", "far_right"],
     reason: "Bù nhìn rơm nhỏ gọn có thể đặt tại mọi vị trí mặt đất Y=800px.",
   },
+  hospital_operating_bed: {
+    name: "Giường mổ bệnh viện rỉ sét",
+    allowedSlots: ["mid_left", "center", "mid_right"],
+    reason: "Giường mổ bệnh viện là tâm điểm bối cảnh kinh dị hiện đại, đặt tại khu vực giữa sân khấu.",
+  },
+  hotel_reception_desk: {
+    name: "Quầy lễ tân khách sạn u ám",
+    allowedSlots: ["mid_left", "center", "mid_right"],
+    reason: "Quầy lễ tân đặt tại các vị trí tiếp đất trung tâm (mid_left, center, mid_right).",
+  },
+  supermarket_shelf_aisle: {
+    name: "Dãy kệ hàng siêu thị hoang tàn",
+    allowedSlots: ["far_left", "center", "far_right"],
+    reason: "Dãy kệ hàng siêu thị cao lớn đặt ở hai bên rìa hoặc trung tâm tạo chiều sâu lối đi.",
+  },
+  creepy_elevator_doors: {
+    name: "Cửa thang máy rùng rợn hé mở",
+    allowedSlots: ["mid_left", "center", "mid_right"],
+    reason: "Cửa thang máy đặt tại khu vực giữa sân khấu (mid_left, center, mid_right) tạo điểm nhìn kịch tính.",
+  },
+  dining_table_chairs: {
+    name: "Bàn ăn nhà hàng khăn rách",
+    allowedSlots: ["mid_left", "center", "mid_right"],
+    reason: "Bàn ăn nhà hàng đặt tiếp đất tại khu vực giữa sân khấu (mid_left, center, mid_right).",
+  },
 };
 
 export interface DetailRule {
@@ -105,6 +130,26 @@ export const DETAIL_RULES: Record<DetailId, DetailRule> = {
     name: "Dây bùa trấn yểm",
     allowedSlots: ALL_AIR_SLOT_IDS,
     reason: "Dây bùa treo giăng ngang chỉ được đặt tại các vị trí trên không (air_left, air_center, air_right).",
+  },
+  detail_iv_drip_stand: {
+    name: "Cột truyền dịch y tế rỉ máu",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Cột truyền dịch y tế có bánh xe có thể đứng tại mọi vị trí trên mặt đất Y=800px.",
+  },
+  detail_shopping_cart: {
+    name: "Xe đẩy siêu thị rỉ sét",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Xe đẩy siêu thị có thể đặt tại mọi vị trí trên mặt đất Y=800px.",
+  },
+  detail_surveillance_camera: {
+    name: "Camera an ninh chớp đỏ",
+    allowedSlots: ALL_AIR_SLOT_IDS,
+    reason: "Camera an ninh chỉ được gắn trên cao (air_left, air_center, air_right).",
+  },
+  detail_flickering_ceiling_lamp: {
+    name: "Đèn huỳnh quang trần chập chờn",
+    allowedSlots: ALL_AIR_SLOT_IDS,
+    reason: "Bóng đèn tuýp huỳnh quang chỉ treo trên cao (air_left, air_center, air_right).",
   },
 };
 

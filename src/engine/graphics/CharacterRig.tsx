@@ -513,6 +513,73 @@ const TorsoOutfit: React.FC<{
         </g>
       );
 
+    case "outfit_doctor_coat":
+      return (
+        <g className="costume-doctor-coat-torso">
+          {/* Main Lab Coat Body */}
+          <path
+            d="M -22 -190 C -24 -150, -20 -115, -18 -90 L 18 -90 C 20 -115, 24 -150, 22 -190 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="1.2"
+          />
+          {/* V-neck opening with dark scrub shirt inside */}
+          <polygon points="-8,-190 8,-190 0,-155" fill={palette.pantsPrimary} />
+          {/* Lapels */}
+          <path d="M -16 -190 L -6 -150 L -12 -120" stroke={palette.secondary} strokeWidth="1.5" fill="none" />
+          <path d="M 16 -190 L 6 -150 L 12 -120" stroke={palette.secondary} strokeWidth="1.5" fill="none" />
+          {/* Stethoscope draped around neck */}
+          <path d="M -12 -190 Q -15 -145 0 -138 Q 15 -145 12 -190" fill="none" stroke={palette.trim} strokeWidth="2.5" />
+          <circle cx="0" cy="-136" r="3.5" fill="#E2E8F0" stroke="#0F172A" strokeWidth="1" />
+          {/* Blood Splatters on Doctor's Coat */}
+          <circle cx="-8" cy="-110" r="2.5" fill={palette.accent} />
+          <path d="M 5 -125 Q 7 -105 6 -95" stroke={palette.accent} strokeWidth="2" fill="none" />
+          <circle cx="10" cy="-105" r="1.8" fill={palette.accent} />
+        </g>
+      );
+
+    case "outfit_patient_gown":
+      return (
+        <g className="costume-patient-gown-torso">
+          {/* Loose Baggy Hospital Patient Gown */}
+          <path
+            d="M -25 -188 C -26 -150, -22 -115, -20 -90 L 20 -90 C 22 -115, 26 -150, 25 -188 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="1.2"
+          />
+          {/* Open Round Collar with Ties */}
+          <ellipse cx="0" cy="-188" rx="10" ry="5" fill={appearance.skinShadow} />
+          {/* Vertical Pale Hospital Faint Stripes */}
+          {[-12, -4, 4, 12].map((x) => (
+            <line key={x} x1={x} y1="-180" x2={x} y2="-90" stroke={palette.secondary} strokeWidth="1.2" opacity="0.65" />
+          ))}
+          {/* Creepy Stain */}
+          <circle cx="-6" cy="-120" r="3" fill={palette.accent} opacity="0.75" />
+        </g>
+      );
+
+    case "outfit_modern_casual":
+      return (
+        <g className="costume-modern-casual-torso">
+          {/* Modern Zipper Hoodie / Jacket */}
+          <path
+            d="M -24 -190 C -26 -150, -21 -115, -18 -90 L 18 -90 C 21 -115, 26 -150, 24 -190 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="1.2"
+          />
+          {/* Front Center Zipper Line */}
+          <line x1="0" y1="-190" x2="0" y2="-90" stroke={palette.secondary} strokeWidth="2" />
+          <circle cx="0" cy="-155" r="2" fill={palette.accent} />
+          {/* Kangaroo Pockets */}
+          <path d="M -15 -115 L -6 -90 L 6 -90 L 15 -115" stroke={palette.trim} strokeWidth="1.5" fill="none" />
+          {/* Dangling White Drawstrings */}
+          <path d="M -4 -185 Q -7 -160 -5 -145" stroke={palette.accent} strokeWidth="1.5" fill="none" />
+          <path d="M 4 -185 Q 7 -160 5 -145" stroke={palette.accent} strokeWidth="1.5" fill="none" />
+        </g>
+      );
+
     case "outfit_tattered_tunic":
     default:
       return (
@@ -657,6 +724,63 @@ const LowerBodyOutfit: React.FC<{
         {/* Knee-length shorts */}
         <path d="M -11 -85 L -13 -38 L -3 -38 L -3 -85 Z" fill={palette.pantsPrimary} stroke={appearance.outline} strokeWidth="0.9" />
         <path d="M 11 -85 L 13 -38 L 3 -38 L 3 -85 Z" fill={palette.pantsSecondary} stroke={appearance.outline} strokeWidth="0.9" />
+      </g>
+    );
+  }
+
+  // 7. Doctor Coat Tails over Hospital Scrubs
+  if (costume === "outfit_doctor_coat") {
+    return (
+      <g className={isWalking ? "anim-male-walk" : isShivering ? "anim-leg-tremble" : ""}>
+        {/* Dark Hospital Scrub Trousers */}
+        <line x1="-8" y1="-90" x2="-12" y2="-4" stroke={palette.pantsPrimary} strokeWidth="8" />
+        <line x1="8" y1="-90" x2="12" y2="-4" stroke={palette.pantsSecondary} strokeWidth="8" />
+        {/* Doctor Clogs / Shoes */}
+        <ellipse cx="-13" cy="-2" rx="7" ry="3.5" fill="#0F172A" />
+        <ellipse cx="13" cy="-2" rx="7" ry="3.5" fill="#0F172A" />
+        {/* White Lab Coat Tails (slit in center) */}
+        <polygon points="-18,-90 -22,-38 -6,-38 -4,-90" fill={palette.primary} stroke={appearance.outline} strokeWidth="1" />
+        <polygon points="4,-90 6,-38 22,-38 18,-90" fill={palette.primary} stroke={appearance.outline} strokeWidth="1" />
+        {/* Blood splatter drip on coat tail */}
+        <circle cx="-14" cy="-45" r="2" fill={palette.accent} />
+      </g>
+    );
+  }
+
+  // 8. Patient Gown (Hem at Knee + Bare Ankles)
+  if (costume === "outfit_patient_gown") {
+    return (
+      <g className={isWalking ? "anim-skirt-walk" : isShivering ? "anim-leg-tremble" : ""}>
+        {/* Bare Shins / Ankles */}
+        <path d="M -9 -45 L -11 -3 L -5 -3 L -4 -45 Z" fill={appearance.skin} />
+        <path d="M 9 -45 L 11 -3 L 5 -3 L 4 -45 Z" fill={appearance.skinShadow} />
+        {/* Bare Feet or Hospital Slippers */}
+        <ellipse cx="-10" cy="-2" rx="6" ry="3" fill={appearance.skinShadow} />
+        <ellipse cx="10" cy="-2" rx="6" ry="3" fill={appearance.skinShadow} />
+        {/* Patient Gown Skirt */}
+        <path
+          d="M -20 -90 C -24 -65, -22 -45, -20 -42 L 20 -42 C 22 -45, 24 -65, 20 -90 Z"
+          fill={palette.primary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        <line x1="-19" y1="-42" x2="19" y2="-42" stroke={palette.secondary} strokeWidth="1.5" />
+      </g>
+    );
+  }
+
+  // 9. Modern Casual (Slim Jeans + Modern Sneakers)
+  if (costume === "outfit_modern_casual") {
+    return (
+      <g className={isWalking ? "anim-male-walk" : isShivering ? "anim-leg-tremble" : ""}>
+        {/* Dark Cargo / Denim Pants */}
+        <line x1="-8" y1="-90" x2="-11" y2="-6" stroke={palette.pantsPrimary} strokeWidth="7.5" />
+        <line x1="8" y1="-90" x2="11" y2="-6" stroke={palette.pantsSecondary} strokeWidth="7.5" />
+        {/* Modern Sneakers with White Rubber Soles */}
+        <ellipse cx="-12" cy="-5" rx="8" ry="4" fill={palette.primary} />
+        <line x1="-19" y1="-2" x2="-5" y2="-2" stroke={palette.accent} strokeWidth="2" strokeLinecap="round" />
+        <ellipse cx="12" cy="-5" rx="8" ry="4" fill={palette.secondary} />
+        <line x1="5" y1="-2" x2="19" y2="-2" stroke={palette.accent} strokeWidth="2" strokeLinecap="round" />
       </g>
     );
   }

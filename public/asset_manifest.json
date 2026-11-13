@@ -1,6 +1,6 @@
 {
-  "version": "1.3",
-  "name": "Silhouette Horror 2D Procedural Graphics Library - Extended Assets & Placement Rules",
+  "version": "1.4",
+  "name": "Silhouette Horror 2D Procedural Graphics Library - Extended Assets & Modern Indoor Environments",
   "style": "Silhouette Minimalist Horror (Limbo / Badland / U Linh Kỳ Truyện)",
   "standard_resolution": {
     "viewBox": "0 0 1920 1080",
@@ -28,6 +28,12 @@
         "name": "Đầm lầy u minh",
         "desc": "Vùng nước chết tĩnh mịch ngập chìm trong sương độc, lau sậy khẳng khiu, cây khô mục và bãi tha ma sình lầy",
         "sky_options": ["eclipse_abyss", "foggy_night", "stormy_dark"]
+      },
+      {
+        "id": "modern_indoor",
+        "name": "Hành lang & Không gian trong nhà hiện đại",
+        "desc": "Hành lang bệnh viện, sảnh khách sạn, siêu thị bỏ hoang hoặc nhà hàng u ám với trần nhà ống tuýp, sàn gạch bóng loáng và cửa thoát hiểm",
+        "sky_options": ["flickering_fluorescent", "dim_indoor_night"]
       }
     ],
     "sky_presets": [
@@ -73,6 +79,28 @@
           "moon": "#06070A",
           "moon_glow": "rgba(16, 185, 129, 0.45)",
           "fog": "rgba(16, 185, 129, 0.25)"
+        }
+      },
+      {
+        "id": "flickering_fluorescent",
+        "name": "Đèn Tuýp Huỳnh Quang Chập Chờn",
+        "palette": {
+          "top": "#02090C",
+          "bottom": "#041518",
+          "light_tubes": "#A7F3D0",
+          "exit_sign": "#10B981",
+          "fog": "rgba(52, 211, 153, 0.22)"
+        }
+      },
+      {
+        "id": "dim_indoor_night",
+        "name": "Ánh Vàng Đêm Mờ Ảo",
+        "palette": {
+          "top": "#080503",
+          "bottom": "#17100A",
+          "light_tubes": "#FDE68A",
+          "exit_sign": "#F59E0B",
+          "fog": "rgba(251, 191, 36, 0.18)"
         }
       }
     ],
@@ -155,6 +183,56 @@
         "layer": "midground",
         "width": 450,
         "height": 580,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "hospital_operating_bed",
+        "name": "Giường mổ bệnh viện rỉ sét",
+        "semantic_role": "Tâm điểm kinh hoàng hiện đại, đệm ố vấy máu, cọc truyền dịch và đèn phẫu thuật",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 300,
+        "height": 240,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "hotel_reception_desk",
+        "name": "Quầy lễ tân khách sạn u ám",
+        "semantic_role": "Quầy gỗ cổ, chuông dịch vụ bí ẩn, sổ đăng ký khách và giá treo chìa khóa phòng",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 300,
+        "height": 220,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "supermarket_shelf_aisle",
+        "name": "Dãy kệ hàng siêu thị hoang tàn",
+        "semantic_role": "Kệ thép cao nhiều tầng chất đầy hàng hóa đổ nát, dây lòng thòng và biển số dãy",
+        "allowed_slots": ["far_left", "center", "far_right"],
+        "layer": "midground",
+        "width": 260,
+        "height": 380,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "creepy_elevator_doors",
+        "name": "Cửa thang máy rùng rợn hé mở",
+        "semantic_role": "Cửa thang máy kim loại hé mở khe đen ngòm, mắt đỏ rực và đèn báo tầng âm 4",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 280,
+        "height": 360,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "dining_table_chairs",
+        "name": "Bàn ăn nhà hàng khăn rách",
+        "semantic_role": "Bàn ăn phủ khăn trải bàn rách rưới, hai ghế tựa cao, chân nến và chai rượu bám bụi",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 250,
+        "height": 200,
         "anchor": "bottom-center"
       }
     ]
@@ -263,6 +341,21 @@
         "id": "outfit_child_pajamas",
         "name": "Yếm hoa / Bộ đồ trẻ thơ vương vết ố",
         "desc": "Chiếc áo yếm trẻ thơ hoặc áo cộc nút thắt truyền thống, ống tay ngắn để lộ cánh tay nhỏ thó gầy guộc"
+      },
+      {
+        "id": "outfit_doctor_coat",
+        "name": "Áo blouse bác sĩ vấy máu phẫu thuật",
+        "desc": "Áo blouse y tế trắng vạt dài loang lổ vết máu, ống nghe stethoscope vắt qua cổ và quần scrub tối màu"
+      },
+      {
+        "id": "outfit_patient_gown",
+        "name": "Áo bệnh nhân sọc xanh lấm lem",
+        "desc": "Bộ quần áo bệnh nhân sọc xanh nhạt rộng thùng thình, cổ áo buộc dây sau lưng, vạt áo rách lấm lem"
+      },
+      {
+        "id": "outfit_modern_casual",
+        "name": "Áo hoodie / Đồ hiện đại thường nhật",
+        "desc": "Áo khoác hoodie hiện đại màu xám đen có khóa kéo và dây rút, quần jean ôm và giày thể thao đế trắng"
       }
     ],
     "faces": [
@@ -354,7 +447,9 @@
       { "id": "item_rusty_sickle", "name": "Liềm gỉ vương máu" },
       { "id": "item_ritual_bell", "name": "Chuông đồng triệu hồn" },
       { "id": "item_tattered_doll", "name": "Búp bê vải rách kinh dị" },
-      { "id": "item_tattered_umbrella", "name": "Ô giấy dầu cổ rách nát" }
+      { "id": "item_tattered_umbrella", "name": "Ô giấy dầu cổ rách nát" },
+      { "id": "item_flashlight", "name": "Đèn pin rọi nón sáng kinh dị" },
+      { "id": "item_scalpel", "name": "Dao mổ phẫu thuật sắc lạnh" }
     ]
   },
   "details": [
@@ -399,6 +494,34 @@
       "semantic_role": "Dây bùa chú đỏ vàng giăng ngang trên không trung",
       "allowed_slots": ["air_left", "air_center", "air_right"],
       "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_iv_drip_stand",
+      "name": "Cột truyền dịch y tế rỉ máu",
+      "semantic_role": "Cột truyền dịch di động có bánh xe, túi dịch và ống truyền rỉ máu tiếp đất Y=800px",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_shopping_cart",
+      "name": "Xe đẩy siêu thị rỉ sét",
+      "semantic_role": "Xe đẩy kim loại rỉ sét bỏ quên giữa hành lang siêu thị tiếp đất Y=800px",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_surveillance_camera",
+      "name": "Camera an ninh chớp đỏ",
+      "semantic_role": "Camera giám sát treo trần hoặc góc tường cao chớp đèn đỏ liên tục",
+      "allowed_slots": ["air_left", "air_center", "air_right"],
+      "anchor": "top-center"
+    },
+    {
+      "id": "detail_flickering_ceiling_lamp",
+      "name": "Đèn huỳnh quang trần chập chờn",
+      "semantic_role": "Đèn tuýp huỳnh quang công nghiệp treo lơ lửng trên không trung chập chờn phát sáng",
+      "allowed_slots": ["air_left", "air_center", "air_right"],
+      "anchor": "top-center"
     }
   ],
   "actor_motion_schema": {

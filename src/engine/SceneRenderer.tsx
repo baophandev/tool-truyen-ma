@@ -514,7 +514,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
         {/* LAYER 2 (z-index 20): MAIN GROUND & MIDGROUND OBJECTS */}
         <g id="layer-2-ground-world">
           {/* Main Ground Surface */}
-          <MainGroundLayer />
+          <MainGroundLayer theme={theme} />
 
           {/* Interactive Click-Anywhere Ground Line Runway (underneath entities so drags always take priority) */}
           {interactiveDrag &&
@@ -893,6 +893,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
           <ForegroundLayer
             fogDensity={lighting.fog_density}
             skyPreset={lighting.sky_preset}
+            theme={theme}
           />
         </g>
 

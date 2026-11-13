@@ -33,6 +33,20 @@ export const SvgDefs: React.FC = () => {
         <stop offset="100%" stopColor={COLOR_PALETTE.skies.eclipse_abyss.gradient_bottom} />
       </linearGradient>
 
+      {/* Modern Indoor Flickering Fluorescent Sky */}
+      <linearGradient id="sky-grad-flickering_fluorescent" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor={COLOR_PALETTE.skies.flickering_fluorescent.gradient_top} />
+        <stop offset="50%" stopColor="#0B1A1E" />
+        <stop offset="100%" stopColor={COLOR_PALETTE.skies.flickering_fluorescent.gradient_bottom} />
+      </linearGradient>
+
+      {/* Modern Indoor Dim Night Sky */}
+      <linearGradient id="sky-grad-dim_indoor_night" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor={COLOR_PALETTE.skies.dim_indoor_night.gradient_top} />
+        <stop offset="60%" stopColor="#120D07" />
+        <stop offset="100%" stopColor={COLOR_PALETTE.skies.dim_indoor_night.gradient_bottom} />
+      </linearGradient>
+
       {/* 2. MOON GLOW RADIAL GRADIENTS */}
       <radialGradient id="blood-moon-glow-radial" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stopColor="rgba(220, 38, 38, 0.7)" />
@@ -92,6 +106,26 @@ export const SvgDefs: React.FC = () => {
         <stop offset="0%" stopColor="rgba(16, 185, 129, 0)" />
         <stop offset="60%" stopColor="rgba(16, 185, 129, 0.25)" />
         <stop offset="100%" stopColor="rgba(4, 9, 14, 0.65)" />
+      </linearGradient>
+
+      <linearGradient id="mid-mist-grad-flickering_fluorescent" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="rgba(6, 182, 212, 0)" />
+        <stop offset="60%" stopColor="rgba(6, 182, 212, 0.18)" />
+        <stop offset="100%" stopColor="rgba(8, 16, 20, 0.7)" />
+      </linearGradient>
+
+      <linearGradient id="mid-mist-grad-dim_indoor_night" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="rgba(202, 138, 4, 0)" />
+        <stop offset="60%" stopColor="rgba(202, 138, 4, 0.16)" />
+        <stop offset="100%" stopColor="rgba(14, 10, 6, 0.7)" />
+      </linearGradient>
+
+      {/* Modern Flashlight Conical Beam Glow */}
+      <linearGradient id="flashlight-beam-glow" x1="0%" y1="50%" x2="100%" y2="50%">
+        <stop offset="0%" stopColor="rgba(255, 255, 255, 0.85)" />
+        <stop offset="25%" stopColor="rgba(224, 242, 254, 0.5)" />
+        <stop offset="65%" stopColor="rgba(186, 230, 253, 0.2)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
       </linearGradient>
 
       {/* 4. FOREGROUND GROUND FOG GRADIENT */}

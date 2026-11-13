@@ -12,6 +12,8 @@ export const SkyLayer: React.FC<{ skyPreset: SkyPresetId; thunderFlash?: boolean
   const isBloodMoon = skyPreset === "blood_moon";
   const isStormy = skyPreset === "stormy_dark";
   const isEclipse = skyPreset === "eclipse_abyss";
+  const isIndoor = skyPreset === "flickering_fluorescent" || skyPreset === "dim_indoor_night";
+  const isFluorescent = skyPreset === "flickering_fluorescent";
 
   return (
     <g className="environment-layer-0-sky">
@@ -36,88 +38,170 @@ export const SkyLayer: React.FC<{ skyPreset: SkyPresetId; thunderFlash?: boolean
         style={{ mixBlendMode: "screen", pointerEvents: "none" }}
       />
 
-      {/* Distant Stars / Embers */}
-      <g className="distant-embers" opacity="0.45">
-        <circle cx="210" cy="120" r="1.5" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-        <circle cx="340" cy="80" r="1.2" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-        <circle cx="580" cy="150" r="1.8" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-        <circle cx="720" cy="95" r="1" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-        <circle cx="1120" cy="130" r="1.5" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-        <circle cx="1280" cy="70" r="1.2" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-        <circle cx="1450" cy="110" r="1.8" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-        <circle cx="1780" cy="160" r="1.3" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-      </g>
-
-      {/* Massive Celestial Body: Blood Moon / Pale Moon / Solar Eclipse */}
-      <g className="horror-moon-group" transform="translate(1380, 240)">
-        {/* Halo Glow */}
-        <circle
-          cx="0"
-          cy="0"
-          r="165"
-          fill={
-            isBloodMoon
-              ? "url(#blood-moon-glow-radial)"
-              : isEclipse
-              ? "url(#eclipse-glow-radial)"
-              : "url(#pale-moon-glow-radial)"
-          }
-          opacity="0.85"
-        />
-
-        {/* Eclipse Corona Flare Ring */}
-        {isEclipse && (
-          <circle
-            cx="0"
-            cy="0"
-            r="102"
-            fill="none"
-            stroke="#10B981"
-            strokeWidth="5"
-            opacity="0.9"
-            className="anim-moon-pulse"
-          />
-        )}
-
-        {/* Main Moon / Black Sun Disc */}
-        <circle
-          cx="0"
-          cy="0"
-          r="95"
-          fill={
-            isBloodMoon
-              ? COLOR_PALETTE.accent_bright_red
-              : isEclipse
-              ? "#06070A"
-              : isStormy
-              ? "#64748B"
-              : COLOR_PALETTE.accent_fog_white
-          }
-          className="anim-moon-pulse"
-        />
-
-        {/* Craters / Occult Texture (when not eclipse) */}
-        {!isEclipse && (
-          <g>
-            <ellipse cx="-25" cy="-20" rx="18" ry="14" fill={isBloodMoon ? "#991B1B" : "#475569"} opacity="0.5" />
-            <ellipse cx="20" cy="25" rx="24" ry="16" fill={isBloodMoon ? "#7F1D1D" : "#334155"} opacity="0.45" />
-            <circle cx="-10" cy="35" r="10" fill={isBloodMoon ? "#7F1D1D" : "#334155"} opacity="0.4" />
+      {/* Indoor Ceiling vs. Outdoor Celestial Moon */}
+      {isIndoor ? (
+        <IndoorCeilingLayer isFluorescent={isFluorescent} />
+      ) : (
+        <>
+          {/* Distant Stars / Embers */}
+          <g className="distant-embers" opacity="0.45">
+            <circle cx="210" cy="120" r="1.5" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+            <circle cx="340" cy="80" r="1.2" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+            <circle cx="580" cy="150" r="1.8" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+            <circle cx="720" cy="95" r="1" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+            <circle cx="1120" cy="130" r="1.5" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+            <circle cx="1280" cy="70" r="1.2" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+            <circle cx="1450" cy="110" r="1.8" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+            <circle cx="1780" cy="160" r="1.3" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
           </g>
-        )}
+
+          {/* Massive Celestial Body: Blood Moon / Pale Moon / Solar Eclipse */}
+          <g className="horror-moon-group" transform="translate(1380, 240)">
+            {/* Halo Glow */}
+            <circle
+              cx="0"
+              cy="0"
+              r="165"
+              fill={
+                isBloodMoon
+                  ? "url(#blood-moon-glow-radial)"
+                  : isEclipse
+                  ? "url(#eclipse-glow-radial)"
+                  : "url(#pale-moon-glow-radial)"
+              }
+              opacity="0.85"
+            />
+
+            {/* Eclipse Corona Flare Ring */}
+            {isEclipse && (
+              <circle
+                cx="0"
+                cy="0"
+                r="102"
+                fill="none"
+                stroke="#10B981"
+                strokeWidth="5"
+                opacity="0.9"
+                className="anim-moon-pulse"
+              />
+            )}
+
+            {/* Main Moon / Black Sun Disc */}
+            <circle
+              cx="0"
+              cy="0"
+              r="95"
+              fill={
+                isBloodMoon
+                  ? COLOR_PALETTE.accent_bright_red
+                  : isEclipse
+                  ? "#06070A"
+                  : isStormy
+                  ? "#64748B"
+                  : COLOR_PALETTE.accent_fog_white
+              }
+              className="anim-moon-pulse"
+            />
+
+            {/* Craters / Occult Texture (when not eclipse) */}
+            {!isEclipse && (
+              <g>
+                <ellipse cx="-25" cy="-20" rx="18" ry="14" fill={isBloodMoon ? "#991B1B" : "#475569"} opacity="0.5" />
+                <ellipse cx="20" cy="25" rx="24" ry="16" fill={isBloodMoon ? "#7F1D1D" : "#334155"} opacity="0.45" />
+                <circle cx="-10" cy="35" r="10" fill={isBloodMoon ? "#7F1D1D" : "#334155"} opacity="0.4" />
+              </g>
+            )}
+          </g>
+
+          {/* Drifting Clouds */}
+          <g className="drifting-clouds-back anim-cloud-drift-slow" opacity="0.55">
+            <path
+              d="M -200 180 C 100 140, 300 190, 600 160 C 900 130, 1200 180, 1600 150 C 1900 120, 2100 160, 2400 140 L 2400 320 L -200 320 Z"
+              fill={isBloodMoon ? "#1A0606" : isEclipse ? "#04140F" : "#0D111A"}
+            />
+          </g>
+          <g className="drifting-clouds-front anim-cloud-drift-fast" opacity="0.75">
+            <path
+              d="M -100 240 C 250 200, 500 260, 850 220 C 1200 190, 1450 250, 1800 210 C 2050 180, 2250 220, 2500 200 L 2500 380 L -100 380 Z"
+              fill={isBloodMoon ? "#120303" : isEclipse ? "#030E0B" : "#080B12"}
+            />
+          </g>
+        </>
+      )}
+    </g>
+  );
+};
+
+/**
+ * INDOOR CEILING LAYER (Ceiling tiles, hanging ducts, tube lights, exit sign)
+ */
+const IndoorCeilingLayer: React.FC<{ isFluorescent: boolean }> = ({ isFluorescent }) => {
+  const tubeLightColor = isFluorescent ? "#A7F3D0" : "#FDE68A";
+  const tubeGlow = isFluorescent ? "rgba(52, 211, 153, 0.28)" : "rgba(251, 191, 36, 0.24)";
+  const exitGlow = isFluorescent ? "#10B981" : "#F59E0B";
+
+  return (
+    <g className="indoor-ceiling-group">
+      {/* Ceiling Drop-Tile Grid Lines receding to vanishing point */}
+      <g stroke="#1E293B" strokeWidth="1" opacity="0.35">
+        <line x1="0" y1="120" x2="1920" y2="120" />
+        <line x1="0" y1="240" x2="1920" y2="240" />
+        <line x1="0" y1="360" x2="1920" y2="360" />
+        <line x1="0" y1="0" x2="720" y2="440" />
+        <line x1="480" y1="0" x2="840" y2="440" />
+        <line x1="960" y1="0" x2="960" y2="440" />
+        <line x1="1440" y1="0" x2="1080" y2="440" />
+        <line x1="1920" y1="0" x2="1200" y2="440" />
       </g>
 
-      {/* Drifting Clouds */}
-      <g className="drifting-clouds-back anim-cloud-drift-slow" opacity="0.55">
-        <path
-          d="M -200 180 C 100 140, 300 190, 600 160 C 900 130, 1200 180, 1600 150 C 1900 120, 2100 160, 2400 140 L 2400 320 L -200 320 Z"
-          fill={isBloodMoon ? "#1A0606" : isEclipse ? "#04140F" : "#0D111A"}
-        />
+      {/* Industrial Air Ducts & Overhead Pipes */}
+      <g opacity="0.6">
+        <rect x="0" y="35" width="1920" height="26" fill="#0A0C10" stroke="#1E293B" strokeWidth="1.5" />
+        <path d="M 120 61 L 120 140 Q 120 160 140 160 L 320 160" fill="none" stroke="#161B26" strokeWidth="6" />
+        <path d="M 1800 61 L 1800 130 Q 1800 150 1780 150 L 1600 150" fill="none" stroke="#161B26" strokeWidth="6" />
+        {/* Dangling loose power wires */}
+        <path d="M 680 61 Q 710 170 725 210" fill="none" stroke="#0E121A" strokeWidth="2" />
+        <path d="M 1240 61 Q 1220 180 1205 230" fill="none" stroke="#0E121A" strokeWidth="2" />
       </g>
-      <g className="drifting-clouds-front anim-cloud-drift-fast" opacity="0.75">
-        <path
-          d="M -100 240 C 250 200, 500 260, 850 220 C 1200 190, 1450 250, 1800 210 C 2050 180, 2250 220, 2500 200 L 2500 380 L -100 380 Z"
-          fill={isBloodMoon ? "#120303" : isEclipse ? "#030E0B" : "#080B12"}
-        />
+
+      {/* Recessed Overhead Tube Light Fixtures */}
+      {/* Left Tube Fixture */}
+      <g transform="translate(420, 150)">
+        <rect x="-140" y="-12" width="280" height="24" rx="3" fill="#080A0F" stroke="#1E293B" strokeWidth="1.5" />
+        <rect x="-130" y="-8" width="260" height="16" rx="4" fill={tubeGlow} className="anim-flicker-ember" />
+        <rect x="-120" y="-4" width="240" height="8" rx="3" fill={tubeLightColor} className="anim-flicker-ember" />
+      </g>
+
+      {/* Right Tube Fixture */}
+      <g transform="translate(1500, 150)">
+        <rect x="-140" y="-12" width="280" height="24" rx="3" fill="#080A0F" stroke="#1E293B" strokeWidth="1.5" />
+        <rect x="-130" y="-8" width="260" height="16" rx="4" fill={tubeGlow} className="anim-flicker-fast" />
+        <rect x="-120" y="-4" width="240" height="8" rx="3" fill={tubeLightColor} className="anim-flicker-fast" />
+      </g>
+
+      {/* Mid-distance Center Tube Fixture */}
+      <g transform="translate(960, 270) scale(0.65)">
+        <rect x="-110" y="-10" width="220" height="20" rx="2" fill="#080A0F" stroke="#1E293B" strokeWidth="1.5" />
+        <rect x="-100" y="-6" width="200" height="12" rx="3" fill={tubeGlow} className="anim-flicker-ember" />
+        <rect x="-90" y="-3" width="180" height="6" rx="2" fill={tubeLightColor} className="anim-flicker-ember" />
+      </g>
+
+      {/* Distant Glowing EXIT Emergency Sign */}
+      <g transform="translate(960, 395)" className="anim-pulse-eerie">
+        <rect x="-26" y="-12" width="52" height="24" rx="2" fill="#040608" stroke={exitGlow} strokeWidth="1.5" />
+        <rect x="-24" y="-10" width="48" height="20" fill={exitGlow} opacity="0.22" />
+        <text
+          x="0"
+          y="4"
+          textAnchor="middle"
+          fill={exitGlow}
+          fontSize="10"
+          fontWeight="bold"
+          fontFamily="monospace"
+          letterSpacing="1"
+        >
+          EXIT
+        </text>
       </g>
     </g>
   );
@@ -137,22 +221,29 @@ export const BackgroundLayer: React.FC<{ theme: ThemeId; skyPreset: SkyPresetId 
 
   return (
     <g className="environment-layer-1-background">
-      {/* Distant Misty Mountain Ridges */}
-      <path
-        d="M 0 580 C 250 480, 500 560, 750 510 C 1000 460, 1250 540, 1500 490 C 1700 450, 1850 500, 1920 480 L 1920 800 L 0 800 Z"
-        fill={mountainColor}
-        opacity="0.8"
-      />
+      {/* THEME 4: MODERN INDOOR CORRIDOR / HALLWAY */}
+      {theme === "modern_indoor" ? (
+        <IndoorCorridorBackground skyPreset={skyPreset} />
+      ) : (
+        <>
+          {/* Distant Misty Mountain Ridges */}
+          <path
+            d="M 0 580 C 250 480, 500 560, 750 510 C 1000 460, 1250 540, 1500 490 C 1700 450, 1850 500, 1920 480 L 1920 800 L 0 800 Z"
+            fill={mountainColor}
+            opacity="0.8"
+          />
 
-      {/* Mid-distance Mist */}
-      <rect
-        x="0"
-        y="500"
-        width={CANVAS_WIDTH}
-        height="300"
-        fill={`url(#mid-mist-grad-${skyPreset})`}
-        opacity="0.6"
-      />
+          {/* Mid-distance Mist */}
+          <rect
+            x="0"
+            y="500"
+            width={CANVAS_WIDTH}
+            height="300"
+            fill={`url(#mid-mist-grad-${skyPreset})`}
+            opacity="0.6"
+          />
+        </>
+      )}
 
       {/* THEME 1: RURAL GRAVEYARD */}
       {theme === "rural_graveyard" && (
@@ -203,6 +294,61 @@ export const BackgroundLayer: React.FC<{ theme: ThemeId; skyPreset: SkyPresetId 
           </g>
         </g>
       )}
+    </g>
+  );
+};
+
+/**
+ * INDOOR CORRIDOR PERSPECTIVE BACKGROUND
+ */
+const IndoorCorridorBackground: React.FC<{ skyPreset: SkyPresetId }> = ({ skyPreset }) => {
+  const isFluorescent = skyPreset === "flickering_fluorescent";
+  const wallTone = isFluorescent ? "#091214" : "#140F0A";
+  const trimTone = isFluorescent ? "#0E1E20" : "#221A12";
+
+  return (
+    <g className="indoor-corridor-perspective">
+      {/* End Hallway Wall Silhouette (Receding center corridor) */}
+      <rect x="760" y="440" width="400" height="360" fill={wallTone} />
+      <rect x="760" y="440" width="400" height="360" fill="#05070A" opacity="0.4" />
+      {/* Distant double fire door at the end of hallway */}
+      <rect x="880" y="560" width="160" height="240" fill="#030406" stroke={trimTone} strokeWidth="2" />
+      <line x1="960" y1="560" x2="960" y2="800" stroke={trimTone} strokeWidth="2" />
+      {/* Wire glass window slits on distant doors */}
+      <rect x="905" y="600" width="22" height="60" rx="2" fill={isFluorescent ? "#082B24" : "#2D1D09"} stroke={trimTone} strokeWidth="1" />
+      <rect x="985" y="600" width="22" height="60" rx="2" fill={isFluorescent ? "#082B24" : "#2D1D09"} stroke={trimTone} strokeWidth="1" />
+      <line x1="880" y1="710" x2="955" y2="710" stroke="#475569" strokeWidth="2.5" />
+      <line x1="965" y1="710" x2="1040" y2="710" stroke="#475569" strokeWidth="2.5" />
+
+      {/* Receding Left Hallway Wall & Door Frames */}
+      <polygon points="0,0 760,440 760,800 0,800" fill={wallTone} />
+      <line x1="0" y1="785" x2="760" y2="795" stroke={trimTone} strokeWidth="6" />
+      <line x1="0" y1="670" x2="760" y2="720" stroke={trimTone} strokeWidth="3" />
+      {/* Left Doorway 1 */}
+      <polygon points="120,70 290,170 290,800 120,800" fill="#020305" stroke={trimTone} strokeWidth="3" />
+      <polygon points="135,100 275,185 275,795 135,795" fill="#000000" />
+      {/* Left Doorway 2 */}
+      <polygon points="440,255 560,325 560,800 440,800" fill="#020305" stroke={trimTone} strokeWidth="2" />
+      <polygon points="450,275 550,335 550,795 450,795" fill="#000000" />
+
+      {/* Receding Right Hallway Wall & Door Frames */}
+      <polygon points="1920,0 1160,440 1160,800 1920,800" fill={wallTone} />
+      <line x1="1920" y1="785" x2="1160" y2="795" stroke={trimTone} strokeWidth="6" />
+      <line x1="1920" y1="670" x2="1160" y2="720" stroke={trimTone} strokeWidth="3" />
+      {/* Right Doorway 1 */}
+      <polygon points="1800,70 1630,170 1630,800 1800,800" fill="#020305" stroke={trimTone} strokeWidth="3" />
+      <polygon points="1785,100 1645,185 1645,795 1785,795" fill="#000000" />
+      {/* Right Doorway 2 */}
+      <polygon points="1480,255 1360,325 1360,800 1480,800" fill="#020305" stroke={trimTone} strokeWidth="2" />
+      <polygon points="1470,275 1370,335 1370,795 1470,795" fill="#000000" />
+
+      {/* Receding Floor Perspective Grid Lines */}
+      <g stroke={trimTone} strokeWidth="1" opacity="0.45">
+        <line x1="180" y1="800" x2="800" y2="800" />
+        <line x1="380" y1="800" x2="860" y2="800" />
+        <line x1="1540" y1="800" x2="1120" y2="800" />
+        <line x1="1740" y1="800" x2="1060" y2="800" />
+      </g>
     </g>
   );
 };
@@ -280,7 +426,38 @@ const SwampReeds: React.FC<{ x: number; y: number; scale: number; color: string 
 /**
  * LAYER 2: MAIN GROUND (Y = 800px)
  */
-export const MainGroundLayer: React.FC = () => {
+export const MainGroundLayer: React.FC<{ theme?: ThemeId }> = ({ theme }) => {
+  if (theme === "modern_indoor") {
+    return (
+      <g className="environment-layer-2-ground-indoor">
+        {/* Solid Indoor Floor */}
+        <rect
+          x="0"
+          y={GROUND_Y}
+          width={CANVAS_WIDTH}
+          height={CANVAS_HEIGHT - GROUND_Y}
+          fill={COLOR_PALETTE.silhouette_primary}
+        />
+        {/* Floor Sheen Line & Base Trim */}
+        <line x1="0" y1={GROUND_Y} x2={CANVAS_WIDTH} y2={GROUND_Y} stroke="#1E293B" strokeWidth="2" />
+        <line x1="0" y1={GROUND_Y + 12} x2={CANVAS_WIDTH} y2={GROUND_Y + 12} stroke="#0B0F17" strokeWidth="2" />
+        {/* Polished Floor Tile Seams */}
+        <g stroke="#141A24" strokeWidth="1.5" opacity="0.6">
+          <line x1="160" y1={GROUND_Y} x2="80" y2={CANVAS_HEIGHT} />
+          <line x1="420" y1={GROUND_Y} x2="340" y2={CANVAS_HEIGHT} />
+          <line x1="720" y1={GROUND_Y} x2="680" y2={CANVAS_HEIGHT} />
+          <line x1="960" y1={GROUND_Y} x2="960" y2={CANVAS_HEIGHT} />
+          <line x1="1200" y1={GROUND_Y} x2="1240" y2={CANVAS_HEIGHT} />
+          <line x1="1500" y1={GROUND_Y} x2="1580" y2={CANVAS_HEIGHT} />
+          <line x1="1760" y1={GROUND_Y} x2="1840" y2={CANVAS_HEIGHT} />
+          <line x1="0" y1={GROUND_Y + 60} x2={CANVAS_WIDTH} y2={GROUND_Y + 60} />
+          <line x1="0" y1={GROUND_Y + 140} x2={CANVAS_WIDTH} y2={GROUND_Y + 140} />
+          <line x1="0" y1={GROUND_Y + 220} x2={CANVAS_WIDTH} y2={GROUND_Y + 220} />
+        </g>
+      </g>
+    );
+  }
+
   return (
     <g className="environment-layer-2-ground">
       <rect
@@ -315,9 +492,13 @@ export const MainGroundLayer: React.FC = () => {
 /**
  * LAYER 3: FOREGROUND
  */
-export const ForegroundLayer: React.FC<{ fogDensity: number; skyPreset: SkyPresetId }> = ({
-  fogDensity,
-}) => {
+export const ForegroundLayer: React.FC<{
+  fogDensity: number;
+  skyPreset: SkyPresetId;
+  theme?: ThemeId;
+}> = ({ fogDensity, theme }) => {
+  const isIndoor = theme === "modern_indoor";
+
   return (
     <g className="environment-layer-3-foreground" pointerEvents="none">
       <g className="anim-fog-wave-slow" opacity={fogDensity * 0.85}>
@@ -339,15 +520,30 @@ export const ForegroundLayer: React.FC<{ fogDensity: number; skyPreset: SkyPrese
         />
       </g>
 
-      {/* Overhanging Branches */}
-      <path
-        d="M 0 0 C 80 40, 150 90, 210 160 C 230 185, 270 210, 310 230 C 270 220, 230 190, 190 145 C 130 85, 60 30, 0 15 Z"
-        fill={COLOR_PALETTE.silhouette_primary}
-      />
-      <path
-        d="M 1920 0 C 1820 50, 1720 110, 1630 185 C 1600 210, 1540 235, 1490 255 C 1545 240, 1605 210, 1655 165 C 1740 95, 1830 35, 1920 18 Z"
-        fill={COLOR_PALETTE.silhouette_primary}
-      />
+      {/* Foreground Framing Elements */}
+      {isIndoor ? (
+        <g className="indoor-foreground-framing">
+          {/* Left Doorway Jamb Frame */}
+          <path d="M 0 0 L 70 0 L 50 1080 L 0 1080 Z" fill={COLOR_PALETTE.silhouette_primary} />
+          {/* Right Doorway Jamb Frame */}
+          <path d="M 1920 0 L 1850 0 L 1870 1080 L 1920 1080 Z" fill={COLOR_PALETTE.silhouette_primary} />
+          {/* Top Hanging Ceiling Duct Silhouette */}
+          <path d="M 0 0 L 320 0 L 260 70 L 0 50 Z" fill={COLOR_PALETTE.silhouette_primary} />
+          <path d="M 1920 0 L 1600 0 L 1660 70 L 1920 50 Z" fill={COLOR_PALETTE.silhouette_primary} />
+        </g>
+      ) : (
+        <>
+          {/* Overhanging Branches */}
+          <path
+            d="M 0 0 C 80 40, 150 90, 210 160 C 230 185, 270 210, 310 230 C 270 220, 230 190, 190 145 C 130 85, 60 30, 0 15 Z"
+            fill={COLOR_PALETTE.silhouette_primary}
+          />
+          <path
+            d="M 1920 0 C 1820 50, 1720 110, 1630 185 C 1600 210, 1540 235, 1490 255 C 1545 240, 1605 210, 1655 165 C 1740 95, 1830 35, 1920 18 Z"
+            fill={COLOR_PALETTE.silhouette_primary}
+          />
+        </>
+      )}
 
       {/* Cinematic Vignette */}
       <rect

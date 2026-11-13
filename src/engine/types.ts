@@ -3,8 +3,19 @@
  * Style: Silhouette Minimalist Horror (Limbo / Badland / U Linh Kỳ Truyện)
  */
 
-export type ThemeId = "rural_graveyard" | "abandoned_village" | "cursed_swamp";
-export type SkyPresetId = "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss";
+export type ThemeId =
+  | "rural_graveyard"
+  | "abandoned_village"
+  | "cursed_swamp"
+  | "modern_indoor";
+
+export type SkyPresetId =
+  | "blood_moon"
+  | "foggy_night"
+  | "stormy_dark"
+  | "eclipse_abyss"
+  | "flickering_fluorescent"
+  | "dim_indoor_night";
 
 export type StructureId =
   | "creepy_banyan_tree"
@@ -14,7 +25,12 @@ export type StructureId =
   | "broken_wooden_bridge"
   | "scarecrow_of_the_damned"
   | "creepy_well"
-  | "haunted_gallows_tree";
+  | "haunted_gallows_tree"
+  | "hospital_operating_bed"
+  | "hotel_reception_desk"
+  | "supermarket_shelf_aisle"
+  | "creepy_elevator_doors"
+  | "dining_table_chairs";
 
 export type DetailId =
   | "detail_black_crow"
@@ -22,7 +38,11 @@ export type DetailId =
   | "detail_blood_lantern"
   | "detail_incense_bowl"
   | "detail_skull_pile"
-  | "detail_hanging_talisman";
+  | "detail_hanging_talisman"
+  | "detail_iv_drip_stand"
+  | "detail_shopping_cart"
+  | "detail_surveillance_camera"
+  | "detail_flickering_ceiling_lamp";
 
 export type CharacterBaseId =
   | "male_adult"
@@ -40,7 +60,10 @@ export type CostumeId =
   | "outfit_monk_cassock"       // Áo cà sa pháp sư / Đạo bào trừ tà
   | "outfit_shredded_burial"    // Vải liệm oan hồn / Áo niệm tử thi
   | "outfit_ancient_armor"      // Giáp tướng cổ vỡ nát / Chiến bào tử sĩ
-  | "outfit_child_pajamas";     // Yếm hoa / Bộ đồ trẻ thơ vương vết ố
+  | "outfit_child_pajamas"      // Yếm hoa / Bộ đồ trẻ thơ vương vết ố
+  | "outfit_doctor_coat"        // Áo blouse bác sĩ / Y tá bệnh viện hiện đại
+  | "outfit_patient_gown"       // Áo bệnh nhân sọc xanh lấm lem
+  | "outfit_modern_casual";     // Trang phục thường ngày hiện đại (Hoodie / Áo khoác)
 
 export type CharacterFaceId =
   | "face_calm"
@@ -71,7 +94,9 @@ export type HeldItemId =
   | "item_rusty_sickle"
   | "item_ritual_bell"
   | "item_tattered_doll"
-  | "item_tattered_umbrella";
+  | "item_tattered_umbrella"
+  | "item_flashlight"
+  | "item_scalpel";
 
 export type HeldHand = "right" | "left";
 
@@ -152,6 +177,20 @@ export interface DirectorSceneScript {
   details?: DetailItemConfig[];
   dialogue?: string;
   narrative_note?: string;
+}
+
+/**
+ * Named Shared Environment Preset
+ * Cấu hình bối cảnh dùng lại giữa các phân cảnh để tránh lệch bối cảnh
+ */
+export interface NamedEnvironmentPreset {
+  id: string;
+  name: string; // Tên bối cảnh (ví dụ: "Bãi Tha Ma Đêm Ba Mươi", "Miếu Hoang Trăng Máu")
+  description?: string; // Ghi chú mô tả bối cảnh
+  theme: ThemeId;
+  lighting: DirectorLightingConfig;
+  environment_items: EnvironmentItemConfig[];
+  details?: DetailItemConfig[];
 }
 
 /**

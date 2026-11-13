@@ -19,6 +19,8 @@ export const HELD_ITEM_CATALOG: HeldItemMeta[] = [
   { id: "item_ritual_bell", name: "Chuông đồng triệu hồn", desc: "Chuông Tam Thanh dùng trong nghi lễ gọi hồn" },
   { id: "item_tattered_doll", name: "Búp bê vải rách kinh dị", desc: "Búp bê mất đầu bằng vải bố khâu vá" },
   { id: "item_tattered_umbrella", name: "Ô giấy dầu cổ rách nát", desc: "Cây dù cổ rách tơi tả che sương đêm" },
+  { id: "item_flashlight", name: "Đèn pin rọi nón sáng kinh dị", desc: "Đèn pin hiện đại phát luồng sáng hình nón rọi bóng đêm" },
+  { id: "item_scalpel", name: "Dao mổ phẫu thuật sắc lạnh", desc: "Dao mổ kim loại sáng loáng vương vệt máu" },
 ];
 
 interface HandheldItemRendererProps {
@@ -243,6 +245,61 @@ function renderHeldItemSvg(itemId: Exclude<HeldItemId, "none">) {
           <line x1="0" y1="-92" x2="42" y2="-65" stroke="#78350F" strokeWidth="1.2" opacity="0.8" />
           {/* Top finial */}
           <polygon points="-3,-92 3,-92 0,-102" fill="#451A03" />
+        </g>
+      );
+
+    case "item_flashlight":
+      return (
+        <g className="held-flashlight">
+          {/* Tactical Flashlight Body held at palm [0, 0] */}
+          <rect x="-18" y="-5" width="34" height="10" rx="2" fill="#0A0C10" stroke="#334155" strokeWidth="1.2" />
+          <line x1="-12" y1="-5" x2="-12" y2="5" stroke="#1E293B" strokeWidth="1.5" />
+          <line x1="-6" y1="-5" x2="-6" y2="5" stroke="#1E293B" strokeWidth="1.5" />
+          <line x1="0" y1="-5" x2="0" y2="5" stroke="#1E293B" strokeWidth="1.5" />
+          <line x1="6" y1="-5" x2="6" y2="5" stroke="#1E293B" strokeWidth="1.5" />
+          <rect x="-22" y="-4" width="4" height="8" rx="1" fill="#1E293B" />
+          <polygon points="16,-5 26,-9 26,9 16,5" fill="#1E293B" stroke="#475569" strokeWidth="1" />
+          <ellipse cx="26" cy="0" rx="2" ry="9" fill="#F8FAFC" className="anim-flicker-ember" />
+
+          {/* Conical Light Beam */}
+          <path
+            d="M 27 -8 L 380 -85 L 380 85 L 27 8 Z"
+            fill="url(#flashlight-beam-glow)"
+            style={{ mixBlendMode: "screen", pointerEvents: "none" }}
+          />
+          {/* Dust motes */}
+          <g opacity="0.6">
+            <circle cx="80" cy="-12" r="1.5" fill="#FFFFFF" />
+            <circle cx="150" cy="18" r="1.8" fill="#FFFFFF" />
+            <circle cx="230" cy="-25" r="1.2" fill="#FFFFFF" />
+            <circle cx="310" cy="15" r="2" fill="#FFFFFF" />
+          </g>
+        </g>
+      );
+
+    case "item_scalpel":
+      return (
+        <g className="held-scalpel">
+          {/* Surgical Handle held at [0, 0] */}
+          <path
+            d="M -24 -2 L 8 -2 L 10 3 L -24 3 Z"
+            fill="#94A3B8"
+            stroke="#475569"
+            strokeWidth="1"
+          />
+          <line x1="-16" y1="-1" x2="-16" y2="2" stroke="#334155" strokeWidth="1" />
+          <line x1="-10" y1="-1" x2="-10" y2="2" stroke="#334155" strokeWidth="1" />
+          <line x1="-4" y1="-1" x2="-4" y2="2" stroke="#334155" strokeWidth="1" />
+          <polygon points="8,-3 14,-2 14,2 8,3" fill="#64748B" />
+          {/* Scalpel Blade */}
+          <path
+            d="M 14 -2 L 28 -2 C 32 0, 32 3, 26 4 L 14 3 Z"
+            fill="#F1F5F9"
+            stroke="#CBD5E1"
+            strokeWidth="1.2"
+          />
+          <line x1="14" y1="3" x2="26" y2="4" stroke="#FFFFFF" strokeWidth="1.2" />
+          <circle cx="27" cy="2" r="1.5" fill={COLOR_PALETTE.accent_blood_red} />
         </g>
       );
   }

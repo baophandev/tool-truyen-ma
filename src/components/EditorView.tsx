@@ -25,6 +25,10 @@ import { ALL_SLOTS, GROUND_Y } from "../engine/constants";
 import { HELD_ITEM_CATALOG } from "../engine/graphics/HandheldItems";
 import { getDefaultCostumeForBase, getSlotCoordinates } from "../engine/layoutRouter";
 import {
+  loadStoredNamedEnvironments,
+  applyEnvironmentToScene,
+} from "../engine/environmentPresets";
+import {
   STRUCTURE_RULES,
   DETAIL_RULES,
   coordsToSlotAssignment,
@@ -55,18 +59,21 @@ import {
   Play,
   Pause,
   ArrowRight,
+  Compass,
 } from "lucide-react";
 
 interface EditorViewProps {
   scene: DirectorSceneScript;
   onChangeScene: (updated: DirectorSceneScript) => void;
   onResetScene: () => void;
+  onOpenAiDirector?: (mode?: "description_film" | "environments_manager" | "re_direct_scene" | "full_film" | "append_scene") => void;
 }
 
 export const EditorView: React.FC<EditorViewProps> = ({
   scene,
   onChangeScene,
   onResetScene,
+  onOpenAiDirector,
 }) => {
   const [activeTab, setActiveTab] = useState<"actors" | "structures" | "details" | "lighting" | "story">("actors");
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity>(() => {
@@ -939,6 +946,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="outfit_shredded_burial">Vải liệm oan hồn / Áo niệm tử thi (outfit_shredded_burial)</option>
                         <option value="outfit_ancient_armor">Giáp tướng cổ vỡ nát / Chiến bào tử sĩ (outfit_ancient_armor)</option>
                         <option value="outfit_child_pajamas">Yếm hoa / Đồ trẻ thơ vương vết ố (outfit_child_pajamas)</option>
+                        <option value="outfit_doctor_coat">Áo blouse bác sĩ vấy máu phẫu thuật (outfit_doctor_coat)</option>
+                        <option value="outfit_patient_gown">Áo bệnh nhân sọc xanh lấm lem (outfit_patient_gown)</option>
+                        <option value="outfit_modern_casual">Áo hoodie / Đồ hiện đại thường nhật (outfit_modern_casual)</option>
                       </select>
                     </div>
 
@@ -1596,6 +1606,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="scarecrow_of_the_damned">Bù nhìn rơm bị quỷ ám (scarecrow_of_the_damned)</option>
                         <option value="creepy_well">Giếng cạn oan hồn (creepy_well)</option>
                         <option value="haunted_gallows_tree">Cây treo cổ rủ cành liễu (haunted_gallows_tree)</option>
+                        <option value="hospital_operating_bed">Giường mổ bệnh viện rỉ sét (hospital_operating_bed)</option>
+                        <option value="hotel_reception_desk">Quầy lễ tân khách sạn u ám (hotel_reception_desk)</option>
+                        <option value="supermarket_shelf_aisle">Dãy kệ hàng siêu thị hoang tàn (supermarket_shelf_aisle)</option>
+                        <option value="creepy_elevator_doors">Cửa thang máy rùng rợn hé mở (creepy_elevator_doors)</option>
+                        <option value="dining_table_chairs">Bàn ăn nhà hàng khăn rách (dining_table_chairs)</option>
                       </select>
                     </div>
 
@@ -1949,28 +1964,77 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
           {/* TAB 3: LIGHTING & ENVIRONMENT */}
           {activeTab === "lighting" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-neutral-300">
-                    Chủ Đề Bối Cảnh (Theme):
-                  </label>
+            <div className="flex flex-col gap-5">
+              {/* Reusable Named Environment Quick Apply */}
+              <div className="bg-gradient-to-r from-amber-950/40 via-purple-950/30 to-black border border-amber-600/40 p-4 rounded-xl flex flex-col gap-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Compass className="w-4 h-4 text-amber-400" />
+                    <span className="text-xs font-bold text-white">
+                      Khóa Bối Cảnh Chung Dùng Lại (Chống Lệch Cảnh)
+                    </span>
+                    <span className="text-[10px] bg-amber-950 text-amber-300 border border-amber-800/60 px-1.5 py-0.2 rounded font-mono">
+                      Shared Set
+                    </span>
+                  </div>
+                  {onOpenAiDirector && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenAiDirector("environments_manager")}
+                      className="text-xs text-amber-300 hover:text-amber-200 underline font-mono flex items-center gap-1"
+                    >
+                      <span>Quản lý thư viện ({loadStoredNamedEnvironments().length} bối cảnh)</span>
+                    </button>
+                  )}
+                </div>
+                <p className="text-[11px] text-neutral-400 m-0">
+                  Chọn bối cảnh có sẵn để áp dụng đồng bộ ngay lập tức cho cảnh này (Theme, Bầu trời, Công trình & Đạo cụ sẽ được khóa đúng chuẩn, giữ nguyên diễn viên):
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
                   <select
-                    value={scene.theme}
-                    onChange={(e) =>
-                      onChangeScene({ ...scene, theme: e.target.value as ThemeId })
-                    }
-                    className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600"
+                    onChange={(e) => {
+                      const envs = loadStoredNamedEnvironments();
+                      const selected = envs.find((env) => env.id === e.target.value);
+                      if (selected) {
+                        onChangeScene(applyEnvironmentToScene(scene, selected));
+                      }
+                    }}
+                    defaultValue=""
+                    className="flex-1 bg-black border border-amber-700/80 rounded-lg p-2 text-xs text-amber-200 font-semibold focus:outline-none focus:border-amber-400"
                   >
-                    <option value="rural_graveyard">Bãi tha ma nông thôn (rural_graveyard)</option>
-                    <option value="abandoned_village">Đường làng hoang vắng (abandoned_village)</option>
-                    <option value="cursed_swamp">Đầm lầy u minh (cursed_swamp)</option>
+                    <option value="" disabled>-- Chọn bối cảnh mẫu để khóa khung cảnh --</option>
+                    {loadStoredNamedEnvironments().map((env) => (
+                      <option key={env.id} value={env.id}>
+                        📍 {env.name} ({env.theme} | {env.lighting.sky_preset})
+                      </option>
+                    ))}
                   </select>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-neutral-300">
+                      Chủ Đề Bối Cảnh (Theme):
+                    </label>
+                    <select
+                      value={scene.theme}
+                      onChange={(e) =>
+                        onChangeScene({ ...scene, theme: e.target.value as ThemeId })
+                      }
+                      className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600"
+                    >
+                      <option value="rural_graveyard">Bãi tha ma nông thôn (rural_graveyard)</option>
+                      <option value="abandoned_village">Đường làng hoang vắng (abandoned_village)</option>
+                      <option value="cursed_swamp">Đầm lầy u minh (cursed_swamp)</option>
+                      <option value="modern_indoor">Hành lang & Không gian trong nhà hiện đại (modern_indoor)</option>
+                    </select>
+                  </div>
 
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-neutral-300">
-                    Bầu Trời & Trăng (Sky Preset):
+                    Bầu Trời & Ánh Sáng (Sky Preset):
                   </label>
                   <select
                     value={scene.lighting.sky_preset}
@@ -1989,6 +2053,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     <option value="foggy_night">Đêm Sương Lạnh Buốt (foggy_night - Gradient đen tím lạnh, trăng mờ nhạt)</option>
                     <option value="stormy_dark">Bão Đêm Sấm Chớp (stormy_dark - Trời dông tối om, chớp giật)</option>
                     <option value="eclipse_abyss">Nhật Thực Hắc Ám & Ma Trơi (eclipse_abyss - Lửa xanh lân tinh)</option>
+                    <option value="flickering_fluorescent">Đèn Tuýp Huỳnh Quang Chập Chờn (flickering_fluorescent - Bệnh viện, siêu thị)</option>
+                    <option value="dim_indoor_night">Ánh Vàng Đêm Mờ Ảo (dim_indoor_night - Khách sạn, nhà hàng)</option>
                   </select>
                 </div>
               </div>
@@ -2039,7 +2105,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
           {/* TAB 4: STORY & DIALOGUE */}
           {activeTab === "story" && (
@@ -2134,6 +2201,48 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   placeholder="Ghi chú bối cảnh và cảm xúc nhân vật..."
                   className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600 resize-none"
                 />
+              </div>
+
+              {/* AI Direct Description Action & Environment Library */}
+              <div className="mt-2 bg-gradient-to-br from-purple-950/40 via-red-950/30 to-black border border-purple-800/60 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg shadow-purple-950/20">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-purple-900/60 border border-purple-500/40 flex items-center justify-center shrink-0 mt-0.5">
+                    <Compass className="w-5 h-5 text-amber-300" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-xs font-bold text-white">
+                        Cỗ Máy Tạo Video 2D Theo Mô Tả Trực Tiếp (Gemini)
+                      </h4>
+                      <span className="text-[10px] bg-purple-900/80 text-purple-200 border border-purple-700/60 px-1.5 py-0.2 rounded font-mono">
+                        Khóa Bối Cảnh
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-neutral-400 mt-1">
+                      Mô tả trực tiếp nhân vật làm gì trong scene (vd: "Cho lữ khách cầm đèn bão chạy hoảng loạn từ trái sang phải, bóng ma bay phía sau") để AI bố trí ngay!
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => onOpenAiDirector?.("environments_manager")}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-200 text-xs font-semibold border border-neutral-700 transition-all"
+                  >
+                    <Compass className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Thư Viện Bối Cảnh</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => onOpenAiDirector?.("re_direct_scene")}
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-gradient-to-r from-purple-700 via-pink-700 to-red-700 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white text-xs font-bold shadow-md shadow-purple-950/50 border border-purple-400/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+                    <span>✨ AI Bố Trí Cảnh Này</span>
+                  </button>
+                </div>
               </div>
             </div>
           )}

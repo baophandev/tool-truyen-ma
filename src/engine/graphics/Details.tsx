@@ -21,6 +21,10 @@ export const DetailRenderer: React.FC<DetailRendererProps> = ({
       {id === "detail_incense_bowl" && <IncenseBowl />}
       {id === "detail_skull_pile" && <SkullPile />}
       {id === "detail_hanging_talisman" && <HangingTalisman />}
+      {id === "detail_iv_drip_stand" && <IvDripStand />}
+      {id === "detail_shopping_cart" && <ShoppingCart />}
+      {id === "detail_surveillance_camera" && <SurveillanceCamera />}
+      {id === "detail_flickering_ceiling_lamp" && <FlickeringCeilingLamp />}
 
       {showAnchor && (
         <g className="detail-debug-anchor" pointerEvents="none">
@@ -230,6 +234,163 @@ const HangingTalisman: React.FC = () => {
         <line x1="0" y1="6" x2="0" y2="36" stroke={COLOR_PALETTE.accent_blood_red} strokeWidth="2" />
         <line x1="-4" y1="24" x2="4" y2="24" stroke={COLOR_PALETTE.accent_blood_red} strokeWidth="1.8" />
       </g>
+    </g>
+  );
+};
+
+/**
+ * 7. IV DRIP STAND (Cột Truyền Dịch Y Tế Rỉ Máu)
+ */
+const IvDripStand: React.FC = () => {
+  return (
+    <g className="iv-drip-stand">
+      {/* 5-Legged Castor Spider Base on Ground Y=0 */}
+      <circle cx="-22" cy="-3" r="3.5" fill="#334155" />
+      <circle cx="-10" cy="-2" r="3" fill="#1E293B" />
+      <circle cx="10" cy="-2" r="3" fill="#1E293B" />
+      <circle cx="22" cy="-3" r="3.5" fill="#334155" />
+      <path d="M -22 -3 L 0 -12 L 22 -3" stroke="#1E293B" strokeWidth="3" fill="none" />
+      <circle cx="0" cy="-12" r="4" fill="#475569" />
+
+      {/* Vertical Chrome Rod */}
+      <line x1="0" y1="-12" x2="0" y2="-165" stroke="#94A3B8" strokeWidth="3" />
+      <line x1="-1" y1="-12" x2="-1" y2="-165" stroke="#E2E8F0" strokeWidth="1" opacity="0.6" />
+      <circle cx="0" cy="-90" r="3" fill="#475569" />
+
+      {/* Top Ram's Horn Hooks */}
+      <path
+        d="M -16 -170 C -16 -162, 0 -162, 0 -165 C 0 -162, 16 -162, 16 -170"
+        stroke="#64748B"
+        strokeWidth="2.5"
+        fill="none"
+      />
+
+      {/* Hanging IV Saline Infusion Bag */}
+      <g transform="translate(-16, -170)">
+        <line x1="0" y1="0" x2="0" y2="8" stroke="#334155" strokeWidth="1.5" />
+        {/* Transparent IV Bag */}
+        <rect x="-9" y="8" width="18" height="30" rx="3" fill="#E0F2FE" opacity="0.8" stroke="#0284C7" strokeWidth="1" />
+        {/* Fluid Level with Red Stain */}
+        <rect x="-8" y="16" width="16" height="20" rx="2" fill="#BAE6FD" opacity="0.9" />
+        <rect x="-8" y="26" width="16" height="10" rx="1" fill={COLOR_PALETTE.accent_blood_red} opacity="0.85" />
+        {/* Drip Chamber */}
+        <rect x="-3" y="38" width="6" height="10" rx="1" fill="#E2E8F0" stroke="#0284C7" strokeWidth="1" />
+        {/* Plastic Infusion Tube Looping Down */}
+        <path d="M 0 48 Q 12 75 8 105 Q 4 130 14 150" fill="none" stroke="#E0F2FE" strokeWidth="1.5" opacity="0.75" />
+        {/* Dripping Blood Droplet */}
+        <circle cx="14" cy="153" r="2" fill={COLOR_PALETTE.accent_blood_red} />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 8. SHOPPING CART (Xe Đẩy Siêu Thị Rỉ Sét)
+ */
+const ShoppingCart: React.FC = () => {
+  return (
+    <g className="shopping-cart">
+      {/* 4 Castor Wheels on Ground Y=0 */}
+      <circle cx="-32" cy="-4" r="4" fill="#334155" stroke="#0F172A" strokeWidth="1.5" />
+      <circle cx="-18" cy="-4" r="3.5" fill="#1E293B" />
+      <circle cx="18" cy="-4" r="3.5" fill="#1E293B" />
+      <circle cx="32" cy="-4" r="4" fill="#334155" stroke="#0F172A" strokeWidth="1.5" />
+
+      {/* Lower Wire Frame Chassis */}
+      <line x1="-34" y1="-8" x2="34" y2="-8" stroke="#475569" strokeWidth="3" />
+      <line x1="-32" y1="-8" x2="-28" y2="-32" stroke="#475569" strokeWidth="3" />
+      <line x1="28" y1="-8" x2="32" y2="-32" stroke="#475569" strokeWidth="3" />
+      {/* Lower Tray Shelf with Rusted Box */}
+      <line x1="-22" y1="-12" x2="22" y2="-12" stroke="#64748B" strokeWidth="1.5" />
+      <rect x="-10" y="-22" width="18" height="10" fill="#78350F" opacity="0.8" />
+
+      {/* Slanted Wireframe Basket (Slanted front) */}
+      <polygon
+        points="-35,-72 32,-72 26,-32 -28,-32"
+        fill="#0F172A"
+        opacity="0.25"
+        stroke="#64748B"
+        strokeWidth="2"
+      />
+      {/* Horizontal Wire Grid */}
+      <line x1="-33" y1="-60" x2="30" y2="-60" stroke="#94A3B8" strokeWidth="1.2" opacity="0.7" />
+      <line x1="-31" y1="-48" x2="28" y2="-48" stroke="#94A3B8" strokeWidth="1.2" opacity="0.7" />
+      <line x1="-29" y1="-38" x2="27" y2="-38" stroke="#94A3B8" strokeWidth="1.2" opacity="0.7" />
+      {/* Vertical Wire Grid */}
+      {[-20, -10, 0, 10, 20].map((x) => (
+        <line key={x} x1={x} y1="-72" x2={x} y2="-32" stroke="#94A3B8" strokeWidth="1.2" opacity="0.7" />
+      ))}
+
+      {/* Push Handle Extending Upwards */}
+      <line x1="-28" y1="-50" x2="-40" y2="-80" stroke="#475569" strokeWidth="3" />
+      <ellipse cx="-40" cy="-80" rx="3" ry="5" fill="#EF4444" stroke="#991B1B" strokeWidth="1" />
+    </g>
+  );
+};
+
+/**
+ * 9. SURVEILLANCE CAMERA (Camera An Ninh Chớp Đỏ) - AIR SLOT
+ */
+const SurveillanceCamera: React.FC = () => {
+  return (
+    <g className="surveillance-camera">
+      {/* Ceiling Mount Bracket */}
+      <rect x="-14" y="0" width="28" height="6" rx="1" fill="#1E293B" stroke="#0F172A" strokeWidth="1.5" />
+      {/* Swivel Stem Arm */}
+      <line x1="0" y1="6" x2="0" y2="18" stroke="#334155" strokeWidth="3.5" />
+      <circle cx="0" cy="18" r="4.5" fill="#475569" />
+
+      {/* Angled Camera Body (pointing down & right ~35 deg) */}
+      <g transform="translate(0, 18) rotate(32)">
+        {/* Rear cable loop */}
+        <path d="M -16 0 Q -24 -10 -12 -16" fill="none" stroke="#0F172A" strokeWidth="2" />
+        {/* Main Cylindrical Housing */}
+        <rect x="-16" y="-8" width="34" height="16" rx="3" fill="#E2E8F0" stroke="#334155" strokeWidth="1.5" />
+        {/* Sunshield Visor Hood */}
+        <path d="M -14 -10 L 22 -10 L 20 -8 L -14 -8 Z" fill="#94A3B8" />
+        {/* Front Lens Barrel */}
+        <rect x="18" y="-7" width="6" height="14" rx="2" fill="#0F172A" />
+        <ellipse cx="23" cy="0" rx="2" ry="5" fill="#0284C7" />
+        {/* Pulsing Red Recording LED Dot */}
+        <circle cx="16" cy="-4" r="2" fill="#EF4444" className="anim-pulse-eerie" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 10. FLICKERING CEILING LAMP (Đèn Huỳnh Quang Trần Chập Chờn) - AIR SLOT
+ */
+const FlickeringCeilingLamp: React.FC = () => {
+  return (
+    <g className="flickering-ceiling-lamp">
+      {/* Two Hanging Suspension Cords from Ceiling */}
+      <line x1="-42" y1="-45" x2="-42" y2="0" stroke="#475569" strokeWidth="1.5" />
+      <line x1="42" y1="-45" x2="42" y2="0" stroke="#475569" strokeWidth="1.5" />
+      {/* Loose Dangling Wire Cord */}
+      <path d="M 46 -30 Q 55 -10 50 15" fill="none" stroke="#0F172A" strokeWidth="1.5" />
+
+      {/* Industrial Lamp Metal Body Casing */}
+      <rect x="-55" y="0" width="110" height="14" rx="2" fill="#0F172A" stroke="#334155" strokeWidth="1.5" />
+
+      {/* Diffuse Eerie Downward Glow Cone */}
+      <polygon
+        points="-45,14 -85,120 85,120 45,14"
+        fill="url(#lantern-warm-glow)"
+        opacity="0.2"
+        className="anim-flicker-ember"
+      />
+
+      {/* Fluorescent Light Tube Inside */}
+      <rect
+        x="-48"
+        y="5"
+        width="96"
+        height="6"
+        rx="2"
+        fill="#A7F3D0"
+        className="anim-flicker-ember"
+      />
     </g>
   );
 };

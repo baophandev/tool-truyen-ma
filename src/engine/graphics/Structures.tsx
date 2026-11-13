@@ -26,6 +26,11 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "scarecrow_of_the_damned" && <ScarecrowOfTheDamned />}
       {id === "creepy_well" && <CreepyWell />}
       {id === "haunted_gallows_tree" && <HauntedGallowsTree />}
+      {id === "hospital_operating_bed" && <HospitalOperatingBed />}
+      {id === "hotel_reception_desk" && <HotelReceptionDesk />}
+      {id === "supermarket_shelf_aisle" && <SupermarketShelfAisle />}
+      {id === "creepy_elevator_doors" && <CreepyElevatorDoors />}
+      {id === "dining_table_chairs" && <DiningTableChairs />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -433,6 +438,322 @@ const HauntedGallowsTree: React.FC = () => {
         <circle cx="0" cy="162" r="4.5" fill={COLOR_PALETTE.silhouette_primary} />
         {/* Noose Loop */}
         <ellipse cx="0" cy="188" rx="14" ry="24" fill="none" stroke={COLOR_PALETTE.accent_fog_white} strokeWidth="2.5" opacity="0.85" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 9. HOSPITAL OPERATING BED (Giường Mổ Bệnh Viện Rỉ Sét)
+ */
+const HospitalOperatingBed: React.FC = () => {
+  return (
+    <g className="hospital-operating-bed">
+      {/* 4 Castor Wheels on Ground Y=0 */}
+      <circle cx="-110" cy="-6" r="6" fill="#1E293B" stroke="#0F172A" strokeWidth="2" />
+      <circle cx="-45" cy="-6" r="6" fill="#1E293B" stroke="#0F172A" strokeWidth="2" />
+      <circle cx="45" cy="-6" r="6" fill="#1E293B" stroke="#0F172A" strokeWidth="2" />
+      <circle cx="110" cy="-6" r="6" fill="#1E293B" stroke="#0F172A" strokeWidth="2" />
+      <line x1="-120" y1="-12" x2="120" y2="-12" stroke="#0F172A" strokeWidth="4" />
+
+      {/* Hydraulic Scissor Lift Base */}
+      <line x1="-80" y1="-12" x2="30" y2="-60" stroke="#1E293B" strokeWidth="4.5" />
+      <line x1="80" y1="-12" x2="-30" y2="-60" stroke="#1E293B" strokeWidth="4.5" />
+      <circle cx="0" cy="-36" r="4.5" fill="#334155" />
+
+      {/* Bed Platform Frame */}
+      <rect x="-130" y="-68" width="260" height="10" rx="2" fill="#0A0D14" stroke="#334155" strokeWidth="1.5" />
+
+      {/* Raised Headrest (Left) */}
+      <polygon points="-130,-68 -70,-68 -90,-96 -140,-86" fill="#0A0D14" stroke="#334155" strokeWidth="1.5" />
+
+      {/* Stained Mattress with Drooping Ripped Sheet */}
+      <path
+        d="M -138 -86 L -90 -96 L -65 -72 L 128 -72 L 128 -68 L -65 -68 Z"
+        fill="#CBD5E1"
+        opacity="0.85"
+      />
+      {/* Drooping soiled bedsheet */}
+      <path
+        d="M -40 -60 C -30 -35, -20 -18, -5 -15 L 15 -15 C 25 -32, 40 -48, 55 -60 Z"
+        fill="#94A3B8"
+        opacity="0.75"
+      />
+      {/* Ominous Blood Stain on Mattress */}
+      <ellipse cx="-20" cy="-70" rx="18" ry="4" fill={COLOR_PALETTE.accent_blood_red} opacity="0.8" />
+      <circle cx="20" cy="-69" r="3" fill={COLOR_PALETTE.accent_blood_red} opacity="0.7" />
+
+      {/* Restraint Straps Dangling */}
+      <path d="M -50 -60 Q -55 -30 -52 -10" stroke="#475569" strokeWidth="2" fill="none" />
+      <path d="M 60 -60 Q 64 -35 60 -8" stroke="#475569" strokeWidth="2" fill="none" />
+
+      {/* Attached Tall Surgical Arch & Overhead Lamp */}
+      <path
+        d="M -125 -68 L -125 -190 Q -125 -220 -95 -220 L 0 -220"
+        fill="none"
+        stroke="#1E293B"
+        strokeWidth="3.5"
+      />
+      {/* Surgical Lamp Bell */}
+      <ellipse cx="0" cy="-220" rx="24" ry="8" fill="#334155" stroke="#0F172A" strokeWidth="1.5" />
+      <ellipse cx="0" cy="-219" rx="18" ry="4" fill="#A7F3D0" opacity="0.6" className="anim-flicker-fast" />
+    </g>
+  );
+};
+
+/**
+ * 10. HOTEL RECEPTION DESK (Quầy Lễ Tân Khách Sạn U Ám)
+ */
+const HotelReceptionDesk: React.FC = () => {
+  return (
+    <g className="hotel-reception-desk">
+      {/* Background Room Key / Mail Slot Wall Rack (Behind desk) */}
+      <g transform="translate(0, -95)">
+        <rect x="-115" y="-120" width="230" height="120" fill="#0C0F17" stroke="#1E293B" strokeWidth="2" />
+        {/* Grid Slots */}
+        {[-90, -45, 0, 45, 90].map((x) => (
+          <React.Fragment key={x}>
+            <line x1={x} y1="-120" x2={x} y2="0" stroke="#1E293B" strokeWidth="1.5" />
+            {/* Hanging brass keys */}
+            <circle cx={x - 22} cy="-85" r="2.5" fill="#F59E0B" opacity="0.85" />
+            <line x1={x - 22} y1="-85" x2={x - 22} y2="-72" stroke="#D97706" strokeWidth="1.2" />
+            <circle cx={x - 22} cy="-45" r="2.5" fill="#F59E0B" opacity="0.85" />
+            <line x1={x - 22} y1="-45" x2={x - 22} y2="-32" stroke="#D97706" strokeWidth="1.2" />
+          </React.Fragment>
+        ))}
+        <line x1="-115" y1="-80" x2="115" y2="-80" stroke="#1E293B" strokeWidth="1.5" />
+        <line x1="-115" y1="-40" x2="115" y2="-40" stroke="#1E293B" strokeWidth="1.5" />
+      </g>
+
+      {/* Main Wooden Counter Body */}
+      <rect x="-140" y="-95" width="280" height="95" fill={COLOR_PALETTE.silhouette_primary} />
+      {/* Wood Paneling Decorative Insets */}
+      <rect x="-125" y="-82" width="70" height="70" fill="#06080D" stroke="#1E293B" strokeWidth="2" />
+      <rect x="-35" y="-82" width="70" height="70" fill="#06080D" stroke="#1E293B" strokeWidth="2" />
+      <rect x="55" y="-82" width="70" height="70" fill="#06080D" stroke="#1E293B" strokeWidth="2" />
+      {/* Heavy Countertop Slab */}
+      <rect x="-150" y="-103" width="300" height="10" rx="2" fill="#1E293B" stroke="#0F172A" strokeWidth="1.5" />
+
+      {/* Brass Service Bell */}
+      <g transform="translate(-50, -103)">
+        <ellipse cx="0" cy="0" rx="10" ry="3" fill="#D97706" />
+        <path d="M -8 0 C -8 -8, 8 -8, 8 0 Z" fill="#F59E0B" stroke="#B45309" strokeWidth="0.8" />
+        <circle cx="0" cy="-9" r="2" fill="#FDE68A" />
+      </g>
+
+      {/* Guest Check-in Ledger Book */}
+      <g transform="translate(15, -103)">
+        <polygon points="-24,0 -20,-8 18,-8 22,0" fill="#CBD5E1" stroke="#475569" strokeWidth="1" />
+        <line x1="-2" y1="-8" x2="-2" y2="0" stroke="#0F172A" strokeWidth="1" />
+      </g>
+
+      {/* Vintage Green Banker's Desk Lamp */}
+      <g transform="translate(90, -103)">
+        <ellipse cx="0" cy="0" rx="8" ry="2.5" fill="#D97706" />
+        <path d="M 0 0 L 0 -24 Q 0 -34 -12 -34" fill="none" stroke="#D97706" strokeWidth="2.5" />
+        {/* Emerald glass shade */}
+        <path d="M -24 -32 C -24 -44, 0 -44, 0 -32 Z" fill="#047857" stroke="#065F46" strokeWidth="1" />
+        <ellipse cx="-12" cy="-32" rx="12" ry="3" fill="#A7F3D0" opacity="0.65" className="anim-flicker-ember" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 11. SUPERMARKET SHELF AISLE (Dãy Kệ Hàng Siêu Thị Hoang Tàn)
+ */
+const SupermarketShelfAisle: React.FC = () => {
+  return (
+    <g className="supermarket-shelf-aisle">
+      {/* Industrial Upright Steel Frame (Height 360px) */}
+      <rect x="-120" y="-350" width="8" height="350" fill="#1E293B" stroke="#0F172A" strokeWidth="1.5" />
+      <rect x="112" y="-350" width="8" height="350" fill="#1E293B" stroke="#0F172A" strokeWidth="1.5" />
+      <rect x="-4" y="-350" width="8" height="350" fill="#1E293B" stroke="#0F172A" strokeWidth="1.5" />
+      {/* Base feet */}
+      <rect x="-135" y="-12" width="270" height="12" rx="2" fill="#0A0D14" stroke="#1E293B" strokeWidth="1.5" />
+
+      {/* 4 Shelves with Price Tag Rails */}
+      {[-75, -145, -215, -285].map((y) => (
+        <React.Fragment key={y}>
+          {/* Shelf platform */}
+          <rect x="-120" y={y} width="240" height="8" fill="#141B26" stroke="#334155" strokeWidth="1" />
+          {/* Neon price strip */}
+          <line x1="-120" y1={y + 8} x2="120" y2={y + 8} stroke="#0284C7" strokeWidth="1.5" opacity="0.5" />
+        </React.Fragment>
+      ))}
+
+      {/* Top Shelf Clutter (Canned goods & detergent boxes) */}
+      <g fill="#334155" opacity="0.85">
+        {/* Tier 4 (y=-285) */}
+        <rect x="-105" y="-325" width="20" height="38" fill="#475569" />
+        <rect x="-82" y="-320" width="18" height="33" fill="#334155" />
+        <rect x="-60" y="-310" width="16" height="23" fill="#64748B" />
+        {/* Cans */}
+        <rect x="20" y="-315" width="14" height="28" rx="2" fill="#94A3B8" />
+        <rect x="37" y="-315" width="14" height="28" rx="2" fill="#94A3B8" />
+        <rect x="54" y="-315" width="14" height="28" rx="2" fill="#94A3B8" />
+        <rect x="80" y="-325" width="24" height="38" fill="#475569" />
+
+        {/* Tier 3 (y=-215) */}
+        <rect x="-110" y="-245" width="15" height="28" rx="2" fill="#94A3B8" />
+        <rect x="-92" y="-245" width="15" height="28" rx="2" fill="#94A3B8" />
+        {/* Overturned can with dripping stain */}
+        <polygon points="-70,-225 -42,-230 -40,-218 -68,-215" fill="#CBD5E1" />
+        <path d="M -55 -215 Q -55 -190 -50 -180" stroke={COLOR_PALETTE.accent_blood_red} strokeWidth="2" fill="none" />
+        <rect x="10" y="-255" width="30" height="38" fill="#475569" />
+        <rect x="45" y="-250" width="26" height="33" fill="#334155" />
+        <rect x="75" y="-258" width="32" height="41" fill="#475569" />
+
+        {/* Tier 2 (y=-145) */}
+        <rect x="-105" y="-180" width="35" height="33" fill="#334155" />
+        <rect x="-65" y="-175" width="28" height="28" fill="#475569" />
+        <rect x="15" y="-170" width="16" height="23" rx="2" fill="#94A3B8" />
+        <rect x="35" y="-170" width="16" height="23" rx="2" fill="#94A3B8" />
+        <rect x="65" y="-185" width="40" height="38" fill="#334155" />
+
+        {/* Tier 1 (y=-75) - Empty & ransacked */}
+        <rect x="-90" y="-105" width="18" height="28" rx="2" fill="#64748B" />
+        <rect x="40" y="-115" width="32" height="38" fill="#334155" />
+      </g>
+
+      {/* Dangling loose cable */}
+      <path d="M 112 -285 Q 125 -200 115 -140 Q 110 -100 120 -60" fill="none" stroke="#0F172A" strokeWidth="2.5" />
+
+      {/* Overhead Hanging Aisle Category Marker */}
+      <g transform="translate(0, -350)">
+        <line x1="0" y1="0" x2="0" y2="-35" stroke="#475569" strokeWidth="2" />
+        <rect x="-28" y="-62" width="56" height="28" rx="3" fill="#0C121E" stroke="#38BDF8" strokeWidth="1.5" />
+        <text x="0" y="-43" textAnchor="middle" fill="#38BDF8" fontSize="13" fontWeight="bold" fontFamily="monospace">
+          04
+        </text>
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 12. CREEPY ELEVATOR DOORS (Cửa Thang Máy Rùng Rợn Hé Mở)
+ */
+const CreepyElevatorDoors: React.FC = () => {
+  return (
+    <g className="creepy-elevator-doors">
+      {/* Outer Heavy Steel Doorway Frame */}
+      <rect x="-130" y="-350" width="260" height="350" fill="#0B0F17" stroke="#1E293B" strokeWidth="4" />
+
+      {/* Left Stainless Door Panel */}
+      <rect x="-116" y="-325" width="108" height="325" fill="#141C2B" stroke="#0F172A" strokeWidth="1.5" />
+      <line x1="-110" y1="-320" x2="-110" y2="0" stroke="#1E293B" strokeWidth="1.5" opacity="0.6" />
+      <line x1="-12" y1="-320" x2="-12" y2="0" stroke="#334155" strokeWidth="2" />
+
+      {/* Right Stainless Door Panel */}
+      <rect x="8" y="-325" width="108" height="325" fill="#141C2B" stroke="#0F172A" strokeWidth="1.5" />
+      <line x1="110" y1="-320" x2="110" y2="0" stroke="#1E293B" strokeWidth="1.5" opacity="0.6" />
+      <line x1="14" y1="-320" x2="14" y2="0" stroke="#334155" strokeWidth="2" />
+
+      {/* Pitch-Black Center Crevice (Abyss slit) */}
+      <rect x="-8" y="-325" width="16" height="325" fill="#000000" />
+      {/* Dangling steel hoist cable inside slit */}
+      <line x1="0" y1="-325" x2="0" y2="0" stroke="#1E293B" strokeWidth="2" opacity="0.8" />
+      {/* Glowing ominous pair of eyes inside elevator gap */}
+      <g className="anim-pulse-eerie">
+        <circle cx="-3" cy="-170" r="1.8" fill={COLOR_PALETTE.accent_blood_red} />
+        <circle cx="3" cy="-170" r="1.8" fill={COLOR_PALETTE.accent_blood_red} />
+      </g>
+
+      {/* Overhead Digital Floor Indicator Panel */}
+      <g transform="translate(0, -336)">
+        <rect x="-35" y="-12" width="70" height="22" rx="3" fill="#030407" stroke="#475569" strokeWidth="1.5" />
+        <text
+          x="0"
+          y="4"
+          textAnchor="middle"
+          fill="#DC2626"
+          fontSize="13"
+          fontWeight="bold"
+          fontFamily="monospace"
+          className="anim-flicker-ember"
+        >
+          -4
+        </text>
+      </g>
+
+      {/* Call Button Box on Right Wall Jamb */}
+      <g transform="translate(142, -160)">
+        <rect x="-8" y="-22" width="16" height="44" rx="2" fill="#0F172A" stroke="#334155" strokeWidth="1" />
+        {/* Up button */}
+        <circle cx="0" cy="-10" r="4" fill="#1E293B" />
+        {/* Down button glowing red */}
+        <circle cx="0" cy="10" r="4" fill="#DC2626" className="anim-pulse-eerie" />
+        <polygon points="-2.5,9 2.5,9 0,12" fill="#FFF" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 13. DINING TABLE & CHAIRS (Bàn Ăn Nhà Hàng Khăn Rách)
+ */
+const DiningTableChairs: React.FC = () => {
+  return (
+    <g className="dining-table-chairs">
+      {/* Left High-backed Vintage Wooden Chair */}
+      <g transform="translate(-105, 0)">
+        {/* Chair Legs */}
+        <line x1="-16" y1="0" x2="-14" y2="-70" stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="4.5" />
+        <line x1="14" y1="0" x2="12" y2="-70" stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="4.5" />
+        {/* Chair Seat */}
+        <polygon points="-22,-70 20,-70 16,-62 -18,-62" fill={COLOR_PALETTE.silhouette_primary} />
+        {/* High Spindled Backrest */}
+        <line x1="-18" y1="-70" x2="-18" y2="-175" stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="4" />
+        <line x1="-10" y1="-70" x2="-10" y2="-165" stroke={COLOR_PALETTE.silhouette_secondary} strokeWidth="2.5" />
+        <line x1="-2" y1="-70" x2="-2" y2="-165" stroke={COLOR_PALETTE.silhouette_secondary} strokeWidth="2.5" />
+        <path d="M -22 -175 C -10 -185, 2 -185, 10 -175" stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="4.5" fill="none" />
+      </g>
+
+      {/* Right High-backed Vintage Wooden Chair */}
+      <g transform="translate(105, 0) scale(-1, 1)">
+        {/* Chair Legs */}
+        <line x1="-16" y1="0" x2="-14" y2="-70" stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="4.5" />
+        <line x1="14" y1="0" x2="12" y2="-70" stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="4.5" />
+        {/* Chair Seat */}
+        <polygon points="-22,-70 20,-70 16,-62 -18,-62" fill={COLOR_PALETTE.silhouette_primary} />
+        {/* High Spindled Backrest */}
+        <line x1="-18" y1="-70" x2="-18" y2="-175" stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="4" />
+        <line x1="-10" y1="-70" x2="-10" y2="-165" stroke={COLOR_PALETTE.silhouette_secondary} strokeWidth="2.5" />
+        <line x1="-2" y1="-70" x2="-2" y2="-165" stroke={COLOR_PALETTE.silhouette_secondary} strokeWidth="2.5" />
+        <path d="M -22 -175 C -10 -185, 2 -185, 10 -175" stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="4.5" fill="none" />
+      </g>
+
+      {/* Main Dining Table Pedestal & Legs */}
+      <line x1="-65" y1="0" x2="-60" y2="-85" stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="5" />
+      <line x1="65" y1="0" x2="60" y2="-85" stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="5" />
+      <line x1="-75" y1="-85" x2="75" y2="-85" stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="5" />
+
+      {/* Draped Ragged Tablecloth */}
+      <path
+        d="M -75 -85 L 75 -85 L 72 -35 C 65 -45, 55 -30, 45 -48 C 30 -35, 15 -52, 0 -38 C -15 -50, -30 -36, -45 -46 C -55 -32, -65 -42, -72 -35 Z"
+        fill="#CBD5E1"
+        opacity="0.82"
+        stroke="#94A3B8"
+        strokeWidth="1"
+      />
+
+      {/* Centerpiece 1: Candelabra with Wax Drippings */}
+      <g transform="translate(-15, -88)">
+        <ellipse cx="0" cy="0" rx="9" ry="3" fill="#D97706" />
+        <line x1="0" y1="0" x2="0" y2="-35" stroke="#D97706" strokeWidth="3" />
+        {/* Left and Right Arms */}
+        <path d="M -16 -24 Q -16 -14 0 -14 Q 16 -14 16 -24" fill="none" stroke="#D97706" strokeWidth="2.2" />
+        {/* Mini Candle Flames */}
+        <circle cx="-16" cy="-28" r="2.5" fill="#F59E0B" className="anim-flicker-ember" />
+        <circle cx="0" cy="-39" r="3" fill="#F59E0B" className="anim-flicker-fast" />
+        <circle cx="16" cy="-28" r="2.5" fill="#F59E0B" className="anim-flicker-ember" />
+      </g>
+
+      {/* Centerpiece 2: Dusty Wine Bottle */}
+      <g transform="translate(30, -88)">
+        <rect x="-5" y="-28" width="10" height="28" rx="2" fill="#0F172A" stroke="#1E293B" strokeWidth="1" />
+        <rect x="-2" y="-38" width="4" height="10" fill="#0F172A" />
       </g>
     </g>
   );

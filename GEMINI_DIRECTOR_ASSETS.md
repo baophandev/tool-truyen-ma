@@ -63,14 +63,17 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"rural_graveyard"`: Bãi tha ma nông thôn (nghĩa địa âm u hoang tàn, bia đá rêu phong, rặng tre ma mị).
 - `"abandoned_village"`: Đường làng hoang vắng (con đường đất cô quạnh, lều tranh xiêu vẹo, cây cổ thụ trơ trụi).
 - `"cursed_swamp"`: Đầm lầy u minh (vùng nước chết tĩnh mịch, lau sậy khẳng khiu, sương độc ma trơi).
+- `"modern_indoor"`: Hành lang & Không gian trong nhà hiện đại (hành lang bệnh viện, sảnh khách sạn u ám, siêu thị bỏ hoang, nhà hàng đêm muộn với trần nhà drop-tile, đèn tuýp huỳnh quang, biển báo EXIT và sàn gạch bóng loáng).
 
-### 3.2. Bầu Trời & Ánh Sáng (Sky Presets)
+### 3.2. Bầu Trời & Chiếu Sáng (Sky Presets)
 - `"blood_moon"`: Trăng Máu U Uất (Gradient đỏ rực `#2B0808` -> `#0D0202`, trăng đỏ quạch khổng lồ).
 - `"foggy_night"`: Đêm Sương Lạnh Buốt (Gradient đen tím `#06070B` -> `#141724`, trăng bạc nhợt nhạt).
 - `"stormy_dark"`: Bão Đêm Sấm Chớp (Trời dông đen đặc `#030408` -> `#0B0E17`, có thể bật `thunder_flash: true`).
 - `"eclipse_abyss"`: Nhật Thực Hắc Ám & Ma Trơi (Trời xanh đen `#021A12` -> `#04090E`, mặt trời đen viền lửa xanh lân tinh).
+- `"flickering_fluorescent"`: Đèn Tuýp Huỳnh Quang Chập Chờn (Ánh sáng xanh ngọc lạnh lẽo trong nhà, bóng tuýp chập chờn, biển báo EXIT xanh lục phát sáng).
+- `"dim_indoor_night"`: Ánh Vàng Đêm Mờ Ảo (Ánh đèn vàng hổ phách u tịch trong khách sạn / nhà hàng đêm muộn).
 
-### 3.3. 8 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
+### 3.3. 13 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
 
 Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ được đặt tại các Slot được phép** sau:
 
@@ -84,6 +87,11 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `dilapidated_hut` | Căn lều tranh xiêu vẹo | Nơi trú ẩn rách nát, nguồn cơn rùng rợn | `["far_left", "center", "far_right"]` |
 | `broken_wooden_bridge` | Cầu gỗ gãy nhịp | Cây cầu bắc qua vùng nước chết, chia cắt không gian | `["far_left", "center", "far_right"]` |
 | `scarecrow_of_the_damned`| Bù nhìn rơm bị quỷ ám | Bù nhìn mặt rách rưới dang tay giữa đồng hoang | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `hospital_operating_bed` | Giường mổ bệnh viện rỉ sét | Tâm điểm kinh hoàng bệnh viện, đệm ố vấy máu, cọc truyền và đèn phẫu thuật | `["mid_left", "center", "mid_right"]` |
+| `hotel_reception_desk` | Quầy lễ tân khách sạn u ám | Quầy gỗ cổ, chuông dịch vụ bí ẩn, sổ đăng ký khách và giá treo chìa khóa phòng | `["mid_left", "center", "mid_right"]` |
+| `supermarket_shelf_aisle`| Dãy kệ hàng siêu thị hoang tàn | Kệ thép cao nhiều tầng chất đầy hàng hóa đổ nát, dây lòng thòng và biển số dãy | `["far_left", "center", "far_right"]` |
+| `creepy_elevator_doors` | Cửa thang máy rùng rợn hé mở | Cửa thang máy kim loại hé mở khe đen ngòm, mắt đỏ rực và đèn báo tầng âm 4 | `["mid_left", "center", "mid_right"]` |
+| `dining_table_chairs` | Bàn ăn nhà hàng khăn rách | Bàn ăn phủ khăn trải bàn rách rưới, hai ghế tựa cao, chân nến và chai rượu bám bụi | `["mid_left", "center", "mid_right"]` |
 
 ---
 
@@ -99,6 +107,10 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `detail_incense_bowl` | Bát hương tàn & Nến cầu hồn | Khói hương nghi ngút đặt tiếp đất trước mộ hoặc miếu | `["mid_left", "center", "mid_right"]` (Ground only) |
 | `detail_skull_pile` | Đống đầu lâu & Xương khô | Tàn tích rùng rợn nằm rải rác trên mặt đất | Cả 5 Ground Slots (Ground only) |
 | `detail_hanging_talisman`| Dây bùa trấn yểm | Dây bùa đỏ vàng giăng ngang không trung phong ấn tà ma | `["air_left", "air_center", "air_right"]` (Air only) |
+| `detail_iv_drip_stand` | Cột truyền dịch y tế rỉ máu | Cột truyền dịch di động có bánh xe, túi dịch và ống truyền rỉ máu tiếp đất Y=800px | Cả 5 Ground Slots (Ground only) |
+| `detail_shopping_cart` | Xe đẩy siêu thị rỉ sét | Xe đẩy kim loại rỉ sét bỏ quên giữa hành lang tiếp đất Y=800px | Cả 5 Ground Slots (Ground only) |
+| `detail_surveillance_camera` | Camera an ninh chớp đỏ | Camera giám sát treo trần chớp đèn đỏ liên tục | `["air_left", "air_center", "air_right"]` (Air only) |
+| `detail_flickering_ceiling_lamp`| Đèn huỳnh quang trần chập chờn | Đèn tuýp huỳnh quang công nghiệp treo lơ lửng trên trần chập chờn phát sáng | `["air_left", "air_center", "air_right"]` (Air only) |
 
 ---
 
@@ -125,7 +137,7 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
 - `"jiangshi_corpse"`: Cương thi áo quan (xác chết nhảy búp, mũ quan phong kiến, tay duỗi thẳng phía trước).
 - `"demon_shadow"`: Quỷ bóng đen dị hình (vóc dáng to lớn 1.25x, sừng cong nhọn hoắt, móng vuốt, hào quang khói đen).
 
-### 5.2. 8 Bộ Sưu Tập Trang Phục (Costumes)
+### 5.2. 11 Bộ Sưu Tập Trang Phục (Costumes)
 - `"outfit_tattered_tunic"`: Áo tơi / Áo nông phu nâu đất sờn rách, thắt lưng dây gai.
 - `"outfit_flowing_ao_dai"`: Áo dài cổ truyền tà rách ma mị phất phơ trong gió.
 - `"outfit_shrouded_cloak"`: Áo choàng trùm đầu tăm tối (Reaper / Kẻ hành hương tà giáo).
@@ -134,6 +146,9 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
 - `"outfit_shredded_burial"`: Vải liệm oan hồn / Áo niệm tử thi rách tua tủa vương vệt máu.
 - `"outfit_ancient_armor"`: Giáp tướng cổ vỡ nát / Chiến bào tử sĩ trỗi dậy từ chiến trường xưa.
 - `"outfit_child_pajamas"`: Yếm hoa đỏ / Đồ trẻ thơ vương vết ố sẫm màu.
+- `"outfit_doctor_coat"`: Áo blouse bác sĩ phẫu thuật vạt dài loang lổ vết máu, ống nghe stethoscope và quần scrub tối màu.
+- `"outfit_patient_gown"`: Bộ quần áo bệnh nhân sọc xanh nhạt rộng thùng thình, buộc dây sau gáy, vạt áo lấm lem rách rưới.
+- `"outfit_modern_casual"`: Áo khoác hoodie hiện đại màu xám đen có khóa kéo, dây rút, quần jean ôm và giày thể thao đế trắng.
 
 ### 5.3. 7 Biểu Cảm Khuôn Mặt (Faces - Gắn tại Head Socket -250px)
 - `"face_calm"`: Mặt bình thường, mắt đen nhỏ vô hồn, lạnh lẽo.
@@ -169,7 +184,7 @@ Nhân vật có thể cầm đồ vật trên tay thông qua Hand Socket. Vật 
   - `"right"`: Tay trước (mặc định - tay chính quay về phía người xem).
   - `"left"`: Tay sau.
 
-### 6.2. Danh Mục 9 Đồ Vật Cầm Tay Thuần SVG:
+### 6.2. Danh Mục 12 Đồ Vật Cầm Tay Thuần SVG:
 1. `"none"`: Hai tay trống không.
 2. `"item_storm_lantern"`: Đèn bão sắt cổ phát sáng vàng ấm soi rọi màn sương (tỏa quầng sáng ấm xung quanh).
 3. `"item_paper_lantern"`: Đèn lồng giấy đỏ cầm tay cán trúc, tỏa ánh đỏ ma mị kèm tua rua.
@@ -180,6 +195,8 @@ Nhân vật có thể cầm đồ vật trên tay thông qua Hand Socket. Vật 
 8. `"item_ritual_bell"`: Chuông đồng triệu hồn Tam Thanh dùng trong pháp sự gọi vong.
 9. `"item_tattered_doll"`: Búp bê vải bố mất đầu khâu chỉ đen, cổ vương vệt máu rùng rợn.
 10. `"item_tattered_umbrella"`: Cây dù giấy dầu cổ rách tơi tả, lộ nan tre đen đúa che mưa sương.
+11. `"item_flashlight"`: Đèn pin chiến thuật hiện đại phát luồng sáng nón hình học xuyên thủng bóng đêm.
+12. `"item_scalpel"`: Dao mổ phẫu thuật kim loại sáng loáng sắc lạnh, mũi dao vương vệt máu tươi.
 
 ---
 
@@ -226,14 +243,14 @@ export interface DirectorSceneScript {
   scene_id: string;               // Mã định danh cảnh, ví dụ: "scene_01_graveyard"
   title: string;                  // Tiêu đề cảnh tiếng Việt
   duration_sec: number;           // Thời lượng cảnh (1 đến 60 giây, khuyến nghị 5-8s)
-  theme: "rural_graveyard" | "abandoned_village" | "cursed_swamp";
+  theme: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor";
   lighting: {
-    sky_preset: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss";
+    sky_preset: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss" | "flickering_fluorescent" | "dim_indoor_night";
     fog_density: number;          // Độ dày sương mù từ 0.0 đến 1.0
     thunder_flash?: boolean;      // Bật chớp giật sấm sét (true/false)
   };
   environment_items: Array<{
-    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree";
+    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right";
     offsetX?: number;
     offsetY?: number;
@@ -242,7 +259,7 @@ export interface DirectorSceneScript {
   actors: Array<{
     id: string;
     base: "male_adult" | "female_adult" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow";
-    costume?: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas";
+    costume?: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual";
     face: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered";
     pose: "pose_standing" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging";
     facing: "left" | "right";
@@ -251,7 +268,7 @@ export interface DirectorSceneScript {
     offsetY?: number;
     scale?: number;
     opacity?: number;
-    heldItem?: "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella";
+    heldItem?: "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel";
     heldHand?: "right" | "left";
     motion?: {
       targetSlot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
@@ -266,7 +283,7 @@ export interface DirectorSceneScript {
   }>;
   details?: Array<{
     id: string;
-    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman";
+    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
     offsetX?: number;
     offsetY?: number;
@@ -386,6 +403,77 @@ export interface DirectorSceneScript {
   ],
   "dialogue": "Lá bùa vàng phất phơ trước trán tử thi quan chức... Tiếng bước chân nhảy cứng đờ tiến lại gần...",
   "narrative_note": "Pháp sư áo cà sa thủ kiếm gỗ đào sẵn sàng nghênh chiến cương thi đang áp sát dưới ánh trăng máu."
+}
+```
+
+### Ví dụ 3: Hành lang bệnh viện bỏ hoang, bác sĩ quỷ truy đuổi người cầm đèn pin
+```json
+{
+  "scene_id": "scene_07_hospital_corridor",
+  "title": "Cảnh 7: Ác Mộng Hành Lang Bệnh Viện",
+  "duration_sec": 6,
+  "theme": "modern_indoor",
+  "lighting": {
+    "sky_preset": "flickering_fluorescent",
+    "fog_density": 0.55,
+    "thunder_flash": false
+  },
+  "environment_items": [
+    { "asset_id": "hospital_operating_bed", "slot": "center", "scale": 1.0 },
+    { "asset_id": "creepy_elevator_doors", "slot": "far_right", "scale": 0.95 }
+  ],
+  "actors": [
+    {
+      "id": "actor_survivor",
+      "base": "male_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_scared",
+      "pose": "pose_holding",
+      "facing": "right",
+      "slot": "far_left",
+      "offsetX": 60,
+      "scale": 1.0,
+      "heldItem": "item_flashlight",
+      "heldHand": "right",
+      "motion": {
+        "targetSlot": "mid_left",
+        "targetOffsetX": 40,
+        "startTimeSec": 0.5,
+        "endTimeSec": 4.8,
+        "easing": "ease_in_out",
+        "autoFaceTarget": true,
+        "movingPose": "pose_walking"
+      }
+    },
+    {
+      "id": "actor_doctor_ghost",
+      "base": "male_adult",
+      "costume": "outfit_doctor_coat",
+      "face": "face_creepy_smile",
+      "pose": "pose_holding",
+      "facing": "left",
+      "slot": "mid_right",
+      "scale": 1.05,
+      "heldItem": "item_scalpel",
+      "heldHand": "right",
+      "motion": {
+        "targetSlot": "center",
+        "targetOffsetX": 60,
+        "startTimeSec": 1.2,
+        "endTimeSec": 5.5,
+        "easing": "ease_in",
+        "autoFaceTarget": true,
+        "movingPose": "pose_walking"
+      }
+    }
+  ],
+  "details": [
+    { "id": "detail_iv_1", "asset_id": "detail_iv_drip_stand", "slot": "mid_left", "offsetX": -60 },
+    { "id": "detail_cam_1", "asset_id": "detail_surveillance_camera", "slot": "air_right" },
+    { "id": "detail_lamp_1", "asset_id": "detail_flickering_ceiling_lamp", "slot": "air_left" }
+  ],
+  "dialogue": "Ánh đèn huỳnh quang chập chờn rọi bóng chiếc giường mổ hoen rỉ... Tiếng bước chân bác sĩ lê bước với con dao mổ sắc lạnh...",
+  "narrative_note": "Người thanh niên rọi đèn pin tháo chạy khi bóng bác sĩ quỷ vấy máu cầm dao mổ lao tới từ thang máy."
 }
 ```
 

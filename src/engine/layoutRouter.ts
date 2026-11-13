@@ -20,6 +20,8 @@ import {
   DETAIL_RULES,
   STRUCTURE_RULES,
   getAllowedSlotsForActor,
+  findNearestAllowedSlot,
+  isAirPose,
   isSlotAllowed,
 } from "./placementRules";
 
@@ -65,8 +67,15 @@ export function getDefaultCostumeForBase(base: CharacterBaseId): CostumeId {
   }
 }
 
-const VALID_THEMES: ThemeId[] = ["rural_graveyard", "abandoned_village", "cursed_swamp"];
-const VALID_SKY_PRESETS: SkyPresetId[] = ["blood_moon", "foggy_night", "stormy_dark", "eclipse_abyss"];
+const VALID_THEMES: ThemeId[] = ["rural_graveyard", "abandoned_village", "cursed_swamp", "modern_indoor"];
+const VALID_SKY_PRESETS: SkyPresetId[] = [
+  "blood_moon",
+  "foggy_night",
+  "stormy_dark",
+  "eclipse_abyss",
+  "flickering_fluorescent",
+  "dim_indoor_night",
+];
 const VALID_STRUCTURES: StructureId[] = [
   "creepy_banyan_tree",
   "ancient_tomb",
@@ -76,6 +85,11 @@ const VALID_STRUCTURES: StructureId[] = [
   "scarecrow_of_the_damned",
   "creepy_well",
   "haunted_gallows_tree",
+  "hospital_operating_bed",
+  "hotel_reception_desk",
+  "supermarket_shelf_aisle",
+  "creepy_elevator_doors",
+  "dining_table_chairs",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -94,6 +108,9 @@ const VALID_COSTUMES: CostumeId[] = [
   "outfit_shredded_burial",
   "outfit_ancient_armor",
   "outfit_child_pajamas",
+  "outfit_doctor_coat",
+  "outfit_patient_gown",
+  "outfit_modern_casual",
 ];
 const VALID_FACES: CharacterFaceId[] = [
   "face_calm",
@@ -125,6 +142,8 @@ const VALID_HELD_ITEMS: HeldItemId[] = [
   "item_ritual_bell",
   "item_tattered_doll",
   "item_tattered_umbrella",
+  "item_flashlight",
+  "item_scalpel",
 ];
 const VALID_HELD_HANDS: HeldHand[] = ["right", "left"];
 const VALID_DETAILS: DetailId[] = [
@@ -134,6 +153,10 @@ const VALID_DETAILS: DetailId[] = [
   "detail_incense_bowl",
   "detail_skull_pile",
   "detail_hanging_talisman",
+  "detail_iv_drip_stand",
+  "detail_shopping_cart",
+  "detail_surveillance_camera",
+  "detail_flickering_ceiling_lamp",
 ];
 const VALID_FACINGS: FacingDirection[] = ["left", "right"];
 const VALID_SLOTS: SlotId[] = [
@@ -148,195 +171,253 @@ const VALID_SLOTS: SlotId[] = [
 ];
 
 /**
- * Rigorous validator for DirectorSceneScript JSON emitted by Gemini LLM
+ * Rigorous validator and self-healing normalizer for DirectorSceneScript JSON
+ * Guarantees that minor LLM quirks (e.g. missing facing, motion: null, out-of-range fog)
+ * are cleanly sanitized and auto-repaired so valid, glitch-free scenes are always produced.
  */
 export function validateDirectorScript(script: any): { valid: boolean; errors: string[]; normalized?: DirectorSceneScript } {
-  const errors: string[] = [];
-
   if (!script || typeof script !== "object") {
     return { valid: false, errors: ["Script phải là một JSON Object hợp lệ"] };
   }
 
-  if (!script.scene_id || typeof script.scene_id !== "string") {
-    errors.push('Thiếu trường "scene_id" (string)');
-  }
+  // 1. Scene ID, Title & Duration
+  const scene_id =
+    script.scene_id && typeof script.scene_id === "string"
+      ? script.scene_id.trim()
+      : `scene_ai_${Date.now().toString().slice(-6)}`;
 
-  if (!VALID_THEMES.includes(script.theme)) {
-    errors.push(`theme "${script.theme}" không hợp lệ. Phải là: ${VALID_THEMES.join(" | ")}`);
-  }
+  const title =
+    script.title && typeof script.title === "string"
+      ? script.title.trim()
+      : "Phân Cảnh Hoạt Hình";
 
-  if (!script.lighting || typeof script.lighting !== "object") {
-    errors.push('Thiếu khối "lighting"');
-  } else {
-    if (!VALID_SKY_PRESETS.includes(script.lighting.sky_preset)) {
-      errors.push(`lighting.sky_preset "${script.lighting.sky_preset}" không hợp lệ. Phải là: ${VALID_SKY_PRESETS.join(" | ")}`);
-    }
-    const fog = Number(script.lighting.fog_density);
-    if (isNaN(fog) || fog < 0 || fog > 1) {
-      errors.push('lighting.fog_density phải là số thực từ 0.0 đến 1.0');
-    }
-  }
+  const rawDuration = Number(script.duration_sec);
+  const duration_sec =
+    !isNaN(rawDuration) && rawDuration >= 1 && rawDuration <= 60
+      ? Math.round(rawDuration)
+      : 6;
 
-  if (!Array.isArray(script.environment_items)) {
-    errors.push('environment_items phải là mảng Array');
-  } else {
-    script.environment_items.forEach((item: any, idx: number) => {
-      if (!VALID_STRUCTURES.includes(item.asset_id)) {
-        errors.push(`environment_items[${idx}].asset_id "${item.asset_id}" không hợp lệ`);
-      } else if (!isSlotAllowed(item.slot, STRUCTURE_RULES[item.asset_id as StructureId].allowedSlots)) {
-        errors.push(
-          `environment_items[${idx}].slot "${item.slot}" không hợp lệ cho "${item.asset_id}". Cho phép: ${STRUCTURE_RULES[item.asset_id as StructureId].allowedSlots.join(" | ")}`
-        );
-      } else if (!["far_left", "mid_left", "center", "mid_right", "far_right"].includes(item.slot)) {
-        errors.push(`environment_items[${idx}].slot "${item.slot}" không phải là GroundSlot hợp lệ`);
-      }
-    });
-  }
+  // 2. Theme
+  const theme: ThemeId = VALID_THEMES.includes(script.theme)
+    ? script.theme
+    : "rural_graveyard";
 
-  if (!Array.isArray(script.actors)) {
-    errors.push('actors phải là mảng Array');
-  } else {
-    script.actors.forEach((actor: any, idx: number) => {
-      if (!actor.id) errors.push(`actors[${idx}] thiếu id`);
-      if (!VALID_BASES.includes(actor.base)) errors.push(`actors[${idx}].base "${actor.base}" không hợp lệ`);
-      if (actor.costume && !VALID_COSTUMES.includes(actor.costume)) {
-        errors.push(`actors[${idx}].costume "${actor.costume}" không hợp lệ`);
-      }
-      if (actor.heldItem !== undefined && !VALID_HELD_ITEMS.includes(actor.heldItem)) {
-        errors.push(`actors[${idx}].heldItem "${actor.heldItem}" không hợp lệ`);
-      }
-      if (actor.heldHand !== undefined && !VALID_HELD_HANDS.includes(actor.heldHand)) {
-        errors.push(`actors[${idx}].heldHand "${actor.heldHand}" không hợp lệ (chỉ nhận "right" hoặc "left")`);
-      }
-      if (!VALID_FACES.includes(actor.face)) errors.push(`actors[${idx}].face "${actor.face}" không hợp lệ`);
-      if (!VALID_POSES.includes(actor.pose)) errors.push(`actors[${idx}].pose "${actor.pose}" không hợp lệ`);
-      if (!VALID_FACINGS.includes(actor.facing)) errors.push(`actors[${idx}].facing "${actor.facing}" không hợp lệ (chỉ nhận "left" hoặc "right")`);
-      if (!VALID_SLOTS.includes(actor.slot)) {
-        errors.push(`actors[${idx}].slot "${actor.slot}" không hợp lệ`);
-      } else if (VALID_BASES.includes(actor.base) && VALID_POSES.includes(actor.pose)) {
-        const actorRule = getAllowedSlotsForActor({ base: actor.base, pose: actor.pose });
-        if (!isSlotAllowed(actor.slot, actorRule.allowedSlots)) {
-          errors.push(
-            `actors[${idx}].slot "${actor.slot}" không phù hợp với pose "${actor.pose}". Cho phép: ${actorRule.allowedSlots.join(" | ")}`
-          );
-        }
-        if (actor.motion !== undefined) {
-          if (!actor.motion || typeof actor.motion !== "object") {
-            errors.push(`actors[${idx}].motion phải là một Object hợp lệ`);
-          } else {
-            if (!VALID_SLOTS.includes(actor.motion.targetSlot)) {
-              errors.push(`actors[${idx}].motion.targetSlot "${actor.motion.targetSlot}" không hợp lệ`);
-            } else if (!isSlotAllowed(actor.motion.targetSlot, actorRule.allowedSlots)) {
-              errors.push(
-                `actors[${idx}].motion.targetSlot "${actor.motion.targetSlot}" không phù hợp quy tắc vùng của pose "${actor.pose}". Cho phép: ${actorRule.allowedSlots.join(" | ")}`
-              );
-            }
-            if (
-              actor.motion.easing !== undefined &&
-              !["linear", "ease_in_out", "ease_in", "ease_out"].includes(actor.motion.easing)
-            ) {
-              errors.push(`actors[${idx}].motion.easing "${actor.motion.easing}" không hợp lệ`);
-            }
-            if (actor.motion.movingPose !== undefined && !VALID_POSES.includes(actor.motion.movingPose)) {
-              errors.push(`actors[${idx}].motion.movingPose "${actor.motion.movingPose}" không hợp lệ`);
-            }
-          }
-        }
-      }
-    });
-  }
+  // 3. Lighting
+  const lightingRaw = script.lighting && typeof script.lighting === "object" ? script.lighting : {};
+  const sky_preset: SkyPresetId = VALID_SKY_PRESETS.includes(lightingRaw.sky_preset)
+    ? lightingRaw.sky_preset
+    : (theme === "modern_indoor" ? "flickering_fluorescent" : "foggy_night");
 
-  if (script.details !== undefined) {
-    if (!Array.isArray(script.details)) {
-      errors.push('details phải là mảng Array nếu được khai báo');
-    } else {
-      script.details.forEach((detail: any, idx: number) => {
-        if (!detail.id) errors.push(`details[${idx}] thiếu id`);
-        if (!VALID_DETAILS.includes(detail.asset_id)) {
-          errors.push(`details[${idx}].asset_id "${detail.asset_id}" không hợp lệ`);
-        } else if (!VALID_SLOTS.includes(detail.slot)) {
-          errors.push(`details[${idx}].slot "${detail.slot}" không hợp lệ`);
-        } else if (!isSlotAllowed(detail.slot, DETAIL_RULES[detail.asset_id as DetailId].allowedSlots)) {
-          errors.push(
-            `details[${idx}].slot "${detail.slot}" không được phép cho "${detail.asset_id}". Cho phép: ${DETAIL_RULES[detail.asset_id as DetailId].allowedSlots.join(" | ")}`
-          );
-        }
+  const rawFog = Number(lightingRaw.fog_density);
+  const fog_density = !isNaN(rawFog) ? Math.min(1, Math.max(0, rawFog)) : 0.65;
+  const thunder_flash = Boolean(lightingRaw.thunder_flash);
+  const ambient_tint = lightingRaw.ambient_tint;
+
+  // 4. Environment Items (Structures)
+  const environment_items: DirectorSceneScript["environment_items"] = [];
+  if (Array.isArray(script.environment_items)) {
+    script.environment_items.forEach((item: any) => {
+      if (!item || typeof item !== "object") return;
+      if (!VALID_STRUCTURES.includes(item.asset_id)) return;
+
+      const structId = item.asset_id as StructureId;
+      const rule = STRUCTURE_RULES[structId];
+      let slot: GroundSlotId = item.slot;
+      if (!rule.allowedSlots.includes(slot)) {
+        slot = rule.allowedSlots[0] || "center";
+      }
+
+      environment_items.push({
+        asset_id: structId,
+        slot,
+        offsetX: Number(item.offsetX) || 0,
+        offsetY: Number(item.offsetY) || 0,
+        scale: Number(item.scale) || 1,
       });
-    }
+    });
   }
 
-  if (errors.length > 0) {
-    return { valid: false, errors };
+  // 5. Actors with Self-Healing (facing, motion, pose compatibility)
+  const rawActors = Array.isArray(script.actors) ? script.actors : [];
+  const actors: DirectorSceneScript["actors"] = [];
+
+  rawActors.forEach((actor: any, idx: number) => {
+    if (!actor || typeof actor !== "object") return;
+
+    const id = actor.id && typeof actor.id === "string" ? actor.id.trim() : `actor_${idx + 1}`;
+    const base: CharacterBaseId = VALID_BASES.includes(actor.base) ? actor.base : "male_adult";
+    const costume: CostumeId = VALID_COSTUMES.includes(actor.costume)
+      ? actor.costume
+      : getDefaultCostumeForBase(base);
+    const face: CharacterFaceId = VALID_FACES.includes(actor.face) ? actor.face : "face_calm";
+    const pose: CharacterPoseId = VALID_POSES.includes(actor.pose) ? actor.pose : "pose_standing";
+
+    const actorRule = getAllowedSlotsForActor({ base, pose });
+
+    // Slot healing: ensure slot matches pose allowed area
+    let slot: SlotId = actor.slot;
+    if (!VALID_SLOTS.includes(slot) || !isSlotAllowed(slot, actorRule.allowedSlots)) {
+      const fallbackInitialSlot = isAirPose(pose) ? "air_center" : "center";
+      const curCoord = getSlotCoordinates(VALID_SLOTS.includes(slot) ? slot : fallbackInitialSlot);
+      const nearest = findNearestAllowedSlot(curCoord.x, curCoord.y, actorRule.allowedSlots);
+      slot = nearest.slot.id;
+    }
+
+    const offsetX = Number(actor.offsetX) || 0;
+    const offsetY = isAirPose(pose) ? (Number(actor.offsetY) || 0) : 0;
+    const scale = Number(actor.scale) || 1;
+    const opacity = actor.opacity !== undefined ? Math.min(1, Math.max(0, Number(actor.opacity))) : 1;
+
+    const heldItem: HeldItemId = VALID_HELD_ITEMS.includes(actor.heldItem) ? actor.heldItem : "none";
+    const heldHand: HeldHand = VALID_HELD_HANDS.includes(actor.heldHand) ? actor.heldHand : "right";
+
+    // Motion healing: drop motion if null, false, empty object, or invalid
+    let motion: DirectorSceneScript["actors"][0]["motion"] = undefined;
+    const rawMotion = actor.motion;
+    if (
+      rawMotion &&
+      typeof rawMotion === "object" &&
+      rawMotion !== null &&
+      !Array.isArray(rawMotion) &&
+      rawMotion.targetSlot &&
+      VALID_SLOTS.includes(rawMotion.targetSlot) &&
+      rawMotion.targetSlot !== slot
+    ) {
+      let targetSlot: SlotId = rawMotion.targetSlot;
+      if (!isSlotAllowed(targetSlot, actorRule.allowedSlots)) {
+        const curTargetCoord = getSlotCoordinates(targetSlot);
+        const nearest = findNearestAllowedSlot(curTargetCoord.x, curTargetCoord.y, actorRule.allowedSlots);
+        targetSlot = nearest.slot.id;
+      }
+
+      const easing = ["linear", "ease_in_out", "ease_in", "ease_out"].includes(rawMotion.easing)
+        ? rawMotion.easing
+        : "ease_in_out";
+
+      const autoFaceTarget = rawMotion.autoFaceTarget !== false;
+      const movingPose = VALID_POSES.includes(rawMotion.movingPose)
+        ? rawMotion.movingPose
+        : (isAirPose(pose) ? "pose_floating" : "pose_walking");
+
+      const startTimeSec = Math.max(0, Number(rawMotion.startTimeSec) || 0);
+      const endTimeSec = rawMotion.endTimeSec !== undefined
+        ? Math.max(startTimeSec + 0.5, Number(rawMotion.endTimeSec) || duration_sec)
+        : duration_sec;
+
+      const targetOffsetX = Number(rawMotion.targetOffsetX) || 0;
+      const targetOffsetY = isAirPose(pose) ? (Number(rawMotion.targetOffsetY) || 0) : 0;
+
+      motion = {
+        targetSlot,
+        targetOffsetX,
+        targetOffsetY,
+        startTimeSec,
+        endTimeSec,
+        easing,
+        autoFaceTarget,
+        movingPose,
+      };
+    }
+
+    // Facing healing: auto-infer facing if undefined, null, or invalid
+    let facing: FacingDirection;
+    if (VALID_FACINGS.includes(actor.facing)) {
+      facing = actor.facing;
+    } else {
+      if (motion) {
+        const startX = getSlotCoordinates(slot).x + offsetX;
+        const targetX = getSlotCoordinates(motion.targetSlot).x + (motion.targetOffsetX || 0);
+        facing = targetX < startX ? "left" : "right";
+      } else if (slot === "far_left" || slot === "mid_left") {
+        facing = "right"; // Look inwards towards center
+      } else if (slot === "far_right" || slot === "mid_right") {
+        facing = "left"; // Look inwards towards center
+      } else {
+        facing = idx === 0 ? "right" : "left";
+      }
+    }
+
+    actors.push({
+      id,
+      base,
+      costume,
+      face,
+      pose,
+      facing,
+      slot,
+      offsetX,
+      offsetY,
+      scale,
+      opacity,
+      heldItem,
+      heldHand,
+      ...(motion ? { motion } : {}),
+    });
+  });
+
+  // Guarantee at least 1 actor exists
+  if (actors.length === 0) {
+    actors.push({
+      id: "actor_main",
+      base: "male_adult",
+      costume: "outfit_tattered_tunic",
+      face: "face_scared",
+      pose: "pose_standing",
+      facing: "right",
+      slot: "center",
+      offsetX: 0,
+      offsetY: 0,
+      scale: 1,
+      opacity: 1,
+      heldItem: "none",
+      heldHand: "right",
+    });
   }
+
+  // 6. Details with Self-Healing
+  const details: NonNullable<DirectorSceneScript["details"]> = [];
+  if (Array.isArray(script.details)) {
+    script.details.forEach((dt: any, dIdx: number) => {
+      if (!dt || typeof dt !== "object") return;
+      if (!VALID_DETAILS.includes(dt.asset_id)) return;
+
+      const detailId = dt.asset_id as DetailId;
+      const rule = DETAIL_RULES[detailId];
+      let slot: SlotId = dt.slot;
+      if (!VALID_SLOTS.includes(slot) || !isSlotAllowed(slot, rule.allowedSlots)) {
+        slot = rule.allowedSlots[0] || "center";
+      }
+
+      details.push({
+        id: dt.id && typeof dt.id === "string" ? dt.id.trim() : `detail_${dIdx + 1}`,
+        asset_id: detailId,
+        slot,
+        offsetX: Number(dt.offsetX) || 0,
+        offsetY: Number(dt.offsetY) || 0,
+        scale: Number(dt.scale) || 1,
+      });
+    });
+  }
+
+  const dialogue = typeof script.dialogue === "string" ? script.dialogue.trim() : "";
+  const narrative_note = typeof script.narrative_note === "string" ? script.narrative_note.trim() : "";
 
   const normalized: DirectorSceneScript = {
-    scene_id: script.scene_id,
-    title: script.title || "Cảnh Không Tên",
-    duration_sec: script.duration_sec || 5,
-    theme: script.theme,
+    scene_id,
+    title,
+    duration_sec,
+    theme,
     lighting: {
-      sky_preset: script.lighting.sky_preset,
-      fog_density: Math.min(1, Math.max(0, Number(script.lighting.fog_density))),
-      ambient_tint: script.lighting.ambient_tint,
-      thunder_flash: Boolean(script.lighting.thunder_flash),
+      sky_preset,
+      fog_density,
+      thunder_flash,
+      ambient_tint,
     },
-    environment_items: script.environment_items.map((it: any) => ({
-      asset_id: it.asset_id,
-      slot: it.slot,
-      offsetX: Number(it.offsetX) || 0,
-      offsetY: Number(it.offsetY) || 0,
-      scale: Number(it.scale) || 1,
-    })),
-    actors: script.actors.map((ac: any) => ({
-      id: ac.id,
-      base: ac.base,
-      costume: ac.costume || getDefaultCostumeForBase(ac.base),
-      face: ac.face,
-      pose: ac.pose,
-      facing: ac.facing,
-      slot: ac.slot,
-      offsetX: Number(ac.offsetX) || 0,
-      offsetY: Number(ac.offsetY) || 0,
-      scale: Number(ac.scale) || 1,
-      opacity: ac.opacity !== undefined ? Number(ac.opacity) : 1,
-      heldItem: ac.heldItem || "none",
-      heldHand: ac.heldHand === "left" ? "left" : "right",
-      ...(ac.motion
-        ? {
-            motion: {
-              targetSlot: ac.motion.targetSlot,
-              targetOffsetX: Number(ac.motion.targetOffsetX) || 0,
-              targetOffsetY:
-                ac.pose === "pose_floating" || ac.pose === "pose_hanging"
-                  ? Number(ac.motion.targetOffsetY) || 0
-                  : 0,
-              startTimeSec:
-                ac.motion.startTimeSec !== undefined
-                  ? Math.max(0, Number(ac.motion.startTimeSec) || 0)
-                  : 0,
-              endTimeSec:
-                ac.motion.endTimeSec !== undefined
-                  ? Math.max(0, Number(ac.motion.endTimeSec))
-                  : undefined,
-              easing: ac.motion.easing || "ease_in_out",
-              autoFaceTarget: ac.motion.autoFaceTarget !== false,
-              movingPose: ac.motion.movingPose,
-            },
-          }
-        : {}),
-    })),
-    details: Array.isArray(script.details)
-      ? script.details.map((dt: any, idx: number) => ({
-          id: dt.id || `detail_${idx + 1}`,
-          asset_id: dt.asset_id,
-          slot: dt.slot,
-          offsetX: Number(dt.offsetX) || 0,
-          offsetY: Number(dt.offsetY) || 0,
-          scale: Number(dt.scale) || 1,
-        }))
-      : [],
-    dialogue: script.dialogue || "",
-    narrative_note: script.narrative_note || "",
+    environment_items,
+    actors,
+    details,
+    dialogue,
+    narrative_note,
   };
 
   return { valid: true, errors: [], normalized };
