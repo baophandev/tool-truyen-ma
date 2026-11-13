@@ -14,12 +14,15 @@ import type {
   ActorConfig,
   ActorMotionConfig,
   EasingType,
+  HeldItemId,
+  HeldHand,
   EnvironmentItemConfig,
   DetailItemConfig,
   SelectedEntity,
 } from "../engine/types";
 import { SceneRenderer, type DragSnapMode } from "../engine/SceneRenderer";
 import { ALL_SLOTS, GROUND_Y } from "../engine/constants";
+import { HELD_ITEM_CATALOG } from "../engine/graphics/HandheldItems";
 import { getDefaultCostumeForBase, getSlotCoordinates } from "../engine/layoutRouter";
 import {
   STRUCTURE_RULES,
@@ -978,6 +981,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600"
                       >
                         <option value="pose_standing">Đứng quan sát (pose_standing)</option>
+                        <option value="pose_holding">Cầm / Giơ đồ vật phía trước (pose_holding)</option>
                         <option value="pose_shivering">Run rẩy co ro (pose_shivering)</option>
                         <option value="pose_walking">Bước đi chậm rãi (pose_walking)</option>
                         <option value="pose_floating">Bay lơ lửng dập dềnh (pose_floating)</option>
@@ -1014,6 +1018,52 @@ export const EditorView: React.FC<EditorViewProps> = ({
                           Sang Phải
                         </button>
                       </div>
+                    </div>
+
+                    {/* Handheld Prop / Hand Socket */}
+                    <div className="flex flex-col gap-2 bg-amber-950/15 border border-amber-800/35 p-3 rounded-xl">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-amber-200">
+                          6. Đồ Vật Cầm Tay (Hand Socket):
+                        </label>
+                        <div className="flex items-center gap-1 bg-black p-0.5 rounded-lg border border-neutral-800">
+                          <button
+                            onClick={() => updateActor(selectedActor.id, { heldHand: "right" as HeldHand })}
+                            className={`px-2 py-0.5 rounded text-[11px] transition-all ${
+                              (selectedActor.heldHand || "right") === "right"
+                                ? "bg-amber-600 text-white font-bold"
+                                : "text-neutral-400 hover:text-white"
+                            }`}
+                          >
+                            Tay trước (Phải)
+                          </button>
+                          <button
+                            onClick={() => updateActor(selectedActor.id, { heldHand: "left" as HeldHand })}
+                            className={`px-2 py-0.5 rounded text-[11px] transition-all ${
+                              selectedActor.heldHand === "left"
+                                ? "bg-amber-600 text-white font-bold"
+                                : "text-neutral-400 hover:text-white"
+                            }`}
+                          >
+                            Tay sau (Trái)
+                          </button>
+                        </div>
+                      </div>
+
+                      <select
+                        value={selectedActor.heldItem || "none"}
+                        onChange={(e) => {
+                          const nextItem = e.target.value as HeldItemId;
+                          updateActor(selectedActor.id, { heldItem: nextItem });
+                        }}
+                        className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-amber-500"
+                      >
+                        {HELD_ITEM_CATALOG.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.name} ({item.id})
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
 
@@ -1430,6 +1480,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                                   ) : (
                                     <>
                                       <option value="pose_walking">Bước đi (pose_walking)</option>
+                                      <option value="pose_holding">Cầm đồ vật giơ trước (pose_holding)</option>
                                       <option value="pose_crawling">Bò trườn (pose_crawling)</option>
                                       <option value="pose_reaching">Vươn vuốt tiến tới (pose_reaching)</option>
                                       <option value="pose_shivering">Run rẩy tiến bước (pose_shivering)</option>

@@ -5,6 +5,8 @@ import type {
   CharacterPoseId,
   CostumeId,
   FacingDirection,
+  HeldHand,
+  HeldItemId,
 } from "../types";
 import {
   COLOR_PALETTE,
@@ -14,6 +16,87 @@ import {
   type CostumePalette,
 } from "../constants";
 import { getDefaultCostumeForBase } from "../layoutRouter";
+import { HandheldItemRenderer } from "./HandheldItems";
+
+interface HandSocketPoint {
+  x: number;
+  y: number;
+  rot: number;
+}
+
+/**
+ * Single source of truth for dynamic Left/Right Hand Sockets across every base & pose.
+ * Ensures ArmsRig drawing, HeldItem anchoring, and Gizmo socket overlay stay 100% aligned.
+ */
+function resolveHandSockets(
+  base: CharacterBaseId,
+  pose: CharacterPoseId,
+  heldItem?: HeldItemId,
+  heldHand: HeldHand = "right"
+): { left: HandSocketPoint; right: HandSocketPoint } {
+  if (base === "jiangshi_corpse") {
+    return {
+      left: { x: 75, y: -180, rot: 0 },
+      right: { x: 81, y: -178, rot: 0 },
+    };
+  }
+  if (pose === "pose_crawling") {
+    return {
+      left: { x: -69, y: -6, rot: 0 },
+      right: { x: 69, y: -6, rot: 0 },
+    };
+  }
+  if (pose === "pose_reaching") {
+    return {
+      left: { x: -18, y: -115, rot: 0 },
+      right: { x: 91, y: -185, rot: 10 },
+    };
+  }
+  if (pose === "pose_hanging") {
+    return {
+      left: { x: -22, y: -87, rot: -8 },
+      right: { x: 22, y: -87, rot: 8 },
+    };
+  }
+  if (pose === "pose_holding") {
+    return {
+      left: heldHand === "left" ? { x: 48, y: -158, rot: 0 } : { x: -20, y: -98, rot: 0 },
+      right: heldHand === "left" ? { x: 20, y: -98, rot: 0 } : { x: 62, y: -162, rot: 0 },
+    };
+  }
+  if (pose === "pose_shivering") {
+    return {
+      left: { x: -15, y: -145, rot: 8 },
+      right: { x: 13, y: -150, rot: -8 },
+    };
+  }
+  if (pose === "pose_walking") {
+    return {
+      left: { x: -46, y: -98, rot: -10 },
+      right: { x: 42, y: -100, rot: 6 },
+    };
+  }
+  if (pose === "pose_floating") {
+    return {
+      left: { x: -93, y: -196, rot: -12 },
+      right: { x: 93, y: -196, rot: 12 },
+    };
+  }
+
+  const hasItem = Boolean(heldItem && heldItem !== "none");
+  const isChild = base === "creepy_child";
+  const rightRaised = hasItem && heldHand === "right";
+  const leftRaised = hasItem && heldHand === "left";
+
+  return {
+    left: leftRaised
+      ? { x: isChild ? -32 : -38, y: isChild ? -136 : -128, rot: 0 }
+      : { x: isChild ? -16 : -19, y: isChild ? -108 : -95, rot: 0 },
+    right: rightRaised
+      ? { x: isChild ? 34 : 44, y: isChild ? -138 : -130, rot: 0 }
+      : { x: isChild ? 16 : 19, y: isChild ? -108 : -95, rot: 0 },
+  };
+}
 
 interface CharacterRigProps {
   id?: string;
@@ -24,6 +107,8 @@ interface CharacterRigProps {
   facing: FacingDirection;
   scale?: number;
   opacity?: number;
+  heldItem?: HeldItemId;
+  heldHand?: HeldHand;
   showSockets?: boolean;
 }
 
@@ -36,11 +121,14 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
   facing,
   scale = 1,
   opacity = 1,
+  heldItem = "none",
+  heldHand = "right",
   showSockets = false,
 }) => {
   const activeCostume = costume || getDefaultCostumeForBase(base);
   const appearance = BASE_APPEARANCE[base];
   const palette = COSTUME_PALETTES[activeCostume];
+  const handSockets = resolveHandSockets(base, pose, heldItem, heldHand);
 
   const flip = facing === "left" ? -1 : 1;
   const isGhost = base === "ghost_wraith";
@@ -121,7 +209,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
         />
       </g>
 
-      {/* 3. ARMS & SLEEVES */}
+      {/* 3. ARMS, SLEEVES & HANDHELD ITEM SOCKETS */}
       <g className="rig-arms-costume">
         <ArmsRig
           costume={activeCostume}
@@ -129,6 +217,9 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
           pose={pose}
           palette={palette}
           appearance={appearance}
+          heldItem={heldItem}
+          heldHand={heldHand}
+          handSockets={handSockets}
         />
       </g>
 
@@ -261,6 +352,19 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
           <circle cx={SOCKETS.shoulderR[0]} cy={SOCKETS.shoulderR[1]} r="4" fill="#F59E0B" />
           <circle cx={SOCKETS.neck[0]} cy={SOCKETS.neck[1]} r="4" fill="#EC4899" />
           <circle cx={SOCKETS.head[0]} cy={SOCKETS.head[1]} r="5" fill="#EF4444" />
+
+          {/* Hand Grip Sockets (Left & Right) */}
+          <g transform={`translate(${handSockets.left.x}, ${handSockets.left.y})`}>
+            <circle cx="0" cy="0" r="6" fill="none" stroke="#A855F7" strokeWidth="1.8" strokeDasharray="2,2" />
+            <circle cx="0" cy="0" r="2.2" fill="#A855F7" />
+          </g>
+          <g transform={`translate(${handSockets.right.x}, ${handSockets.right.y})`}>
+            <circle cx="0" cy="0" r="6.5" fill="none" stroke="#22D3EE" strokeWidth="2" />
+            <circle cx="0" cy="0" r="2.5" fill="#22D3EE" />
+            <text x="9" y="4" fill="#67E8F9" fontSize="10" fontFamily="monospace">
+              {`Hand${heldHand === "left" ? "L" : "R"}`}
+            </text>
+          </g>
         </g>
       )}
     </g>
@@ -605,9 +709,21 @@ const GhostTail: React.FC<{ palette: CostumePalette }> = ({ palette }) => {
   );
 };
 
+const AttachedProp: React.FC<{ socket: HandSocketPoint; itemId?: HeldItemId }> = ({
+  socket,
+  itemId,
+}) => {
+  if (!itemId || itemId === "none") return null;
+  return (
+    <g transform={`translate(${socket.x}, ${socket.y}) rotate(${socket.rot})`}>
+      <HandheldItemRenderer itemId={itemId} />
+    </g>
+  );
+};
+
 /**
  * =========================================================
- * ARMS & SLEEVES RIG (Matches Costume Color + Skin Hands)
+ * ARMS & SLEEVES RIG (Matches Costume Color + Skin Hands + Hand Sockets)
  * =========================================================
  */
 const ArmsRig: React.FC<{
@@ -616,11 +732,17 @@ const ArmsRig: React.FC<{
   pose: CharacterPoseId;
   palette: CostumePalette;
   appearance: BaseAppearance;
-}> = ({ costume, base, pose, palette, appearance }) => {
+  heldItem?: HeldItemId;
+  heldHand?: HeldHand;
+  handSockets: { left: HandSocketPoint; right: HandSocketPoint };
+}> = ({ costume, base, pose, palette, appearance, heldItem = "none", heldHand = "right", handSockets }) => {
   const sleeveColor = costume === "outfit_child_pajamas" ? appearance.skin : palette.sleeve;
   const sleeveShadowColor = costume === "outfit_child_pajamas" ? appearance.skinShadow : palette.sleeveShadow;
   const handColor = appearance.skin;
   const handShadowColor = appearance.skinShadow;
+  const activeSocket = heldHand === "left" ? handSockets.left : handSockets.right;
+  const hasItem = Boolean(heldItem && heldItem !== "none");
+  const isChild = base === "creepy_child";
 
   // 1. Jiangshi rigid outstretched arms
   if (base === "jiangshi_corpse") {
@@ -631,6 +753,7 @@ const ArmsRig: React.FC<{
         <polygon points="87,-184 106,-183 87,-180" fill="#1E293B" />
         <polygon points="87,-180 109,-178 87,-176" fill="#1E293B" />
         <polygon points="87,-176 105,-173 87,-172" fill="#1E293B" />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
       </g>
     );
   }
@@ -641,8 +764,9 @@ const ArmsRig: React.FC<{
       <g>
         <path d="M -25 -185 L -55 -120 L -75 -10 L -62 -10 L -45 -115 L -20 -185 Z" fill={sleeveColor} />
         <path d="M 25 -185 L 55 -120 L 75 -10 L 62 -10 L 45 -115 L 20 -185 Z" fill={sleeveShadowColor} />
-        <circle cx="-69" cy="-6" r="5.5" fill={handColor} />
-        <circle cx="69" cy="-6" r="5.5" fill={handShadowColor} />
+        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="5.5" fill={handColor} />
+        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="5.5" fill={handShadowColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
       </g>
     );
   }
@@ -652,9 +776,10 @@ const ArmsRig: React.FC<{
     return (
       <g className="anim-arms-reaching">
         <path d="M -25 -185 C 10 -180, 48 -195, 86 -190 L 84 -178 C 46 -182, 10 -170, -20 -185 Z" fill={sleeveColor} />
-        <ellipse cx="91" cy="-185" rx="7" ry="5.5" fill={handColor} />
+        <ellipse cx={handSockets.right.x} cy={handSockets.right.y} rx="7" ry="5.5" fill={handColor} />
         <polygon points="96,-190 116,-195 100,-185" fill="#7C5E56" />
         <polygon points="96,-185 119,-185 99,-180" fill="#7C5E56" />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
       </g>
     );
   }
@@ -665,74 +790,116 @@ const ArmsRig: React.FC<{
       <g>
         <line x1="-25" y1="-185" x2="-22" y2="-92" stroke={sleeveColor} strokeWidth="7" strokeLinecap="round" />
         <line x1="25" y1="-185" x2="22" y2="-92" stroke={sleeveShadowColor} strokeWidth="7" strokeLinecap="round" />
-        <circle cx="-22" cy="-87" r="4.5" fill={handColor} />
-        <circle cx="22" cy="-87" r="4.5" fill={handShadowColor} />
+        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.5" fill={handColor} />
+        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.5" fill={handShadowColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
       </g>
     );
   }
 
-  // 5. Creepy child holding headless rag doll
-  if (base === "creepy_child") {
+  // 5. Holding / Raising Item Forward Pose (e.g. holding lantern or talisman in the fog)
+  if (pose === "pose_holding") {
+    const raiseLeft = heldHand === "left";
     return (
       <g>
-        <path d="M -16 -170 C -5 -150, 5 -150, 10 -160 L 5 -165 C 0 -155, -10 -155, -14 -170 Z" fill={sleeveColor} />
-        <circle cx="10" cy="-161" r="4" fill={handColor} />
-        {/* Vintage Burlap Rag Doll */}
-        <g transform="translate(15, -145) rotate(15)">
-          <ellipse cx="0" cy="0" rx="8" ry="14" fill="#8C7355" stroke="#2D2218" strokeWidth="1" />
-          <line x1="-6" y1="-5" x2="-14" y2="5" stroke="#8C7355" strokeWidth="3.5" />
-          <line x1="6" y1="-5" x2="14" y2="5" stroke="#8C7355" strokeWidth="3.5" />
-          <line x1="-4" y1="12" x2="-6" y2="22" stroke="#8C7355" strokeWidth="3.5" />
-          <line x1="4" y1="12" x2="6" y2="22" stroke="#8C7355" strokeWidth="3.5" />
-          <circle cx="0" cy="-14" r="3" fill={COLOR_PALETTE.accent_blood_red} />
-        </g>
+        {/* Back resting arm */}
+        <path
+          d={
+            raiseLeft
+              ? "M 22 -185 C 25 -150, 23 -125, 20 -100 L 14 -100 C 17 -125, 18 -150, 15 -185 Z"
+              : "M -22 -185 C -25 -150, -23 -125, -20 -100 L -14 -100 C -17 -125, -18 -150, -15 -185 Z"
+          }
+          fill={sleeveShadowColor}
+        />
+        <circle
+          cx={raiseLeft ? handSockets.right.x : handSockets.left.x}
+          cy={raiseLeft ? handSockets.right.y : handSockets.left.y}
+          r="4.5"
+          fill={handShadowColor}
+        />
+        {/* Active raised forearm holding object out in front */}
+        <path
+          d={
+            raiseLeft
+              ? `M -12 -184 L 22 -144 L ${handSockets.left.x} ${handSockets.left.y + 4} L ${handSockets.left.x - 4} ${handSockets.left.y - 5} L 20 -155 L -4 -184 Z`
+              : `M 18 -184 L 38 -144 L ${handSockets.right.x} ${handSockets.right.y + 4} L ${handSockets.right.x - 4} ${handSockets.right.y - 5} L 34 -155 L 10 -184 Z`
+          }
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="0.9"
+        />
+        <circle
+          cx={raiseLeft ? handSockets.left.x : handSockets.right.x}
+          cy={raiseLeft ? handSockets.left.y : handSockets.right.y}
+          r="4.8"
+          fill={handColor}
+        />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
       </g>
     );
   }
 
-  // Shivering pose
+  // 6. Shivering pose
   if (pose === "pose_shivering") {
     return (
       <g className="anim-arms-tremble">
         <path d="M -24 -185 C -20 -160, -5 -145, 12 -150 C 14 -155, 10 -165, -8 -160 C -18 -170, -20 -180, -24 -185 Z" fill={sleeveColor} />
         <path d="M 24 -185 C 20 -160, 5 -140, -14 -145 C -16 -150, -10 -160, 8 -155 C 18 -168, 20 -180, 24 -185 Z" fill={sleeveShadowColor} />
-        <circle cx="13" cy="-150" r="4.5" fill={handColor} />
-        <circle cx="-15" cy="-145" r="4.5" fill={handShadowColor} />
+        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.5" fill={handColor} />
+        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.5" fill={handShadowColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
       </g>
     );
   }
 
-  // Walking pose
+  // 7. Walking pose
   if (pose === "pose_walking") {
     return (
       <g className="anim-arms-walk">
         <path d="M -25 -185 C -35 -150, -45 -120, -50 -102 L -42 -100 C -37 -120, -28 -145, -20 -185 Z" fill={sleeveColor} />
         <path d="M 25 -185 C 32 -150, 40 -120, 45 -104 L 38 -102 C 33 -120, 26 -145, 20 -185 Z" fill={sleeveShadowColor} />
-        <circle cx="-46" cy="-98" r="4.8" fill={handColor} />
-        <circle cx="42" cy="-100" r="4.5" fill={handShadowColor} />
+        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.8" fill={handColor} />
+        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.5" fill={handShadowColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
       </g>
     );
   }
 
-  // Floating pose
+  // 8. Floating pose
   if (pose === "pose_floating") {
     return (
       <g className="anim-arms-float">
         <path d="M -25 -185 C -50 -175, -75 -180, -90 -193 C -86 -198, -68 -190, -45 -190 C -35 -190, -26 -188, -22 -185 Z" fill={sleeveColor} />
         <path d="M 25 -185 C 50 -175, 75 -180, 90 -193 C 86 -198, 68 -190, 45 -190 C 35 -190, 26 -188, 22 -185 Z" fill={sleeveShadowColor} />
-        <circle cx="-93" cy="-196" r="4.5" fill={handColor} />
-        <circle cx="93" cy="-196" r="4.5" fill={handShadowColor} />
+        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.5" fill={handColor} />
+        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.5" fill={handShadowColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
       </g>
     );
   }
 
-  // Default standing arms
+  // 9. Default standing arms (automatically bends active holding arm slightly outward to clear body silhouette)
+  const rightArmPath =
+    hasItem && heldHand === "right"
+      ? `M 20 -184 L 33 -148 L ${handSockets.right.x} ${handSockets.right.y + 3} L ${handSockets.right.x - 4} ${handSockets.right.y - 5} L 28 -155 L 14 -184 Z`
+      : isChild
+      ? "M -18 -172 C -21 -148, -19 -128, -17 -111 L -12 -111 C -15 -128, -15 -148, -13 -172 Z"
+      : "M 25 -185 C 28 -150, 26 -125, 22 -99 L 16 -99 C 20 -125, 21 -150, 18 -185 Z";
+
+  const leftArmPath =
+    hasItem && heldHand === "left"
+      ? `M -20 -184 L -31 -148 L ${handSockets.left.x} ${handSockets.left.y + 3} L ${handSockets.left.x + 4} ${handSockets.left.y - 5} L -26 -155 L -14 -184 Z`
+      : isChild
+      ? "M 18 -172 C 21 -148, 19 -128, 17 -111 L 12 -111 C 15 -128, 15 -148, 13 -172 Z"
+      : "M -25 -185 C -28 -150, -26 -125, -22 -99 L -16 -99 C -20 -125, -21 -150, -18 -185 Z";
+
   return (
     <g>
-      <path d="M -25 -185 C -28 -150, -26 -125, -22 -99 L -16 -99 C -20 -125, -21 -150, -18 -185 Z" fill={sleeveColor} />
-      <path d="M 25 -185 C 28 -150, 26 -125, 22 -99 L 16 -99 C 20 -125, 21 -150, 18 -185 Z" fill={sleeveShadowColor} />
-      <circle cx="-19" cy="-95" r="4.5" fill={handColor} />
-      <circle cx="19" cy="-95" r="4.5" fill={handShadowColor} />
+      <path d={leftArmPath} fill={sleeveShadowColor} />
+      <path d={rightArmPath} fill={sleeveColor} />
+      <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.5" fill={handShadowColor} />
+      <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.5" fill={handColor} />
+      <AttachedProp socket={activeSocket} itemId={heldItem} />
     </g>
   );
 };

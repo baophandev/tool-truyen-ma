@@ -715,6 +715,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                     facing={evaluated.facing}
                     scale={actor.scale || 1}
                     opacity={actor.opacity !== undefined ? actor.opacity : 1}
+                    heldItem={actor.heldItem}
+                    heldHand={actor.heldHand}
                     showSockets={showGizmo || isSelected || isBeingDragged}
                   />
 
@@ -773,6 +775,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                       facing={ghostFacing}
                       scale={actor.scale || 1}
                       opacity={isSelected || isDraggingB ? 0.36 : 0.18}
+                      heldItem={actor.heldItem}
+                      heldHand={actor.heldHand}
                       showSockets={false}
                     />
 

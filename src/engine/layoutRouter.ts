@@ -10,6 +10,8 @@ import type {
   CostumeId,
   DetailId,
   FacingDirection,
+  HeldHand,
+  HeldItemId,
   StructureId,
   ThemeId,
   SkyPresetId,
@@ -110,7 +112,21 @@ const VALID_POSES: CharacterPoseId[] = [
   "pose_crawling",
   "pose_reaching",
   "pose_hanging",
+  "pose_holding",
 ];
+const VALID_HELD_ITEMS: HeldItemId[] = [
+  "none",
+  "item_storm_lantern",
+  "item_paper_lantern",
+  "item_soul_candle",
+  "item_peach_wood_sword",
+  "item_yellow_talisman",
+  "item_rusty_sickle",
+  "item_ritual_bell",
+  "item_tattered_doll",
+  "item_tattered_umbrella",
+];
+const VALID_HELD_HANDS: HeldHand[] = ["right", "left"];
 const VALID_DETAILS: DetailId[] = [
   "detail_black_crow",
   "detail_will_o_wisp",
@@ -185,6 +201,12 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       if (!VALID_BASES.includes(actor.base)) errors.push(`actors[${idx}].base "${actor.base}" không hợp lệ`);
       if (actor.costume && !VALID_COSTUMES.includes(actor.costume)) {
         errors.push(`actors[${idx}].costume "${actor.costume}" không hợp lệ`);
+      }
+      if (actor.heldItem !== undefined && !VALID_HELD_ITEMS.includes(actor.heldItem)) {
+        errors.push(`actors[${idx}].heldItem "${actor.heldItem}" không hợp lệ`);
+      }
+      if (actor.heldHand !== undefined && !VALID_HELD_HANDS.includes(actor.heldHand)) {
+        errors.push(`actors[${idx}].heldHand "${actor.heldHand}" không hợp lệ (chỉ nhận "right" hoặc "left")`);
       }
       if (!VALID_FACES.includes(actor.face)) errors.push(`actors[${idx}].face "${actor.face}" không hợp lệ`);
       if (!VALID_POSES.includes(actor.pose)) errors.push(`actors[${idx}].pose "${actor.pose}" không hợp lệ`);
@@ -277,6 +299,8 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       offsetY: Number(ac.offsetY) || 0,
       scale: Number(ac.scale) || 1,
       opacity: ac.opacity !== undefined ? Number(ac.opacity) : 1,
+      heldItem: ac.heldItem || "none",
+      heldHand: ac.heldHand === "left" ? "left" : "right",
       ...(ac.motion
         ? {
             motion: {

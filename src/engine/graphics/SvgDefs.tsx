@@ -55,6 +55,20 @@ export const SvgDefs: React.FC = () => {
         <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
       </radialGradient>
 
+      {/* 2b. HANDHELD LIGHT GLOWS (Đèn bão, đèn lồng, nến cầu hồn) */}
+      <radialGradient id="lantern-warm-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="rgba(253, 224, 71, 0.85)" />
+        <stop offset="35%" stopColor="rgba(245, 158, 11, 0.45)" />
+        <stop offset="70%" stopColor="rgba(217, 119, 6, 0.15)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </radialGradient>
+
+      <radialGradient id="candle-eerie-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="rgba(254, 240, 138, 0.8)" />
+        <stop offset="45%" stopColor="rgba(16, 185, 129, 0.32)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </radialGradient>
+
       {/* 3. MIDGROUND MIST GRADIENTS */}
       <linearGradient id="mid-mist-grad-blood_moon" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stopColor="rgba(153, 27, 27, 0)" />

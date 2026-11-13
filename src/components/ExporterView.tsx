@@ -130,8 +130,11 @@ Hệ thống đồ họa 2D thuần code có các tài nguyên và tọa độ c
 - Actor Bases: "male_adult" | "female_adult" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow"
 - Actor Costumes: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas"
 - Actor Faces: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered"
-- Actor Poses: "pose_standing" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging"
+- Actor Poses: "pose_standing" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging" | "pose_holding"
 - Actor Facing: "left" | "right"
+- Actor Handheld Items (Gắn vào Hand Socket):
+  "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella"
+  "heldHand": "right" | "left" (mặc định "right")
 - Actor Motion (Tùy chọn di chuyển từ Điểm A -> Điểm B trong cảnh):
   "motion": { "targetSlot": SlotId, "targetOffsetX": number, "targetOffsetY": number, "startTimeSec": number, "endTimeSec": number, "easing": "linear"|"ease_in_out"|"ease_in"|"ease_out", "autoFaceTarget": true, "movingPose": CharacterPoseId }
 

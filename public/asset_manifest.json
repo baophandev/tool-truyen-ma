@@ -337,7 +337,24 @@
         "id": "pose_hanging",
         "type": "air",
         "desc": "Bị treo thắt cổ lơ lửng, đầu gục bất động, thân đung đưa kẽo kẹt"
+      },
+      {
+        "id": "pose_holding",
+        "type": "ground",
+        "desc": "Giơ tay cầm đồ vật ra phía trước (soi đèn, giơ bùa, thủ kiếm)"
       }
+    ],
+    "held_items": [
+      { "id": "none", "name": "Không cầm đồ vật" },
+      { "id": "item_storm_lantern", "name": "Đèn bão sắt cổ phát sáng" },
+      { "id": "item_paper_lantern", "name": "Đèn lồng giấy đỏ cầm tay" },
+      { "id": "item_soul_candle", "name": "Nến cầu hồn sáp chảy" },
+      { "id": "item_peach_wood_sword", "name": "Kiếm gỗ đào trừ tà" },
+      { "id": "item_yellow_talisman", "name": "Lá bùa vàng trấn yểm" },
+      { "id": "item_rusty_sickle", "name": "Liềm gỉ vương máu" },
+      { "id": "item_ritual_bell", "name": "Chuông đồng triệu hồn" },
+      { "id": "item_tattered_doll", "name": "Búp bê vải rách kinh dị" },
+      { "id": "item_tattered_umbrella", "name": "Ô giấy dầu cổ rách nát" }
     ]
   },
   "details": [

@@ -58,7 +58,22 @@ export type CharacterPoseId =
   | "pose_floating"
   | "pose_crawling"
   | "pose_reaching"
-  | "pose_hanging";
+  | "pose_hanging"
+  | "pose_holding";
+
+export type HeldItemId =
+  | "none"
+  | "item_storm_lantern"
+  | "item_paper_lantern"
+  | "item_soul_candle"
+  | "item_peach_wood_sword"
+  | "item_yellow_talisman"
+  | "item_rusty_sickle"
+  | "item_ritual_bell"
+  | "item_tattered_doll"
+  | "item_tattered_umbrella";
+
+export type HeldHand = "right" | "left";
 
 export type FacingDirection = "left" | "right";
 
@@ -114,6 +129,8 @@ export interface ActorConfig {
   offsetY?: number; // Optional fine-tuning in px
   scale?: number;   // Optional scaling factor
   opacity?: number; // e.g. 0.0 - 1.0 for spectral ghost
+  heldItem?: HeldItemId; // Modular handheld prop attached to Hand Socket
+  heldHand?: HeldHand;   // "right" (front arm, default) or "left" (back arm)
   motion?: ActorMotionConfig; // Optional A -> B keyframe movement
 }
 
