@@ -281,6 +281,21 @@
         "features": "Tà áo dài/váy buông thõng rách mép phất phơ theo gió, tóc đen xõa dài"
       },
       {
+        "id": "elder_hunched",
+        "name": "Bà lão / Cụ già lưng còng (elder_hunched)",
+        "features": "Lưng gù gập về trước, cổ chúc xuống, bước đi khòm, tóc hoa râm búi củ tỏi gài trâm tre, vóc người 0.85x"
+      },
+      {
+        "id": "brute_hulking",
+        "name": "Đồ tể / Hộ pháp lực lưỡng (brute_hulking)",
+        "features": "Vóc dáng đồ sộ 1.2x, vai u thịt bắp bè ngang, quai hàm bạnh vuông thô ráp, vết sẹo trên má, tóc húi cua sát đầu"
+      },
+      {
+        "id": "skeletal_emaciated",
+        "name": "Kẻ gầy trơ xương / Ngạ quỷ (skeletal_emaciated)",
+        "features": "Thân hình cao gầy 1.05x khẳng khiu dài ngoằng, ngực hóp lộ khung xương sườn, khớp gối to lồi, tóc xơ xác rũ rượi"
+      },
+      {
         "id": "ghost_wraith",
         "name": "Bóng ma bay lượn (tà áo rách, không chân, bay lơ lửng)",
         "features": "Không chân, vạt áo rách tan biến vào hư không dạng khói sương, hào quang lân tinh u ám"
@@ -378,6 +393,36 @@
         "id": "face_bleeding_eyes",
         "name": "Mắt chảy máu",
         "semantic": "Mắt trắng dã chảy hai vệt máu đen rỉ xuống cằm"
+      },
+      {
+        "id": "face_old_wrinkled",
+        "name": "Mặt già nua nếp nhăn",
+        "semantic": "Khuôn mặt nhiều nếp nhăn trán và đuôi mắt chân chim chùng xuống, khóe rãnh miệng sâu móm tém"
+      },
+      {
+        "id": "face_rage_furious",
+        "name": "Phẫn nộ trừng mắt",
+        "semantic": "Cặp chân mày xếch ngược dữ dội, mắt trợn trừng đỏ ngầu căm phẫn, nhe răng nanh gầm thét đe dọa"
+      },
+      {
+        "id": "face_pale_corpse",
+        "name": "Mặt tử thi lạnh lẽo",
+        "semantic": "Da tím tái bầm tím quanh mắt, tròng mắt trợn trắng dã không có đồng tử, môi thâm sì cứng đờ"
+      },
+      {
+        "id": "face_weeping_ghost",
+        "name": "Oán phụ khóc than",
+        "semantic": "Đôi mắt nhắm nghiền u uất đẫm lệ, hai dòng lệ đen kịt rỉ dài từ khóe mắt xuống cằm đầy thê lương"
+      },
+      {
+        "id": "face_sewn_mouth",
+        "name": "Miệng khâu chỉ đen",
+        "semantic": "Đôi mắt mở to kinh hoàng hoảng loạn, miệng bị khâu kín chéo chữ X bằng những mũi chỉ đen rỉ máu"
+      },
+      {
+        "id": "face_haggard_gaunt",
+        "name": "Hốc hác đói khát",
+        "semantic": "Hốc mắt trũng sâu quầng thâm kịt, gò má nhô cao hóp lại, môi nứt nẻ, vẻ mặt kiệt quệ rùng rợn của kẻ bị ma ám"
       },
       {
         "id": "face_faceless",

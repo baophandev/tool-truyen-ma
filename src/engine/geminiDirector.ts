@@ -178,6 +178,9 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
 - Actor Bases (Khung nhân vật):
   * "male_adult" (Nam thanh niên, người lữ khách gầy)
   * "female_adult" (Nữ thanh niên, tà áo buông, tóc dài)
+  * "elder_hunched" (Bà lão / Cụ già lưng còng 0.85x, tóc hoa râm búi củ tỏi)
+  * "brute_hulking" (Đồ tể / Hộ pháp lực lưỡng 1.2x, vai u thịt bắp, cằm bạnh)
+  * "skeletal_emaciated" (Kẻ gầy trơ xương / Ngạ quỷ 1.05x, khẳng khiu, ngực lộ sườn)
   * "ghost_wraith" (Bóng ma bay lượn, không chân, áo rách)
   * "creepy_child" (Đứa trẻ ma nhỏ bé 0.65x)
   * "jiangshi_corpse" (Cương thi áo quan, mũ quan bùa trán)
@@ -195,7 +198,7 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
   * "outfit_patient_gown" (Áo bệnh nhân sọc xanh lấm lem)
   * "outfit_modern_casual" (Áo hoodie / Đồ hiện đại thường nhật)
 - Actor Faces (Khuôn mặt):
-  * "face_calm", "face_scared", "face_creepy_smile", "face_bleeding_eyes", "face_faceless", "face_glowing_hollow", "face_talisman_covered"
+  * "face_calm", "face_scared", "face_creepy_smile", "face_bleeding_eyes", "face_old_wrinkled", "face_rage_furious", "face_pale_corpse", "face_weeping_ghost", "face_sewn_mouth", "face_haggard_gaunt", "face_faceless", "face_glowing_hollow", "face_talisman_covered"
 - Actor Facing (BẮT BUỘC có trên mỗi actor):
   * "facing": "left" | "right" (hướng mặt quay sang trái hoặc sang phải)
 - Actor Poses (Tư thế & Quy định vùng):
@@ -548,9 +551,9 @@ ${actionDescription}
 
 NHIỆM VỤ CỦA BẠN:
 1. KHÔNG tự suy nghĩ kịch bản/cốt truyện. Hãy biên dịch TRỰC TIẾP mô tả hành động trên thành danh sách diễn viên (actors) và chuyển động (motion):
-   - Chọn đúng base: "male_adult" | "female_adult" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow"
+   - Chọn đúng base: "male_adult" | "female_adult" | "elder_hunched" | "brute_hulking" | "skeletal_emaciated" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow"
    - Chọn đúng costume: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual"
-   - Chọn đúng face: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered"
+   - Chọn đúng face: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered"
    - BẮT BUỘC có "facing": "left" | "right" (hướng mặt nhìn trái hoặc phải).
    - Chọn đúng pose và vị trí slot tiếp đất (offsetY = 0): "far_left" (250) | "mid_left" (600) | "center" (960) | "mid_right" (1320) | "far_right" (1670). (Nếu pose_floating/pose_hanging dùng air_left | air_center | air_right).
    - Chọn đúng heldItem & heldHand: "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "none".
@@ -692,9 +695,9 @@ YÊU CẦU ĐẠO DIỄN:
 3. QUY ĐỊNH CHO MỖI ACTOR TRONG DANH SÁCH "actors":
    - "id": id duy nhất ví dụ "actor_1", "actor_2"
    - "facing": "left" | "right" (BẮT BUỘC CÓ trên mọi actor).
-   - "base": "male_adult" | "female_adult" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow"
+   - "base": "male_adult" | "female_adult" | "elder_hunched" | "brute_hulking" | "skeletal_emaciated" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow"
    - "costume": "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual"
-   - "face": "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered"
+   - "face": "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered"
    - "pose": "pose_standing" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_crawling" | "pose_reaching" (ở ground slots) | "pose_floating" | "pose_hanging" (ở air slots)
    - "slot": "far_left" | "mid_left" | "center" | "mid_right" | "far_right" (hoặc "air_left" | "air_center" | "air_right")
    - "offsetX": 0, "offsetY": 0 (nếu tiếp đất thì offsetY bắt buộc bằng 0)

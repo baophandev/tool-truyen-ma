@@ -162,6 +162,24 @@ export const BASE_APPEARANCE: Record<CharacterBaseId, BaseAppearance> = {
     hair: "#151821",
     outline: "#0A0B0F",
   },
+  elder_hunched: {
+    skin: "#B8A394",
+    skinShadow: "#8C7769",
+    hair: "#94A3B8", // Hoa râm / bạc trắng
+    outline: "#0A0B0F",
+  },
+  brute_hulking: {
+    skin: "#B59E92",
+    skinShadow: "#856F64",
+    hair: "#11141A",
+    outline: "#07080A",
+  },
+  skeletal_emaciated: {
+    skin: "#9CA79D",
+    skinShadow: "#6B766C",
+    hair: "#1C2229",
+    outline: "#0A0B0F",
+  },
   ghost_wraith: {
     skin: "#CFDCE6",
     skinShadow: "#94A3B8",

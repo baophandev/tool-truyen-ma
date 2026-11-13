@@ -61,6 +61,12 @@ export function getDefaultCostumeForBase(base: CharacterBaseId): CostumeId {
       return "outfit_mandarin_court";
     case "demon_shadow":
       return "outfit_ancient_armor";
+    case "elder_hunched":
+      return "outfit_tattered_tunic";
+    case "brute_hulking":
+      return "outfit_ancient_armor";
+    case "skeletal_emaciated":
+      return "outfit_shredded_burial";
     case "male_adult":
     default:
       return "outfit_tattered_tunic";
@@ -94,6 +100,9 @@ const VALID_STRUCTURES: StructureId[] = [
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
   "female_adult",
+  "elder_hunched",
+  "brute_hulking",
+  "skeletal_emaciated",
   "ghost_wraith",
   "creepy_child",
   "jiangshi_corpse",
@@ -120,6 +129,12 @@ const VALID_FACES: CharacterFaceId[] = [
   "face_faceless",
   "face_glowing_hollow",
   "face_talisman_covered",
+  "face_old_wrinkled",
+  "face_rage_furious",
+  "face_pale_corpse",
+  "face_weeping_ghost",
+  "face_sewn_mouth",
+  "face_haggard_gaunt",
 ];
 const VALID_POSES: CharacterPoseId[] = [
   "pose_standing",

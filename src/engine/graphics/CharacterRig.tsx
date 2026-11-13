@@ -40,6 +40,42 @@ function resolveHandSockets(
       right: { x: 81, y: -178, rot: 0 },
     };
   }
+  if (base === "elder_hunched") {
+    if (pose === "pose_holding") {
+      return {
+        left: heldHand === "left" ? { x: 42, y: -130, rot: 0 } : { x: -14, y: -78, rot: 0 },
+        right: heldHand === "left" ? { x: 14, y: -78, rot: 0 } : { x: 50, y: -134, rot: 0 },
+      };
+    }
+    return {
+      left: { x: -16, y: -78, rot: 10 },
+      right: { x: 28, y: -80, rot: -5 },
+    };
+  }
+  if (base === "brute_hulking") {
+    if (pose === "pose_holding") {
+      return {
+        left: heldHand === "left" ? { x: 58, y: -160, rot: 0 } : { x: -32, y: -98, rot: 0 },
+        right: heldHand === "left" ? { x: 32, y: -98, rot: 0 } : { x: 74, y: -162, rot: 0 },
+      };
+    }
+    return {
+      left: { x: -36, y: -96, rot: 0 },
+      right: { x: 36, y: -96, rot: 0 },
+    };
+  }
+  if (base === "skeletal_emaciated") {
+    if (pose === "pose_holding") {
+      return {
+        left: heldHand === "left" ? { x: 52, y: -160, rot: 0 } : { x: -22, y: -96, rot: 0 },
+        right: heldHand === "left" ? { x: 22, y: -96, rot: 0 } : { x: 68, y: -164, rot: 0 },
+      };
+    }
+    return {
+      left: { x: -22, y: -92, rot: 0 },
+      right: { x: 22, y: -92, rot: 0 },
+    };
+  }
   if (pose === "pose_crawling") {
     return {
       left: { x: -69, y: -6, rot: 0 },
@@ -134,19 +170,22 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
   const isGhost = base === "ghost_wraith";
   const isDemon = base === "demon_shadow";
   const isChild = base === "creepy_child";
+  const isElder = base === "elder_hunched";
+  const isBrute = base === "brute_hulking";
+  const isSkeletal = base === "skeletal_emaciated";
 
   // Base scale adjustment
-  const baseScaleModifier = isChild ? 0.65 : isDemon ? 1.25 : 1;
+  const baseScaleModifier = isChild ? 0.65 : isDemon ? 1.25 : isBrute ? 1.2 : isElder ? 0.85 : isSkeletal ? 1.05 : 1;
   const finalScale = scale * baseScaleModifier;
 
   // Socket relative coordinates
   const SOCKETS = {
     ground: [0, 0],
     hip: [0, -90],
-    shoulderL: [-25, -190],
-    shoulderR: [25, -190],
-    neck: [0, -210],
-    head: [0, -250],
+    shoulderL: isBrute ? [-35, -190] : [-25, -190],
+    shoulderR: isBrute ? [35, -190] : [25, -190],
+    neck: isElder ? [10, -195] : [0, -210],
+    head: isElder ? [18, -215] : [0, -250],
   };
 
   // Determine CSS animation class based on pose
@@ -183,6 +222,30 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
         </g>
       )}
 
+      {/* Hunched Back / Hump behind torso for Elder */}
+      {isElder && (
+        <g className="rig-elder-hump">
+          <path
+            d="M -15 -180 C -36 -165, -34 -120, -18 -95 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="1.2"
+          />
+        </g>
+      )}
+
+      {/* Broad Muscular Shoulders / Trapezius for Brute */}
+      {isBrute && (
+        <g className="rig-brute-trapezius">
+          <polygon
+            points="-40,-185 -16,-220 16,-220 40,-185"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="1.2"
+          />
+        </g>
+      )}
+
       {/* 1. LOWER BODY & LEGS (Underneath / Integrated with Outfit) */}
       <g className="rig-lower-body">
         {isGhost ? (
@@ -207,6 +270,15 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
           palette={palette}
           appearance={appearance}
         />
+        {/* Prominent Ribcage Lines for Skeletal Base */}
+        {isSkeletal && (
+          <g className="rig-skeletal-ribs" opacity="0.55">
+            <path d="M -15 -170 Q 0 -162 15 -170" stroke={appearance.outline} strokeWidth="1.8" fill="none" />
+            <path d="M -16 -152 Q 0 -144 16 -152" stroke={appearance.outline} strokeWidth="1.8" fill="none" />
+            <path d="M -14 -134 Q 0 -126 14 -134" stroke={appearance.outline} strokeWidth="1.8" fill="none" />
+            <path d="M -12 -116 Q 0 -108 12 -116" stroke={appearance.outline} strokeWidth="1.8" fill="none" />
+          </g>
+        )}
       </g>
 
       {/* 3. ARMS, SLEEVES & HANDHELD ITEM SOCKETS */}
@@ -224,12 +296,28 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
       </g>
 
       {/* 4. NECK SOCKET */}
-      <path
-        d="M -7 -190 L -6 -218 L 6 -218 L 7 -190 Z"
-        fill={appearance.skinShadow}
-        stroke={appearance.outline}
-        strokeWidth="1"
-      />
+      {isElder ? (
+        <path
+          d="M -10 -175 C -5 -195, 6 -205, 18 -215 L 24 -210 C 14 -195, 6 -175, 4 -168 Z"
+          fill={appearance.skinShadow}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+      ) : isSkeletal ? (
+        <path
+          d="M -4 -190 L -3 -228 L 3 -228 L 4 -190 Z"
+          fill={appearance.skinShadow}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+      ) : (
+        <path
+          d="M -7 -190 L -6 -218 L 6 -218 L 7 -190 Z"
+          fill={appearance.skinShadow}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+      )}
 
       {/* 5. BASE-SPECIFIC HEAD ACCESSORIES (Behind / Side of Head) */}
       {base === "female_adult" && (
@@ -268,7 +356,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
 
       {/* Hooded Cloak Special Hood Overlay */}
       {activeCostume === "outfit_shrouded_cloak" && (
-        <g className="rig-cloak-hood" transform="translate(0, -250)">
+        <g className="rig-cloak-hood" transform={isElder ? "translate(18, -215)" : "translate(0, -250)"}>
           {/* Colored dark cowl covering head */}
           <path
             d="M -28 10 C -38 -20, -32 -48, 0 -60 C 32 -48, 38 -20, 28 10 C 20 22, -20 22, -28 10 Z"
@@ -282,18 +370,22 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
       )}
 
       {/* 6. HEAD, HAIR CAP & INTERCHANGEABLE FACE */}
-      <g className="rig-head-group" transform="translate(0, -250)">
+      <g className="rig-head-group" transform={isElder ? "translate(18, -215)" : "translate(0, -250)"}>
         {activeCostume !== "outfit_shrouded_cloak" && (
           <>
             <ellipse
               cx="0"
               cy="0"
-              rx={isChild ? "26" : "22"}
-              ry={isChild ? "26" : "28"}
+              rx={isChild ? "26" : isElder ? "19" : isBrute ? "24" : isSkeletal ? "18" : "22"}
+              ry={isChild ? "26" : isElder ? "22" : isBrute ? "27" : isSkeletal ? "30" : "28"}
               fill={appearance.skin}
               stroke={appearance.outline}
               strokeWidth="1.5"
             />
+            {/* Brute squarish heavy jaw */}
+            {isBrute && (
+              <polygon points="-22,10 22,10 18,27 -18,27" fill={appearance.skin} stroke={appearance.outline} strokeWidth="1.2" />
+            )}
             {/* Simple stylized hair caps */}
             {base === "male_adult" && (
               <path
@@ -306,6 +398,29 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
                 d="M -22 -2 C -23 -27, 0 -32, 22 -27 C 23 -11, 22 -2, 20 -4 C 14 -16, 4 -18, 0 -13 C -4 -18, -14 -16, -20 -4 Z"
                 fill={appearance.hair}
               />
+            )}
+            {base === "elder_hunched" && (
+              <g className="rig-elder-hair">
+                <ellipse cx="-15" cy="-14" rx="7" ry="8" fill={appearance.hair} />
+                <line x1="-21" y1="-20" x2="-7" y2="-6" stroke="#92400E" strokeWidth="2.2" strokeLinecap="round" />
+                <path d="M -18 -8 Q -24 6 -20 16" stroke={appearance.hair} strokeWidth="2" fill="none" />
+                <path d="M 18 -8 Q 24 6 20 16" stroke={appearance.hair} strokeWidth="2" fill="none" />
+              </g>
+            )}
+            {base === "brute_hulking" && (
+              <g className="rig-brute-hair">
+                <path d="M -23 -8 C -23 -28, 0 -32, 23 -28 C 24 -15, 23 -8, 20 -10 C 14 -19, -14 -19, -20 -10 Z" fill={appearance.hair} />
+                <line x1="8" y1="-2" x2="16" y2="10" stroke="#7F1D1D" strokeWidth="1.5" />
+                <line x1="10" y1="2" x2="13" y2="5" stroke="#7F1D1D" strokeWidth="1.5" />
+              </g>
+            )}
+            {base === "skeletal_emaciated" && (
+              <g className="rig-skeletal-hair">
+                <path d="M -19 -10 Q -28 15 -24 35" stroke={appearance.hair} strokeWidth="1.8" fill="none" />
+                <path d="M -14 -15 Q -22 20 -17 42" stroke={appearance.hair} strokeWidth="1.5" fill="none" />
+                <path d="M 19 -10 Q 28 15 24 35" stroke={appearance.hair} strokeWidth="1.8" fill="none" />
+                <path d="M 14 -15 Q 22 20 17 40" stroke={appearance.hair} strokeWidth="1.5" fill="none" />
+              </g>
             )}
             {base === "creepy_child" && (
               <path
@@ -385,6 +500,8 @@ const TorsoOutfit: React.FC<{
   appearance: BaseAppearance;
 }> = ({ costume, base, palette, appearance }) => {
   const isDemon = base === "demon_shadow";
+  const isBrute = base === "brute_hulking";
+  const isSkeletal = base === "skeletal_emaciated";
 
   switch (costume) {
     case "outfit_flowing_ao_dai":
@@ -586,8 +703,10 @@ const TorsoOutfit: React.FC<{
         <g className="costume-tattered-tunic-torso">
           <path
             d={
-              isDemon
+              isDemon || isBrute
                 ? "M -35 -195 C -45 -150, -32 -115, -22 -90 L 22 -90 C 32 -115, 45 -150, 35 -195 Z"
+                : isSkeletal
+                ? "M -18 -185 C -20 -150, -17 -115, -13 -92 L 13 -92 C 17 -115, 20 -150, 18 -185 Z"
                 : "M -22 -185 C -25 -150, -20 -115, -16 -92 L 16 -92 C 20 -115, 25 -150, 22 -185 Z"
             }
             fill={palette.primary}
@@ -804,6 +923,30 @@ const LowerBodyOutfit: React.FC<{
         <path d="M 15 -92 L 6 -50 L 12 -4 L 4 -4 L 1 -50 L 3 -92 Z" fill={palette.pantsSecondary} />
         <ellipse cx="-9" cy="-2" rx="7" ry="3" fill="#181512" />
         <ellipse cx="8" cy="-2" rx="7" ry="3" fill="#181512" />
+      </g>
+    );
+  }
+
+  if (base === "skeletal_emaciated") {
+    return (
+      <g className="rig-skeletal-legs">
+        <line x1="-12" y1="-92" x2="-10" y2="0" stroke={palette.pantsPrimary} strokeWidth="5" />
+        <line x1="12" y1="-92" x2="10" y2="0" stroke={palette.pantsSecondary} strokeWidth="5" />
+        <circle cx="-11" cy="-45" r="4.5" fill={appearance.skinShadow} />
+        <circle cx="11" cy="-45" r="4.5" fill={appearance.skinShadow} />
+        <ellipse cx="-10" cy="-2" rx="6" ry="2.5" fill="#181512" />
+        <ellipse cx="10" cy="-2" rx="6" ry="2.5" fill="#181512" />
+      </g>
+    );
+  }
+
+  if (base === "brute_hulking") {
+    return (
+      <g className="rig-brute-legs">
+        <path d="M -22 -92 L -25 -45 L -20 -4 L -8 -4 L -10 -45 L -7 -92 Z" fill={palette.pantsPrimary} />
+        <path d="M 22 -92 L 25 -45 L 20 -4 L 8 -4 L 10 -45 L 7 -92 Z" fill={palette.pantsSecondary} />
+        <ellipse cx="-14" cy="-2" rx="9" ry="4" fill="#181512" />
+        <ellipse cx="14" cy="-2" rx="9" ry="4" fill="#181512" />
       </g>
     );
   }
@@ -1108,6 +1251,139 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
           <path d="M 6 -1 L 6 22 L 8 22 L 8 -1 Z" fill={COLOR_PALETTE.accent_blood_red} />
           <circle cx="7" cy="23" r="1.8" fill={COLOR_PALETTE.accent_blood_red} />
           <line x1="-5" y1="12" x2="5" y2="12" stroke="#1F1212" strokeWidth="1.3" />
+        </g>
+      );
+
+    case "face_old_wrinkled":
+      return (
+        <g className="face-old-wrinkled">
+          {/* Forehead wrinkles */}
+          <path d="M -12 -18 Q 0 -15 12 -18" stroke="#4A3B32" strokeWidth="1" fill="none" opacity="0.8" />
+          <path d="M -9 -14 Q 0 -11 9 -14" stroke="#4A3B32" strokeWidth="1" fill="none" opacity="0.8" />
+          {/* Drooping old eyelids and dim eyes */}
+          <path d="M -9 -6 Q -6 -9 -3 -6" stroke="#2B1D16" strokeWidth="1.2" fill="none" />
+          <ellipse cx="-6" cy="-4" rx="2.2" ry="1.4" fill="#1C1917" />
+          <circle cx="-6.5" cy="-4.5" r="0.6" fill="#CBD5E1" />
+          {/* Crow's feet wrinkles near eyes */}
+          <path d="M -9 -5 L -14 -7 M -10 -4 L -15 -4 M -9 -3 L -13 -1" stroke="#4A3B32" strokeWidth="0.8" />
+          <path d="M 3 -6 Q 6 -9 9 -6" stroke="#2B1D16" strokeWidth="1.2" fill="none" />
+          <ellipse cx="6" cy="-4" rx="2.2" ry="1.4" fill="#1C1917" />
+          <circle cx="5.5" cy="-4.5" r="0.6" fill="#CBD5E1" />
+          <path d="M 9 -5 L 14 -7 M 10 -4 L 15 -4 M 9 -3 L 13 -1" stroke="#4A3B32" strokeWidth="0.8" />
+          {/* Deep nasolabial folds */}
+          <path d="M -7 4 Q -9 12 -5 18" stroke="#3A2820" strokeWidth="1.2" fill="none" />
+          <path d="M 7 4 Q 9 12 5 18" stroke="#3A2820" strokeWidth="1.2" fill="none" />
+          {/* Sunken toothless mouth */}
+          <path d="M -5 14 Q 0 12 5 14" stroke="#1C1917" strokeWidth="1.8" fill="none" />
+          {/* Chin wrinkles */}
+          <path d="M -4 20 Q 0 22 4 20" stroke="#4A3B32" strokeWidth="0.9" fill="none" />
+        </g>
+      );
+
+    case "face_rage_furious":
+      return (
+        <g className="face-rage-furious anim-jitter-slight">
+          {/* Deep furrowed brow & sharp angry eyebrows angled down */}
+          <polygon points="-12,-12 -2,-4 -2,-6 -12,-15" fill="#1F2937" />
+          <polygon points="12,-12 2,-4 2,-6 12,-15" fill="#1F2937" />
+          <line x1="-1" y1="-8" x2="-1" y2="-1" stroke="#450A0A" strokeWidth="1.5" />
+          <line x1="1" y1="-8" x2="1" y2="-1" stroke="#450A0A" strokeWidth="1.5" />
+          {/* Piercing bloodshot red-rimmed glare */}
+          <ellipse cx="-6" cy="-3" rx="4.5" ry="3.5" fill="#450A0A" />
+          <circle cx="-6" cy="-3" r="2.2" fill={COLOR_PALETTE.accent_blood_red} />
+          <circle cx="-6" cy="-3" r="0.8" fill="#FFFFFF" />
+          <ellipse cx="6" cy="-3" rx="4.5" ry="3.5" fill="#450A0A" />
+          <circle cx="6" cy="-3" r="2.2" fill={COLOR_PALETTE.accent_blood_red} />
+          <circle cx="6" cy="-3" r="0.8" fill="#FFFFFF" />
+          {/* Snarl teeth & menacing open grimace */}
+          <path d="M -9 8 Q 0 4 9 8 Q 8 20 0 20 Q -8 20 -9 8 Z" fill="#2A0404" stroke="#7F1D1D" strokeWidth="1" />
+          {/* Sharp fangs */}
+          <polygon points="-7,8 -5,14 -4,8" fill="#F8FAFC" />
+          <polygon points="4,8 5,14 7,8" fill="#F8FAFC" />
+          <polygon points="-5,19 -4,15 -3,19" fill="#F8FAFC" />
+          <polygon points="3,19 4,15 5,19" fill="#F8FAFC" />
+        </g>
+      );
+
+    case "face_pale_corpse":
+      return (
+        <g className="face-pale-corpse">
+          {/* Dark bruised purplish eye hollows */}
+          <ellipse cx="-7" cy="-4" rx="6.5" ry="5.5" fill="#1E1B2E" opacity="0.85" />
+          <ellipse cx="7" cy="-4" rx="6.5" ry="5.5" fill="#1E1B2E" opacity="0.85" />
+          {/* Wide dead glassy white pupilless eyes */}
+          <ellipse cx="-7" cy="-4" rx="4.5" ry="4" fill="#E2E8F0" stroke="#0F172A" strokeWidth="0.8" />
+          <circle cx="-7" cy="-4" r="1.5" fill="#94A3B8" opacity="0.5" />
+          <ellipse cx="7" cy="-4" rx="4.5" ry="4" fill="#E2E8F0" stroke="#0F172A" strokeWidth="0.8" />
+          <circle cx="7" cy="-4" r="1.5" fill="#94A3B8" opacity="0.5" />
+          {/* Cold bluish dead lips hanging slack */}
+          <path d="M -6 11 Q 0 9 6 11 Q 4 16 0 16 Q -4 16 -6 11 Z" fill="#2E1026" stroke="#4C1D45" strokeWidth="1" />
+          <line x1="-7" y1="11" x2="7" y2="11" stroke="#0F0814" strokeWidth="1.2" />
+        </g>
+      );
+
+    case "face_weeping_ghost":
+      return (
+        <g className="face-weeping-ghost">
+          {/* Sorrowful downward arched eyebrows */}
+          <path d="M -11 -9 Q -6 -13 -2 -8" stroke="#1E293B" strokeWidth="1.2" fill="none" />
+          <path d="M 11 -9 Q 6 -13 2 -8" stroke="#1E293B" strokeWidth="1.2" fill="none" />
+          {/* Tightly closed weeping eyes */}
+          <path d="M -9 -4 Q -6 -1 -3 -4" stroke="#0F172A" strokeWidth="1.8" fill="none" />
+          <path d="M 3 -4 Q 6 -1 9 -4" stroke="#0F172A" strokeWidth="1.8" fill="none" />
+          {/* Bleeding black sorrowful tear streams dripping down to chin */}
+          <path d="M -6 -2 L -7 14 L -5 23 L -6 23 L -8 13 L -6 -2 Z" fill="#09090B" />
+          <circle cx="-5.5" cy="25" r="1.5" fill="#09090B" />
+          <path d="M 6 -2 L 7 12 L 5 21 L 6 21 L 8 11 L 6 -2 Z" fill="#09090B" />
+          <circle cx="5.5" cy="23" r="1.4" fill="#09090B" />
+          {/* Melancholy trembling mouth */}
+          <path d="M -5 13 Q 0 10 5 13 Q 0 15 -5 13 Z" fill="#1C1917" stroke="#451A03" strokeWidth="0.8" />
+        </g>
+      );
+
+    case "face_sewn_mouth":
+      return (
+        <g className="face-sewn-mouth anim-jitter-slight">
+          {/* Wide terrified bulging eyes */}
+          <ellipse cx="-7" cy="-5" rx="5.5" ry="6.5" fill="#F8FAFC" stroke="#0F172A" strokeWidth="1" />
+          <circle cx="-7" cy="-5" r="1.8" fill="#000000" />
+          <circle cx="-6" cy="-6" r="0.8" fill="#FFFFFF" />
+          <ellipse cx="7" cy="-5" rx="5.5" ry="6.5" fill="#F8FAFC" stroke="#0F172A" strokeWidth="1" />
+          <circle cx="7" cy="-5" r="1.8" fill="#000000" />
+          <circle cx="8" cy="-6" r="0.8" fill="#FFFFFF" />
+          {/* Lips clamped shut with stitch line */}
+          <line x1="-12" y1="12" x2="12" y2="12" stroke="#450A0A" strokeWidth="2" />
+          {/* Cross stitches (X stitches) with blood dots */}
+          {[-9, -5, -1, 3, 7].map((x, i) => (
+            <g key={i}>
+              <line x1={x - 2} y1="8" x2={x + 2} y2="16" stroke="#000000" strokeWidth="1.6" />
+              <line x1={x + 2} y1="8" x2={x - 2} y2="16" stroke="#000000" strokeWidth="1.6" />
+              <circle cx={x} cy="8" r="0.9" fill={COLOR_PALETTE.accent_blood_red} />
+              <circle cx={x} cy="16" r="0.9" fill={COLOR_PALETTE.accent_blood_red} />
+            </g>
+          ))}
+        </g>
+      );
+
+    case "face_haggard_gaunt":
+      return (
+        <g className="face-haggard-gaunt">
+          {/* Deep dark hollow eye sockets */}
+          <ellipse cx="-7" cy="-4" rx="7" ry="6" fill="#18181B" opacity="0.9" />
+          <ellipse cx="7" cy="-4" rx="7" ry="6" fill="#18181B" opacity="0.9" />
+          {/* Unnerving pinprick stare in darkness */}
+          <circle cx="-7" cy="-4" r="2.8" fill="#E2E8F0" />
+          <circle cx="-7" cy="-4" r="1" fill="#000000" />
+          <circle cx="7" cy="-4" r="2.8" fill="#E2E8F0" />
+          <circle cx="7" cy="-4" r="1" fill="#000000" />
+          {/* Sharp prominent cheekbones */}
+          <path d="M -15 2 L -7 6" stroke="#3F3F46" strokeWidth="1.5" />
+          <path d="M 15 2 L 7 6" stroke="#3F3F46" strokeWidth="1.5" />
+          {/* Sunken dry hollow cheeks */}
+          <ellipse cx="-11" cy="9" rx="3" ry="5" fill="#18181B" opacity="0.35" />
+          <ellipse cx="11" cy="9" rx="3" ry="5" fill="#18181B" opacity="0.35" />
+          {/* Chapped parted lips */}
+          <ellipse cx="0" cy="14" rx="4" ry="2.5" fill="#18181B" stroke="#52525B" strokeWidth="0.8" />
         </g>
       );
 

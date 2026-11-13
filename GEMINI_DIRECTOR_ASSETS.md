@@ -129,9 +129,12 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
           └── motion (Chuyển động di chuyển từ Điểm A -> Điểm B)
 ```
 
-### 5.1. 6 Khung Thân Thể Nhân Vật (Character Bases)
+### 5.1. 9 Khung Thân Thể Nhân Vật (Character Bases)
 - `"male_adult"`: Nam thanh niên (dáng người gầy, bước đi hoang mang, người lữ khách).
 - `"female_adult"`: Nữ thanh niên (tà áo buông, mái tóc đen dài rủ bóng).
+- `"elder_hunched"`: Bà lão / Cụ già lưng còng (vai gù gập về trước, cổ chúc xuống, bước đi khòm, tóc hoa râm búi củ tỏi gài trâm tre, vóc người thấp bé 0.85x).
+- `"brute_hulking"`: Đồ tể / Hộ pháp lực lưỡng (vóc dáng đồ sộ 1.2x, vai u thịt bắp bè ngang, quai hàm bạnh vuông thô ráp, sẹo trên má, tóc húi cua sát đầu).
+- `"skeletal_emaciated"`: Kẻ gầy trơ xương / Ngạ quỷ (vóc người cao 1.05x khẳng khiu dài ngoằng, ngực hóp lộ khung sườn, khớp gối lồi, tóc xơ xác rũ rượi).
 - `"ghost_wraith"`: Bóng ma oan hồn (không chân, đuôi áo rách dập dềnh bồng bềnh, quầng hào quang ma mị).
 - `"creepy_child"`: Đứa trẻ ma (vóc dáng nhỏ bé 0.65x, yếm hoa, vẻ u uất bí hiểm).
 - `"jiangshi_corpse"`: Cương thi áo quan (xác chết nhảy búp, mũ quan phong kiến, tay duỗi thẳng phía trước).
@@ -150,11 +153,17 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
 - `"outfit_patient_gown"`: Bộ quần áo bệnh nhân sọc xanh nhạt rộng thùng thình, buộc dây sau gáy, vạt áo lấm lem rách rưới.
 - `"outfit_modern_casual"`: Áo khoác hoodie hiện đại màu xám đen có khóa kéo, dây rút, quần jean ôm và giày thể thao đế trắng.
 
-### 5.3. 7 Biểu Cảm Khuôn Mặt (Faces - Gắn tại Head Socket -250px)
+### 5.3. 13 Biểu Cảm Khuôn Mặt (Faces - Gắn tại Head Socket -250px)
 - `"face_calm"`: Mặt bình thường, mắt đen nhỏ vô hồn, lạnh lẽo.
 - `"face_scared"`: Kinh hãi tột cùng, tròng mắt trợn trắng, miệng há hốc run rẩy.
 - `"face_creepy_smile"`: Nụ cười ma quái xé toạc dài tới mang tai với hàm răng nhọn.
 - `"face_bleeding_eyes"`: Mắt trắng dã chảy hai vệt máu đen rỉ xuống cằm.
+- `"face_old_wrinkled"`: Mặt già nua nếp nhăn, trán nhăn sâu, đuôi mắt chân chim chùng xuống, khóe rãnh miệng móm tém.
+- `"face_rage_furious"`: Mặt phẫn nộ trừng mắt, chân mày xếch ngược dữ dội, mắt đỏ ngầu căm phẫn, nhe răng nanh gầm thét đe dọa.
+- `"face_pale_corpse"`: Mặt tử thi lạnh lẽo, da tím tái, tròng mắt trợn trắng dã không có đồng tử, môi thâm sì cứng đờ.
+- `"face_weeping_ghost"`: Mặt oán phụ khóc than, mắt nhắm nghiền đẫm lệ, hai dòng lệ đen kịt rỉ dài từ khóe mắt xuống cằm thê lương.
+- `"face_sewn_mouth"`: Mặt miệng khâu chỉ đen, mắt mở to kinh hoàng hoảng loạn, miệng bị khâu kín chéo chữ X bằng những mũi chỉ đen rỉ máu.
+- `"face_haggard_gaunt"`: Mặt hốc hác đói khát, hốc mắt trũng sâu quầng thâm kịt, gò má nhô cao hóp lại, vẻ mặt kiệt quệ rùng rợn của kẻ bị ma ám.
 - `"face_faceless"`: Mặt trắng trơn vô diện (No-Face), không ngũ quan, cực kỳ bất an.
 - `"face_glowing_hollow"`: Hốc mắt và miệng rỗng tuếch rực cháy lửa xanh lân tinh ma trơi.
 - `"face_talisman_covered"`: Lá bùa vàng chu sa che kín từ trán xuống miệng, bay phấp phới.
@@ -258,9 +267,9 @@ export interface DirectorSceneScript {
   }>;
   actors: Array<{
     id: string;
-    base: "male_adult" | "female_adult" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow";
+    base: "male_adult" | "female_adult" | "elder_hunched" | "brute_hulking" | "skeletal_emaciated" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow";
     costume?: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual";
-    face: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered";
+    face: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered";
     pose: "pose_standing" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging";
     facing: "left" | "right";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";

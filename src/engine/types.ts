@@ -47,6 +47,9 @@ export type DetailId =
 export type CharacterBaseId =
   | "male_adult"
   | "female_adult"
+  | "elder_hunched"
+  | "brute_hulking"
+  | "skeletal_emaciated"
   | "ghost_wraith"
   | "creepy_child"
   | "jiangshi_corpse"
@@ -72,7 +75,13 @@ export type CharacterFaceId =
   | "face_bleeding_eyes"
   | "face_faceless"
   | "face_glowing_hollow"
-  | "face_talisman_covered";
+  | "face_talisman_covered"
+  | "face_old_wrinkled"
+  | "face_rage_furious"
+  | "face_pale_corpse"
+  | "face_weeping_ghost"
+  | "face_sewn_mouth"
+  | "face_haggard_gaunt";
 
 export type CharacterPoseId =
   | "pose_standing"
