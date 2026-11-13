@@ -4,11 +4,15 @@ import {
   generateFilmFromDescriptions,
   generateSceneFromDescription,
   generateNamedEnvironmentFromPrompt,
+  breakdownStoryToSceneDrafts,
+  auditStoryAssets,
+  SAMPLE_HORROR_PROMPTS,
   getStoredApiKey,
   setStoredApiKey,
   getStoredModel,
   setStoredModel,
   type SceneDescriptionSpec,
+  type AssetAuditResult,
 } from "../engine/geminiDirector";
 import {
   loadStoredNamedEnvironments,
@@ -19,8 +23,6 @@ import {
 } from "../engine/environmentPresets";
 import {
   Sparkles,
-  Bot,
-  Film,
   Key,
   Play,
   RotateCcw,
@@ -37,6 +39,10 @@ import {
   Trash2,
   Plus,
   Check,
+  Wand2,
+  RefreshCw,
+  ShieldAlert,
+  ShieldCheck,
 } from "lucide-react";
 
 export type AiModalMode =
@@ -63,6 +69,7 @@ interface SceneDraftSpec {
   actionDescription: string;
   duration_sec: number;
   title: string;
+  dialogue?: string;
 }
 
 export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
@@ -122,6 +129,17 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
       },
     ];
   });
+
+  // Story Breakdown Assistant state (Auto-fill)
+  const [rawStoryInput, setRawStoryInput] = useState<string>("");
+  const [targetSceneCount, setTargetSceneCount] = useState<number | "auto">("auto");
+  const [isBreakingDown, setIsBreakingDown] = useState<boolean>(false);
+  const [breakdownNotice, setBreakdownNotice] = useState<string | null>(null);
+  const [isAssistantExpanded, setIsAssistantExpanded] = useState<boolean>(true);
+
+  // Asset Audit state (Kiểm tra tài nguyên theo GEMINI_DIRECTOR_ASSETS.md)
+  const [assetAudit, setAssetAudit] = useState<AssetAuditResult | null>(null);
+  const [isAuditing, setIsAuditing] = useState<boolean>(false);
 
   // Single Scene Action Director state
   const [singleSceneEnvId, setSingleSceneEnvId] = useState<string>(() => {
@@ -198,6 +216,100 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     });
   };
 
+  // Auto-breakdown story to auto-fill scene drafts
+  const handleAutoBreakdownStory = async () => {
+    if (!rawStoryInput.trim()) {
+      setErrorMessage("Vui lòng dán nội dung cốt truyện hoặc chọn một cốt truyện mẫu.");
+      return;
+    }
+
+    setIsBreakingDown(true);
+    setErrorMessage(null);
+    setBreakdownNotice(null);
+
+    try {
+      const result = await breakdownStoryToSceneDrafts(rawStoryInput, namedEnvironments, {
+        targetSceneCount,
+        apiKey,
+        model,
+      });
+
+      if (!result.success || !result.drafts || result.drafts.length === 0) {
+        setErrorMessage(result.error || "Không thể phân tích cốt truyện.");
+      } else {
+        const drafts = result.drafts;
+        setSceneCount(drafts.length);
+        setSceneDrafts(
+          drafts.map((d) => ({
+            environmentId: d.environmentId,
+            title: d.title,
+            actionDescription: d.actionDescription,
+            dialogue: d.dialogue || "",
+            duration_sec: d.duration_sec,
+          }))
+        );
+        if (result.assetAudit) {
+          setAssetAudit(result.assetAudit);
+        } else {
+          setAssetAudit({
+            success: true,
+            isSufficient: true,
+            missingAssets: [],
+            summary: "Toàn bộ nhân vật, trang phục và đạo cụ đều đã có trong GEMINI_DIRECTOR_ASSETS.md!",
+          });
+        }
+
+        setBreakdownNotice(
+          `✨ Trợ thủ AI đã tự động điền thành công ${drafts.length} phân cảnh! Toàn bộ bối cảnh dùng lại và mô tả hành động đã được điền sẵn vào các thẻ bên dưới.`
+        );
+      }
+    } catch (err: any) {
+      setErrorMessage(`Lỗi phân tích cốt truyện: ${err.message}`);
+    } finally {
+      setIsBreakingDown(false);
+    }
+  };
+
+  // Re-check story assets against GEMINI_DIRECTOR_ASSETS.md
+  const handleRecheckAssets = async () => {
+    const textToCheck = rawStoryInput.trim() || sceneDrafts.map((d) => d.actionDescription).join(". ");
+    if (!textToCheck) {
+      setErrorMessage("Vui lòng nhập cốt truyện hoặc mô tả phân cảnh để kiểm tra tài nguyên asset.");
+      return;
+    }
+
+    setIsAuditing(true);
+    setErrorMessage(null);
+
+    try {
+      const result = await auditStoryAssets(textToCheck, {
+        apiKey,
+        model,
+      });
+
+      if (!result.success) {
+        setErrorMessage(result.error || "Không thể kiểm tra tài nguyên asset.");
+      } else {
+        setAssetAudit(result);
+      }
+    } catch (err: any) {
+      setErrorMessage(`Lỗi kiểm tra tài nguyên: ${err.message}`);
+    } finally {
+      setIsAuditing(false);
+    }
+  };
+
+  // Acknowledge missing assets and proceed with available fallbacks
+  const handleAcknowledgeAndProceed = () => {
+    if (assetAudit) {
+      setAssetAudit({
+        ...assetAudit,
+        isSufficient: true,
+        summary: "Đã xác nhận sử dụng asset thay thế có sẵn.",
+      });
+    }
+  };
+
   // Generate Film from Description Specs
   const handleGenerateFilmFromDescriptions = async () => {
     const hasAny = sceneDrafts.some((d) => d.actionDescription.trim().length > 0);
@@ -216,6 +328,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         actionDescription: draft.actionDescription.trim() || "Nhân vật bước đi cẩn trọng trong màn sương mù.",
         duration_sec: draft.duration_sec || 6,
         title: draft.title || undefined,
+        dialogue: draft.dialogue || undefined,
       };
     });
 
@@ -372,14 +485,14 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold text-white tracking-tight m-0">
-                  CỖ MÁY TẠO VIDEO 2D THEO MÔ TẢ TRỰC TIẾP
+                  CỖ MÁY TẠO VIDEO 2D THEO CỐT TRUYỆN & MÔ TẢ
                 </h2>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800/60">
-                  DIRECT DESCRIPTION ENGINE
+                  AI STORY ASSISTANT & 2D ENGINE
                 </span>
               </div>
               <p className="text-[11px] text-neutral-400">
-                Khóa bối cảnh chung dùng lại chống lệch cảnh • Mô tả trực tiếp nhân vật làm gì trong scene
+                Trợ thủ AI tự động bóc tách cốt truyện, khóa bối cảnh dùng lại chống lệch cảnh và điền sẵn kịch bản
               </p>
             </div>
           </div>
@@ -476,8 +589,8 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                   : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-850"
               }`}
             >
-              <Film className="w-4 h-4 text-amber-300" />
-              <span>1. Tạo Phim Theo Mô Tả ({sceneCount} Cảnh)</span>
+              <Wand2 className="w-4 h-4 text-amber-300" />
+              <span>1. Trợ Thủ Cốt Truyện & Tạo Phim ({sceneCount} Cảnh)</span>
             </button>
 
             {/* TAB 2 */}
@@ -514,13 +627,249 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
             </button>
           </div>
 
-          {/* TAB 1: DESCRIPTION-DRIVEN MULTI-SCENE GENERATOR */}
+          {/* TAB 1: DESCRIPTION-DRIVEN MULTI-SCENE GENERATOR WITH AI STORY ASSISTANT */}
           {mode === "description_film" && (
             <div className="flex flex-col gap-4">
+              {/* AI STORY BREAKDOWN ASSISTANT (NHẬP CỐT TRUYỆN THÔ -> TỰ ĐỘNG ĐIỀN CẢNH) */}
+              <div className="bg-gradient-to-b from-purple-950/40 via-neutral-950 to-neutral-950 border border-purple-800/50 rounded-2xl p-4 flex flex-col gap-3 shadow-xl shadow-purple-950/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 via-purple-600 to-red-600 flex items-center justify-center text-white shadow-md shadow-purple-950/50 border border-amber-400/30">
+                      <Wand2 className="w-4 h-4 text-amber-100" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-xs font-bold text-white tracking-wide uppercase m-0">
+                          Trợ Thủ Biên Kịch: Nhập Cốt Truyện Thô
+                        </h3>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold">
+                          AI Tự Động Điền & Khóa Bối Cảnh
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-neutral-400 m-0">
+                        Dán một câu chuyện bất kỳ, LLM sẽ tự động bóc tách các cảnh, chọn bối cảnh dùng lại và điền sẵn mọi trường. Bạn không cần suy nghĩ hay dán thủ công!
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsAssistantExpanded(!isAssistantExpanded)}
+                    className="text-neutral-400 hover:text-white p-1.5 rounded-lg hover:bg-neutral-800 transition-all text-xs flex items-center gap-1 font-mono"
+                  >
+                    <span>{isAssistantExpanded ? "Thu gọn" : "Mở rộng"}</span>
+                    {isAssistantExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+
+                {isAssistantExpanded && (
+                  <div className="flex flex-col gap-3 pt-1 border-t border-purple-900/30">
+                    {/* Quick Inspirations Chips */}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="text-[11px] text-neutral-400 font-semibold mr-1 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-400" /> Cốt truyện mẫu:
+                      </span>
+                      {SAMPLE_HORROR_PROMPTS.slice(0, 5).map((preset) => (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          onClick={() => {
+                            setRawStoryInput(preset.prompt);
+                            setTargetSceneCount(preset.suggestedScenes);
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-purple-950/60 hover:bg-purple-900 border border-purple-800/60 hover:border-amber-400/50 text-[11px] text-purple-200 hover:text-white transition-all font-medium"
+                        >
+                          {preset.title}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Raw Story Input Textarea */}
+                    <div className="flex flex-col gap-1.5">
+                      <textarea
+                        rows={3}
+                        value={rawStoryInput}
+                        onChange={(e) => setRawStoryInput(e.target.value)}
+                        placeholder="Dán câu chuyện, ý tưởng kịch bản hoặc truyền thuyết kinh dị của bạn vào đây (ví dụ: Một lữ khách đi qua bãi tha ma sương mù đêm ba mươi...)"
+                        className="w-full bg-black/80 border border-neutral-700/80 rounded-xl p-3 text-xs text-neutral-200 focus:outline-none focus:border-purple-500 resize-none leading-relaxed shadow-inner"
+                      />
+                    </div>
+
+                    {/* Breakdown Controls Bar */}
+                    <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-semibold text-neutral-300">
+                          Số cảnh mong muốn:
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {(["auto", 2, 3, 4, 5] as const).map((cnt) => (
+                            <button
+                              key={String(cnt)}
+                              type="button"
+                              onClick={() => setTargetSceneCount(cnt)}
+                              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all ${
+                                targetSceneCount === cnt
+                                  ? "bg-purple-700 text-white shadow ring-1 ring-purple-400"
+                                  : "bg-neutral-900 text-neutral-400 hover:text-white hover:bg-neutral-800"
+                              }`}
+                            >
+                              {cnt === "auto" ? "Tự động" : `${cnt} cảnh`}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* The Magic Auto-Fill Button */}
+                      <button
+                        type="button"
+                        onClick={handleAutoBreakdownStory}
+                        disabled={isBreakingDown || !rawStoryInput.trim()}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 via-purple-600 to-red-600 hover:from-amber-500 hover:via-purple-500 hover:to-red-500 disabled:opacity-40 text-white text-xs font-bold shadow-lg shadow-purple-950/60 transition-all transform hover:scale-[1.01] active:scale-[0.99]"
+                      >
+                        {isBreakingDown ? (
+                          <>
+                            <div className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                            <span>AI Đang Phân Tích & Điền Tự Động...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Wand2 className="w-4 h-4 text-amber-200" />
+                            <span>✨ AI Phân Tích & Tự Động Điền Vào Các Cảnh</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Feedback Notice after Breakdown */}
+                    {breakdownNotice && (
+                      <div className="p-2.5 bg-emerald-950/70 border border-emerald-800 rounded-xl flex items-center gap-2 text-xs text-emerald-200 animate-in fade-in">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>{breakdownNotice}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* ASSET AUDIT & WARNING PANEL (DỰA VÀO GEMINI_DIRECTOR_ASSETS.MD) */}
+              {assetAudit && (
+                <div
+                  className={`rounded-2xl p-4 flex flex-col gap-3.5 border transition-all animate-in fade-in ${
+                    !assetAudit.isSufficient && assetAudit.missingAssets.length > 0
+                      ? "bg-amber-950/30 border-amber-600/60 shadow-lg shadow-amber-950/40"
+                      : "bg-emerald-950/30 border-emerald-600/60 shadow-lg shadow-emerald-950/40"
+                  }`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      {!assetAudit.isSufficient && assetAudit.missingAssets.length > 0 ? (
+                        <div className="w-8 h-8 rounded-xl bg-amber-600/20 border border-amber-500/50 flex items-center justify-center text-amber-400 shrink-0">
+                          <ShieldAlert className="w-4 h-4" />
+                        </div>
+                      ) : (
+                        <div className="w-8 h-8 rounded-xl bg-emerald-600/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shrink-0">
+                          <ShieldCheck className="w-4 h-4" />
+                        </div>
+                      )}
+
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-xs font-bold text-white tracking-wide uppercase m-0 flex items-center gap-1.5">
+                            {!assetAudit.isSufficient && assetAudit.missingAssets.length > 0 ? (
+                              <>
+                                <span className="text-amber-300">Cảnh Báo: Thiếu {assetAudit.missingAssets.length} Asset Trong Code</span>
+                                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">
+                                  GEMINI_DIRECTOR_ASSETS.md
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-emerald-300">AI Xác Nhận: Đủ Asset 100% (Sẵn Sàng Làm Phim)</span>
+                                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+                                  ĐÃ KIỂM TRA HỢP LỆ
+                                </span>
+                              </>
+                            )}
+                          </h4>
+                        </div>
+                        <p className="text-[11px] text-neutral-300 m-0">
+                          {assetAudit.summary}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Re-check Button */}
+                    <button
+                      type="button"
+                      onClick={handleRecheckAssets}
+                      disabled={isAuditing}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-xs font-bold text-neutral-200 hover:text-white transition-all shadow"
+                      title="Kiểm tra lại toàn bộ cốt truyện và các phân cảnh so với tài liệu GEMINI_DIRECTOR_ASSETS.md"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${isAuditing ? "animate-spin" : ""}`} />
+                      <span>{isAuditing ? "Đang kiểm tra lại..." : "🔄 Kiểm Tra Lại Asset"}</span>
+                    </button>
+                  </div>
+
+                  {/* MISSING ASSETS DETAILS TABLE / CARDS */}
+                  {!assetAudit.isSufficient && assetAudit.missingAssets.length > 0 && (
+                    <div className="flex flex-col gap-2.5 pt-2 border-t border-amber-900/40">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                        {assetAudit.missingAssets.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className="bg-black/70 border border-amber-800/60 rounded-xl p-3 flex flex-col gap-1.5"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-amber-200">
+                                {item.name}
+                              </span>
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-neutral-300">
+                                {item.categoryLabel}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-neutral-300">
+                              <span className="text-neutral-400">ID đề xuất thêm:</span>{" "}
+                              <code className="text-cyan-300 font-mono text-[10px] px-1 py-0.5 bg-neutral-950 rounded border border-neutral-800">
+                                {item.suggestedId}
+                              </code>
+                            </div>
+                            <p className="text-[11px] text-neutral-400 m-0 leading-relaxed">
+                              <strong className="text-neutral-300">Lý do:</strong> {item.reason}
+                            </p>
+                            {item.replacementAvailable && (
+                              <div className="text-[10px] text-neutral-400 bg-neutral-950/80 px-2 py-1 rounded border border-neutral-800/80">
+                                <span className="text-amber-400 font-semibold">Tạm thay bằng:</span> {item.replacementAvailable}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* 7-Step Guide Note */}
+                      <div className="p-2.5 bg-neutral-950/90 border border-neutral-800 rounded-xl flex items-start justify-between gap-3 text-xs">
+                        <div className="text-neutral-300 text-[11px] leading-relaxed">
+                          <span className="font-bold text-amber-300">Quy trình thêm asset vào code (theo GEMINI.md):</span> Cập nhật đồng thời vào 7 tệp: <code className="text-neutral-200">GEMINI_DIRECTOR_ASSETS.md</code>, <code className="text-neutral-200">types.ts</code>, <code className="text-neutral-200">graphics/</code>, <code className="text-neutral-200">placementRules.ts</code>, <code className="text-neutral-200">layoutRouter.ts</code>, <code className="text-neutral-200">EditorView.tsx</code>, <code className="text-neutral-200">asset_manifest.json</code>.
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleAcknowledgeAndProceed}
+                          className="shrink-0 px-2.5 py-1 rounded-lg bg-amber-900/60 hover:bg-amber-800 border border-amber-700/60 text-[11px] font-semibold text-amber-200 transition-all"
+                          title="Nếu chưa kịp thêm code, bạn có thể bấm vào đây để chấp nhận dùng asset thay thế tạm thời"
+                        >
+                          Chấp Nhận Dùng Tạm Asset Thay Thế
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* SECTION HEADER: SCENE CARDS */}
               <div className="flex flex-wrap items-center justify-between gap-3 bg-neutral-950/70 p-3 rounded-xl border border-neutral-800">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-neutral-200">
-                    Số lượng phân cảnh:
+                    Danh Sách Phân Cảnh ({sceneCount} Cảnh):
                   </span>
                   <div className="flex items-center gap-1.5">
                     {[1, 2, 3, 4, 5].map((cnt) => (
@@ -543,7 +892,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
 
                 <div className="text-xs text-neutral-400 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Các cảnh chọn cùng một bối cảnh sẽ có khung cảnh 100% y hệt nhau, không bị lệch.</span>
+                  <span>Các cảnh chung bối cảnh sẽ có khung cảnh 100% y hệt nhau, không bị lệch.</span>
                 </div>
               </div>
 
@@ -621,24 +970,54 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                           className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600 resize-none leading-relaxed transition-all"
                         />
                       </div>
+
+                      {/* Dialogue / Subtitle */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[11px] font-semibold text-neutral-400">
+                          Phụ đề / Lời thoại nhân vật trong cảnh:
+                        </label>
+                        <input
+                          type="text"
+                          value={draft.dialogue || ""}
+                          onChange={(e) => handleUpdateDraft(idx, "dialogue", e.target.value)}
+                          placeholder="Ví dụ: Đêm ba mươi sao lạnh thấu xương... có tiếng ai gọi tên mình?"
+                          className="w-full bg-neutral-950 border border-neutral-800/80 rounded-lg px-2.5 py-1 text-xs text-red-200 italic font-serif focus:outline-none focus:border-red-600"
+                        />
+                      </div>
                     </div>
                   );
                 })}
               </div>
 
-              {/* Action Button */}
-              <button
-                onClick={handleGenerateFilmFromDescriptions}
-                disabled={isLoading}
-                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-red-700 via-amber-700 to-purple-800 hover:from-red-600 hover:via-amber-600 hover:to-purple-700 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-950/60"
-              >
-                <Bot className="w-4 h-4 text-amber-300" />
-                <span>
-                  {isLoading
-                    ? "Gemini Đang Biên Dịch Mô Tả Thành Hoạt Hình 2D..."
-                    : `Bắt Đầu Tạo ${sceneCount} Phân Cảnh (Theo Mô Tả Trực Tiếp)`}
-                </span>
-              </button>
+              {/* Action Button: Chạy Tạo Phim */}
+              <div className="flex flex-col gap-2 pt-1">
+                <button
+                  onClick={() => {
+                    if (assetAudit && !assetAudit.isSufficient && assetAudit.missingAssets.length > 0) {
+                      if (
+                        !window.confirm(
+                          `Phát hiện ${assetAudit.missingAssets.length} asset trong cốt truyện chưa có trong GEMINI_DIRECTOR_ASSETS.md.\n\nBạn có muốn tiếp tục tạo phim bằng các asset thay thế tạm thời không?`
+                        )
+                      ) {
+                        return;
+                      }
+                    }
+                    handleGenerateFilmFromDescriptions();
+                  }}
+                  disabled={isLoading || isBreakingDown || isAuditing}
+                  className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-red-700 via-amber-700 to-purple-800 hover:from-red-600 hover:via-amber-600 hover:to-purple-700 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xl shadow-red-950/80 ring-1 ring-amber-400/30 transform hover:scale-[1.01] active:scale-[0.99]"
+                >
+                  <Play className="w-4 h-4 text-amber-300 fill-amber-300" />
+                  <span>
+                    {isLoading
+                      ? "Gemini Đang Biên Dịch Kịch Bản Sang Hoạt Hình 2D..."
+                      : `🎬 CHẠY TẠO PHIM NGAY (Tạo ${sceneCount} Phân Cảnh)`}
+                  </span>
+                </button>
+                <p className="text-[11px] text-neutral-400 text-center m-0">
+                  Sau khi tool điền xong, bạn nhấn "Chạy Tạo Phim Ngay" thì Engine mới bắt đầu biên dịch sang hoạt hình và mở Player.
+                </p>
+              </div>
             </div>
           )}
 

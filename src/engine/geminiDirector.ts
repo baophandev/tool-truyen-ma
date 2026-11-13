@@ -646,6 +646,7 @@ export interface SceneDescriptionSpec {
   actionDescription: string;
   duration_sec?: number;
   title?: string;
+  dialogue?: string;
 }
 
 /**
@@ -681,6 +682,7 @@ export async function generateFilmFromDescriptions(
 - Bối Cảnh Cố Định: "${spec.environment.name}" (Theme: "${spec.environment.theme}", Sky: "${spec.environment.lighting.sky_preset}")
 - Công trình cố định: ${JSON.stringify(spec.environment.environment_items.map((e) => e.asset_id))}
 - Mô Tả Hành Động & Nhân Vật: """${spec.actionDescription.trim() || "Nhân vật bước đi cẩn trọng trong màn đêm."}"""
+- Lời thoại / Phụ đề: """${spec.dialogue ? spec.dialogue.trim() : "..."}"""
 - Thời lượng: ${spec.duration_sec || 6}s`;
   }).join("\n\n");
 
@@ -768,6 +770,7 @@ YÊU CẦU ĐẠO DIỄN:
       sc.details = spec.environment.details ? JSON.parse(JSON.stringify(spec.environment.details)) : [];
       if (spec.duration_sec) sc.duration_sec = spec.duration_sec;
       if (spec.title) sc.title = spec.title;
+      if (spec.dialogue && spec.dialogue.trim()) sc.dialogue = spec.dialogue.trim();
 
       const val = validateDirectorScript(sc);
       if (val.normalized) {
@@ -865,5 +868,390 @@ TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:`;
     return { success: true, environment: targetObj };
   } catch (err: any) {
     return { success: false, error: `Lỗi tạo bối cảnh: ${err.message}` };
+  }
+}
+
+/**
+ * AUTO-FILL STORY BREAKDOWN ASSISTANT SPECIFICATION
+ */
+export interface AutoFillSceneDraft {
+  title: string;
+  environmentId: string;
+  actionDescription: string;
+  dialogue?: string;
+  duration_sec: number;
+}
+
+export interface MissingAssetItem {
+  category: "actor_base" | "costume" | "face" | "held_item" | "structure" | "detail" | "theme" | "sky_preset";
+  categoryLabel: string;
+  name: string;
+  suggestedId: string;
+  reason: string;
+  replacementAvailable?: string;
+}
+
+export interface AssetAuditResult {
+  success: boolean;
+  isSufficient: boolean;
+  missingAssets: MissingAssetItem[];
+  summary: string;
+  error?: string;
+  rawText?: string;
+}
+
+export interface BreakdownStoryResult {
+  success: boolean;
+  drafts?: AutoFillSceneDraft[];
+  assetAudit?: AssetAuditResult;
+  error?: string;
+  rawText?: string;
+}
+
+/**
+ * AUDIT STORY ASSETS AGAINST GEMINI_DIRECTOR_ASSETS.md
+ * Checks if the story implies or requires entities not currently implemented in the 2D SVG engine.
+ */
+export async function auditStoryAssets(
+  storyPrompt: string,
+  options: {
+    apiKey?: string;
+    model?: string;
+  } = {}
+): Promise<AssetAuditResult> {
+  const apiKey = (options.apiKey || getStoredApiKey()).trim();
+  const model = options.model || getStoredModel() || "gemini-2.5-flash";
+
+  if (!apiKey) {
+    return {
+      success: false,
+      isSufficient: false,
+      missingAssets: [],
+      summary: "Chưa cấu hình API Key.",
+      error: "Chưa có Gemini API Key. Vui lòng cấu hình API Key.",
+    };
+  }
+
+  if (!storyPrompt.trim()) {
+    return {
+      success: false,
+      isSufficient: false,
+      missingAssets: [],
+      summary: "Cốt truyện trống.",
+      error: "Vui lòng nhập nội dung cốt truyện để kiểm tra asset.",
+    };
+  }
+
+  const userPrompt = `BẠN LÀ CHUYÊN VIÊN KIỂM ĐỊNH TÀI NGUYÊN ĐỒ HỌA (ASSET AUDITOR) DỰA THEO TÀI LIỆU GEMINI_DIRECTOR_ASSETS.md.
+Nhiệm vụ của bạn là đọc kỹ cốt truyện dưới đây, nhận diện tất cả các thực thể (nhân vật, trang phục, khuôn mặt, đồ vật cầm tay, công trình bối cảnh, đạo cụ) mà cốt truyện nhắc đến hoặc ngụ ý cần có, và đối chiếu với DANH MỤC ASSETS ĐANG CÓ SẴN TRONG HỆ THỐNG.
+
+CỐT TRUYỆN:
+"""
+${storyPrompt.trim()}
+"""
+
+DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
+1. KHUNG NHÂN VẬT (Bases - 9 loại):
+   - "male_adult" (Nam thanh niên, lữ khách gầy)
+   - "female_adult" (Nữ thanh niên tóc dài)
+   - "elder_hunched" (Bà lão / Cụ già lưng còng 0.85x)
+   - "brute_hulking" (Đồ tể / Hộ pháp lực lưỡng 1.2x)
+   - "skeletal_emaciated" (Kẻ gầy trơ xương / Ngạ quỷ 1.05x)
+   - "ghost_wraith" (Bóng ma oan hồn bay lơ lửng, không chân)
+   - "creepy_child" (Đứa trẻ ma nhỏ bé 0.65x)
+   - "jiangshi_corpse" (Cương thi áo quan nhảy cứng đờ)
+   - "demon_shadow" (Quỷ bóng đen to lớn 1.25x sừng cong)
+
+2. TRANG PHỤC (Costumes - 11 bộ):
+   - "outfit_tattered_tunic" (Áo tơi sờn rách)
+   - "outfit_flowing_ao_dai" (Áo dài tà rách)
+   - "outfit_shrouded_cloak" (Áo choàng trùm đầu Reaper)
+   - "outfit_mandarin_court" (Quan phục triều đình)
+   - "outfit_monk_cassock" (Áo cà sa pháp sư)
+   - "outfit_shredded_burial" (Vải liệm tử thi)
+   - "outfit_ancient_armor" (Giáp tướng cổ)
+   - "outfit_child_pajamas" (Yếm hoa trẻ thơ)
+   - "outfit_doctor_coat" (Áo blouse bác sĩ)
+   - "outfit_patient_gown" (Áo bệnh nhân)
+   - "outfit_modern_casual" (Đồ hoodie hiện đại)
+
+3. BIỂU CẢM KHUÔN MẶT (Faces - 13 mặt):
+   - "face_calm", "face_scared", "face_creepy_smile", "face_bleeding_eyes", "face_old_wrinkled", "face_rage_furious", "face_pale_corpse", "face_weeping_ghost", "face_sewn_mouth", "face_haggard_gaunt", "face_faceless", "face_glowing_hollow", "face_talisman_covered"
+
+4. ĐỒ VẬT CẦM TAY (Held Items - 12 món):
+   - "none" (tay không)
+   - "item_storm_lantern" (đèn bão sắt)
+   - "item_paper_lantern" (lồng đèn giấy)
+   - "item_soul_candle" (nến triệu hồn)
+   - "item_peach_wood_sword" (kiếm gỗ đào)
+   - "item_yellow_talisman" (lá bùa vàng)
+   - "item_rusty_sickle" (lưỡi liềm rỉ sét)
+   - "item_ritual_bell" (chuông đồng Tam Thanh)
+   - "item_tattered_doll" (búp bê vải)
+   - "item_tattered_umbrella" (ô rách)
+   - "item_flashlight" (đèn pin hiện đại)
+   - "item_scalpel" (dao mổ phẫu thuật)
+
+5. CÔNG TRÌNH BỐI CẢNH (Structures - 13 công trình):
+   - "creepy_banyan_tree" (Cây đa cổ thụ)
+   - "haunted_gallows_tree" (Cây treo cổ rủ cành)
+   - "ancient_tomb" (Ngôi mộ cổ và bia đá)
+   - "abandoned_shrine" (Miếu hoang cô hồn)
+   - "creepy_well" (Giếng cạn oan hồn)
+   - "dilapidated_hut" (Lều tranh xiêu vẹo)
+   - "broken_wooden_bridge" (Cầu gỗ gãy nhịp)
+   - "scarecrow_of_the_damned" (Bù nhìn quỷ ám)
+   - "hospital_operating_bed" (Giường mổ bệnh viện)
+   - "hotel_reception_desk" (Quầy lễ tân khách sạn)
+   - "supermarket_shelf_aisle" (Kệ hàng siêu thị)
+   - "creepy_elevator_doors" (Cửa thang máy rùng rợn)
+   - "dining_table_chairs" (Bàn ăn nhà hàng)
+
+6. ĐẠO CỤ BỐI CẢNH (Details - 10 đạo cụ):
+   - "detail_black_crow" (Quạ đen)
+   - "detail_will_o_wisp" (Đốm ma trơi)
+   - "detail_blood_lantern" (Lồng đèn máu)
+   - "detail_incense_bowl" (Bát hương tàn)
+   - "detail_skull_pile" (Đống sọ người)
+   - "detail_hanging_talisman" (Dây bùa treo)
+   - "detail_iv_drip_stand" (Cột truyền dịch)
+   - "detail_shopping_cart" (Xe đẩy siêu thị)
+   - "detail_surveillance_camera" (Camera an ninh)
+   - "detail_flickering_ceiling_lamp" (Đèn huỳnh quang trần)
+
+7. THEMES & SKY PRESETS:
+   - Themes: rural_graveyard, abandoned_village, cursed_swamp, modern_indoor
+   - Sky: blood_moon, foggy_night, stormy_dark, eclipse_abyss, flickering_fluorescent, dim_indoor_night
+
+YÊU CẦU KIỂM TRA ĐỐI CHIẾU:
+- Phân tích xem trong cốt truyện có chi tiết nào mà hệ thống CHƯA CÓ asset phù hợp không.
+- Ví dụ nếu truyện có "cung tên", "súng săn", "chó săn", "ngựa ma", "rìu đốn củi", "thuyền gỗ", "mặt nạ quỷ", v.v. -> đây là các asset mà hệ thống chưa có.
+- Nếu phát hiện thiếu asset:
+  * "isSufficient": false
+  * "missingAssets": mảng các asset thiếu. Mỗi asset gồm:
+    - "category": "actor_base" | "costume" | "face" | "held_item" | "structure" | "detail" | "theme" | "sky_preset"
+    - "categoryLabel": Tên tiếng Việt phân loại (vd: "Đồ vật cầm tay", "Khung nhân vật", "Công trình bối cảnh")
+    - "name": Tên tiếng Việt của thực thể thiếu (vd: "Cung tên gỗ", "Chó săn ma")
+    - "suggestedId": ID kỹ thuật đề xuất theo chuẩn hệ thống (vd: "item_wooden_bow", "beast_hunting_dog")
+    - "reason": Lý do tại sao cốt truyện cần asset này
+    - "replacementAvailable": Gợi ý asset có sẵn gần nhất trong kho có thể tạm thời thay thế (vd: "Có thể tạm dùng 'item_rusty_sickle'")
+- Nếu toàn bộ thực thể trong câu chuyện đều đã có thể đáp ứng trọn vẹn bằng các asset trên:
+  * "isSufficient": true
+  * "missingAssets": []
+  * "summary": "Tất cả các nhân vật, công trình và đạo cụ cho câu chuyện này đều đã có sẵn trong GEMINI_DIRECTOR_ASSETS.md!"
+
+TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
+{
+  "isSufficient": true,
+  "summary": "Tóm tắt đánh giá mức độ đầy đủ của tài nguyên...",
+  "missingAssets": []
+}`;
+
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: GEMINI_DIRECTOR_SYSTEM_INSTRUCTION }] },
+        contents: [{ parts: [{ text: userPrompt }] }],
+        generationConfig: { responseMimeType: "application/json", temperature: 0.2 },
+      }),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      return {
+        success: false,
+        isSufficient: false,
+        missingAssets: [],
+        summary: "Lỗi kết nối Gemini API",
+        error: `Lỗi Gemini API: ${errBody}`,
+      };
+    }
+
+    const data = await res.json();
+    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+    const parsed = JSON.parse(rawText);
+
+    const isSufficient = Boolean(parsed.isSufficient && (!parsed.missingAssets || parsed.missingAssets.length === 0));
+    const missingAssets: MissingAssetItem[] = Array.isArray(parsed.missingAssets) ? parsed.missingAssets : [];
+
+    return {
+      success: true,
+      isSufficient,
+      missingAssets,
+      summary: parsed.summary || (isSufficient ? "Tài nguyên đầy đủ 100%!" : `Phát hiện ${missingAssets.length} asset cần bổ sung.`),
+      rawText,
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      isSufficient: false,
+      missingAssets: [],
+      summary: "Lỗi kiểm tra tài nguyên",
+      error: `Lỗi kiểm tra tài nguyên: ${err.message}`,
+    };
+  }
+}
+
+/**
+ * AUTO-FILL ASSISTANT:
+ * Breaks down raw user story into scene specifications with reusable environments
+ * and audits if any required asset is missing from GEMINI_DIRECTOR_ASSETS.md.
+ */
+export async function breakdownStoryToSceneDrafts(
+  storyPrompt: string,
+  availableEnvironments: NamedEnvironmentPreset[],
+  options: {
+    targetSceneCount?: number | "auto";
+    apiKey?: string;
+    model?: string;
+  } = {}
+): Promise<BreakdownStoryResult> {
+  const apiKey = (options.apiKey || getStoredApiKey()).trim();
+  const model = options.model || getStoredModel() || "gemini-2.5-flash";
+
+  if (!apiKey) {
+    return {
+      success: false,
+      error: "Chưa có Gemini API Key. Vui lòng cấu hình API Key.",
+    };
+  }
+
+  if (!storyPrompt.trim()) {
+    return {
+      success: false,
+      error: "Vui lòng nhập nội dung cốt truyện để phân tích.",
+    };
+  }
+
+  const envsSummary = availableEnvironments
+    .map(
+      (env) =>
+        `- ID: "${env.id}" | Tên: "${env.name}" | Theme: "${env.theme}" | Sky: "${env.lighting.sky_preset}" | Mô tả: "${env.description || ""}"`
+    )
+    .join("\n");
+
+  const countRequirement =
+    options.targetSceneCount && options.targetSceneCount !== "auto"
+      ? `BẮT BUỘC phân chia thành đúng ${options.targetSceneCount} phân cảnh.`
+      : `Hãy tự động phân tích nhịp điệu cốt truyện và chia thành từ 2 đến 5 phân cảnh phù hợp nhất.`;
+
+  const userPrompt = `BẠN LÀ TRỢ THỦ BIÊN KỊCH HOẠT HÌNH KINH DỊ BÓNG ĐEN 2D (LIMBO ENGINE SCRIPT BREAKDOWN ASSISTANT).
+Nhiệm vụ của bạn là nhận cốt truyện thô từ người dùng, phân tích và tự động bóc tách thành các phân cảnh hoàn chỉnh để ĐIỀN TỰ ĐỘNG VÀO CÁC TRƯỜNG THÔNG TIN (AUTO-FILL).
+
+CỐT TRUYỆN CỦA NGƯỜI DÙNG:
+"""
+${storyPrompt.trim()}
+"""
+
+DANH SÁCH BỐI CẢNH DÙNG LẠI HIỆN CÓ TRONG THƯ VIỆN CỦA HỆ THỐNG:
+${envsSummary}
+
+YÊU CẦU ĐẶC BIỆT DÀNH CHO TRỢ THỦ BIÊN KỊCH:
+1. SỐ LƯỢNG PHÂN CẢNH: ${countRequirement}
+2. QUY TẮC KHÓA BỐI CẢNH DÙNG LẠI (CRITICAL - SCENE CONTINUITY):
+   - Mọi cảnh BẮT BUỘC phải chọn 1 "environmentId" từ danh sách bối cảnh trên (chính xác ID, không tự bịa).
+   - NGUYÊN TẮC VÀNG: Nếu các cảnh liên tiếp diễn ra ở cùng một không gian / địa điểm (ví dụ lữ khách bước đi trong bãi tha ma rồi gặp ma hiện hình, hoặc ở miếu hoang rồi đối đầu cương thi), BẮT BUỘC PHẢI DÙNG CHUNG 1 "environmentId" để bối cảnh được giữ nguyên 100%, không bị lệch hay nhảy bối cảnh!
+   - Chỉ đổi sang "environmentId" khác khi cốt truyện thực sự chuyển địa điểm (ví dụ từ bãi tha ma chạy tới miếu hoang).
+3. MÔ TẢ HÀNH ĐỘNG NHÂN VẬT (actionDescription):
+   - Viết mô tả hành động trực tiếp, chi tiết, sống động theo đúng tài nguyên của Limbo Engine:
+     * Nhân vật (bases): "male_adult" (lữ khách, nam thanh niên), "female_adult" (thiếu nữ tóc dài), "elder_hunched" (bà lão, cụ già), "brute_hulking" (đồ tể, hộ pháp), "skeletal_emaciated" (kẻ gầy trơ xương, ngạ quỷ), "ghost_wraith" (bóng ma lơ lửng), "creepy_child" (đứa trẻ ma), "jiangshi_corpse" (cương thi phong kiến), "demon_shadow" (quỷ bóng đen sừng cong).
+     * Trang phục (costumes): "outfit_tattered_tunic" (áo tơi nông phu), "outfit_flowing_ao_dai" (áo dài ma mị), "outfit_shrouded_cloak" (áo choàng trùm đầu), "outfit_mandarin_court" (quan phục triều đình), "outfit_monk_cassock" (áo cà sa pháp sư), "outfit_shredded_burial" (vải liệm tử thi), "outfit_ancient_armor" (giáp tướng cổ), "outfit_child_pajamas" (yếm hoa trẻ thơ), "outfit_doctor_coat" (áo blouse bác sĩ), "outfit_patient_gown" (áo bệnh nhân), "outfit_modern_casual" (đồ hiện đại).
+     * Đồ vật cầm tay (held items): đèn bão sắt ("item_storm_lantern"), lồng đèn giấy ("item_paper_lantern"), nến triệu hồn ("item_soul_candle"), kiếm gỗ đào ("item_peach_wood_sword"), bùa vàng ("item_yellow_talisman"), liềm rỉ sét ("item_rusty_sickle"), chuông đồng ("item_ritual_bell"), búp bê vải ("item_tattered_doll"), ô rách ("item_tattered_umbrella"), đèn pin ("item_flashlight"), dao mổ ("item_scalpel").
+     * Hướng nhìn và di chuyển A -> B: bước đi từ trái qua phải, bước lùi hoảng sợ, sà xuống rượt đuổi, nhảy cứng đờ...
+4. TIÊU ĐỀ (title): Ngắn gọn, có số thứ tự (ví dụ: "Cảnh 1: Lạc Bước Bãi Tha Ma", "Cảnh 2: Hồn Ma Áo Liệm Xuất Hiện").
+5. LỜI THOẠI / PHỤ ĐỀ (dialogue): Một câu phụ đề rùng rợn, ma quái hoặc độc thoại nội tâm gắn liền với diễn biến cảnh.
+6. THỜI LƯỢNG (duration_sec): Từ 5 đến 8 giây.
+7. KIỂM ĐỊNH ASSET (CRITICAL): Rà soát xem cốt truyện có yêu cầu nhân vật, trang phục, đồ vật cầm tay hay công trình nào mà hệ thống CHƯA CÓ không (ví dụ cung tên, súng săn, chó săn, ngựa, rìu, đò gỗ, v.v.). Nếu có chi tiết nào thiếu so với kho asset trong GEMINI_DIRECTOR_ASSETS.md thì báo vào mảng missingAssets trong đối tượng assetAudit!
+
+TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
+{
+  "assetAudit": {
+    "isSufficient": true,
+    "summary": "Đánh giá mức độ đầy đủ của tài nguyên...",
+    "missingAssets": []
+  },
+  "scenes": [
+    {
+      "title": "Cảnh 1: ...",
+      "environmentId": "id_bối_cảnh_chọn_từ_danh_sách",
+      "actionDescription": "Mô tả chi tiết nhân vật làm gì...",
+      "dialogue": "Lời thoại rùng rợn...",
+      "duration_sec": 6
+    }
+  ]
+}
+(Nếu phát hiện thiếu asset thì isSufficient = false và liệt kê chi tiết trong missingAssets).`;
+
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: GEMINI_DIRECTOR_SYSTEM_INSTRUCTION }] },
+        contents: [{ parts: [{ text: userPrompt }] }],
+        generationConfig: { responseMimeType: "application/json", temperature: 0.6 },
+      }),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      return { success: false, error: `Lỗi Gemini API: ${errBody}` };
+    }
+
+    const data = await res.json();
+    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+    const parsed = JSON.parse(rawText);
+
+    let rawScenes: any[] = [];
+    let assetAudit: AssetAuditResult | undefined = undefined;
+
+    if (Array.isArray(parsed)) {
+      rawScenes = parsed;
+    } else if (parsed && typeof parsed === "object") {
+      if (Array.isArray(parsed.scenes)) {
+        rawScenes = parsed.scenes;
+      } else if (Array.isArray(parsed.drafts)) {
+        rawScenes = parsed.drafts;
+      }
+      if (parsed.assetAudit && typeof parsed.assetAudit === "object") {
+        const missing = Array.isArray(parsed.assetAudit.missingAssets) ? parsed.assetAudit.missingAssets : [];
+        const isSufficient = Boolean(parsed.assetAudit.isSufficient && missing.length === 0);
+        assetAudit = {
+          success: true,
+          isSufficient,
+          missingAssets: missing,
+          summary: parsed.assetAudit.summary || (isSufficient ? "Tài nguyên đầy đủ 100%!" : `Phát hiện ${missing.length} asset cần bổ sung.`),
+        };
+      }
+    }
+
+    const validEnvIds = new Set(availableEnvironments.map((e) => e.id));
+    const fallbackEnvId = availableEnvironments[0]?.id || "env_graveyard_foggy";
+
+    const drafts: AutoFillSceneDraft[] = rawScenes.map((item, idx) => {
+      let envId = item.environmentId;
+      if (!envId || !validEnvIds.has(envId)) {
+        envId = fallbackEnvId;
+      }
+      return {
+        title: item.title || `Cảnh ${idx + 1}: Diễn Biến Cốt Truyện`,
+        environmentId: envId,
+        actionDescription: item.actionDescription || "Nhân vật bước đi cẩn trọng trong bóng tối.",
+        dialogue: item.dialogue || undefined,
+        duration_sec: Math.max(3, Math.min(20, Number(item.duration_sec) || 6)),
+      };
+    });
+
+    if (drafts.length === 0) {
+      return { success: false, error: "Không thể phân tách phân cảnh từ cốt truyện.", rawText };
+    }
+
+    return { success: true, drafts, assetAudit, rawText };
+  } catch (err: any) {
+    return { success: false, error: `Lỗi phân tích cốt truyện: ${err.message}` };
   }
 }

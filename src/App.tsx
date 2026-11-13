@@ -241,10 +241,10 @@ export function App() {
             <button
               onClick={() => handleOpenAiDirector("description_film")}
               className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-amber-600 to-purple-600 hover:from-red-500 hover:via-amber-500 hover:to-purple-500 text-white shadow-lg shadow-red-950/50 border border-amber-400/40 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
-              title="Cỗ máy tạo video 2D theo mô tả trực tiếp & khóa bối cảnh chung dùng lại"
+              title="Trợ thủ AI bóc tách cốt truyện, tự động điền các cảnh và khóa bối cảnh dùng lại"
             >
               <Compass className="w-4 h-4 text-amber-300 animate-pulse" />
-              <span>✨ Cỗ Máy Video 2D (Gemini)</span>
+              <span>✨ Trợ Thủ AI Video 2D</span>
             </button>
 
             {/* Tab Navigation Switches */}
