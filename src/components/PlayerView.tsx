@@ -37,7 +37,6 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const [isLetterbox, setIsLetterbox] = useState<boolean>(false);
-  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const activeScene = scenes[currentSceneIndex] || scenes[0];
@@ -53,7 +52,6 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
     if (!isPlaying) return;
 
     let rafId: number | null = null;
-    let transitionTimer: number | null = null;
     let lastTimestamp = performance.now();
     let hasTriggeredAdvance = false;
 
@@ -67,12 +65,8 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           if (scenes.length > 1) {
             if (!hasTriggeredAdvance) {
               hasTriggeredAdvance = true;
-              setIsTransitioning(true);
-              transitionTimer = window.setTimeout(() => {
-                const nextIndex = (currentSceneIndex + 1) % scenes.length;
-                onSelectScene(nextIndex);
-                setIsTransitioning(false);
-              }, 300);
+              const nextIndex = (currentSceneIndex + 1) % scenes.length;
+              onSelectScene(nextIndex);
             }
             return 0;
           }
@@ -90,7 +84,6 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
 
     return () => {
       if (rafId !== null) window.cancelAnimationFrame(rafId);
-      if (transitionTimer !== null) window.clearTimeout(transitionTimer);
     };
   }, [isPlaying, currentSceneIndex, scenes.length, sceneDuration, playbackSpeed, onSelectScene]);
 
@@ -174,13 +167,6 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           isLetterbox ? "p-4 md:p-8 bg-neutral-950" : ""
         }`}
       >
-        {/* Cinematic Fade Transition Overlay */}
-        <div
-          className={`absolute inset-0 bg-black z-40 pointer-events-none transition-opacity duration-300 ${
-            isTransitioning ? "opacity-100" : "opacity-0"
-          }`}
-        />
-
         {/* The 2D Procedural SVG Horror Engine */}
         <div className="relative w-full overflow-hidden">
           <SceneRenderer
