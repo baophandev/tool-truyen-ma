@@ -958,7 +958,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     {/* Face */}
                     <div className="flex flex-col gap-1.5">
                       <label className="text-xs font-semibold text-neutral-300">
-                        3. Biểu Cảm Khuôn Mặt (Head Socket -250px):
+                        3. Biểu Cảm Khuôn Mặt (Head Socket):
                       </label>
                       <select
                         value={selectedActor.face}

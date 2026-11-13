@@ -178,14 +178,25 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
   const baseScaleModifier = isChild ? 0.65 : isDemon ? 1.25 : isBrute ? 1.2 : isElder ? 0.85 : isSkeletal ? 1.05 : 1;
   const finalScale = scale * baseScaleModifier;
 
+  // Dynamic Head Position based on Base (adjusting neck length to realistic & natural proportions)
+  const headPos = isElder
+    ? { x: 18, y: -212 }
+    : isChild
+    ? { x: 0, y: -226 }
+    : isBrute
+    ? { x: 0, y: -232 }
+    : isSkeletal
+    ? { x: 0, y: -242 }
+    : { x: 0, y: -234 };
+
   // Socket relative coordinates
   const SOCKETS = {
     ground: [0, 0],
     hip: [0, -90],
     shoulderL: isBrute ? [-35, -190] : [-25, -190],
     shoulderR: isBrute ? [35, -190] : [25, -190],
-    neck: isElder ? [10, -195] : [0, -210],
-    head: isElder ? [18, -215] : [0, -250],
+    neck: [headPos.x, headPos.y + 24],
+    head: [headPos.x, headPos.y],
   };
 
   // Determine CSS animation class based on pose
@@ -238,7 +249,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
       {isBrute && (
         <g className="rig-brute-trapezius">
           <polygon
-            points="-40,-185 -16,-220 16,-220 40,-185"
+            points="-40,-185 -16,-208 16,-208 40,-185"
             fill={palette.primary}
             stroke={appearance.outline}
             strokeWidth="1.2"
@@ -298,21 +309,28 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
       {/* 4. NECK SOCKET */}
       {isElder ? (
         <path
-          d="M -10 -175 C -5 -195, 6 -205, 18 -215 L 24 -210 C 14 -195, 6 -175, 4 -168 Z"
+          d="M -10 -175 C -5 -190, 6 -200, 16 -210 L 22 -206 C 14 -194, 6 -175, 4 -168 Z"
           fill={appearance.skinShadow}
           stroke={appearance.outline}
           strokeWidth="1"
         />
       ) : isSkeletal ? (
         <path
-          d="M -4 -190 L -3 -228 L 3 -228 L 4 -190 Z"
+          d="M -4 -188 L -3 -220 L 3 -220 L 4 -188 Z"
+          fill={appearance.skinShadow}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+      ) : isBrute ? (
+        <path
+          d="M -11 -188 L -10 -214 L 10 -214 L 11 -188 Z"
           fill={appearance.skinShadow}
           stroke={appearance.outline}
           strokeWidth="1"
         />
       ) : (
         <path
-          d="M -7 -190 L -6 -218 L 6 -218 L 7 -190 Z"
+          d="M -7 -188 L -6 -214 L 6 -214 L 7 -188 Z"
           fill={appearance.skinShadow}
           stroke={appearance.outline}
           strokeWidth="1"
@@ -323,13 +341,13 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
       {base === "female_adult" && (
         <g className="rig-hair">
           <path
-            d="M -18 -260 C -45 -220, -40 -160, -32 -110 C -28 -125, -25 -170, -18 -210 Z"
+            d="M -18 -246 C -45 -206, -40 -150, -32 -100 C -28 -115, -25 -160, -18 -200 Z"
             fill={appearance.hair}
             stroke={appearance.outline}
             strokeWidth="1"
           />
           <path
-            d="M 18 -260 C 42 -220, 38 -160, 30 -105 C 26 -125, 23 -170, 18 -210 Z"
+            d="M 18 -246 C 42 -206, 38 -150, 30 -95 C 26 -115, 23 -160, 18 -200 Z"
             fill={appearance.hair}
             stroke={appearance.outline}
             strokeWidth="1"
@@ -338,7 +356,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
       )}
 
       {base === "demon_shadow" && (
-        <g className="rig-demon-horns" transform="translate(0, -250)">
+        <g className="rig-demon-horns" transform={`translate(${headPos.x}, ${headPos.y})`}>
           <path
             d="M -18 -15 C -35 -40, -55 -60, -50 -85 C -40 -70, -30 -40, -12 -28 Z"
             fill="#5C443E"
@@ -356,7 +374,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
 
       {/* Hooded Cloak Special Hood Overlay */}
       {activeCostume === "outfit_shrouded_cloak" && (
-        <g className="rig-cloak-hood" transform={isElder ? "translate(18, -215)" : "translate(0, -250)"}>
+        <g className="rig-cloak-hood" transform={`translate(${headPos.x}, ${headPos.y})`}>
           {/* Colored dark cowl covering head */}
           <path
             d="M -28 10 C -38 -20, -32 -48, 0 -60 C 32 -48, 38 -20, 28 10 C 20 22, -20 22, -28 10 Z"
@@ -370,7 +388,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
       )}
 
       {/* 6. HEAD, HAIR CAP & INTERCHANGEABLE FACE */}
-      <g className="rig-head-group" transform={isElder ? "translate(18, -215)" : "translate(0, -250)"}>
+      <g className="rig-head-group" transform={`translate(${headPos.x}, ${headPos.y})`}>
         {activeCostume !== "outfit_shrouded_cloak" && (
           <>
             <ellipse
