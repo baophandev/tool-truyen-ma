@@ -377,9 +377,82 @@ export const DEFAULT_NAMED_ENVIRONMENTS: NamedEnvironmentPreset[] = [
       },
     ],
   },
+  {
+    id: "env_midnight_bus",
+    name: "Chuyến Xe Bus Nửa Đêm",
+    description: "Khoang xe bus đêm hoang tàn, ánh đèn huỳnh quang chập chờn xanh lạnh, dãy ghế rách nát và bóng tối đặc quánh ngoài ô cửa sổ.",
+    theme: "vehicle_interior",
+    lighting: {
+      sky_preset: "flickering_fluorescent",
+      fog_density: 0.35,
+      thunder_flash: false,
+    },
+    environment_items: [
+      {
+        asset_id: "bus_interior",
+        slot: "mid_left",
+        scale: 1.0,
+      },
+    ],
+    details: [
+      {
+        id: "detail_cam_bus",
+        asset_id: "detail_surveillance_camera",
+        slot: "air_left",
+      },
+      {
+        id: "detail_lamp_bus",
+        asset_id: "detail_flickering_ceiling_lamp",
+        slot: "air_right",
+      },
+    ],
+  },
+  {
+    id: "env_creepy_bathroom",
+    name: "Phòng Tắm Ma Ám Nửa Đêm",
+    description: "Phòng tắm ẩm ướt rùng rợn, bồn tắm rỉ sét ngập nước máu ở trung tâm, gương nứt mạng nhện vấy dấu tay máu trên tường và đèn huỳnh quang chập chờn xanh lạnh.",
+    theme: "modern_indoor",
+    lighting: {
+      sky_preset: "flickering_fluorescent",
+      fog_density: 0.65,
+      thunder_flash: false,
+    },
+    environment_items: [
+      {
+        asset_id: "creepy_bathtub",
+        slot: "center",
+        scale: 1.0,
+      },
+    ],
+    details: [
+      {
+        id: "detail_mirror_bath",
+        asset_id: "detail_broken_mirror",
+        slot: "mid_left",
+        offsetX: -30,
+      },
+      {
+        id: "detail_lamp_bath",
+        asset_id: "detail_flickering_ceiling_lamp",
+        slot: "air_center",
+      },
+    ],
+  },
 ];
 
 const STORAGE_KEY_ENVIRONMENTS = "limbo_named_environments_v1";
+
+/**
+ * Hard-resets named environments stored in localStorage back to original clean defaults
+ */
+export function resetStoredNamedEnvironments(): NamedEnvironmentPreset[] {
+  try {
+    localStorage.removeItem(STORAGE_KEY_ENVIRONMENTS);
+  } catch {
+    // Ignore storage errors
+  }
+  return DEFAULT_NAMED_ENVIRONMENTS;
+}
 
 /**
  * Load named environments from localStorage or defaults
@@ -392,7 +465,21 @@ export function loadStoredNamedEnvironments(): NamedEnvironmentPreset[] {
     }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed;
+      // Auto-merge missing official presets and upgrade outdated themes (e.g., bus interior from modern_indoor to vehicle_interior)
+      const existingIds = new Set(parsed.map((e: any) => e.id));
+      const merged = parsed.map((item: any) => {
+        const official = DEFAULT_NAMED_ENVIRONMENTS.find((d) => d.id === item.id);
+        if (official && official.id === "env_midnight_bus" && item.theme !== "vehicle_interior") {
+          return official;
+        }
+        return item;
+      });
+      for (const def of DEFAULT_NAMED_ENVIRONMENTS) {
+        if (!existingIds.has(def.id)) {
+          merged.push(def);
+        }
+      }
+      return merged;
     }
     return DEFAULT_NAMED_ENVIRONMENTS;
   } catch {

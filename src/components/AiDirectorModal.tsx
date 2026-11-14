@@ -16,6 +16,7 @@ import {
 } from "../engine/geminiDirector";
 import {
   loadStoredNamedEnvironments,
+  resetStoredNamedEnvironments,
   addOrUpdateNamedEnvironment,
   deleteNamedEnvironment,
   applyEnvironmentToScene,
@@ -43,6 +44,7 @@ import {
   RefreshCw,
   ShieldAlert,
   ShieldCheck,
+  Search,
 } from "lucide-react";
 
 export type AiModalMode =
@@ -132,6 +134,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
 
   // Story Breakdown Assistant state (Auto-fill)
   const [rawStoryInput, setRawStoryInput] = useState<string>("");
+  const [lastBreakdownStory, setLastBreakdownStory] = useState<string>("");
   const [targetSceneCount, setTargetSceneCount] = useState<number | "auto">("auto");
   const [isBreakingDown, setIsBreakingDown] = useState<boolean>(false);
   const [breakdownNotice, setBreakdownNotice] = useState<string | null>(null);
@@ -248,16 +251,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
             duration_sec: d.duration_sec,
           }))
         );
-        if (result.assetAudit) {
-          setAssetAudit(result.assetAudit);
-        } else {
-          setAssetAudit({
-            success: true,
-            isSufficient: true,
-            missingAssets: [],
-            summary: "Toàn bộ nhân vật, trang phục và đạo cụ đều đã có trong GEMINI_DIRECTOR_ASSETS.md!",
-          });
-        }
+        setLastBreakdownStory(rawStoryInput.trim());
 
         setBreakdownNotice(
           `✨ Trợ thủ AI đã tự động điền thành công ${drafts.length} phân cảnh! Toàn bộ bối cảnh dùng lại và mô tả hành động đã được điền sẵn vào các thẻ bên dưới.`
@@ -310,18 +304,89 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     }
   };
 
+  // Reset assistant state to start a clean new film
+  const handleResetAssistant = () => {
+    const confirmReset = window.confirm(
+      "Bạn có chắc muốn làm mới toàn bộ trợ thủ AI để viết phim mới?\n\n- Toàn bộ cốt truyện và các phân cảnh đã điền sẽ được xóa sạch.\n- Thư viện bối cảnh sẽ được khôi phục về danh sách chuẩn mặc định (bao gồm phòng tắm, xe bus, bệnh viện...)."
+    );
+    if (!confirmReset) return;
+
+    const freshEnvs = resetStoredNamedEnvironments();
+    setNamedEnvironments(freshEnvs);
+    setRawStoryInput("");
+    setLastBreakdownStory("");
+    setBreakdownNotice(null);
+    setAssetAudit(null);
+    setErrorMessage(null);
+    setGeneratedScenes(null);
+    setSceneCount(3);
+    const env1 = freshEnvs[0]?.id || "env_graveyard_foggy";
+    setSceneDrafts([
+      {
+        environmentId: env1,
+        title: "Cảnh 1: Khởi Đầu",
+        actionDescription: "",
+        dialogue: "",
+        duration_sec: 6,
+      },
+    ]);
+  };
+
   // Generate Film from Description Specs
   const handleGenerateFilmFromDescriptions = async () => {
-    const hasAny = sceneDrafts.some((d) => d.actionDescription.trim().length > 0);
+    let currentDrafts = sceneDrafts;
+
+    // AUTO-SYNC CHECK: If user entered/changed rawStoryInput without clicking Step 2:
+    // Auto-run breakdown FIRST so user's new story is never bypassed or stuck on old scenes!
+    if (rawStoryInput.trim() && rawStoryInput.trim() !== lastBreakdownStory) {
+      setIsLoading(true);
+      setErrorMessage(null);
+      setLoadingStep("1/4: Đang tự động phân tích cốt truyện mới của bạn và bóc tách các phân cảnh...");
+
+      try {
+        const result = await breakdownStoryToSceneDrafts(rawStoryInput, namedEnvironments, {
+          targetSceneCount,
+          apiKey,
+          model,
+        });
+
+        if (!result.success || !result.drafts || result.drafts.length === 0) {
+          setErrorMessage(result.error || "Không thể phân tích cốt truyện mới.");
+          setIsLoading(false);
+          return;
+        }
+
+        const drafts = result.drafts;
+        setSceneCount(drafts.length);
+        const mappedDrafts = drafts.map((d) => ({
+          environmentId: d.environmentId,
+          title: d.title,
+          actionDescription: d.actionDescription,
+          dialogue: d.dialogue || "",
+          duration_sec: d.duration_sec,
+        }));
+        setSceneDrafts(mappedDrafts);
+        setLastBreakdownStory(rawStoryInput.trim());
+        setBreakdownNotice(`✨ Trợ thủ AI đã tự động điền thành công ${drafts.length} phân cảnh từ cốt truyện mới!`);
+        currentDrafts = mappedDrafts;
+      } catch (err: any) {
+        setErrorMessage(`Lỗi phân tích cốt truyện: ${err.message}`);
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    const hasAny = currentDrafts.some((d) => d.actionDescription.trim().length > 0);
     if (!hasAny) {
       setErrorMessage("Vui lòng nhập mô tả hành động nhân vật cho ít nhất một phân cảnh.");
+      setIsLoading(false);
       return;
     }
 
     const envMap = new Map(namedEnvironments.map((e) => [e.id, e]));
     const fallbackEnv = namedEnvironments[0];
 
-    const specs: SceneDescriptionSpec[] = sceneDrafts.map((draft) => {
+    const specs: SceneDescriptionSpec[] = currentDrafts.map((draft) => {
       const env = envMap.get(draft.environmentId) || fallbackEnv;
       return {
         environment: env,
@@ -335,14 +400,14 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     setIsLoading(true);
     setErrorMessage(null);
     setGeneratedScenes(null);
-    setLoadingStep("1/3: Đang kết nối tới trí tuệ nhân tạo Gemini...");
+    setLoadingStep("2/4: Đang kết nối tới trí tuệ nhân tạo Gemini...");
 
     const stepTimer1 = setTimeout(() => {
-      setLoadingStep("2/3: Đang khóa cố định bối cảnh và biên dịch hành động nhân vật sang SVG JSX...");
+      setLoadingStep("3/4: Đang khóa cố định bối cảnh và biên dịch hành động nhân vật sang SVG JSX...");
     }, 1500);
 
     const stepTimer2 = setTimeout(() => {
-      setLoadingStep("3/3: Đang tính toán socket cán cầm và quỹ đạo chuyển động A → B...");
+      setLoadingStep("4/4: Đang tính toán socket cán cầm và quỹ đạo chuyển động A → B...");
     }, 3500);
 
     try {
@@ -652,14 +717,26 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setIsAssistantExpanded(!isAssistantExpanded)}
-                    className="text-neutral-400 hover:text-white p-1.5 rounded-lg hover:bg-neutral-800 transition-all text-xs flex items-center gap-1 font-mono"
-                  >
-                    <span>{isAssistantExpanded ? "Thu gọn" : "Mở rộng"}</span>
-                    {isAssistantExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleResetAssistant}
+                      className="text-neutral-400 hover:text-red-300 px-2.5 py-1.5 rounded-lg bg-neutral-900/90 hover:bg-red-950/80 border border-neutral-700/80 hover:border-red-700/80 transition-all text-xs flex items-center gap-1.5 font-semibold shadow"
+                      title="Xóa trắng cốt truyện cũ và các phân cảnh đã điền để bắt đầu viết phim mới hoàn toàn"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Reset Làm Phim Mới</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsAssistantExpanded(!isAssistantExpanded)}
+                      className="text-neutral-400 hover:text-white p-1.5 rounded-lg hover:bg-neutral-800 transition-all text-xs flex items-center gap-1 font-mono"
+                    >
+                      <span>{isAssistantExpanded ? "Thu gọn" : "Mở rộng"}</span>
+                      {isAssistantExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
                 </div>
 
                 {isAssistantExpanded && (
@@ -695,6 +772,63 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                       />
                     </div>
 
+                    {/* 3-Step Pipeline Flow Banner */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 py-1 text-xs">
+                      <div
+                        className={`flex items-center gap-2 p-2 rounded-xl border transition-all ${
+                          assetAudit?.isSufficient
+                            ? "bg-emerald-950/40 border-emerald-700/60 text-emerald-300"
+                            : assetAudit && !assetAudit.isSufficient
+                            ? "bg-amber-950/40 border-amber-700/60 text-amber-300"
+                            : "bg-neutral-900/60 border-neutral-800 text-neutral-300"
+                        }`}
+                      >
+                        <span className="w-5 h-5 rounded-full bg-neutral-800 text-white font-mono text-[10px] font-bold flex items-center justify-center shrink-0">
+                          1
+                        </span>
+                        <div className="flex flex-col">
+                          <span className="font-bold">Bước 1: Rà Soát Asset</span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            {assetAudit
+                              ? assetAudit.isSufficient
+                                ? "Đủ 100% asset"
+                                : `Thiếu ${assetAudit.missingAssets.length} asset`
+                              : "Kiểm tra xem đủ chưa"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div
+                        className={`flex items-center gap-2 p-2 rounded-xl border transition-all ${
+                          breakdownNotice
+                            ? "bg-purple-950/40 border-purple-700/60 text-purple-300"
+                            : "bg-neutral-900/60 border-neutral-800 text-neutral-300"
+                        }`}
+                      >
+                        <span className="w-5 h-5 rounded-full bg-neutral-800 text-white font-mono text-[10px] font-bold flex items-center justify-center shrink-0">
+                          2
+                        </span>
+                        <div className="flex flex-col">
+                          <span className="font-bold">Bước 2: Tạo Phân Cảnh</span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            {breakdownNotice ? `Đã điền ${sceneCount} cảnh` : "Bóc tách & điền dữ liệu"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 p-2 rounded-xl border border-neutral-800 bg-neutral-900/60 text-neutral-300">
+                        <span className="w-5 h-5 rounded-full bg-neutral-800 text-white font-mono text-[10px] font-bold flex items-center justify-center shrink-0">
+                          3
+                        </span>
+                        <div className="flex flex-col">
+                          <span className="font-bold">Bước 3: Tạo Phim</span>
+                          <span className="text-[10px] text-neutral-400 font-normal">
+                            Biên dịch hoạt hình 2D
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Breakdown Controls Bar */}
                     <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
                       <div className="flex items-center gap-2">
@@ -719,25 +853,49 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                         </div>
                       </div>
 
-                      {/* The Magic Auto-Fill Button */}
-                      <button
-                        type="button"
-                        onClick={handleAutoBreakdownStory}
-                        disabled={isBreakingDown || !rawStoryInput.trim()}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 via-purple-600 to-red-600 hover:from-amber-500 hover:via-purple-500 hover:to-red-500 disabled:opacity-40 text-white text-xs font-bold shadow-lg shadow-purple-950/60 transition-all transform hover:scale-[1.01] active:scale-[0.99]"
-                      >
-                        {isBreakingDown ? (
-                          <>
-                            <div className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                            <span>AI Đang Phân Tích & Điền Tự Động...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Wand2 className="w-4 h-4 text-amber-200" />
-                            <span>✨ AI Phân Tích & Tự Động Điền Vào Các Cảnh</span>
-                          </>
-                        )}
-                      </button>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {/* BUTTON 1: AUDIT ASSET */}
+                        <button
+                          type="button"
+                          onClick={handleRecheckAssets}
+                          disabled={isAuditing || !rawStoryInput.trim()}
+                          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 hover:border-amber-400/50 text-neutral-200 hover:text-white text-xs font-bold transition-all shadow"
+                          title="Kiểm tra xem kịch bản có thiếu asset nào trong GEMINI_DIRECTOR_ASSETS.md không"
+                        >
+                          {isAuditing ? (
+                            <>
+                              <div className="w-3.5 h-3.5 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
+                              <span>Đang Rà Soát Asset...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Search className="w-3.5 h-3.5 text-amber-400" />
+                              <span>🔍 Bước 1: Kiểm Tra Asset</span>
+                            </>
+                          )}
+                        </button>
+
+                        {/* BUTTON 2: BREAKDOWN SCENES & AUTO-FILL */}
+                        <button
+                          type="button"
+                          onClick={handleAutoBreakdownStory}
+                          disabled={isBreakingDown || !rawStoryInput.trim()}
+                          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 via-purple-600 to-red-600 hover:from-amber-500 hover:via-purple-500 hover:to-red-500 disabled:opacity-40 text-white text-xs font-bold shadow-lg shadow-purple-950/60 transition-all transform hover:scale-[1.01] active:scale-[0.99]"
+                          title="Bóc tách kịch bản thành các phân cảnh, khóa bối cảnh dùng lại và tự động điền các trường"
+                        >
+                          {isBreakingDown ? (
+                            <>
+                              <div className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                              <span>AI Đang Điền Phân Cảnh...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Wand2 className="w-4 h-4 text-amber-200" />
+                              <span>✨ Bước 2: Tạo Phân Cảnh (Điền Thông Tin)</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     {/* Feedback Notice after Breakdown */}
@@ -1011,11 +1169,11 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                   <span>
                     {isLoading
                       ? "Gemini Đang Biên Dịch Kịch Bản Sang Hoạt Hình 2D..."
-                      : `🎬 CHẠY TẠO PHIM NGAY (Tạo ${sceneCount} Phân Cảnh)`}
+                      : `🎬 BƯỚC 3: CHẠY TẠO PHIM NGAY (Tạo ${sceneCount} Phân Cảnh)`}
                   </span>
                 </button>
                 <p className="text-[11px] text-neutral-400 text-center m-0">
-                  Sau khi tool điền xong, bạn nhấn "Chạy Tạo Phim Ngay" thì Engine mới bắt đầu biên dịch sang hoạt hình và mở Player.
+                  Sau khi kiểm tra asset và điền xong các phân cảnh, bạn nhấn nút này thì Engine mới bắt đầu biên dịch sang hoạt hình và mở Player.
                 </p>
               </div>
             </div>
@@ -1089,9 +1247,25 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
 
               {/* LIST OF SAVED ENVIRONMENTS */}
               <div className="flex flex-col gap-2.5">
-                <span className="text-xs font-bold text-neutral-300">
-                  Danh Sách Bối Cảnh Chung Đang Có Trong Thư Viện ({namedEnvironments.length}):
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-neutral-300">
+                    Danh Sách Bối Cảnh Chung Đang Có Trong Thư Viện ({namedEnvironments.length}):
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm("Khôi phục toàn bộ thư viện bối cảnh về danh sách mặc định gốc của Limbo Engine (bao gồm Phòng tắm, Xe bus, Bệnh viện, v.v.)?")) {
+                        const fresh = resetStoredNamedEnvironments();
+                        setNamedEnvironments(fresh);
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-amber-300 border border-neutral-700 text-[11px] transition-all font-medium"
+                    title="Khôi phục lại danh sách bối cảnh mặc định chuẩn của Engine"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Khôi phục bối cảnh mặc định</span>
+                  </button>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1">
                   {namedEnvironments.map((env) => (

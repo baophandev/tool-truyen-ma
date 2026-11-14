@@ -21,6 +21,8 @@ export const HELD_ITEM_CATALOG: HeldItemMeta[] = [
   { id: "item_tattered_umbrella", name: "Ô giấy dầu cổ rách nát", desc: "Cây dù cổ rách tơi tả che sương đêm" },
   { id: "item_flashlight", name: "Đèn pin rọi nón sáng kinh dị", desc: "Đèn pin hiện đại phát luồng sáng hình nón rọi bóng đêm" },
   { id: "item_scalpel", name: "Dao mổ phẫu thuật sắc lạnh", desc: "Dao mổ kim loại sáng loáng vương vệt máu" },
+  { id: "item_smartphone", name: "Điện thoại di động phát sáng", desc: "Màn hình smartphone xanh lạnh ma mị soi tỏ bóng đêm" },
+  { id: "item_severed_head", name: "Thủ cấp đứt lìa vương máu", desc: "Đầu người bị chém đứt túm tóc xách tay, mắt trợn trừng, máu rỉ giọt" },
 ];
 
 interface HandheldItemRendererProps {
@@ -300,6 +302,150 @@ function renderHeldItemSvg(itemId: Exclude<HeldItemId, "none">) {
           />
           <line x1="14" y1="3" x2="26" y2="4" stroke="#FFFFFF" strokeWidth="1.2" />
           <circle cx="27" cy="2" r="1.5" fill={COLOR_PALETTE.accent_blood_red} />
+        </g>
+      );
+
+    case "item_smartphone":
+      return (
+        <g className="held-smartphone">
+          {/* Ambient Radial Aura around Phone */}
+          <circle cx="6" cy="-8" r="48" fill="url(#smartphone-glow-radial)" opacity="0.65" pointerEvents="none" />
+
+          {/* Forward Conical Light Beam cast from glowing screen */}
+          <polygon
+            points="12,-20 220,-75 220,55 12,6"
+            fill="url(#smartphone-beam-glow)"
+            style={{ mixBlendMode: "screen", pointerEvents: "none" }}
+            opacity="0.48"
+          />
+
+          {/* Floating Atmospheric Dust Specks in screen beam */}
+          <g opacity="0.6" pointerEvents="none">
+            <circle cx="55" cy="-18" r="1.2" fill="#E0F2FE" />
+            <circle cx="110" cy="8" r="1.6" fill="#BAE6FD" />
+            <circle cx="165" cy="-28" r="1.1" fill="#E0F2FE" />
+            <circle cx="195" cy="22" r="1.4" fill="#BAE6FD" />
+          </g>
+
+          {/* Phone Chassis / Slim Bezel anchored at palm [0, 0] */}
+          <g transform="rotate(-12, 4, -4)">
+            {/* Outer Case / Bumper */}
+            <rect
+              x="-4"
+              y="-26"
+              width="18"
+              height="36"
+              rx="4"
+              fill="#090D16"
+              stroke="#334155"
+              strokeWidth="1.2"
+            />
+            {/* Volume / Power Button bumps */}
+            <rect x="-5.5" y="-18" width="1.5" height="5" rx="0.5" fill="#475569" />
+            <rect x="-5.5" y="-11" width="1.5" height="5" rx="0.5" fill="#475569" />
+            <rect x="14" y="-15" width="1.5" height="7" rx="0.5" fill="#475569" />
+
+            {/* Glowing Smartphone Display Screen */}
+            <rect
+              x="-1.5"
+              y="-23"
+              width="13"
+              height="30"
+              rx="2.5"
+              fill="#0369A1"
+              stroke="#0284C7"
+              strokeWidth="0.8"
+            />
+            {/* Bright screen light wash */}
+            <rect
+              x="-0.5"
+              y="-22"
+              width="11"
+              height="28"
+              rx="1.5"
+              fill="#38BDF8"
+              opacity="0.85"
+              className="anim-flicker-ember"
+            />
+
+            {/* Top Speaker Slit & Front Camera Notch */}
+            <rect x="3" y="-22" width="4" height="1" rx="0.5" fill="#090D16" />
+            <circle cx="8.5" cy="-21.5" r="0.6" fill="#090D16" />
+
+            {/* Status Bar Indicators */}
+            <line x1="1" y1="-19.5" x2="3.5" y2="-19.5" stroke="#FFFFFF" strokeWidth="0.8" opacity="0.9" />
+            <rect x="7.5" y="-20" width="3" height="1.2" rx="0.4" fill="#FFFFFF" opacity="0.9" />
+
+            {/* Screen Content: Eerie Incoming Midnight Call */}
+            {/* Pulsing red caller avatar / warning indicator */}
+            <circle cx="5" cy="-13" r="3" fill="#DC2626" className="anim-pulse-eerie" />
+            <circle cx="5" cy="-13" r="1.4" fill="#FEF2F2" />
+
+            {/* Call Action Icons (Green Accept & Red Decline buttons) */}
+            <circle cx="2" cy="-4" r="1.6" fill="#16A34A" />
+            <circle cx="8" cy="-4" r="1.6" fill="#DC2626" />
+            <path d="M 1.2 -4 L 2.8 -4" stroke="#FFFFFF" strokeWidth="0.6" strokeLinecap="round" />
+            <path d="M 7.2 -4 L 8.8 -4" stroke="#FFFFFF" strokeWidth="0.6" strokeLinecap="round" />
+          </g>
+        </g>
+      );
+
+    case "item_severed_head":
+      return (
+        <g className="held-severed-head anim-sway-subtle">
+          {/* Blood drips falling toward ground */}
+          <path d="M -2 38 L -3 49" stroke="#991B1B" strokeWidth="1.5" strokeLinecap="round" />
+          <circle cx="-3" cy="51" r="1.3" fill="#991B1B" />
+          <path d="M 3 38 L 4 46" stroke="#DC2626" strokeWidth="1.2" strokeLinecap="round" />
+          <circle cx="4" cy="48" r="1.1" fill="#DC2626" />
+          <circle cx="0" cy="54" r="0.9" fill="#7F1D1D" className="anim-pulse-slow" />
+
+          {/* Hair clump held tightly in palm socket [0, 0] */}
+          <ellipse cx="0" cy="0" rx="4.5" ry="3.5" fill="#0A0A0C" />
+          <path
+            d="M -5 1 C -7 8, -9 16, -11 26 L 11 26 C 9 16, 7 8, 5 1 Z"
+            fill="#0F172A"
+          />
+
+          {/* Severed Head Skull Base */}
+          <ellipse cx="0" cy="22" rx="11" ry="14" fill="#CBD5E1" stroke="#0A0A0C" strokeWidth="1.2" />
+
+          {/* Messy wet hair hanging down and framing face */}
+          <path
+            d="M -11 12 C -15 22, -14 36, -10 46 C -9 36, -9 22, -6 14 Z"
+            fill="#09090B"
+          />
+          <path
+            d="M 11 12 C 15 22, 14 36, 10 46 C 9 36, 9 22, 6 14 Z"
+            fill="#09090B"
+          />
+          {/* Bangs across forehead */}
+          <path
+            d="M -9 11 Q 0 16 9 11 Q 0 13 -9 11 Z"
+            fill="#0A0A0C"
+          />
+
+          {/* Dead horrified eyes */}
+          <ellipse cx="-4" cy="20" rx="3" ry="2.5" fill="#0F172A" />
+          <circle cx="-4" cy="20" r="1.6" fill="#F8FAFC" />
+          <circle cx="-4" cy="20" r="0.7" fill="#450A0A" />
+          <ellipse cx="4" cy="20" rx="3" ry="2.5" fill="#0F172A" />
+          <circle cx="4" cy="20" r="1.6" fill="#F8FAFC" />
+          <circle cx="4" cy="20" r="0.7" fill="#450A0A" />
+
+          {/* Bleeding tear trails down dead cheeks */}
+          <path d="M -4 22 L -4.5 32" stroke="#991B1B" strokeWidth="1.2" strokeLinecap="round" />
+          <path d="M 4 22 L 4.5 31" stroke="#991B1B" strokeWidth="1.2" strokeLinecap="round" />
+
+          {/* Gaping dead slack mouth */}
+          <ellipse cx="0" cy="29" rx="3.5" ry="2.5" fill="#18181B" stroke="#450A0A" strokeWidth="0.8" />
+          <path d="M -1 30 L -1.5 36" stroke="#7F1D1D" strokeWidth="1" strokeLinecap="round" />
+
+          {/* Severed neck stump at bottom of head */}
+          <ellipse cx="0" cy="36" rx="6.5" ry="2.8" fill="#450A0A" stroke="#1C0C0E" strokeWidth="0.8" />
+          <ellipse cx="0" cy="36" rx="4" ry="1.5" fill="#7F1D1D" />
+          {/* Exposed bone fragment */}
+          <rect x="-1" y="34.5" width="2" height="3" rx="0.5" fill="#E2E8F0" stroke="#0F172A" strokeWidth="0.6" />
         </g>
       );
   }

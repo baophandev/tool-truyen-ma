@@ -31,6 +31,8 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "supermarket_shelf_aisle" && <SupermarketShelfAisle />}
       {id === "creepy_elevator_doors" && <CreepyElevatorDoors />}
       {id === "dining_table_chairs" && <DiningTableChairs />}
+      {id === "bus_interior" && <BusInterior />}
+      {id === "creepy_bathtub" && <CreepyBathtub />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -754,6 +756,312 @@ const DiningTableChairs: React.FC = () => {
       <g transform="translate(30, -88)">
         <rect x="-5" y="-28" width="10" height="28" rx="2" fill="#0F172A" stroke="#1E293B" strokeWidth="1" />
         <rect x="-2" y="-38" width="4" height="10" fill="#0F172A" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 14. BUS INTERIOR / DRIVER STATION (Buồng Lái Tài Xế & Hộp Thu Vé Xe Bus)
+ * Detailed front cockpit of a midnight bus anchored at [bottom-center] (0, 0) on Ground Line Y=800.
+ * Features driver console, large steering wheel on angled column, glowing red instrument gauges,
+ * high-back driver seat, coin fare collection box / card validator, passenger entrance handrail,
+ * and convex rearview mirror bracket. Seamlessly integrates with vehicle_interior theme.
+ */
+const BusInterior: React.FC = () => {
+  return (
+    <g className="bus-interior-driver-station">
+      {/* 1. RAISED DRIVER FLOOR PLATFORM & TREAD */}
+      <rect x="-165" y="-16" width="220" height="16" fill="#0A0D15" stroke="#1E293B" strokeWidth="1.2" />
+      <line x1="-165" y1="-16" x2="55" y2="-16" stroke="#CA8A04" strokeWidth="2" />
+      <g stroke="#1E293B" strokeWidth="1.2">
+        <line x1="-145" y1="-16" x2="-140" y2="0" />
+        <line x1="-115" y1="-16" x2="-110" y2="0" />
+        <line x1="-85" y1="-16" x2="-80" y2="0" />
+        <line x1="-55" y1="-16" x2="-50" y2="0" />
+        <line x1="-25" y1="-16" x2="-20" y2="0" />
+        <line x1="5" y1="-16" x2="10" y2="0" />
+        <line x1="35" y1="-16" x2="40" y2="0" />
+      </g>
+
+      {/* 2. DRIVER HIGH-BACK HYDRAULIC SEAT */}
+      <g className="driver-seat" transform="translate(-105, -16)">
+        {/* Heavy central hydraulic shock cylinder */}
+        <rect x="-10" y="-70" width="20" height="70" fill="#04060A" stroke="#1E293B" strokeWidth="1.5" />
+        <line x1="-6" y1="-50" x2="6" y2="-50" stroke="#475569" strokeWidth="2" />
+        <line x1="-6" y1="-30" x2="6" y2="-30" stroke="#475569" strokeWidth="2" />
+        {/* Seat base cushion */}
+        <rect x="-34" y="-95" width="68" height="25" rx="5" fill="#090E18" stroke="#1E293B" strokeWidth="2" />
+        {/* Contoured high-back rest */}
+        <path
+          d="M -30 -95 L -26 -210 C -26 -225, 26 -225, 26 -210 L 30 -95 Z"
+          fill="#060912"
+          stroke="#151E2E"
+          strokeWidth="2.5"
+        />
+        {/* Adjustable headrest */}
+        <rect x="-20" y="-235" width="40" height="26" rx="4" fill="#04060A" stroke="#1E293B" strokeWidth="1.5" />
+        <line x1="-8" y1="-210" x2="-8" y2="-195" stroke="#475569" strokeWidth="3" />
+        <line x1="8" y1="-210" x2="8" y2="-195" stroke="#475569" strokeWidth="3" />
+        {/* Left armrest */}
+        <path d="M -30 -140 L -45 -140 L -45 -110" fill="none" stroke="#1E293B" strokeWidth="4" strokeLinecap="round" />
+      </g>
+
+      {/* 3. FRONT A-PILLAR & LARGE CONVEX REARVIEW MIRROR */}
+      <g className="driver-mirror-pillar">
+        {/* Windshield corner A-pillar */}
+        <path d="M -165 -16 L -155 -310 L -140 -310 L -145 -16 Z" fill="#070A10" stroke="#1E293B" strokeWidth="1.5" />
+        {/* Mirror tubular bracket arm */}
+        <path d="M -145 -260 L -185 -270 L -185 -230 L -145 -225" fill="none" stroke="#475569" strokeWidth="3" />
+        {/* Convex wide-angle rearview mirror casing */}
+        <rect x="-202" y="-285" width="22" height="65" rx="4" fill="#05070C" stroke="#334155" strokeWidth="1.8" />
+        {/* Mirror glass reflection with cold teal haze */}
+        <rect x="-198" y="-281" width="14" height="57" rx="2" fill="#0B1C22" opacity="0.8" />
+        <line x1="-195" y1="-275" x2="-187" y2="-240" stroke="#38BDF8" strokeWidth="1" opacity="0.4" />
+      </g>
+
+      {/* 4. DRIVER DASHBOARD CONSOLE & INSTRUMENT CLUSTERS */}
+      <g className="driver-dashboard" transform="translate(0, -16)">
+        {/* Slanted dashboard housing */}
+        <path
+          d="M -75 0 L -70 -95 L 35 -105 L 45 0 Z"
+          fill="#080C14"
+          stroke="#1E293B"
+          strokeWidth="2"
+        />
+        {/* Raised instrument binnacle */}
+        <path d="M -60 -95 L -55 -125 L 5 -128 L 10 -102 Z" fill="#04060A" stroke="#1E293B" strokeWidth="1.5" />
+
+        {/* Speedometer & Tachometer Gauges with eerie red LED glow */}
+        <g transform="translate(-38, -112)">
+          <circle cx="0" cy="0" r="10" fill="#020305" stroke="#334155" strokeWidth="1" />
+          <circle cx="0" cy="0" r="8" fill="none" stroke="#DC2626" strokeWidth="1" strokeDasharray="30,8" opacity="0.75" />
+          <line x1="0" y1="0" x2="5" y2="-5" stroke="#EF4444" strokeWidth="1.2" />
+        </g>
+        <g transform="translate(-14, -114)">
+          <circle cx="0" cy="0" r="9" fill="#020305" stroke="#334155" strokeWidth="1" />
+          <circle cx="0" cy="0" r="7" fill="none" stroke="#EAB308" strokeWidth="1" strokeDasharray="24,6" opacity="0.75" />
+          <line x1="0" y1="0" x2="-4" y2="-4" stroke="#FDE047" strokeWidth="1.2" />
+        </g>
+        {/* Warning Indicator Lights (Hazard, Door Open, Oil) */}
+        <circle cx="4" cy="-115" r="2.2" fill="#EF4444" className="anim-pulse-eerie" />
+        <circle cx="4" cy="-108" r="2.2" fill="#EAB308" />
+
+        {/* 5. LARGE BUS STEERING WHEEL ON ANGLED COLUMN */}
+        <g transform="translate(-25, -100)">
+          {/* Thick steel steering column */}
+          <line x1="0" y1="0" x2="-10" y2="-38" stroke="#1E293B" strokeWidth="7" />
+          <line x1="-1" y1="0" x2="-11" y2="-38" stroke="#475569" strokeWidth="2" />
+          {/* Steering wheel rim tilted at driving angle */}
+          <ellipse
+            cx="-12"
+            cy="-42"
+            rx="32"
+            ry="16"
+            fill="none"
+            stroke="#05070B"
+            strokeWidth="5"
+            transform="rotate(-15, -12, -42)"
+          />
+          <ellipse
+            cx="-12"
+            cy="-42"
+            rx="30"
+            ry="14"
+            fill="none"
+            stroke="#1E293B"
+            strokeWidth="1.8"
+            transform="rotate(-15, -12, -42)"
+          />
+          {/* Center horn boss & 3 spokes */}
+          <circle cx="-12" cy="-42" r="6" fill="#0F172A" stroke="#334155" strokeWidth="1" />
+          <line x1="-12" y1="-42" x2="-38" y2="-36" stroke="#1E293B" strokeWidth="3" />
+          <line x1="-12" y1="-42" x2="14" y2="-48" stroke="#1E293B" strokeWidth="3" />
+          <line x1="-12" y1="-42" x2="-14" y2="-18" stroke="#1E293B" strokeWidth="3" />
+        </g>
+
+        {/* Transmission Gear Shifter Lever */}
+        <line x1="22" y1="-45" x2="26" y2="-80" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
+        <circle cx="26" cy="-80" r="5" fill="#020305" stroke="#1E293B" strokeWidth="1" />
+      </g>
+
+      {/* 6. AUTOMATIC COIN FARE COLLECTION BOX & CARD VALIDATOR */}
+      <g className="bus-fare-box" transform="translate(75, 0)">
+        {/* Sturdy steel pedestal anchored to floor */}
+        <rect x="-24" y="-125" width="48" height="125" rx="3" fill="#090E18" stroke="#1E293B" strokeWidth="2" />
+        {/* Upper coin hopper collector funnel */}
+        <path d="M -28 -125 L 28 -125 L 22 -145 L -22 -145 Z" fill="#05070D" stroke="#1E293B" strokeWidth="1.5" />
+        <ellipse cx="0" cy="-145" rx="18" ry="4" fill="#020305" stroke="#334155" strokeWidth="1" />
+        {/* Coin drop slot */}
+        <line x1="-8" y1="-145" x2="8" y2="-145" stroke="#EAB308" strokeWidth="1.5" />
+
+        {/* Digital Fare Display Screen */}
+        <rect x="-18" y="-115" width="36" height="18" rx="2" fill="#020305" stroke="#334155" strokeWidth="1" />
+        <text
+          x="0"
+          y="-102"
+          textAnchor="middle"
+          fill="#EF4444"
+          fontSize="9"
+          fontFamily="monospace"
+          fontWeight="bold"
+        >
+          $ --.--
+        </text>
+
+        {/* Smart Card Tap Reader Pad */}
+        <rect x="-16" y="-88" width="32" height="22" rx="3" fill="#0B1320" stroke="#1E293B" strokeWidth="1" />
+        <circle cx="0" cy="-77" r="5" fill="none" stroke="#10B981" strokeWidth="1.5" strokeDasharray="6,4" />
+        <circle cx="0" cy="-77" r="2" fill="#10B981" className="anim-pulse-eerie" />
+
+        {/* Locked coin vault door */}
+        <rect x="-18" y="-55" width="36" height="42" rx="2" fill="#05070C" stroke="#1E293B" strokeWidth="1" />
+        <circle cx="10" cy="-34" r="3" fill="#334155" />
+      </g>
+
+      {/* 7. PASSENGER ENTRANCE STANCHION HANDRAIL */}
+      <g className="bus-entrance-handrail" transform="translate(115, 0)">
+        {/* Vertical yellow pole */}
+        <line x1="0" y1="0" x2="0" y2="-280" stroke="#CA8A04" strokeWidth="6" />
+        <line x1="-1" y1="0" x2="-1" y2="-280" stroke="#EAB308" strokeWidth="3" />
+        {/* Floor base flange */}
+        <rect x="-8" y="-6" width="16" height="6" rx="1.5" fill="#1E293B" />
+        {/* Curved boarding assist bar curving towards the door */}
+        <path
+          d="M 0 -160 C 25 -160, 42 -140, 42 -100 L 42 0"
+          fill="none"
+          stroke="#EAB308"
+          strokeWidth="4"
+        />
+        {/* Red passenger STOP button box */}
+        <rect x="-5" y="-185" width="10" height="22" rx="2" fill="#0F172A" stroke="#334155" strokeWidth="1" />
+        <circle cx="0" cy="-174" r="3" fill="#DC2626" className="anim-pulse-eerie" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 15. CREEPY BATHTUB (Bồn Tắm Rỉ Sét Cổ Quái)
+ * Vintage clawfoot porcelain bathtub with rusted stains, blood-tinted murky water,
+ * and a tarnished brass gooseneck faucet dripping blood. Anchored at [bottom-center] (0, 0).
+ */
+const CreepyBathtub: React.FC = () => {
+  return (
+    <g className="creepy-bathtub">
+      {/* 1. Drain pipe underneath */}
+      <path d="M 0 -22 L 0 -8 L 12 -8 L 12 0" fill="none" stroke="#475569" strokeWidth="3" />
+
+      {/* 2. Four Ornate Clawfoot Legs resting on Ground Y=0 */}
+      {/* Back Legs (darker silhouette) */}
+      <path d="M -125 -25 L -120 0 L -132 0 Z" fill="#0B0E14" />
+      <path d="M 125 -25 L 132 0 L 120 0 Z" fill="#0B0E14" />
+
+      {/* Front Left Clawfoot Leg */}
+      <g transform="translate(-112, 0)">
+        <path d="M 0 -26 C -4 -16, -14 -8, -12 0 L 8 0 C 6 -8, 2 -16, 0 -26 Z" fill="#1E293B" stroke="#0F172A" strokeWidth="1" />
+        <circle cx="-5" cy="-2" r="3" fill="#D97706" opacity="0.7" />
+        <circle cx="3" cy="-2" r="3" fill="#D97706" opacity="0.7" />
+      </g>
+
+      {/* Front Right Clawfoot Leg */}
+      <g transform="translate(112, 0)">
+        <path d="M 0 -26 C -2 -16, -6 -8, -8 0 L 12 0 C 14 -8, 4 -16, 0 -26 Z" fill="#1E293B" stroke="#0F172A" strokeWidth="1" />
+        <circle cx="-3" cy="-2" r="3" fill="#D97706" opacity="0.7" />
+        <circle cx="5" cy="-2" r="3" fill="#D97706" opacity="0.7" />
+      </g>
+
+      {/* 3. Cast Iron Tub Outer Belly Silhouette */}
+      <path
+        d="M -145 -125 C -150 -60, -110 -25, -70 -22 L 70 -22 C 110 -25, 145 -55, 142 -115 Z"
+        fill="#0D111A"
+        stroke="#1E293B"
+        strokeWidth="2"
+      />
+
+      {/* Weathered Enamel Body with Mold & Rust Gradients */}
+      <path
+        d="M -142 -122 C -147 -65, -108 -30, -68 -26 L 68 -26 C 108 -30, 140 -60, 138 -112 Z"
+        fill="#141A24"
+      />
+      {/* Dripping blood / rust streaks down the tub belly */}
+      <path d="M -90 -115 C -90 -85, -86 -60, -84 -30" stroke="#7F1D1D" strokeWidth="2.5" fill="none" opacity="0.8" />
+      <path d="M -40 -115 C -38 -80, -42 -55, -40 -26" stroke="#991B1B" strokeWidth="2" fill="none" opacity="0.7" />
+      <path d="M 35 -110 C 37 -80, 34 -55, 36 -28" stroke="#7F1D1D" strokeWidth="2" fill="none" opacity="0.75" />
+      <path d="M 85 -110 C 88 -85, 92 -65, 90 -35" stroke="#991B1B" strokeWidth="2.5" fill="none" opacity="0.8" />
+
+      {/* 4. Flared Rolled Rim & Slipper Headrest */}
+      {/* High-back sloped left headrest */}
+      <path
+        d="M -155 -142 C -155 -125, -135 -118, -120 -118 L 138 -118 C 148 -118, 154 -122, 148 -130 C 142 -136, 120 -134, 110 -134 L -110 -134 C -135 -134, -155 -152, -155 -142 Z"
+        fill="#334155"
+        stroke="#0F172A"
+        strokeWidth="1.5"
+      />
+      {/* Rim top highlight */}
+      <line x1="-120" y1="-120" x2="135" y2="-120" stroke="#64748B" strokeWidth="2" />
+
+      {/* 5. Tub Basin Cavity & Murky Blood Water */}
+      <ellipse cx="0" cy="-115" rx="125" ry="16" fill="#04060A" />
+      {/* Murky Water Surface */}
+      <ellipse cx="0" cy="-112" rx="120" ry="13" fill="url(#bathtub-water-grad)" opacity="0.9" />
+
+      {/* Floating wet hair strands on the water surface */}
+      <path
+        d="M -45 -112 Q -25 -109 -10 -112 Q 10 -115 30 -112 Q 50 -109 70 -113"
+        stroke="#020305"
+        strokeWidth="2.2"
+        fill="none"
+        opacity="0.9"
+      />
+      <path
+        d="M -30 -110 Q -10 -107 10 -110 Q 30 -113 45 -110"
+        stroke="#020305"
+        strokeWidth="1.5"
+        fill="none"
+        opacity="0.85"
+      />
+
+      {/* Eerie Mist / Vapour wafting off the water */}
+      <g opacity="0.5" className="anim-smoke-rise">
+        <ellipse cx="-40" cy="-122" rx="30" ry="6" fill="#E2E8F0" opacity="0.25" />
+        <ellipse cx="30" cy="-122" rx="35" ry="7" fill="#E2E8F0" opacity="0.2" />
+      </g>
+
+      {/* 6. Vintage Brass Gooseneck Faucet & Taps on Right Wall */}
+      <g transform="translate(118, -120)">
+        {/* Faucet Base Escutcheon Plate */}
+        <rect x="-8" y="-5" width="16" height="6" rx="1" fill="#78350F" />
+        {/* Curved Gooseneck Spout Pipe */}
+        <path
+          d="M 0 -5 L 0 -55 C 0 -68, -25 -68, -25 -52 L -25 -45"
+          fill="none"
+          stroke="#D97706"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 0 -5 L 0 -55 C 0 -68, -25 -68, -25 -52 L -25 -45"
+          fill="none"
+          stroke="#92400E"
+          strokeWidth="2"
+        />
+        {/* Hot / Cold Cross Handles */}
+        <g transform="translate(10, -28)">
+          <line x1="-5" y1="0" x2="5" y2="0" stroke="#CBD5E1" strokeWidth="2.5" />
+          <line x1="0" y1="-5" x2="0" y2="5" stroke="#CBD5E1" strokeWidth="2.5" />
+          <circle cx="0" cy="0" r="1.5" fill="#DC2626" />
+        </g>
+        <g transform="translate(-10, -28)">
+          <line x1="-5" y1="0" x2="5" y2="0" stroke="#CBD5E1" strokeWidth="2.5" />
+          <line x1="0" y1="-5" x2="0" y2="5" stroke="#CBD5E1" strokeWidth="2.5" />
+          <circle cx="0" cy="0" r="1.5" fill="#2563EB" />
+        </g>
+
+        {/* Dripping Blood Drops from Spout */}
+        <circle cx="-25" cy="-42" r="2.2" fill="#DC2626" className="anim-pulse-eerie" />
+        <line x1="-25" y1="-40" x2="-25" y2="-25" stroke="#991B1B" strokeWidth="1" strokeDasharray="3,3" />
+        <circle cx="-25" cy="-22" r="1.8" fill="#DC2626" />
       </g>
     </g>
   );

@@ -7,7 +7,8 @@ export type ThemeId =
   | "rural_graveyard"
   | "abandoned_village"
   | "cursed_swamp"
-  | "modern_indoor";
+  | "modern_indoor"
+  | "vehicle_interior";
 
 export type SkyPresetId =
   | "blood_moon"
@@ -30,7 +31,9 @@ export type StructureId =
   | "hotel_reception_desk"
   | "supermarket_shelf_aisle"
   | "creepy_elevator_doors"
-  | "dining_table_chairs";
+  | "dining_table_chairs"
+  | "bus_interior"
+  | "creepy_bathtub";
 
 export type DetailId =
   | "detail_black_crow"
@@ -42,7 +45,8 @@ export type DetailId =
   | "detail_iv_drip_stand"
   | "detail_shopping_cart"
   | "detail_surveillance_camera"
-  | "detail_flickering_ceiling_lamp";
+  | "detail_flickering_ceiling_lamp"
+  | "detail_broken_mirror";
 
 export type CharacterBaseId =
   | "male_adult"
@@ -81,10 +85,14 @@ export type CharacterFaceId =
   | "face_pale_corpse"
   | "face_weeping_ghost"
   | "face_sewn_mouth"
-  | "face_haggard_gaunt";
+  | "face_haggard_gaunt"
+  | "face_headless";           // Không đầu / Cổ chém lìa vương máu (Headless Severed Neck)
 
 export type CharacterPoseId =
   | "pose_standing"
+  | "pose_sitting"
+  | "pose_sitting_twisted_legs"
+  | "pose_twisted_legs_floating"
   | "pose_shivering"
   | "pose_walking"
   | "pose_floating"
@@ -105,7 +113,9 @@ export type HeldItemId =
   | "item_tattered_doll"
   | "item_tattered_umbrella"
   | "item_flashlight"
-  | "item_scalpel";
+  | "item_scalpel"
+  | "item_smartphone"
+  | "item_severed_head";       // Thủ cấp đứt lìa túm tóc xách tay vương máu rỉ giọt
 
 export type HeldHand = "right" | "left";
 

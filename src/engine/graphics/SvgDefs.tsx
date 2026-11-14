@@ -128,6 +128,47 @@ export const SvgDefs: React.FC = () => {
         <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
       </linearGradient>
 
+      {/* Modern Smartphone Screen & Forward Light Glow */}
+      <radialGradient id="smartphone-glow-radial" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="rgba(56, 189, 248, 0.8)" />
+        <stop offset="40%" stopColor="rgba(14, 165, 233, 0.35)" />
+        <stop offset="75%" stopColor="rgba(2, 132, 199, 0.1)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </radialGradient>
+
+      <linearGradient id="smartphone-beam-glow" x1="0%" y1="50%" x2="100%" y2="50%">
+        <stop offset="0%" stopColor="rgba(224, 242, 254, 0.85)" />
+        <stop offset="25%" stopColor="rgba(56, 189, 248, 0.45)" />
+        <stop offset="65%" stopColor="rgba(2, 132, 199, 0.15)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </linearGradient>
+
+      {/* Bus Interior Window Fog & Ambient Lighting */}
+      <linearGradient id="bus-window-fog" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="rgba(30, 41, 59, 0.45)" />
+        <stop offset="55%" stopColor="rgba(15, 23, 42, 0.8)" />
+        <stop offset="100%" stopColor="rgba(8, 11, 18, 0.95)" />
+      </linearGradient>
+
+      <radialGradient id="bus-cabin-light" cx="50%" cy="0%" r="80%">
+        <stop offset="0%" stopColor="rgba(165, 243, 252, 0.28)" />
+        <stop offset="50%" stopColor="rgba(6, 182, 212, 0.08)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </radialGradient>
+
+      {/* Creepy Bathroom Water & Mirror Gradients */}
+      <linearGradient id="bathtub-water-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="rgba(153, 27, 27, 0.45)" />
+        <stop offset="60%" stopColor="rgba(69, 10, 10, 0.75)" />
+        <stop offset="100%" stopColor="rgba(15, 23, 42, 0.95)" />
+      </linearGradient>
+
+      <radialGradient id="mirror-glass-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="rgba(224, 242, 254, 0.35)" />
+        <stop offset="70%" stopColor="rgba(15, 23, 42, 0.6)" />
+        <stop offset="100%" stopColor="rgba(2, 6, 23, 0.95)" />
+      </radialGradient>
+
       {/* 4. FOREGROUND GROUND FOG GRADIENT */}
       <linearGradient id="ground-fog-grad" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stopColor="rgba(226, 232, 240, 0)" />
@@ -164,6 +205,17 @@ export const SvgDefs: React.FC = () => {
         <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" result="noise" />
         <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.12 0" />
       </filter>
+      {/* 8. HORIZONTAL EDGE VIGNETTES (Cho không gian xe buýt ngột ngạt) */}
+      <linearGradient id="left-shadow-vignette" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#000000" stopOpacity="0.95" />
+        <stop offset="60%" stopColor="#000000" stopOpacity="0.4" />
+        <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+      </linearGradient>
+      <linearGradient id="right-shadow-vignette" x1="100%" y1="0%" x2="0%" y2="0%">
+        <stop offset="0%" stopColor="#000000" stopOpacity="0.95" />
+        <stop offset="60%" stopColor="#000000" stopOpacity="0.4" />
+        <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+      </linearGradient>
     </defs>
   );
 };

@@ -78,8 +78,8 @@ function resolveHandSockets(
   }
   if (pose === "pose_crawling") {
     return {
-      left: { x: -69, y: -6, rot: 0 },
-      right: { x: 69, y: -6, rot: 0 },
+      left: { x: 14, y: -4, rot: 0 },
+      right: { x: 86, y: -6, rot: 15 },
     };
   }
   if (pose === "pose_reaching") {
@@ -118,6 +118,24 @@ function resolveHandSockets(
       right: { x: 93, y: -196, rot: 12 },
     };
   }
+  if (pose === "pose_sitting") {
+    const hasItem = Boolean(heldItem && heldItem !== "none");
+    const rightRaised = hasItem && heldHand === "right";
+    const leftRaised = hasItem && heldHand === "left";
+    return {
+      left: leftRaised ? { x: 24, y: -130, rot: 0 } : { x: 22, y: -74, rot: 0 },
+      right: rightRaised ? { x: 30, y: -130, rot: 0 } : { x: 34, y: -74, rot: 0 },
+    };
+  }
+  if (pose === "pose_sitting_twisted_legs" || (pose as string) === "pose_twisted_legs_floating") {
+    const hasItem = Boolean(heldItem && heldItem !== "none");
+    const rightRaised = hasItem && heldHand === "right";
+    const leftRaised = hasItem && heldHand === "left";
+    return {
+      left: leftRaised ? { x: 24, y: -130, rot: 0 } : { x: -10, y: -80, rot: 15 },
+      right: rightRaised ? { x: 28, y: -130, rot: 0 } : { x: 18, y: -80, rot: -10 },
+    };
+  }
 
   const hasItem = Boolean(heldItem && heldItem !== "none");
   const isChild = base === "creepy_child";
@@ -148,6 +166,120 @@ interface CharacterRigProps {
   showSockets?: boolean;
 }
 
+/**
+ * Procedural Severed Neck Stump rendered when face === "face_headless".
+ * Displays jagged cut flesh, exposed cervical vertebra, dripping blood, and ethereal dark vapor.
+ */
+const SeveredNeckStump: React.FC<{
+  base: CharacterBaseId;
+  appearance: BaseAppearance;
+}> = ({ base, appearance }) => {
+  const isElder = base === "elder_hunched";
+  const isBrute = base === "brute_hulking";
+  const isSkeletal = base === "skeletal_emaciated";
+
+  if (isElder) {
+    return (
+      <g className="rig-severed-neck-elder">
+        {/* Jagged severed neck stump */}
+        <path
+          d="M -9 -175 C -6 -185, 0 -192, 8 -198 L 18 -194 C 11 -187, 5 -176, 4 -168 Z"
+          fill={appearance.skinShadow}
+          stroke={appearance.outline}
+          strokeWidth="1.2"
+        />
+        {/* Severed cut surface */}
+        <ellipse cx="13" cy="-196" rx="6" ry="3.5" transform="rotate(-20, 13, -196)" fill="#450A0A" stroke="#1C0C0E" strokeWidth="1" />
+        <ellipse cx="13" cy="-196" rx="3.8" ry="2" transform="rotate(-20, 13, -196)" fill="#7F1D1D" />
+        {/* Exposed cervical vertebra bone */}
+        <polygon points="12,-199 15,-198 14,-194 11,-195" fill="#E2E8F0" stroke="#0F172A" strokeWidth="0.8" />
+        {/* Dark blood drips */}
+        <path d="M 6 -195 Q 5 -182 4 -172" stroke="#991B1B" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+        <path d="M 11 -192 Q 12 -180 11 -170" stroke="#7F1D1D" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+        <circle cx="4" cy="-170" r="1.3" fill="#DC2626" />
+        {/* Wisps of phantom mist rising from stump */}
+        <path d="M 13 -200 Q 11 -212 16 -222" stroke="#991B1B" strokeWidth="1.2" fill="none" opacity="0.6" className="anim-pulse-slow" />
+      </g>
+    );
+  }
+
+  if (isBrute) {
+    return (
+      <g className="rig-severed-neck-brute">
+        <path
+          d="M -11 -188 L -9 -202 Q 0 -200 9 -202 L 11 -188 Z"
+          fill={appearance.skinShadow}
+          stroke={appearance.outline}
+          strokeWidth="1.2"
+        />
+        {/* Severed cut surface */}
+        <ellipse cx="0" cy="-202" rx="9" ry="4" fill="#450A0A" stroke="#1C0C0E" strokeWidth="1" />
+        <ellipse cx="0" cy="-202" rx="6" ry="2.5" fill="#7F1D1D" />
+        {/* Vertebra bone */}
+        <rect x="-2" y="-205" width="4" height="4.5" rx="1" fill="#E2E8F0" stroke="#0F172A" strokeWidth="0.8" />
+        {/* Dripping blood */}
+        <path d="M -5 -200 L -6 -185" stroke="#991B1B" strokeWidth="2" strokeLinecap="round" />
+        <path d="M 0 -199 L 0 -182" stroke="#7F1D1D" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M 5 -200 L 6 -184" stroke="#DC2626" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="-6" cy="-183" r="1.4" fill="#991B1B" />
+        <circle cx="0" cy="-179" r="1.6" fill="#DC2626" />
+        {/* Phantom smoky wisps */}
+        <path d="M -2 -205 Q -6 -216 -3 -228" stroke="#991B1B" strokeWidth="1.2" fill="none" opacity="0.6" className="anim-pulse-slow" />
+        <path d="M 3 -205 Q 7 -218 2 -230" stroke="#1C1917" strokeWidth="1" fill="none" opacity="0.5" className="anim-pulse-slow" />
+      </g>
+    );
+  }
+
+  if (isSkeletal) {
+    return (
+      <g className="rig-severed-neck-skeletal">
+        <path
+          d="M -4 -188 L -3 -204 L 3 -204 L 4 -188 Z"
+          fill={appearance.skinShadow}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        <ellipse cx="0" cy="-204" rx="4" ry="2" fill="#450A0A" stroke="#1C0C0E" strokeWidth="0.8" />
+        {/* Cervical bone column protruding */}
+        <rect x="-1.5" y="-210" width="3" height="7" rx="0.8" fill="#E2E8F0" stroke="#0F172A" strokeWidth="0.8" />
+        {/* Ragged dry blood */}
+        <path d="M -2 -204 L -3 -190" stroke="#7F1D1D" strokeWidth="1.2" strokeLinecap="round" />
+        <path d="M 2 -204 L 2 -188" stroke="#991B1B" strokeWidth="1" strokeLinecap="round" />
+        {/* Eerie green / ghost mist */}
+        <path d="M 0 -211 Q -3 -222 1 -232" stroke="#10B981" strokeWidth="1" fill="none" opacity="0.7" className="anim-flicker-ember" />
+      </g>
+    );
+  }
+
+  // Standard (male_adult, female_adult, creepy_child, jiangshi_corpse, ghost_wraith, demon_shadow)
+  return (
+    <g className="rig-severed-neck-standard">
+      {/* Neck stump cylinder with torn jagged skin */}
+      <path
+        d="M -7 -188 L -6 -201 Q 0 -199 6 -201 L 7 -188 Z"
+        fill={appearance.skinShadow}
+        stroke={appearance.outline}
+        strokeWidth="1.2"
+      />
+      {/* Severed cut surface */}
+      <ellipse cx="0" cy="-201" rx="6.8" ry="3.2" fill="#450A0A" stroke="#1C0C0E" strokeWidth="1" />
+      <ellipse cx="0" cy="-201" rx="4.5" ry="2" fill="#7F1D1D" />
+      {/* Exposed cervical vertebra bone center */}
+      <rect x="-1.8" y="-204" width="3.6" height="4.2" rx="1" fill="#E2E8F0" stroke="#0F172A" strokeWidth="0.8" />
+      <ellipse cx="0" cy="-204" rx="1.2" ry="0.8" fill="#94A3B8" />
+      {/* Dripping coagulated blood */}
+      <path d="M -4 -199 C -4 -194, -5 -189, -4.5 -183" stroke="#991B1B" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+      <path d="M 2 -200 C 2 -193, 3 -188, 2.5 -180" stroke="#7F1D1D" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+      <path d="M -1 -199 L -1 -186" stroke="#DC2626" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+      <circle cx="-4.5" cy="-181" r="1.3" fill="#991B1B" />
+      <circle cx="2.5" cy="-178" r="1.5" fill="#DC2626" />
+      {/* Wisps of phantom mist / blood vapor rising up from severed stump */}
+      <path d="M -2 -204 Q -6 -216 -1 -228" stroke="#991B1B" strokeWidth="1.2" fill="none" opacity="0.65" className="anim-pulse-slow" />
+      <path d="M 2 -204 Q 6 -218 0 -232" stroke="#1E293B" strokeWidth="1" fill="none" opacity="0.5" className="anim-pulse-slow" />
+    </g>
+  );
+};
+
 export const CharacterRig: React.FC<CharacterRigProps> = ({
   id,
   base,
@@ -173,10 +305,32 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
   const isElder = base === "elder_hunched";
   const isBrute = base === "brute_hulking";
   const isSkeletal = base === "skeletal_emaciated";
+  const isHeadless = face === "face_headless";
 
   // Base scale adjustment
   const baseScaleModifier = isChild ? 0.65 : isDemon ? 1.25 : isBrute ? 1.2 : isElder ? 0.85 : isSkeletal ? 1.05 : 1;
   const finalScale = scale * baseScaleModifier;
+
+  // CRAWLING HORIZONTAL LOW-SLUNG SIDE PROFILE OVERRIDE
+  if (pose === "pose_crawling") {
+    return (
+      <CrawlingSideRig
+        id={id}
+        base={base}
+        costume={activeCostume}
+        face={face}
+        scale={finalScale}
+        flip={flip}
+        opacity={opacity}
+        heldItem={heldItem}
+        heldHand={heldHand}
+        showSockets={showSockets}
+        palette={palette}
+        appearance={appearance}
+        handSockets={handSockets}
+      />
+    );
+  }
 
   // Dynamic Head Position based on Base (adjusting neck length to realistic & natural proportions)
   const headPos = isElder
@@ -204,8 +358,9 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
   if (pose === "pose_shivering") poseClass = "rig-shivering";
   if (pose === "pose_walking") poseClass = "rig-walking";
   if (pose === "pose_floating") poseClass = "rig-floating";
-  if (pose === "pose_crawling") poseClass = "rig-crawling";
   if (pose === "pose_hanging") poseClass = "rig-hanging";
+  if (pose === "pose_sitting") poseClass = "rig-sitting";
+  if (pose === "pose_sitting_twisted_legs" || (pose as string) === "pose_twisted_legs_floating") poseClass = "rig-twisted-legs";
 
   return (
     <g
@@ -307,7 +462,9 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
       </g>
 
       {/* 4. NECK SOCKET */}
-      {isElder ? (
+      {isHeadless ? (
+        <SeveredNeckStump base={base} appearance={appearance} />
+      ) : isElder ? (
         <path
           d="M -10 -175 C -5 -190, 6 -200, 16 -210 L 22 -206 C 14 -194, 6 -175, 4 -168 Z"
           fill={appearance.skinShadow}
@@ -338,7 +495,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
       )}
 
       {/* 5. BASE-SPECIFIC HEAD ACCESSORIES (Behind / Side of Head) */}
-      {base === "female_adult" && (
+      {!isHeadless && base === "female_adult" && (
         <g className="rig-hair">
           <path
             d="M -18 -246 C -45 -206, -40 -150, -32 -100 C -28 -115, -25 -160, -18 -200 Z"
@@ -355,7 +512,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
         </g>
       )}
 
-      {base === "demon_shadow" && (
+      {!isHeadless && base === "demon_shadow" && (
         <g className="rig-demon-horns" transform={`translate(${headPos.x}, ${headPos.y})`}>
           <path
             d="M -18 -15 C -35 -40, -55 -60, -50 -85 C -40 -70, -30 -40, -12 -28 Z"
@@ -373,7 +530,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
       )}
 
       {/* Hooded Cloak Special Hood Overlay */}
-      {activeCostume === "outfit_shrouded_cloak" && (
+      {!isHeadless && activeCostume === "outfit_shrouded_cloak" && (
         <g className="rig-cloak-hood" transform={`translate(${headPos.x}, ${headPos.y})`}>
           {/* Colored dark cowl covering head */}
           <path
@@ -388,91 +545,93 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
       )}
 
       {/* 6. HEAD, HAIR CAP & INTERCHANGEABLE FACE */}
-      <g className="rig-head-group" transform={`translate(${headPos.x}, ${headPos.y})`}>
-        {activeCostume !== "outfit_shrouded_cloak" && (
-          <>
-            <ellipse
-              cx="0"
-              cy="0"
-              rx={isChild ? "26" : isElder ? "19" : isBrute ? "24" : isSkeletal ? "18" : "22"}
-              ry={isChild ? "26" : isElder ? "22" : isBrute ? "27" : isSkeletal ? "30" : "28"}
-              fill={appearance.skin}
-              stroke={appearance.outline}
-              strokeWidth="1.5"
-            />
-            {/* Brute squarish heavy jaw */}
-            {isBrute && (
-              <polygon points="-22,10 22,10 18,27 -18,27" fill={appearance.skin} stroke={appearance.outline} strokeWidth="1.2" />
-            )}
-            {/* Simple stylized hair caps */}
-            {base === "male_adult" && (
-              <path
-                d="M -22 -3 C -23 -25, -10 -31, 0 -30 C 14 -31, 23 -24, 22 -3 C 17 -14, 9 -17, 0 -16 C -9 -17, -17 -14, -22 -3 Z"
-                fill={appearance.hair}
+      {!isHeadless && (
+        <g className="rig-head-group" transform={`translate(${headPos.x}, ${headPos.y})`}>
+          {activeCostume !== "outfit_shrouded_cloak" && (
+            <>
+              <ellipse
+                cx="0"
+                cy="0"
+                rx={isChild ? "26" : isElder ? "19" : isBrute ? "24" : isSkeletal ? "18" : "22"}
+                ry={isChild ? "26" : isElder ? "22" : isBrute ? "27" : isSkeletal ? "30" : "28"}
+                fill={appearance.skin}
+                stroke={appearance.outline}
+                strokeWidth="1.5"
               />
-            )}
-            {base === "female_adult" && (
-              <path
-                d="M -22 -2 C -23 -27, 0 -32, 22 -27 C 23 -11, 22 -2, 20 -4 C 14 -16, 4 -18, 0 -13 C -4 -18, -14 -16, -20 -4 Z"
-                fill={appearance.hair}
-              />
-            )}
-            {base === "elder_hunched" && (
-              <g className="rig-elder-hair">
-                <ellipse cx="-15" cy="-14" rx="7" ry="8" fill={appearance.hair} />
-                <line x1="-21" y1="-20" x2="-7" y2="-6" stroke="#92400E" strokeWidth="2.2" strokeLinecap="round" />
-                <path d="M -18 -8 Q -24 6 -20 16" stroke={appearance.hair} strokeWidth="2" fill="none" />
-                <path d="M 18 -8 Q 24 6 20 16" stroke={appearance.hair} strokeWidth="2" fill="none" />
-              </g>
-            )}
-            {base === "brute_hulking" && (
-              <g className="rig-brute-hair">
-                <path d="M -23 -8 C -23 -28, 0 -32, 23 -28 C 24 -15, 23 -8, 20 -10 C 14 -19, -14 -19, -20 -10 Z" fill={appearance.hair} />
-                <line x1="8" y1="-2" x2="16" y2="10" stroke="#7F1D1D" strokeWidth="1.5" />
-                <line x1="10" y1="2" x2="13" y2="5" stroke="#7F1D1D" strokeWidth="1.5" />
-              </g>
-            )}
-            {base === "skeletal_emaciated" && (
-              <g className="rig-skeletal-hair">
-                <path d="M -19 -10 Q -28 15 -24 35" stroke={appearance.hair} strokeWidth="1.8" fill="none" />
-                <path d="M -14 -15 Q -22 20 -17 42" stroke={appearance.hair} strokeWidth="1.5" fill="none" />
-                <path d="M 19 -10 Q 28 15 24 35" stroke={appearance.hair} strokeWidth="1.8" fill="none" />
-                <path d="M 14 -15 Q 22 20 17 40" stroke={appearance.hair} strokeWidth="1.5" fill="none" />
-              </g>
-            )}
-            {base === "creepy_child" && (
-              <path
-                d="M -26 -2 C -27 -27, 0 -31, 27 -27 C 26 -10, 26 -2, 24 -5 L -24 -5 Z"
-                fill={appearance.hair}
-              />
-            )}
-            {base === "ghost_wraith" && (
-              <path
-                d="M -22 -4 C -24 -27, -8 -33, 2 -31 C 15 -32, 24 -24, 22 -4 C 16 -14, 8 -18, -2 -13 C -10 -18, -17 -14, -22 -4 Z"
-                fill={appearance.hair}
-                opacity="0.85"
-              />
-            )}
-          </>
-        )}
+              {/* Brute squarish heavy jaw */}
+              {isBrute && (
+                <polygon points="-22,10 22,10 18,27 -18,27" fill={appearance.skin} stroke={appearance.outline} strokeWidth="1.2" />
+              )}
+              {/* Simple stylized hair caps */}
+              {base === "male_adult" && (
+                <path
+                  d="M -22 -3 C -23 -25, -10 -31, 0 -30 C 14 -31, 23 -24, 22 -3 C 17 -14, 9 -17, 0 -16 C -9 -17, -17 -14, -22 -3 Z"
+                  fill={appearance.hair}
+                />
+              )}
+              {base === "female_adult" && (
+                <path
+                  d="M -22 -2 C -23 -27, 0 -32, 22 -27 C 23 -11, 22 -2, 20 -4 C 14 -16, 4 -18, 0 -13 C -4 -18, -14 -16, -20 -4 Z"
+                  fill={appearance.hair}
+                />
+              )}
+              {base === "elder_hunched" && (
+                <g className="rig-elder-hair">
+                  <ellipse cx="-15" cy="-14" rx="7" ry="8" fill={appearance.hair} />
+                  <line x1="-21" y1="-20" x2="-7" y2="-6" stroke="#92400E" strokeWidth="2.2" strokeLinecap="round" />
+                  <path d="M -18 -8 Q -24 6 -20 16" stroke={appearance.hair} strokeWidth="2" fill="none" />
+                  <path d="M 18 -8 Q 24 6 20 16" stroke={appearance.hair} strokeWidth="2" fill="none" />
+                </g>
+              )}
+              {base === "brute_hulking" && (
+                <g className="rig-brute-hair">
+                  <path d="M -23 -8 C -23 -28, 0 -32, 23 -28 C 24 -15, 23 -8, 20 -10 C 14 -19, -14 -19, -20 -10 Z" fill={appearance.hair} />
+                  <line x1="8" y1="-2" x2="16" y2="10" stroke="#7F1D1D" strokeWidth="1.5" />
+                  <line x1="10" y1="2" x2="13" y2="5" stroke="#7F1D1D" strokeWidth="1.5" />
+                </g>
+              )}
+              {base === "skeletal_emaciated" && (
+                <g className="rig-skeletal-hair">
+                  <path d="M -19 -10 Q -28 15 -24 35" stroke={appearance.hair} strokeWidth="1.8" fill="none" />
+                  <path d="M -14 -15 Q -22 20 -17 42" stroke={appearance.hair} strokeWidth="1.5" fill="none" />
+                  <path d="M 19 -10 Q 28 15 24 35" stroke={appearance.hair} strokeWidth="1.8" fill="none" />
+                  <path d="M 14 -15 Q 22 20 17 40" stroke={appearance.hair} strokeWidth="1.5" fill="none" />
+                </g>
+              )}
+              {base === "creepy_child" && (
+                <path
+                  d="M -26 -2 C -27 -27, 0 -31, 27 -27 C 26 -10, 26 -2, 24 -5 L -24 -5 Z"
+                  fill={appearance.hair}
+                />
+              )}
+              {base === "ghost_wraith" && (
+                <path
+                  d="M -22 -4 C -24 -27, -8 -33, 2 -31 C 15 -32, 24 -24, 22 -4 C 16 -14, 8 -18, -2 -13 C -10 -18, -17 -14, -22 -4 Z"
+                  fill={appearance.hair}
+                  opacity="0.85"
+                />
+              )}
+            </>
+          )}
 
-        {/* Jiangshi Hat sits cleanly atop the head */}
-        {base === "jiangshi_corpse" && (
-          <g className="rig-jiangshi-hat">
-            <path
-              d="M -32 -16 C -22 -39, 22 -39, 32 -16 Z"
-              fill="#1E293B"
-              stroke="#0F172A"
-              strokeWidth="1.5"
-            />
-            <rect x="-24" y="-21" width="48" height="5" rx="2" fill="#334155" />
-            <circle cx="0" cy="-38" r="5" fill={COLOR_PALETTE.accent_blood_red} />
-            <line x1="0" y1="-38" x2="26" y2="-19" stroke={COLOR_PALETTE.accent_eerie_gold} strokeWidth="2.5" />
-          </g>
-        )}
+          {/* Jiangshi Hat sits cleanly atop the head */}
+          {base === "jiangshi_corpse" && (
+            <g className="rig-jiangshi-hat">
+              <path
+                d="M -32 -16 C -22 -39, 22 -39, 32 -16 Z"
+                fill="#1E293B"
+                stroke="#0F172A"
+                strokeWidth="1.5"
+              />
+              <rect x="-24" y="-21" width="48" height="5" rx="2" fill="#334155" />
+              <circle cx="0" cy="-38" r="5" fill={COLOR_PALETTE.accent_blood_red} />
+              <line x1="0" y1="-38" x2="26" y2="-19" stroke={COLOR_PALETTE.accent_eerie_gold} strokeWidth="2.5" />
+            </g>
+          )}
 
-        <FaceRig face={face} />
-      </g>
+          <FaceRig face={face} />
+        </g>
+      )}
 
       {/* DEBUG SOCKETS & GIZMO OVERLAY */}
       {showSockets && (
@@ -755,32 +914,134 @@ const LowerBodyOutfit: React.FC<{
 }> = ({ costume, base, pose, palette, appearance }) => {
   const isWalking = pose === "pose_walking";
   const isShivering = pose === "pose_shivering";
-  const isCrawling = pose === "pose_crawling";
+  const isSitting = pose === "pose_sitting";
+  const isSittingTwisted =
+    pose === "pose_sitting_twisted_legs" ||
+    (pose as string) === "pose_twisted_legs_floating";
 
-  // Crawling Pose override
-  if (isCrawling) {
+  // Deformed Twisted Legs Floating Horror Pose override
+  if (isSittingTwisted) {
     return (
-      <g className="crawling-legs">
-        <path
-          d="M -15 -92 L -45 -40 L -65 -5 L -50 -5 L -35 -40 L -5 -92 Z"
-          fill={palette.pantsPrimary}
-          stroke={appearance.outline}
-          strokeWidth="1"
-        />
-        <path
-          d="M 5 -92 L 25 -40 L 45 -5 L 35 -5 L 18 -40 L -2 -92 Z"
-          fill={palette.pantsSecondary}
-          stroke={appearance.outline}
-          strokeWidth="1"
-        />
-        <ellipse cx="-60" cy="-3" rx="7" ry="3.5" fill={appearance.skinShadow} />
-        <ellipse cx="42" cy="-3" rx="6" ry="3.5" fill={appearance.skinShadow} />
+      <g className="twisted-floating-legs">
+        {/* Floor shadow under floating feet */}
+        <ellipse cx="-45" cy="-2" rx="20" ry="4" fill="#000000" opacity="0.35" />
+
+        {/* Back Leg (Reversed 180 deg, extending backward -X) */}
+        <g opacity="0.85">
+          {/* Back Thigh extending backward */}
+          <path
+            d="M 6 -90 L -28 -76 L -32 -62 L 4 -74 Z"
+            fill={palette.pantsSecondary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          {/* Back Knee & Shin angled backward & down */}
+          <path
+            d="M -28 -76 L -48 -34 L -38 -32 L -20 -72 Z"
+            fill={palette.pantsSecondary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          {/* Back Ankle & Foot reversed, hovering in mid-air (y = -26, well above floor y = 0) */}
+          <path
+            d="M -48 -34 C -56 -36, -66 -40, -70 -38 C -72 -35, -66 -28, -54 -28 L -38 -28 Z"
+            fill="#11131A"
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          {/* Deformed ankle joint knob */}
+          <ellipse cx="-34" cy="-66" rx="4" ry="3.5" fill={appearance.skinShadow} opacity="0.4" />
+        </g>
+
+        {/* Front Leg (Reversed 180 deg, extending backward -X) */}
+        <g>
+          {/* Front Thigh extending backward */}
+          <path
+            d="M -12 -90 L -38 -72 L -38 -56 L -10 -72 Z"
+            fill={palette.pantsPrimary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          {/* Front Knee & Shin protruding backward & downward */}
+          <path
+            d="M -38 -72 L -56 -28 L -44 -26 L -26 -68 Z"
+            fill={palette.pantsPrimary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          {/* Sharp protruding deformed knee bone socket */}
+          <path
+            d="M -38 -72 L -46 -64 L -36 -58 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          {/* Reversed Foot pointing backward (-X), levitating at y = -22 (clear gap above floor y=0) */}
+          <path
+            d="M -56 -28 C -66 -30, -78 -34, -82 -32 C -84 -29, -78 -22, -64 -22 L -44 -22 Z"
+            fill="#181512"
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          {/* Bony heel protruding forward / twisted ankle */}
+          <circle cx="-44" cy="-25" r="3.5" fill={appearance.skinShadow} opacity="0.5" />
+          {/* Sinister mist / miasma wisps dangling from deformed floating feet */}
+          <path
+            d="M -72 -22 Q -68 -10 -65 -4"
+            stroke="#0A0D14"
+            strokeWidth="1.5"
+            strokeDasharray="2,2"
+            fill="none"
+            opacity="0.45"
+          />
+          <path
+            d="M -52 -22 Q -50 -12 -48 -4"
+            stroke="#0A0D14"
+            strokeWidth="1.2"
+            strokeDasharray="2,2"
+            fill="none"
+            opacity="0.45"
+          />
+        </g>
+
+        {/* Costume specific bunched hem on seat */}
+        {costume === "outfit_modern_casual" && (
+          <g>
+            {/* Sneaker sole trim on reversed floating shoes */}
+            <line x1="-80" y1="-31" x2="-46" y2="-23" stroke={palette.accent} strokeWidth="1.8" strokeLinecap="round" />
+            <line x1="-68" y1="-37" x2="-40" y2="-29" stroke={palette.accent} strokeWidth="1.5" strokeLinecap="round" opacity="0.75" />
+          </g>
+        )}
+        {costume === "outfit_doctor_coat" && (
+          <path d="M -16 -90 L -30 -65 L -4 -65 L -2 -90 Z" fill={palette.primary} stroke={appearance.outline} strokeWidth="0.9" />
+        )}
+        {costume === "outfit_flowing_ao_dai" && (
+          <path d="M -16 -90 C -22 -75, -28 -60, -26 -40 L -12 -40 C -10 -60, -8 -75, -6 -90 Z" fill={palette.primary} opacity="0.9" />
+        )}
       </g>
     );
   }
 
   // 1. Áo Dài / Tứ Thân (Flowing Long Panels over Dark Silk Trousers)
   if (costume === "outfit_flowing_ao_dai") {
+    if (isSitting) {
+      return (
+        <g className="ao-dai-seated">
+          {/* Inner dark silk trousers bent at knees */}
+          <path d="M -8 -90 L 32 -78 L 30 -66 L -8 -78 Z" fill={palette.pantsSecondary} />
+          <path d="M 22 -76 L 32 -78 L 32 0 L 22 0 Z" fill={palette.pantsSecondary} />
+          <ellipse cx="36" cy="-2" rx="8" ry="3.5" fill="#11131A" />
+          {/* Flowing front flap draped gracefully over lap and shins */}
+          <path
+            d="M -14 -90 C -4 -86, 18 -82, 38 -74 C 42 -50, 40 -20, 36 0 L 18 0 C 24 -25, 24 -55, 14 -70 C 0 -72, -10 -75, -14 -90 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          <polygon points="18,0 22,-6 26,0 30,-7 34,0 36,0 34,-5" fill={palette.secondary} />
+        </g>
+      );
+    }
     return (
       <g className={isWalking ? "anim-skirt-walk" : isShivering ? "anim-skirt-shiver" : ""}>
         <line x1="-8" y1="-90" x2="-12" y2="0" stroke={palette.pantsPrimary} strokeWidth="8" />
@@ -798,6 +1059,19 @@ const LowerBodyOutfit: React.FC<{
 
   // 2. Hooded Reaper Cloak (Floor-length trailing cloak)
   if (costume === "outfit_shrouded_cloak") {
+    if (isSitting) {
+      return (
+        <g className="cloak-seated">
+          <path
+            d="M -28 -90 C -10 -82, 22 -78, 42 -68 C 46 -35, 42 -10, 38 0 L -25 0 C -34 -20, -32 -60, -28 -90 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="1.2"
+          />
+          <polygon points="-25,0 -16,-10 -6,0 6,-12 16,0 28,-10 38,0" fill={palette.secondary} />
+        </g>
+      );
+    }
     return (
       <g className="cloak-trailing-skirt">
         <path
@@ -813,6 +1087,15 @@ const LowerBodyOutfit: React.FC<{
 
   // 3. Mandarin Court Robe (Boxy Indigo Skirt + Court Boots)
   if (costume === "outfit_mandarin_court") {
+    if (isSitting) {
+      return (
+        <g className="mandarin-court-seated">
+          <path d="M -30 -90 L 38 -72 L 36 -6 L -30 -6 Z" fill={palette.primary} stroke={appearance.outline} strokeWidth="1.2" />
+          <line x1="-30" y1="-10" x2="36" y2="-10" stroke={palette.accent} strokeWidth="2.5" />
+          <polygon points="12,0 12,-12 28,-12 28,0" fill="#11131A" />
+        </g>
+      );
+    }
     return (
       <g className="mandarin-court-skirt">
         <path d="M -35 -90 L -38 -6 L 38 -6 L 35 -90 Z" fill={palette.primary} stroke={appearance.outline} strokeWidth="1.2" />
@@ -825,6 +1108,14 @@ const LowerBodyOutfit: React.FC<{
 
   // 4. Ancient Armor War Skirt
   if (costume === "outfit_ancient_armor") {
+    if (isSitting) {
+      return (
+        <g className="ancient-armor-seated">
+          <polygon points="-16,-90 36,-74 34,-25 -16,-25" fill={palette.primary} stroke={appearance.outline} strokeWidth="1" />
+          <path d="M 22 -25 L 20 0 L 34 0 L 36 -25 Z" fill={palette.secondary} />
+        </g>
+      );
+    }
     return (
       <g className="ancient-armor-skirt">
         <polygon points="-20,-90 -24,-25 -6,-25 -4,-90" fill={palette.primary} stroke={appearance.outline} strokeWidth="1" />
@@ -839,6 +1130,15 @@ const LowerBodyOutfit: React.FC<{
 
   // 5. Shredded Burial Shrouds
   if (costume === "outfit_shredded_burial") {
+    if (isSitting) {
+      return (
+        <g className="burial-shroud-seated">
+          <path d="M -10 -90 L 34 -76 L 34 0 L 22 0 L 22 -72 L -10 -78 Z" fill={palette.pantsPrimary} />
+          <ellipse cx="36" cy="-2" rx="7" ry="3" fill={appearance.skinShadow} />
+          <path d="M -10 -90 Q 20 -70 34 -20" stroke={palette.trim} strokeWidth="2.5" fill="none" opacity="0.75" />
+        </g>
+      );
+    }
     return (
       <g className="burial-shroud-legs">
         <line x1="-10" y1="-90" x2="-14" y2="-4" stroke={palette.pantsPrimary} strokeWidth="8" />
@@ -853,6 +1153,19 @@ const LowerBodyOutfit: React.FC<{
 
   // 6. Child Pajamas (Short Trousers + Bare Calves)
   if (costume === "outfit_child_pajamas" || base === "creepy_child") {
+    if (isSitting) {
+      return (
+        <g className="child-pajamas-seated">
+          {/* Bare calves & feet */}
+          <path d="M 18 -45 L 20 0 L 26 0 L 25 -45 Z" fill={appearance.skin} />
+          <path d="M 26 -45 L 28 0 L 34 0 L 33 -45 Z" fill={appearance.skinShadow} />
+          <ellipse cx="26" cy="-2" rx="5" ry="2.5" fill={appearance.skinShadow} />
+          <ellipse cx="34" cy="-2" rx="5" ry="2.5" fill={appearance.skinShadow} />
+          {/* Shorts over lap */}
+          <path d="M -10 -85 L 30 -72 L 28 -42 L -10 -65 Z" fill={palette.pantsPrimary} stroke={appearance.outline} strokeWidth="0.9" />
+        </g>
+      );
+    }
     return (
       <g>
         {/* Bare lower legs */}
@@ -867,6 +1180,18 @@ const LowerBodyOutfit: React.FC<{
 
   // 7. Doctor Coat Tails over Hospital Scrubs
   if (costume === "outfit_doctor_coat") {
+    if (isSitting) {
+      return (
+        <g className="doctor-coat-seated">
+          {/* Scrubs trousers */}
+          <path d="M -10 -90 L 36 -74 L 36 0 L 24 0 L 24 -70 L -10 -78 Z" fill={palette.pantsPrimary} />
+          <ellipse cx="40" cy="-2" rx="8" ry="3.5" fill="#0F172A" />
+          {/* White coat over thighs */}
+          <path d="M -16 -90 L 38 -74 L 36 -40 L -16 -60 Z" fill={palette.primary} stroke={appearance.outline} strokeWidth="1" />
+          <circle cx="28" cy="-55" r="2" fill={palette.accent} />
+        </g>
+      );
+    }
     return (
       <g className={isWalking ? "anim-male-walk" : isShivering ? "anim-leg-tremble" : ""}>
         {/* Dark Hospital Scrub Trousers */}
@@ -886,6 +1211,20 @@ const LowerBodyOutfit: React.FC<{
 
   // 8. Patient Gown (Hem at Knee + Bare Ankles)
   if (costume === "outfit_patient_gown") {
+    if (isSitting) {
+      return (
+        <g className="patient-gown-seated">
+          {/* Bare Shins / Ankles dropping to floor */}
+          <path d="M 18 -45 L 20 0 L 26 0 L 25 -45 Z" fill={appearance.skin} />
+          <path d="M 28 -45 L 30 0 L 36 0 L 35 -45 Z" fill={appearance.skinShadow} />
+          <ellipse cx="26" cy="-2" rx="6" ry="3" fill={appearance.skinShadow} />
+          <ellipse cx="36" cy="-2" rx="6" ry="3" fill={appearance.skinShadow} />
+          {/* Gown draping over lap */}
+          <path d="M -18 -90 C -4 -85, 20 -82, 38 -72 C 40 -60, 36 -44, 30 -42 L 8 -42 C 4 -60, -2 -72, -16 -90 Z" fill={palette.primary} stroke={appearance.outline} strokeWidth="1" />
+          <line x1="8" y1="-42" x2="30" y2="-42" stroke={palette.secondary} strokeWidth="1.5" />
+        </g>
+      );
+    }
     return (
       <g className={isWalking ? "anim-skirt-walk" : isShivering ? "anim-leg-tremble" : ""}>
         {/* Bare Shins / Ankles */}
@@ -908,6 +1247,22 @@ const LowerBodyOutfit: React.FC<{
 
   // 9. Modern Casual (Slim Jeans + Modern Sneakers)
   if (costume === "outfit_modern_casual") {
+    if (isSitting) {
+      return (
+        <g className="modern-casual-seated">
+          {/* Back leg */}
+          <path d="M -6 -90 L 30 -80 L 30 -66 L -6 -76 Z" fill={palette.pantsSecondary} />
+          <path d="M 20 -76 L 30 -78 L 30 0 L 20 0 Z" fill={palette.pantsSecondary} />
+          <ellipse cx="36" cy="-4" rx="8" ry="3.5" fill={palette.secondary} />
+          <line x1="28" y1="-2" x2="44" y2="-2" stroke={palette.accent} strokeWidth="1.8" strokeLinecap="round" />
+          {/* Front leg */}
+          <path d="M -12 -88 L 38 -74 L 38 -58 L -12 -72 Z" fill={palette.pantsPrimary} stroke={appearance.outline} strokeWidth="0.9" />
+          <path d="M 26 -70 L 38 -72 L 38 0 L 26 0 Z" fill={palette.pantsPrimary} stroke={appearance.outline} strokeWidth="0.9" />
+          <ellipse cx="44" cy="-5" rx="9" ry="4" fill={palette.primary} />
+          <line x1="35" y1="-2" x2="53" y2="-2" stroke={palette.accent} strokeWidth="2" strokeLinecap="round" />
+        </g>
+      );
+    }
     return (
       <g className={isWalking ? "anim-male-walk" : isShivering ? "anim-leg-tremble" : ""}>
         {/* Dark Cargo / Denim Pants */}
@@ -923,6 +1278,21 @@ const LowerBodyOutfit: React.FC<{
   }
 
   // Default Peasant / Monk Trousers
+  if (isSitting) {
+    return (
+      <g className="peasant-seated">
+        {/* Back Leg */}
+        <path d="M -6 -90 L 30 -80 L 30 -66 L -6 -76 Z" fill={palette.pantsSecondary} />
+        <path d="M 20 -76 L 30 -78 L 30 0 L 20 0 Z" fill={palette.pantsSecondary} />
+        <ellipse cx="36" cy="-2" rx="8" ry="3.5" fill="#11131A" />
+        {/* Front Leg */}
+        <path d="M -12 -88 L 38 -74 L 38 -58 L -12 -72 Z" fill={palette.pantsPrimary} stroke={appearance.outline} strokeWidth="0.9" />
+        <path d="M 26 -70 L 38 -72 L 38 0 L 26 0 Z" fill={palette.pantsPrimary} stroke={appearance.outline} strokeWidth="0.9" />
+        <ellipse cx="44" cy="-2" rx="9" ry="4" fill="#181512" />
+      </g>
+    );
+  }
+
   if (isWalking) {
     return (
       <g className="anim-male-walk">
@@ -1043,20 +1413,7 @@ const ArmsRig: React.FC<{
     );
   }
 
-  // 2. Crawling pose arms
-  if (pose === "pose_crawling") {
-    return (
-      <g>
-        <path d="M -25 -185 L -55 -120 L -75 -10 L -62 -10 L -45 -115 L -20 -185 Z" fill={sleeveColor} />
-        <path d="M 25 -185 L 55 -120 L 75 -10 L 62 -10 L 45 -115 L 20 -185 Z" fill={sleeveShadowColor} />
-        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="5.5" fill={handColor} />
-        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="5.5" fill={handShadowColor} />
-        <AttachedProp socket={activeSocket} itemId={heldItem} />
-      </g>
-    );
-  }
-
-  // 3. Reaching out arms
+  // 2. Reaching out arms
   if (pose === "pose_reaching") {
     return (
       <g className="anim-arms-reaching">
@@ -1145,6 +1502,72 @@ const ArmsRig: React.FC<{
         <path d="M 25 -185 C 32 -150, 40 -120, 45 -104 L 38 -102 C 33 -120, 26 -145, 20 -185 Z" fill={sleeveShadowColor} />
         <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.8" fill={handColor} />
         <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.5" fill={handShadowColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+    );
+  }
+
+  // Sitting pose arms
+  if (pose === "pose_sitting") {
+    const raiseLeft = hasItem && heldHand === "left";
+    const raiseRight = hasItem && heldHand === "right";
+    return (
+      <g className="anim-arms-sitting">
+        {/* Back arm */}
+        <path
+          d={
+            raiseLeft
+              ? `M -22 -184 L 18 -144 L ${handSockets.left.x} ${handSockets.left.y + 4} L ${handSockets.left.x - 4} ${handSockets.left.y - 5} L 14 -155 L -14 -184 Z`
+              : "M -22 -185 C -15 -150, -5 -115, 12 -88 L 18 -88 C 2 -115, -8 -150, -15 -185 Z"
+          }
+          fill={sleeveShadowColor}
+        />
+        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.5" fill={handShadowColor} />
+        {/* Front arm */}
+        <path
+          d={
+            raiseRight
+              ? `M 18 -184 L 28 -144 L ${handSockets.right.x} ${handSockets.right.y + 4} L ${handSockets.right.x - 4} ${handSockets.right.y - 5} L 24 -155 L 10 -184 Z`
+              : "M 20 -185 C 24 -150, 26 -115, 26 -86 L 32 -86 C 34 -115, 32 -150, 26 -185 Z"
+          }
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="0.9"
+        />
+        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.8" fill={handColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+    );
+  }
+
+  // Deformed Sitting Twisted Legs arms
+  if (pose === "pose_sitting_twisted_legs" || (pose as string) === "pose_twisted_legs_floating") {
+    const raiseLeft = hasItem && heldHand === "left";
+    const raiseRight = hasItem && heldHand === "right";
+    return (
+      <g className="anim-arms-twisted-seated">
+        {/* Back arm hanging rigid or clawing back */}
+        <path
+          d={
+            raiseLeft
+              ? `M -22 -184 L 14 -144 L ${handSockets.left.x} ${handSockets.left.y + 4} L ${handSockets.left.x - 4} ${handSockets.left.y - 5} L 10 -155 L -14 -184 Z`
+              : "M -24 -185 C -28 -150, -22 -120, -14 -88 L -8 -88 C -16 -120, -20 -150, -17 -185 Z"
+          }
+          fill={sleeveShadowColor}
+        />
+        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.5" fill={handShadowColor} />
+        {/* Front arm resting stiff or holding */}
+        <path
+          d={
+            raiseRight
+              ? `M 18 -184 L 26 -144 L ${handSockets.right.x} ${handSockets.right.y + 4} L ${handSockets.right.x - 4} ${handSockets.right.y - 5} L 22 -155 L 10 -184 Z`
+              : "M 22 -185 C 20 -150, 16 -120, 12 -88 L 18 -88 C 24 -120, 26 -150, 28 -185 Z"
+          }
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="0.9"
+        />
+        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.8" fill={handColor} />
         <AttachedProp socket={activeSocket} itemId={heldItem} />
       </g>
     );
@@ -1405,6 +1828,9 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
         </g>
       );
 
+    case "face_headless":
+      return null;
+
     case "face_calm":
     default:
       return (
@@ -1417,4 +1843,347 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
         </g>
       );
   }
+};
+
+/**
+ * =========================================================
+ * CRAWLING LOW-PROFILE 2D HORIZONTAL RIG (BÒ TRƯỜN SÁT MẶT ĐẤT - GÓC NHÌN NGHIÊNG)
+ * Low-slung horizontal crawler silhouette (~60-70px total height from Ground Y=0)
+ * =========================================================
+ */
+interface CrawlingSideRigProps {
+  id?: string;
+  base: CharacterBaseId;
+  costume: CostumeId;
+  face: CharacterFaceId;
+  scale: number;
+  flip: number;
+  opacity: number;
+  heldItem?: HeldItemId;
+  heldHand?: HeldHand;
+  showSockets?: boolean;
+  palette: CostumePalette;
+  appearance: BaseAppearance;
+  handSockets: { left: HandSocketPoint; right: HandSocketPoint };
+}
+
+const CrawlingSideRig: React.FC<CrawlingSideRigProps> = ({
+  id,
+  base,
+  costume,
+  face,
+  scale,
+  flip,
+  opacity,
+  heldItem = "none",
+  heldHand = "right",
+  showSockets = false,
+  palette,
+  appearance,
+  handSockets,
+}) => {
+  const isGhost = base === "ghost_wraith";
+  const isDemon = base === "demon_shadow";
+  const isChild = base === "creepy_child";
+  const isElder = base === "elder_hunched";
+  const isSkeletal = base === "skeletal_emaciated";
+  const isHeadless = face === "face_headless";
+
+  const sleeveColor = costume === "outfit_child_pajamas" ? appearance.skin : palette.sleeve;
+  const sleeveShadowColor = costume === "outfit_child_pajamas" ? appearance.skinShadow : palette.sleeveShadow;
+  const handColor = appearance.skin;
+  const handShadowColor = appearance.skinShadow;
+  const activeSocket = heldHand === "left" ? handSockets.left : handSockets.right;
+
+  // Head center in low-slung horizontal crawling position (height ~60px above ground)
+  const headPos = { x: 56, y: -60 };
+
+  return (
+    <g
+      id={id ? `actor-${id}` : undefined}
+      transform={`scale(${flip * scale}, ${scale})`}
+      opacity={isGhost ? Math.min(opacity, 0.88) : opacity}
+      className="character-rig rig-crawling"
+    >
+      {/* 1. FLOOR CONTACT GROUND SHADOWS */}
+      <ellipse cx="0" cy="-1.5" rx="95" ry="6" fill="#000000" opacity="0.4" />
+      <ellipse cx="40" cy="-1.5" rx="60" ry="4.5" fill="#000000" opacity="0.32" />
+
+      {/* Ghost aura glow */}
+      {isGhost && (
+        <ellipse
+          cx="15"
+          cy="-40"
+          rx="90"
+          ry="45"
+          fill="url(#ghost-aura-grad)"
+          opacity="0.35"
+          className="anim-pulse-slow"
+        />
+      )}
+
+      {/* Demon dark smoky shadow aura */}
+      {isDemon && (
+        <g opacity="0.35" filter="url(#ghost-blur)">
+          <ellipse cx="15" cy="-40" rx="95" ry="42" fill="#000000" />
+        </g>
+      )}
+
+      {/* 2. REAR LEG (Left leg - darker silhouette trailing behind along ground) */}
+      <g className="crawl-back-leg" opacity="0.88">
+        {/* Rear Thigh extending back from hip (-38, -38) */}
+        <path
+          d="M -38 -40 L -72 -24 L -70 -14 L -36 -30 Z"
+          fill={palette.pantsSecondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        {/* Rear Shin / Calf trailing along floor to ankle (-102, -6) */}
+        <path
+          d="M -72 -24 L -102 -8 L -100 -2 L -70 -14 Z"
+          fill={palette.pantsSecondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        {/* Rear Foot dragging flat on floor */}
+        <ellipse cx="-106" cy="-2.5" rx="9" ry="3" fill="#11131A" />
+        {costume === "outfit_modern_casual" && (
+          <line x1="-113" y1="-1" x2="-99" y2="-1" stroke={palette.accent} strokeWidth="1.5" strokeLinecap="round" />
+        )}
+      </g>
+
+      {/* 3. REAR ARM (Left arm - supporting weight on floor) */}
+      <g className="crawl-back-arm">
+        {/* Upper arm from shoulder (16, -46) down/back to elbow (6, -22) */}
+        <path
+          d="M 14 -46 L 4 -24 L 10 -20 L 20 -42 Z"
+          fill={sleeveShadowColor}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        {/* Forearm from elbow (6, -22) to hand (14, -4) */}
+        <path
+          d="M 4 -24 L 10 -4 L 18 -4 L 10 -20 Z"
+          fill={sleeveShadowColor}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        {/* Back hand pressing floor */}
+        <ellipse cx={handSockets.left.x} cy={handSockets.left.y} rx="5.5" ry="3.5" fill={handShadowColor} />
+      </g>
+
+      {/* 4. MAIN HORIZONTAL TORSO & ARCHED SPINE */}
+      <g className="crawl-torso">
+        {/* Main Arched Torso Flesh / Base Clothes */}
+        <path
+          d="M -40 -38 C -28 -60, 6 -64, 26 -46 L 24 -30 C 6 -40, -18 -38, -36 -28 Z"
+          fill={palette.primary}
+          stroke={appearance.outline}
+          strokeWidth="1.2"
+        />
+
+        {/* Costume specific details over horizontal arched back */}
+        {costume === "outfit_modern_casual" && (
+          <g>
+            {/* Dark Hoodie Fold and Hood Draped behind neck */}
+            <path
+              d="M 8 -54 C 18 -58, 28 -56, 32 -48 C 30 -42, 22 -44, 16 -46 Z"
+              fill={palette.secondary}
+              stroke={appearance.outline}
+              strokeWidth="0.8"
+            />
+            {/* White Hoodie Drawstrings dangling downward toward floor */}
+            <line x1="22" y1="-38" x2="22" y2="-22" stroke="#E2E8F0" strokeWidth="1.5" strokeLinecap="round" />
+            <circle cx="22" cy="-21" r="1.2" fill="#E2E8F0" />
+            <line x1="18" y1="-38" x2="18" y2="-24" stroke="#E2E8F0" strokeWidth="1.5" strokeLinecap="round" />
+            <circle cx="18" cy="-23" r="1.2" fill="#E2E8F0" />
+            {/* Center zipper / seam */}
+            <path d="M 22 -44 Q 18 -36 14 -30" stroke="#334155" strokeWidth="1.4" fill="none" />
+          </g>
+        )}
+
+        {costume === "outfit_flowing_ao_dai" && (
+          <g>
+            {/* Long silk flaps draping over back and trailing along floor */}
+            <path
+              d="M 22 -44 C 4 -52, -22 -48, -48 -24 C -60 -15, -70 -5, -85 0 L -60 0 C -45 -10, -25 -25, 18 -32 Z"
+              fill={palette.primary}
+              opacity="0.9"
+            />
+            <polygon points="-85,0 -78,-5 -72,0 -66,-6 -60,0" fill={palette.secondary} />
+          </g>
+        )}
+
+        {costume === "outfit_shrouded_cloak" && (
+          <g>
+            {/* Dark reaper cloak pooling back along floor */}
+            <path
+              d="M 24 -46 C -5 -62, -35 -55, -60 -30 C -80 -15, -100 -5, -120 0 L -95 0 C -70 -12, -40 -25, 20 -32 Z"
+              fill={palette.primary}
+            />
+            <polygon points="-120,0 -112,-6 -104,0 -96,-8 -88,0" fill={palette.secondary} />
+          </g>
+        )}
+
+        {costume === "outfit_patient_gown" && (
+          <g>
+            <path
+              d="M 24 -46 C 4 -58, -20 -54, -36 -32 L -28 -28 C -14 -44, 4 -46, 20 -34 Z"
+              fill={palette.primary}
+            />
+            <line x1="-10" y1="-50" x2="-6" y2="-35" stroke={palette.secondary} strokeWidth="2" />
+          </g>
+        )}
+
+        {costume === "outfit_doctor_coat" && (
+          <g>
+            <circle cx="2" cy="-48" r="3" fill={palette.accent} />
+            <circle cx="-16" cy="-42" r="2.2" fill={palette.accent} />
+            <path d="M 12 -46 L -20 -38" stroke="#E2E8F0" strokeWidth="1.2" opacity="0.6" />
+          </g>
+        )}
+
+        {/* Hunched Back / Hump for Elder */}
+        {isElder && (
+          <path d="M -20 -56 C -10 -72, 10 -70, 18 -52 Z" fill={palette.secondary} />
+        )}
+
+        {/* Prominent Ribcage Lines for Skeletal Base */}
+        {isSkeletal && (
+          <g opacity="0.6">
+            <path d="M 14 -52 Q 10 -40 18 -32" stroke={appearance.outline} strokeWidth="1.8" fill="none" />
+            <path d="M 2 -56 Q -2 -42 6 -34" stroke={appearance.outline} strokeWidth="1.8" fill="none" />
+            <path d="M -10 -54 Q -14 -40 -6 -34" stroke={appearance.outline} strokeWidth="1.8" fill="none" />
+          </g>
+        )}
+      </g>
+
+      {/* 5. FRONT LEG (Right leg - crawling forward in step) */}
+      <g className="crawl-front-leg">
+        {/* Thigh pushing forward from hip (-36, -34) to knee (-10, -22) */}
+        <path
+          d="M -36 -38 L -8 -26 L -10 -16 L -34 -28 Z"
+          fill={palette.pantsPrimary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        {/* Shin dropping down to ground (-16, -4) */}
+        <path
+          d="M -8 -26 L -14 -6 L -20 -6 L -12 -16 Z"
+          fill={palette.pantsPrimary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        {/* Foot gripping ground */}
+        <ellipse cx="-16" cy="-2.5" rx="9" ry="3.5" fill="#181512" />
+        {costume === "outfit_modern_casual" && (
+          <line x1="-24" y1="-1" x2="-8" y2="-1" stroke={palette.accent} strokeWidth="1.8" strokeLinecap="round" />
+        )}
+      </g>
+
+      {/* 6. FRONT ARM (Right arm - outstretched creeping forward on floor) */}
+      <g className="crawl-front-arm">
+        {/* Upper arm from shoulder (24, -46) to elbow (54, -28) */}
+        <path
+          d="M 24 -48 L 56 -30 L 52 -22 L 22 -40 Z"
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        {/* Forearm from elbow (54, -28) to wrist (80, -8) */}
+        <path
+          d="M 56 -30 L 82 -8 L 78 -4 L 52 -22 Z"
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        {/* Hand clawing the floor */}
+        <ellipse cx={handSockets.right.x} cy={handSockets.right.y} rx="6.5" ry="4.5" fill={handColor} />
+        {/* Creeping outstretched claw fingers */}
+        <polygon points="86,-4 98,-4 92,-8" fill={appearance.skinShadow} />
+        <polygon points="85,-2 96,-1 90,-5" fill={appearance.skinShadow} />
+
+        {/* Attached handheld item held at front reaching hand */}
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+
+      {/* 7. NECK & HEAD & FACE (Low to ground at X=56, Y=-60) */}
+      {isHeadless ? (
+        <g transform="translate(46, -54)">
+          <ellipse cx="0" cy="0" rx="8" ry="6" fill="#7F1D1D" />
+          <path d="M 0 0 C 4 10, 8 18, 12 25" stroke="#DC2626" strokeWidth="2" fill="none" />
+        </g>
+      ) : (
+        <g className="crawl-head-group" transform={`translate(${headPos.x}, ${headPos.y}) rotate(10)`}>
+          {/* Neck connecting torso to head */}
+          <path
+            d="M -28 14 L -8 4 L -6 16 L -24 24 Z"
+            fill={appearance.skinShadow}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+
+          {/* Head ellipse */}
+          <ellipse
+            cx="0"
+            cy="0"
+            rx={isChild ? "22" : isElder ? "18" : "20"}
+            ry={isChild ? "22" : isElder ? "20" : "22"}
+            fill={appearance.skin}
+            stroke={appearance.outline}
+            strokeWidth="1.5"
+          />
+
+          {/* Hair */}
+          {base === "female_adult" && (
+            <g className="crawl-long-hair">
+              {/* Stringy dark hair spilling forward and down toward floor */}
+              <path
+                d="M -16 -8 C -20 15, -10 38, 5 56 L 0 58 C -16 38, -26 15, -22 -8 Z"
+                fill={appearance.hair}
+              />
+              <path
+                d="M 10 -8 C 14 18, 22 42, 32 55 L 26 57 C 16 42, 6 18, 4 -8 Z"
+                fill={appearance.hair}
+              />
+            </g>
+          )}
+
+          {base === "male_adult" && (
+            <path
+              d="M -18 -4 C -20 -20, -8 -24, 0 -24 C 12 -24, 18 -20, 18 -4 C 14 -12, 6 -14, 0 -14 C -6 -14, -14 -12, -18 -4 Z"
+              fill={appearance.hair}
+            />
+          )}
+
+          {base === "creepy_child" && (
+            <path
+              d="M -18 -2 C -22 -18, -4 -22, 2 -22 C 14 -22, 20 -16, 18 -2 C 12 -12, 4 -12, 0 -10 C -6 -12, -12 -10, -18 -2 Z"
+              fill={appearance.hair}
+            />
+          )}
+
+          {/* Face Expression Rig */}
+          <FaceRig face={face} />
+        </g>
+      )}
+
+      {/* 8. DEBUG SOCKETS & GIZMO OVERLAY */}
+      {showSockets && (
+        <g className="rig-debug-gizmo" pointerEvents="none">
+          <circle cx="0" cy="0" r="5" fill="#10B981" />
+          <text x="10" y="-8" fill="#10B981" fontSize="10" fontFamily="monospace">Ground [0,0]</text>
+          <circle cx="-38" cy="-38" r="4" fill="#3B82F6" />
+          <text x="-48" y="-45" fill="#3B82F6" fontSize="9" fontFamily="monospace">Hip</text>
+          <circle cx="24" cy="-48" r="4" fill="#F59E0B" />
+          <text x="26" y="-54" fill="#F59E0B" fontSize="9" fontFamily="monospace">Shoulder</text>
+          <circle cx={headPos.x} cy={headPos.y} r="5" fill="#EF4444" />
+          <text x={headPos.x + 8} y={headPos.y} fill="#EF4444" fontSize="9" fontFamily="monospace">Head</text>
+          <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4" fill="#A855F7" />
+          <circle cx={handSockets.right.x} cy={handSockets.right.y} r="5" fill="#22D3EE" />
+          <text x={handSockets.right.x + 8} y={handSockets.right.y} fill="#67E8F9" fontSize="9" fontFamily="monospace">HandR</text>
+        </g>
+      )}
+    </g>
+  );
 };

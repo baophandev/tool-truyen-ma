@@ -500,6 +500,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
           <SkyLayer
             skyPreset={lighting.sky_preset}
             thunderFlash={lighting.thunder_flash}
+            theme={theme}
           />
         </g>
 

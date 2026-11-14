@@ -77,14 +77,21 @@
   animation: rig-float 3.5s ease-in-out infinite;
 }
 
-/* 4b. Crawling on Ground */
+/* 4b. Crawling Low on Ground (Horizontal Undulation) */
 @keyframes rig-crawl-sway {
-  0%, 100% { transform: translateY(12px) skewX(2deg); }
-  50% { transform: translateY(8px) skewX(-2deg); }
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  30% {
+    transform: translateY(-2px) rotate(-0.8deg);
+  }
+  65% {
+    transform: translateY(1px) rotate(0.6deg);
+  }
 }
 
 .rig-crawling {
-  animation: rig-crawl-sway 1.4s ease-in-out infinite;
+  animation: rig-crawl-sway 2.2s ease-in-out infinite;
 }
 
 /* 4c. Hanging Pendulum Sway */
@@ -116,6 +123,46 @@
 
 .anim-arms-rigid {
   animation: jiangshi-rigid 1s steps(2) infinite;
+}
+
+/* 4f. Seated Pose Gentle Breathing */
+@keyframes rig-sitting-breath {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+
+.rig-sitting {
+  animation: rig-sitting-breath 4s ease-in-out infinite;
+}
+
+/* 4g. Deformed Twisted Legs Floating Hover & Micro-Tremor */
+@keyframes rig-twisted-legs-hover {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  35% { transform: translateY(-3.5px) rotate(0.4deg); }
+  70% { transform: translateY(-1.5px) rotate(-0.3deg); }
+}
+
+.rig-twisted-legs {
+  animation: rig-twisted-legs-hover 3.2s ease-in-out infinite;
+}
+
+@keyframes arms-sitting-breath {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+}
+
+.anim-arms-sitting {
+  animation: arms-sitting-breath 4s ease-in-out infinite;
+}
+
+@keyframes arms-twisted-spasm {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  40% { transform: translateY(-1.5px) rotate(0.5deg); }
+  80% { transform: translateY(0.5px) rotate(-0.5deg); }
+}
+
+.anim-arms-twisted-seated {
+  animation: arms-twisted-spasm 3.5s ease-in-out infinite;
 }
 
 /* 5. Ghost Tail Flutter */

@@ -34,6 +34,12 @@
         "name": "Hành lang & Không gian trong nhà hiện đại",
         "desc": "Hành lang bệnh viện, sảnh khách sạn, siêu thị bỏ hoang hoặc nhà hàng u ám với trần nhà ống tuýp, sàn gạch bóng loáng và cửa thoát hiểm",
         "sky_options": ["flickering_fluorescent", "dim_indoor_night"]
+      },
+      {
+        "id": "vehicle_interior",
+        "name": "Khoang xe bus & Tàu xe kinh dị",
+        "desc": "Không gian bên trong xe buýt, xe khách hoặc toa tàu ma quái với trần uốn cong, ô cửa sổ đêm nhìn ra đường vắng, hàng ghế hành khách, cột vịn tay màu vàng và sàn cao su chống trượt",
+        "sky_options": ["flickering_fluorescent", "foggy_night", "stormy_dark"]
       }
     ],
     "sky_presets": [
@@ -233,6 +239,26 @@
         "layer": "midground",
         "width": 250,
         "height": 200,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "bus_interior",
+        "name": "Buồng lái tài xế & Máy bán vé xe bus",
+        "semantic_role": "Buồng lái tài xế xe bus với vô lăng thép, bảng đồng hồ LED đỏ, hộp thu vé tự động, ghế lái thủy lực và kính chiếu hậu góc rộng",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 340,
+        "height": 310,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "creepy_bathtub",
+        "name": "Bồn tắm rỉ sét ngập máu",
+        "semantic_role": "Bồn tắm chân vuốt quái thú vintage, thành bồn vấy máu rỉ sét, nước đục ngầu lập lòe vệt tóc và vòi đồng nhỏ giọt máu",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 300,
+        "height": 180,
         "anchor": "bottom-center"
       }
     ]
@@ -438,6 +464,11 @@
         "id": "face_talisman_covered",
         "name": "Dán lá bùa vàng che trán",
         "semantic": "Lá bùa đạo sĩ màu vàng viết chữ son đỏ dán che sụp từ trán xuống miệng, bay phấp phới"
+      },
+      {
+        "id": "face_headless",
+        "name": "Không đầu / Cổ đứt lìa (Headless Severed Neck)",
+        "semantic": "Vắng mặt hoàn toàn phần đầu, cuống cổ chém đứt nham nhở lộ đốt sống cổ trắng xám, máu tươi và máu đông rỉ giọt xuống vạt áo kèm làn khói oán khí bốc lên nghi ngút"
       }
     ],
     "poses": [
@@ -445,6 +476,16 @@
         "id": "pose_standing",
         "type": "ground",
         "desc": "Đứng thẳng quan sát, ngực phập phồng nhẹ"
+      },
+      {
+        "id": "pose_sitting",
+        "type": "ground",
+        "desc": "Ngồi ngay ngắn trên ghế hoặc sàn xe buýt, đầu gối gập vuông góc, cẳng chân buông xuống sàn, bàn chân tiếp đất tự nhiên, hai tay đặt trên đùi hoặc cầm điện thoại/đồ vật"
+      },
+      {
+        "id": "pose_sitting_twisted_legs",
+        "type": "ground",
+        "desc": "Tư thế dị dạng kinh dị: thân trên ngồi trên ghế, đôi chân bị xoay ngược 180 độ ra phía sau lưng, hai bàn chân lơ lửng cách mặt sàn vài phân không hề chạm đất"
       },
       {
         "id": "pose_shivering",
@@ -464,7 +505,7 @@
       {
         "id": "pose_crawling",
         "type": "ground",
-        "desc": "Bò trườn sát mặt đất, chân tay co quắp như nhện hoặc ma nữ chui lên"
+        "desc": "Bò trườn sát mặt đất góc nhìn ngang (side view): thân mình rạp thấp nằm ngang sát sàn (cao chỉ ~65px), tứ chi chống đất trườn tới, một tay vươn dài móng vuốt cào sàn"
       },
       {
         "id": "pose_reaching",
@@ -494,7 +535,9 @@
       { "id": "item_tattered_doll", "name": "Búp bê vải rách kinh dị" },
       { "id": "item_tattered_umbrella", "name": "Ô giấy dầu cổ rách nát" },
       { "id": "item_flashlight", "name": "Đèn pin rọi nón sáng kinh dị" },
-      { "id": "item_scalpel", "name": "Dao mổ phẫu thuật sắc lạnh" }
+      { "id": "item_scalpel", "name": "Dao mổ phẫu thuật sắc lạnh" },
+      { "id": "item_smartphone", "name": "Điện thoại di động phát sáng" },
+      { "id": "item_severed_head", "name": "Thủ cấp đứt lìa vương máu" }
     ]
   },
   "details": [
@@ -567,6 +610,13 @@
       "semantic_role": "Đèn tuýp huỳnh quang công nghiệp treo lơ lửng trên không trung chập chờn phát sáng",
       "allowed_slots": ["air_left", "air_center", "air_right"],
       "anchor": "top-center"
+    },
+    {
+      "id": "detail_broken_mirror",
+      "name": "Gương nhà tắm vỡ nứt vấy máu",
+      "semantic_role": "Gương nhà tắm treo tường nứt mạng nhện chằng chịt, dấu bàn tay đẫm máu cào xước",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right", "air_left", "air_center", "air_right"],
+      "anchor": "bottom-center"
     }
   ],
   "actor_motion_schema": {

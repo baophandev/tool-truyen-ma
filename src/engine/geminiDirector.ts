@@ -138,6 +138,18 @@ export const SAMPLE_HORROR_PROMPTS: StoryPromptPreset[] = [
       "Cửa thang máy số 13 ở trung tâm từ từ hé mở một kẽ hở đen ngòm, một đôi mắt đỏ máu rực lên từ bóng tối sâu thẳm của hố thang máy.",
     ],
   },
+  {
+    id: "creepy_bathroom_night",
+    title: "Ác Mộng Phòng Tắm Nửa Đêm",
+    prompt:
+      "Trong phòng tắm ẩm ướt ánh đèn huỳnh quang chập chờn lúc 03:00 sáng. Một cô gái cầm điện thoại phát sáng bước vào soi gương thì bàng hoàng thấy gương nứt vỡ với dấu bàn tay máu cào xước. Vòi nước đồng trên chiếc bồn tắm rỉ sét bắt đầu rỉ từng giọt máu tươi, và từ làn sương đục ngầu một bóng ma áo liệm từ từ trỗi dậy.",
+    suggestedScenes: 3,
+    scenePrompts: [
+      "Phòng tắm ẩm ướt ánh đèn huỳnh quang chập chờn, cô gái mặc áo hoodie cầm điện thoại phát sáng xanh lạnh bước đi rụt rè về phía bồn tắm cổ.",
+      "Gương soi nhà tắm nứt mạng nhện bất ngờ xuất hiện dấu bàn tay máu cào xước, vòi nước đồng rỉ giọt máu đỏ tươi xuống bồn tắm ngập nước đục.",
+      "Bóng ma quấn vải liệm tử thi từ từ bay trồi lên từ làn sương bồn tắm, cô gái hoảng loạn giơ điện thoại lùi lại tháo chạy.",
+    ],
+  },
 ];
 
 /**
@@ -155,7 +167,8 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
 - Đường Line tiếp đất liên tục: Có thể dùng offsetX để nhân vật đứng ở bất kỳ tọa độ X nào từ 80px đến 1840px (X_thực = slot.X + offsetX). Với nhân vật tiếp đất, offsetY BẮT BUỘC bằng 0.
 
 2. KHO TÀI NGUYÊN HỢP LỆ (CHỈ ĐƯỢC DÙNG CÁC ID SAU, KHÔNG ĐƯỢC TỰ BỊA ID MỚI):
-- Themes: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor"
+- Themes: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior"
+  * "vehicle_interior": Toàn bộ khoang bên trong xe bus / tàu hỏa (trần cong, ô cửa sổ nhìn ra đường đêm, ghế xe bus, cột tay vịn vàng với chuông bấm). BẮT BUỘC dùng cho cảnh trong xe, KHÔNG dùng modern_indoor vì modern_indoor là sảnh hành lang rộng lớn.
 - Sky presets (Bầu trời & Chiếu sáng):
   * "blood_moon" (Trăng máu đỏ rực)
   * "foggy_night" (Đêm sương mù lạnh buốt)
@@ -165,11 +178,11 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
   * "dim_indoor_night" (Ánh vàng mờ ảo đêm muộn - trong nhà: khách sạn, nhà hàng)
 - Structures (Công trình & Vùng được phép):
   * "creepy_banyan_tree", "haunted_gallows_tree" -> CHỈ ĐẶT Ở: "far_left" | "far_right"
-  * "ancient_tomb", "abandoned_shrine", "creepy_well", "hospital_operating_bed", "hotel_reception_desk", "creepy_elevator_doors", "dining_table_chairs" -> CHỈ ĐẶT Ở: "mid_left" | "center" | "mid_right"
+  * "ancient_tomb", "abandoned_shrine", "creepy_well", "hospital_operating_bed", "hotel_reception_desk", "creepy_elevator_doors", "dining_table_chairs", "bus_interior", "creepy_bathtub" -> CHỈ ĐẶT Ở: "mid_left" | "center" | "mid_right"
   * "dilapidated_hut", "broken_wooden_bridge", "supermarket_shelf_aisle" -> CHỈ ĐẶT Ở: "far_left" | "center" | "far_right"
   * "scarecrow_of_the_damned" -> Đặt ở mọi ground slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right"
 - Details (Đạo cụ cảnh):
-  * "detail_black_crow" -> Tất cả 5 ground slots và 3 air slots
+  * "detail_black_crow", "detail_broken_mirror" -> Tất cả 5 ground slots và 3 air slots
   * "detail_will_o_wisp" -> "air_left" | "air_center" | "air_right" | "mid_left" | "center" | "mid_right"
   * "detail_blood_lantern" -> 5 ground slots hoặc "air_left" | "air_right"
   * "detail_incense_bowl" -> "mid_left" | "center" | "mid_right" (Ground only)
@@ -198,14 +211,17 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
   * "outfit_patient_gown" (Áo bệnh nhân sọc xanh lấm lem)
   * "outfit_modern_casual" (Áo hoodie / Đồ hiện đại thường nhật)
 - Actor Faces (Khuôn mặt):
-  * "face_calm", "face_scared", "face_creepy_smile", "face_bleeding_eyes", "face_old_wrinkled", "face_rage_furious", "face_pale_corpse", "face_weeping_ghost", "face_sewn_mouth", "face_haggard_gaunt", "face_faceless", "face_glowing_hollow", "face_talisman_covered"
+  * "face_calm", "face_scared", "face_creepy_smile", "face_bleeding_eyes", "face_old_wrinkled", "face_rage_furious", "face_pale_corpse", "face_weeping_ghost", "face_sewn_mouth", "face_haggard_gaunt", "face_faceless", "face_glowing_hollow", "face_talisman_covered", "face_headless" (Cổ đứt lìa / Không đầu, lộ xương sống cổ và máu rỉ)
 - Actor Facing (BẮT BUỘC có trên mỗi actor):
   * "facing": "left" | "right" (hướng mặt quay sang trái hoặc sang phải)
 - Actor Poses (Tư thế & Quy định vùng):
-  * "pose_standing", "pose_holding", "pose_shivering", "pose_walking", "pose_crawling", "pose_reaching" -> BẮT BUỘC ở 5 Ground Slots (offsetY = 0)
+  * "pose_standing", "pose_sitting", "pose_sitting_twisted_legs", "pose_holding", "pose_shivering", "pose_walking", "pose_crawling", "pose_reaching" -> BẮT BUỘC ở 5 Ground Slots (offsetY = 0)
   * "pose_floating", "pose_hanging" -> BẮT BUỘC ở 3 Air Slots ("air_left" | "air_center" | "air_right")
+  * Lưu ý đặc biệt cho bối cảnh xe buýt / ghế ngồi:
+    - "pose_sitting": Nhân vật ngồi ngay ngắn trên ghế / sàn xe (ví dụ Lan ngồi ghế).
+    - "pose_sitting_twisted_legs": Tư thế dị dạng kinh dị - thân trên ngồi trên ghế, đôi chân bị xoay ngược 180 độ ra phía sau lưng, hai bàn chân lơ lửng cách mặt sàn vài phân không chạm đất (người đàn ông ma quái trên xe buýt). BẮT BUỘC ở Ground Slot (offsetY = 0).
 - Actor Handheld Items (Đồ vật cầm tay qua Hand Socket):
-  * "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel"
+  * "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" (Thủ cấp đứt lìa xách tay)
   * "heldHand": "right" (tay trước) | "left" (tay sau)
 - Chuyển động A -> B (motion tweening):
   * NẾU NHÂN VẬT ĐỨNG YÊN KHÔNG DI CHUYỂN: BỎ HẲN trường "motion" (TUYỆT ĐỐI KHÔNG để null hay {}).
@@ -553,10 +569,10 @@ NHIỆM VỤ CỦA BẠN:
 1. KHÔNG tự suy nghĩ kịch bản/cốt truyện. Hãy biên dịch TRỰC TIẾP mô tả hành động trên thành danh sách diễn viên (actors) và chuyển động (motion):
    - Chọn đúng base: "male_adult" | "female_adult" | "elder_hunched" | "brute_hulking" | "skeletal_emaciated" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow"
    - Chọn đúng costume: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual"
-   - Chọn đúng face: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered"
+   - Chọn đúng face: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless"
    - BẮT BUỘC có "facing": "left" | "right" (hướng mặt nhìn trái hoặc phải).
    - Chọn đúng pose và vị trí slot tiếp đất (offsetY = 0): "far_left" (250) | "mid_left" (600) | "center" (960) | "mid_right" (1320) | "far_right" (1670). (Nếu pose_floating/pose_hanging dùng air_left | air_center | air_right).
-   - Chọn đúng heldItem & heldHand: "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "none".
+   - Chọn đúng heldItem & heldHand: "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "none".
    - Nếu có di chuyển A -> B: gắn khối "motion" { targetSlot, targetOffsetX: 0, startTimeSec: 0.2, endTimeSec: ${duration - 0.5}, easing: "ease_in_out", autoFaceTarget: true, movingPose: "pose_walking"|"pose_floating"|"pose_crawling" }.
    - Nếu nhân vật ĐỨNG YÊN KHÔNG DI CHUYỂN: BỎ HẲN trường "motion" (TUYỆT ĐỐI KHÔNG để null hay {}).
 2. Đặt tiêu đề ngắn gọn (title) phản ánh đúng hành động.
@@ -699,11 +715,11 @@ YÊU CẦU ĐẠO DIỄN:
    - "facing": "left" | "right" (BẮT BUỘC CÓ trên mọi actor).
    - "base": "male_adult" | "female_adult" | "elder_hunched" | "brute_hulking" | "skeletal_emaciated" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow"
    - "costume": "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual"
-   - "face": "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered"
-   - "pose": "pose_standing" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_crawling" | "pose_reaching" (ở ground slots) | "pose_floating" | "pose_hanging" (ở air slots)
+   - "face": "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless"
+   - "pose": "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_crawling" | "pose_reaching" (ở ground slots) | "pose_floating" | "pose_hanging" (ở air slots)
    - "slot": "far_left" | "mid_left" | "center" | "mid_right" | "far_right" (hoặc "air_left" | "air_center" | "air_right")
    - "offsetX": 0, "offsetY": 0 (nếu tiếp đất thì offsetY bắt buộc bằng 0)
-   - "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel"
+   - "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head"
    - "heldHand": "right" | "left"
    - "motion": NẾU NHÂN VẬT ĐỨNG YÊN THÌ BỎ HẲN TRƯỜNG NÀY (TUYỆT ĐỐI KHÔNG để null hay {}). Chỉ khi nhân vật di chuyển từ điểm A sang điểm B mới thêm khối: { "targetSlot": "mid_right", "targetOffsetX": 0, "startTimeSec": 0.2, "endTimeSec": 5, "easing": "ease_in_out", "autoFaceTarget": true, "movingPose": "pose_walking" }.
 4. Xuất ra một JSON ARRAY gồm đúng ${sceneSpecs.length} đối tượng DirectorSceneScript:
@@ -975,10 +991,10 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "outfit_patient_gown" (Áo bệnh nhân)
    - "outfit_modern_casual" (Đồ hoodie hiện đại)
 
-3. BIỂU CẢM KHUÔN MẶT (Faces - 13 mặt):
-   - "face_calm", "face_scared", "face_creepy_smile", "face_bleeding_eyes", "face_old_wrinkled", "face_rage_furious", "face_pale_corpse", "face_weeping_ghost", "face_sewn_mouth", "face_haggard_gaunt", "face_faceless", "face_glowing_hollow", "face_talisman_covered"
+3. BIỂU CẢM KHUÔN MẶT & ĐẶC ĐIỂM ĐẦU (Faces - 14 mặt):
+   - "face_calm", "face_scared", "face_creepy_smile", "face_bleeding_eyes", "face_old_wrinkled", "face_rage_furious", "face_pale_corpse", "face_weeping_ghost", "face_sewn_mouth", "face_haggard_gaunt", "face_faceless", "face_glowing_hollow", "face_talisman_covered", "face_headless" (Cổ đứt lìa / Không đầu)
 
-4. ĐỒ VẬT CẦM TAY (Held Items - 12 món):
+4. ĐỒ VẬT CẦM TAY (Held Items - 14 món):
    - "none" (tay không)
    - "item_storm_lantern" (đèn bão sắt)
    - "item_paper_lantern" (lồng đèn giấy)
@@ -991,8 +1007,10 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "item_tattered_umbrella" (ô rách)
    - "item_flashlight" (đèn pin hiện đại)
    - "item_scalpel" (dao mổ phẫu thuật)
+   - "item_smartphone" (điện thoại di động phát sáng)
+   - "item_severed_head" (thủ cấp đứt lìa xách tay)
 
-5. CÔNG TRÌNH BỐI CẢNH (Structures - 13 công trình):
+5. CÔNG TRÌNH BỐI CẢNH (Structures - 14 công trình):
    - "creepy_banyan_tree" (Cây đa cổ thụ)
    - "haunted_gallows_tree" (Cây treo cổ rủ cành)
    - "ancient_tomb" (Ngôi mộ cổ và bia đá)
@@ -1006,8 +1024,10 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "supermarket_shelf_aisle" (Kệ hàng siêu thị)
    - "creepy_elevator_doors" (Cửa thang máy rùng rợn)
    - "dining_table_chairs" (Bàn ăn nhà hàng)
+   - "bus_interior" (Nội thất xe bus đêm bỏ hoang)
+   - "creepy_bathtub" (Bồn tắm rỉ sét ngập máu)
 
-6. ĐẠO CỤ BỐI CẢNH (Details - 10 đạo cụ):
+6. ĐẠO CỤ BỐI CẢNH (Details - 11 đạo cụ):
    - "detail_black_crow" (Quạ đen)
    - "detail_will_o_wisp" (Đốm ma trơi)
    - "detail_blood_lantern" (Lồng đèn máu)
@@ -1018,9 +1038,10 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "detail_shopping_cart" (Xe đẩy siêu thị)
    - "detail_surveillance_camera" (Camera an ninh)
    - "detail_flickering_ceiling_lamp" (Đèn huỳnh quang trần)
+   - "detail_broken_mirror" (Gương nhà tắm vỡ nứt vấy máu)
 
 7. THEMES & SKY PRESETS:
-   - Themes: rural_graveyard, abandoned_village, cursed_swamp, modern_indoor
+   - Themes: rural_graveyard, abandoned_village, cursed_swamp, modern_indoor, vehicle_interior (Bối cảnh trong xe buýt/tàu xe BẮT BUỘC dùng vehicle_interior)
    - Sky: blood_moon, foggy_night, stormy_dark, eclipse_abyss, flickering_fluorescent, dim_indoor_night
 
 YÊU CẦU KIỂM TRA ĐỐI CHIẾU:
@@ -1153,37 +1174,38 @@ YÊU CẦU ĐẶC BIỆT DÀNH CHO TRỢ THỦ BIÊN KỊCH:
 1. SỐ LƯỢNG PHÂN CẢNH: ${countRequirement}
 2. QUY TẮC KHÓA BỐI CẢNH DÙNG LẠI (CRITICAL - SCENE CONTINUITY):
    - Mọi cảnh BẮT BUỘC phải chọn 1 "environmentId" từ danh sách bối cảnh trên (chính xác ID, không tự bịa).
+   - CHỌN ĐÚNG BỐI CẢNH PHÙ HỢP VỚI KHÔNG GIAN CỐT TRUYỆN:
+     * Cốt truyện về phòng tắm, bồn tắm, soi gương, vòi nước -> CHỌN ID: "env_creepy_bathroom"
+     * Cốt truyện về xe bus, trạm xe, ghế xe bus, khoang xe -> CHỌN ID: "env_midnight_bus"
+     * Cốt truyện về bệnh viện, giường mổ, phẫu thuật, bác sĩ -> CHỌN ID: "env_haunted_hospital"
+     * Cốt truyện về khách sạn, sảnh, quầy lễ tân, thang máy -> CHỌN ID: "env_creepy_hotel_corridor"
+     * Cốt truyện về siêu thị, quầy hàng, xe đẩy -> CHỌN ID: "env_abandoned_supermarket"
+     * Cốt truyện về nhà hàng, bàn ăn, nến rượu -> CHỌN ID: "env_dark_restaurant"
+     * Cốt truyện về bãi tha ma, bia mộ, khói hương, cây đa -> CHỌN ID: "env_graveyard_foggy"
+     * Cốt truyện về đường làng, miếu hoang, lều tranh, cương thi -> CHỌN ID: "env_abandoned_shrine_blood_moon"
+     * Cốt truyện về đầm lầy, cầu gỗ, giếng cạn -> CHỌN ID: "env_cursed_swamp_eclipse"
    - NGUYÊN TẮC VÀNG: Nếu các cảnh liên tiếp diễn ra ở cùng một không gian / địa điểm (ví dụ lữ khách bước đi trong bãi tha ma rồi gặp ma hiện hình, hoặc ở miếu hoang rồi đối đầu cương thi), BẮT BUỘC PHẢI DÙNG CHUNG 1 "environmentId" để bối cảnh được giữ nguyên 100%, không bị lệch hay nhảy bối cảnh!
    - Chỉ đổi sang "environmentId" khác khi cốt truyện thực sự chuyển địa điểm (ví dụ từ bãi tha ma chạy tới miếu hoang).
 3. MÔ TẢ HÀNH ĐỘNG NHÂN VẬT (actionDescription):
    - Viết mô tả hành động trực tiếp, chi tiết, sống động theo đúng tài nguyên của Limbo Engine:
      * Nhân vật (bases): "male_adult" (lữ khách, nam thanh niên), "female_adult" (thiếu nữ tóc dài), "elder_hunched" (bà lão, cụ già), "brute_hulking" (đồ tể, hộ pháp), "skeletal_emaciated" (kẻ gầy trơ xương, ngạ quỷ), "ghost_wraith" (bóng ma lơ lửng), "creepy_child" (đứa trẻ ma), "jiangshi_corpse" (cương thi phong kiến), "demon_shadow" (quỷ bóng đen sừng cong).
      * Trang phục (costumes): "outfit_tattered_tunic" (áo tơi nông phu), "outfit_flowing_ao_dai" (áo dài ma mị), "outfit_shrouded_cloak" (áo choàng trùm đầu), "outfit_mandarin_court" (quan phục triều đình), "outfit_monk_cassock" (áo cà sa pháp sư), "outfit_shredded_burial" (vải liệm tử thi), "outfit_ancient_armor" (giáp tướng cổ), "outfit_child_pajamas" (yếm hoa trẻ thơ), "outfit_doctor_coat" (áo blouse bác sĩ), "outfit_patient_gown" (áo bệnh nhân), "outfit_modern_casual" (đồ hiện đại).
-     * Đồ vật cầm tay (held items): đèn bão sắt ("item_storm_lantern"), lồng đèn giấy ("item_paper_lantern"), nến triệu hồn ("item_soul_candle"), kiếm gỗ đào ("item_peach_wood_sword"), bùa vàng ("item_yellow_talisman"), liềm rỉ sét ("item_rusty_sickle"), chuông đồng ("item_ritual_bell"), búp bê vải ("item_tattered_doll"), ô rách ("item_tattered_umbrella"), đèn pin ("item_flashlight"), dao mổ ("item_scalpel").
+     * Đồ vật cầm tay (held items): đèn bão sắt ("item_storm_lantern"), lồng đèn giấy ("item_paper_lantern"), nến triệu hồn ("item_soul_candle"), kiếm gỗ đào ("item_peach_wood_sword"), bùa vàng ("item_yellow_talisman"), liềm rỉ sét ("item_rusty_sickle"), chuông đồng ("item_ritual_bell"), búp bê vải ("item_tattered_doll"), ô rách ("item_tattered_umbrella"), đèn pin ("item_flashlight"), dao mổ ("item_scalpel"), điện thoại di động ("item_smartphone"), thủ cấp đứt lìa ("item_severed_head").
      * Hướng nhìn và di chuyển A -> B: bước đi từ trái qua phải, bước lùi hoảng sợ, sà xuống rượt đuổi, nhảy cứng đờ...
 4. TIÊU ĐỀ (title): Ngắn gọn, có số thứ tự (ví dụ: "Cảnh 1: Lạc Bước Bãi Tha Ma", "Cảnh 2: Hồn Ma Áo Liệm Xuất Hiện").
 5. LỜI THOẠI / PHỤ ĐỀ (dialogue): Một câu phụ đề rùng rợn, ma quái hoặc độc thoại nội tâm gắn liền với diễn biến cảnh.
 6. THỜI LƯỢNG (duration_sec): Từ 5 đến 8 giây.
-7. KIỂM ĐỊNH ASSET (CRITICAL): Rà soát xem cốt truyện có yêu cầu nhân vật, trang phục, đồ vật cầm tay hay công trình nào mà hệ thống CHƯA CÓ không (ví dụ cung tên, súng săn, chó săn, ngựa, rìu, đò gỗ, v.v.). Nếu có chi tiết nào thiếu so với kho asset trong GEMINI_DIRECTOR_ASSETS.md thì báo vào mảng missingAssets trong đối tượng assetAudit!
 
-TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
-{
-  "assetAudit": {
-    "isSufficient": true,
-    "summary": "Đánh giá mức độ đầy đủ của tài nguyên...",
-    "missingAssets": []
-  },
-  "scenes": [
-    {
-      "title": "Cảnh 1: ...",
-      "environmentId": "id_bối_cảnh_chọn_từ_danh_sách",
-      "actionDescription": "Mô tả chi tiết nhân vật làm gì...",
-      "dialogue": "Lời thoại rùng rợn...",
-      "duration_sec": 6
-    }
-  ]
-}
-(Nếu phát hiện thiếu asset thì isSufficient = false và liệt kê chi tiết trong missingAssets).`;
+TRẢ VỀ CHÍNH XÁC MỘT JSON ARRAY gồm danh sách các đối tượng AutoFillSceneDraft (KHÔNG kèm chữ giải thích):
+[
+  {
+    "title": "Cảnh 1: ...",
+    "environmentId": "id_bối_cảnh_chọn_từ_danh_sách",
+    "actionDescription": "Mô tả chi tiết nhân vật làm gì...",
+    "dialogue": "Lời thoại rùng rợn...",
+    "duration_sec": 6
+  }
+]`;
 
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -1193,7 +1215,7 @@ TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: GEMINI_DIRECTOR_SYSTEM_INSTRUCTION }] },
         contents: [{ parts: [{ text: userPrompt }] }],
-        generationConfig: { responseMimeType: "application/json", temperature: 0.6 },
+        generationConfig: { responseMimeType: "application/json", temperature: 0.5 },
       }),
     });
 
@@ -1207,8 +1229,6 @@ TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
     const parsed = JSON.parse(rawText);
 
     let rawScenes: any[] = [];
-    let assetAudit: AssetAuditResult | undefined = undefined;
-
     if (Array.isArray(parsed)) {
       rawScenes = parsed;
     } else if (parsed && typeof parsed === "object") {
@@ -1216,16 +1236,6 @@ TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
         rawScenes = parsed.scenes;
       } else if (Array.isArray(parsed.drafts)) {
         rawScenes = parsed.drafts;
-      }
-      if (parsed.assetAudit && typeof parsed.assetAudit === "object") {
-        const missing = Array.isArray(parsed.assetAudit.missingAssets) ? parsed.assetAudit.missingAssets : [];
-        const isSufficient = Boolean(parsed.assetAudit.isSufficient && missing.length === 0);
-        assetAudit = {
-          success: true,
-          isSufficient,
-          missingAssets: missing,
-          summary: parsed.assetAudit.summary || (isSufficient ? "Tài nguyên đầy đủ 100%!" : `Phát hiện ${missing.length} asset cần bổ sung.`),
-        };
       }
     }
 
@@ -1250,7 +1260,7 @@ TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
       return { success: false, error: "Không thể phân tách phân cảnh từ cốt truyện.", rawText };
     }
 
-    return { success: true, drafts, assetAudit, rawText };
+    return { success: true, drafts, rawText };
   } catch (err: any) {
     return { success: false, error: `Lỗi phân tích cốt truyện: ${err.message}` };
   }

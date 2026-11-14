@@ -982,6 +982,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="face_faceless">Mặt trắng trơn vô diện (face_faceless - không ngũ quan)</option>
                         <option value="face_glowing_hollow">Hốc mắt miệng rực lửa ma trơi (face_glowing_hollow)</option>
                         <option value="face_talisman_covered">Dán bùa vàng chu sa che trán (face_talisman_covered)</option>
+                        <option value="face_headless">Không đầu / Cổ đứt lìa (face_headless - Cuống cổ đứt lìa lộ xương, máu rỉ)</option>
                       </select>
                     </div>
 
@@ -1000,11 +1001,13 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600"
                       >
                         <option value="pose_standing">Đứng quan sát (pose_standing)</option>
+                        <option value="pose_sitting">Ngồi ghế / sàn xe (pose_sitting)</option>
+                        <option value="pose_sitting_twisted_legs">Ngồi chân xoay ngược lơ lửng (pose_sitting_twisted_legs)</option>
                         <option value="pose_holding">Cầm / Giơ đồ vật phía trước (pose_holding)</option>
                         <option value="pose_shivering">Run rẩy co ro (pose_shivering)</option>
                         <option value="pose_walking">Bước đi chậm rãi (pose_walking)</option>
                         <option value="pose_floating">Bay lơ lửng dập dềnh (pose_floating)</option>
-                        <option value="pose_crawling">Bò trườn sát đất (pose_crawling)</option>
+                        <option value="pose_crawling">Bò trườn rạp sàn góc ngang (pose_crawling)</option>
                         <option value="pose_reaching">Vươn tay bắt hồn (pose_reaching)</option>
                         <option value="pose_hanging">Bị treo lơ lửng rũ đầu (pose_hanging)</option>
                       </select>
@@ -1499,6 +1502,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                                   ) : (
                                     <>
                                       <option value="pose_walking">Bước đi (pose_walking)</option>
+                                      <option value="pose_sitting">Ngồi (pose_sitting)</option>
+                                      <option value="pose_sitting_twisted_legs">Ngồi chân xoay ngược lơ lửng (pose_sitting_twisted_legs)</option>
                                       <option value="pose_holding">Cầm đồ vật giơ trước (pose_holding)</option>
                                       <option value="pose_crawling">Bò trườn (pose_crawling)</option>
                                       <option value="pose_reaching">Vươn vuốt tiến tới (pose_reaching)</option>
@@ -1620,6 +1625,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="supermarket_shelf_aisle">Dãy kệ hàng siêu thị hoang tàn (supermarket_shelf_aisle)</option>
                         <option value="creepy_elevator_doors">Cửa thang máy rùng rợn hé mở (creepy_elevator_doors)</option>
                         <option value="dining_table_chairs">Bàn ăn nhà hàng khăn rách (dining_table_chairs)</option>
+                        <option value="bus_interior">Buồng lái tài xế & máy bán vé xe bus (bus_interior)</option>
+                        <option value="creepy_bathtub">Bồn tắm rỉ sét ngập máu (creepy_bathtub)</option>
                       </select>
                     </div>
 
@@ -2038,6 +2045,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       <option value="abandoned_village">Đường làng hoang vắng (abandoned_village)</option>
                       <option value="cursed_swamp">Đầm lầy u minh (cursed_swamp)</option>
                       <option value="modern_indoor">Hành lang & Không gian trong nhà hiện đại (modern_indoor)</option>
+                      <option value="vehicle_interior">Khoang Xe Bus & Tàu Xe Kinh Dị (vehicle_interior)</option>
                     </select>
                   </div>
 

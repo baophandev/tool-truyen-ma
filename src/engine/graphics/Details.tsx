@@ -25,6 +25,7 @@ export const DetailRenderer: React.FC<DetailRendererProps> = ({
       {id === "detail_shopping_cart" && <ShoppingCart />}
       {id === "detail_surveillance_camera" && <SurveillanceCamera />}
       {id === "detail_flickering_ceiling_lamp" && <FlickeringCeilingLamp />}
+      {id === "detail_broken_mirror" && <BrokenBathroomMirror />}
 
       {showAnchor && (
         <g className="detail-debug-anchor" pointerEvents="none">
@@ -391,6 +392,78 @@ const FlickeringCeilingLamp: React.FC = () => {
         fill="#A7F3D0"
         className="anim-flicker-ember"
       />
+    </g>
+  );
+};
+
+/**
+ * 11. BROKEN BATHROOM MIRROR (Gương Nhà Tắm Vỡ Nứt Vấy Máu)
+ * Wall-mounted bathroom mirror with web of fracture cracks and a bloody handprint.
+ * Anchored at [bottom-center] (0, 0).
+ */
+const BrokenBathroomMirror: React.FC = () => {
+  return (
+    <g className="detail-broken-mirror" transform="translate(0, -65)">
+      {/* Outer Rusted Metal Frame */}
+      <rect
+        x="-42"
+        y="-65"
+        width="84"
+        height="130"
+        rx="4"
+        fill="#0B0E14"
+        stroke="#334155"
+        strokeWidth="2.5"
+      />
+      {/* Frame Mounting Screws on 4 Corners */}
+      <circle cx="-37" cy="-60" r="1.5" fill="#64748B" />
+      <circle cx="37" cy="-60" r="1.5" fill="#64748B" />
+      <circle cx="-37" cy="60" r="1.5" fill="#64748B" />
+      <circle cx="37" cy="60" r="1.5" fill="#64748B" />
+
+      {/* Dark Eerie Mirror Glass */}
+      <rect
+        x="-38"
+        y="-61"
+        width="76"
+        height="122"
+        rx="2"
+        fill="url(#mirror-glass-glow)"
+      />
+
+      {/* Spiderweb Fracture Cracks radiating from center */}
+      <g stroke="#CBD5E1" strokeWidth="1.2" fill="none" opacity="0.85">
+        <path d="M 0 -8 L 14 -22 L 32 -30 M 14 -22 L 20 -45 L 36 -55" />
+        <path d="M 0 -8 L -16 -24 L -32 -32 M -16 -24 L -25 -48 L -36 -54" />
+        <path d="M 0 -8 L -18 12 L -34 26 M -18 12 L -24 38 L -35 55" />
+        <path d="M 0 -8 L 16 14 L 32 28 M 16 14 L 26 42 L 35 56" />
+        <path d="M 0 -8 L -8 -38 L -12 -58" />
+        <path d="M 0 -8 L 8 36 L 12 58" />
+      </g>
+
+      {/* Secondary Fine Hairline Cracks */}
+      <g stroke="#94A3B8" strokeWidth="0.7" fill="none" opacity="0.7">
+        <path d="M 8 -16 L 22 -14 M -10 -18 L -24 -15" />
+        <path d="M 10 6 L 24 10 M -10 4 L -22 6" />
+        <path d="M -8 -30 L 4 -35 L 12 -28" />
+        <path d="M -12 24 L 2 30 L 14 22" />
+      </g>
+
+      {/* Central Impact Shatter Cavity */}
+      <polygon points="0,-12 6,-8 4,0 -4,2 -6,-6" fill="#030408" stroke="#E2E8F0" strokeWidth="0.8" />
+
+      {/* Bloody Handprint Smear on the Glass */}
+      <g opacity="0.75">
+        <ellipse cx="6" cy="-2" rx="7.5" ry="10" fill="#7F1D1D" />
+        {/* Finger streaks dragging down */}
+        <path d="M 1 -12 L 0 5" stroke="#991B1B" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M 5 -15 L 4 8" stroke="#991B1B" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M 9 -14 L 8 9" stroke="#991B1B" strokeWidth="2.3" strokeLinecap="round" />
+        <path d="M 13 -10 L 12 6" stroke="#991B1B" strokeWidth="2" strokeLinecap="round" />
+        {/* Palm blood drips down the mirror bottom */}
+        <line x1="4" y1="10" x2="3" y2="28" stroke="#7F1D1D" strokeWidth="1.2" strokeDasharray="4,3" />
+        <circle cx="3" cy="30" r="1.3" fill="#DC2626" />
+      </g>
     </g>
   );
 };

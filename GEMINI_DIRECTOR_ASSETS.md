@@ -64,6 +64,7 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"abandoned_village"`: Đường làng hoang vắng (con đường đất cô quạnh, lều tranh xiêu vẹo, cây cổ thụ trơ trụi).
 - `"cursed_swamp"`: Đầm lầy u minh (vùng nước chết tĩnh mịch, lau sậy khẳng khiu, sương độc ma trơi).
 - `"modern_indoor"`: Hành lang & Không gian trong nhà hiện đại (hành lang bệnh viện, sảnh khách sạn u ám, siêu thị bỏ hoang, nhà hàng đêm muộn với trần nhà drop-tile, đèn tuýp huỳnh quang, biển báo EXIT và sàn gạch bóng loáng).
+- `"vehicle_interior"`: Khoang xe bus & Tàu xe kinh dị (không gian bên trong xe buýt, xe khách hoặc toa tàu ma quái với trần uốn cong, khoang thoát hiểm, ô cửa sổ đêm nhìn ra đường vắng, hàng ghế hành khách, cột vịn tay màu vàng và sàn cao su chống trượt). BẮT BUỘC dùng cho các cảnh diễn ra bên trong xe buýt/tàu xe để tạo cảm giác ngột ngạt (claustrophobic), TUYỆT ĐỐI KHÔNG dùng modern_indoor.
 
 ### 3.2. Bầu Trời & Chiếu Sáng (Sky Presets)
 - `"blood_moon"`: Trăng Máu U Uất (Gradient đỏ rực `#2B0808` -> `#0D0202`, trăng đỏ quạch khổng lồ).
@@ -73,7 +74,7 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"flickering_fluorescent"`: Đèn Tuýp Huỳnh Quang Chập Chờn (Ánh sáng xanh ngọc lạnh lẽo trong nhà, bóng tuýp chập chờn, biển báo EXIT xanh lục phát sáng).
 - `"dim_indoor_night"`: Ánh Vàng Đêm Mờ Ảo (Ánh đèn vàng hổ phách u tịch trong khách sạn / nhà hàng đêm muộn).
 
-### 3.3. 13 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
+### 3.3. 14 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
 
 Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ được đặt tại các Slot được phép** sau:
 
@@ -92,6 +93,8 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `supermarket_shelf_aisle`| Dãy kệ hàng siêu thị hoang tàn | Kệ thép cao nhiều tầng chất đầy hàng hóa đổ nát, dây lòng thòng và biển số dãy | `["far_left", "center", "far_right"]` |
 | `creepy_elevator_doors` | Cửa thang máy rùng rợn hé mở | Cửa thang máy kim loại hé mở khe đen ngòm, mắt đỏ rực và đèn báo tầng âm 4 | `["mid_left", "center", "mid_right"]` |
 | `dining_table_chairs` | Bàn ăn nhà hàng khăn rách | Bàn ăn phủ khăn trải bàn rách rưới, hai ghế tựa cao, chân nến và chai rượu bám bụi | `["mid_left", "center", "mid_right"]` |
+| `bus_interior` | Buồng lái tài xế & Máy bán vé xe bus | Buồng lái tài xế xe bus với vô lăng thép, bảng đồng hồ LED đỏ, hộp thu vé tự động, ghế lái thủy lực | `["mid_left", "center", "mid_right"]` |
+| `creepy_bathtub` | Bồn tắm rỉ sét ngập máu | Bồn tắm chân vuốt quái thú vintage, thành bồn vấy máu rỉ sét, nước đục ngầu lập lòe vệt tóc trôi dạt và vòi đồng nhỏ giọt máu | `["mid_left", "center", "mid_right"]` |
 
 ---
 
@@ -111,6 +114,7 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `detail_shopping_cart` | Xe đẩy siêu thị rỉ sét | Xe đẩy kim loại rỉ sét bỏ quên giữa hành lang tiếp đất Y=800px | Cả 5 Ground Slots (Ground only) |
 | `detail_surveillance_camera` | Camera an ninh chớp đỏ | Camera giám sát treo trần chớp đèn đỏ liên tục | `["air_left", "air_center", "air_right"]` (Air only) |
 | `detail_flickering_ceiling_lamp`| Đèn huỳnh quang trần chập chờn | Đèn tuýp huỳnh quang công nghiệp treo lơ lửng trên trần chập chờn phát sáng | `["air_left", "air_center", "air_right"]` (Air only) |
+| `detail_broken_mirror` | Gương nhà tắm vỡ nứt vấy máu | Gương nhà tắm treo tường nứt mạng nhện chằng chịt, dấu bàn tay đẫm máu cào xước | Cả 5 Ground Slots và 3 Air Slots |
 
 ---
 
@@ -153,7 +157,7 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
 - `"outfit_patient_gown"`: Bộ quần áo bệnh nhân sọc xanh nhạt rộng thùng thình, buộc dây sau gáy, vạt áo lấm lem rách rưới.
 - `"outfit_modern_casual"`: Áo khoác hoodie hiện đại màu xám đen có khóa kéo, dây rút, quần jean ôm và giày thể thao đế trắng.
 
-### 5.3. 13 Biểu Cảm Khuôn Mặt (Faces - Gắn tại Head Socket)
+### 5.3. 14 Biểu Cảm Khuôn Mặt & Đặc Điểm Phần Đầu (Faces - Gắn tại Head Socket)
 - `"face_calm"`: Mặt bình thường, mắt đen nhỏ vô hồn, lạnh lẽo.
 - `"face_scared"`: Kinh hãi tột cùng, tròng mắt trợn trắng, miệng há hốc run rẩy.
 - `"face_creepy_smile"`: Nụ cười ma quái xé toạc dài tới mang tai với hàm răng nhọn.
@@ -167,19 +171,22 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
 - `"face_faceless"`: Mặt trắng trơn vô diện (No-Face), không ngũ quan, cực kỳ bất an.
 - `"face_glowing_hollow"`: Hốc mắt và miệng rỗng tuếch rực cháy lửa xanh lân tinh ma trơi.
 - `"face_talisman_covered"`: Lá bùa vàng chu sa che kín từ trán xuống miệng, bay phấp phới.
+- `"face_headless"`: Không đầu / Cổ đứt lìa (Headless Severed Neck). BẮT BUỘC dùng cho cốt truyện nhân vật không đầu (người đàn ông không đầu, tử sĩ cụt đầu, oan hồn mất đầu). Engine sẽ loại bỏ hoàn toàn đầu, tóc, mũ và nón, thay bằng cuống cổ chém đứt nham nhở, lộ đốt sống cổ trắng xám, máu tươi và máu đông rỉ rách nhỏ giọt xuống vạt áo kèm làn khói oán khí bốc lên nghi ngút.
 
-### 5.4. 8 Tư Thế Động Tác (Poses) & Quy Định Vùng Đứng Bắt Buộc
+### 5.4. 10 Tư Thế Động Tác (Poses) & Quy Định Vùng Đứng Bắt Buộc
 
-| Pose ID | Tên Tư Thế | Loại Vùng | Quy Định Vị Trí Slot Bắt Buộc |
-| :--- | :--- | :--- | :--- |
-| `pose_standing` | Đứng quan sát | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) |
-| `pose_holding` | Cầm / Giơ đồ vật soi đường | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) |
-| `pose_shivering` | Run rẩy co ro sợ hãi | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) |
-| `pose_walking` | Bước đi chậm rãi | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) |
-| `pose_crawling` | Bò trườn sát mặt đất | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) |
-| `pose_reaching` | Vươn móng vuốt bắt hồn | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) |
-| `pose_floating` | Bay lơ lửng dập dềnh | Air | **BẮT BUỘC** đặt ở 3 Air Slots (`air_left`, `air_center`, `air_right`) |
-| `pose_hanging` | Bị treo cổ lơ lửng rũ đầu | Air | **BẮT BUỘC** đặt ở 3 Air Slots (`air_left`, `air_center`, `air_right`) |
+| Pose ID | Tên Tư Thế | Loại Vùng | Quy Định Vị Trí Slot Bắt Buộc | Mô Tả Ngữ Nghĩa & Đặc Điểm Hình Học |
+| :--- | :--- | :--- | :--- | :--- |
+| `pose_standing` | Đứng quan sát | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) | Đứng thẳng quan sát, hai chân trụ tiếp đất vững chãi. |
+| `pose_sitting` | Ngồi ghế / sàn xe | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) | Ngồi ngay ngắn trên ghế xe buýt (`bus_interior`), ghế bàn ăn (`dining_table_chairs`), đùi gập ngang ra trước, cẳng chân buông xuống sàn, bàn chân tiếp đất phẳng phiu. Hai tay đặt trên đùi hoặc cầm điện thoại/đèn soi sáng. |
+| `pose_sitting_twisted_legs` | Ngồi chân xoay ngược lơ lửng | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) | **Tư thế dị dạng kinh dị rùng rợn:** Thân trên ngồi trên ghế, nhưng khớp hông và đầu gối bị vặn xoắn 180° ngược ra sau lưng. Hai cẳng chân chìa ra phía sau, bàn chân bẻ ngược và **lơ lửng cách mặt sàn vài phân** (không chạm đất), bên dưới có bóng tà khí hư ảo. Dành riêng cho hành khách quỷ quyệt trên xe buýt đêm. |
+| `pose_holding` | Cầm / Giơ đồ vật soi đường | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) | Tay giơ cao đèn bão, kiếm gỗ đào hoặc bùa vàng soi rọi về phía trước. |
+| `pose_shivering` | Run rẩy co ro sợ hãi | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) | Đầu gối run rẩy lập cập, hai tay ôm ngực co ro trước tà khí. |
+| `pose_walking` | Bước đi chậm rãi | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) | Chân sải bước luân phiên, tay đánh nhịp chậm rãi trong sương mù. |
+| `pose_crawling` | Bò trườn sát mặt đất (Góc nhìn ngang) | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) | **Góc nhìn ngang 2D chân thực:** Toàn bộ thân mình hạ rạp sát mặt đất (chiều cao chỉ ~60-70px), sống lưng uốn cong nằm ngang, một tay chống đất chịu lực, một tay vươn dài móng vuốt cào trên mặt sàn về phía trước, chân sau duỗi lê lết trên mặt đất, đầu hơi ngẩng nhìn trừng trừng về phía trước. Rất ấn tượng khi bò trườn dọc lối đi xe buýt (`bus_interior`) hoặc mặt cỏ bãi tha ma. |
+| `pose_reaching` | Vươn móng vuốt bắt hồn | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) | Cánh tay dị dạng vươn dài về phía trước chụp bắt con mồi. |
+| `pose_floating` | Bay lơ lửng dập dềnh | Air | **BẮT BUỘC** đặt ở 3 Air Slots (`air_left`, `air_center`, `air_right`) | Oan hồn bay lơ lửng dập dềnh trên không trung. |
+| `pose_hanging` | Bị treo cổ lơ lửng rũ đầu | Air | **BẮT BUỘC** đặt ở 3 Air Slots (`air_left`, `air_center`, `air_right`) | Tử thi bị treo cổ trên cành cây hoặc xà nhà, đầu rũ xuống đung đưa. |
 
 ---
 
@@ -193,7 +200,7 @@ Nhân vật có thể cầm đồ vật trên tay thông qua Hand Socket. Vật 
   - `"right"`: Tay trước (mặc định - tay chính quay về phía người xem).
   - `"left"`: Tay sau.
 
-### 6.2. Danh Mục 12 Đồ Vật Cầm Tay Thuần SVG:
+### 6.2. Danh Mục 14 Đồ Vật Cầm Tay Thuần SVG:
 1. `"none"`: Hai tay trống không.
 2. `"item_storm_lantern"`: Đèn bão sắt cổ phát sáng vàng ấm soi rọi màn sương (tỏa quầng sáng ấm xung quanh).
 3. `"item_paper_lantern"`: Đèn lồng giấy đỏ cầm tay cán trúc, tỏa ánh đỏ ma mị kèm tua rua.
@@ -206,6 +213,8 @@ Nhân vật có thể cầm đồ vật trên tay thông qua Hand Socket. Vật 
 10. `"item_tattered_umbrella"`: Cây dù giấy dầu cổ rách tơi tả, lộ nan tre đen đúa che mưa sương.
 11. `"item_flashlight"`: Đèn pin chiến thuật hiện đại phát luồng sáng nón hình học xuyên thủng bóng đêm.
 12. `"item_scalpel"`: Dao mổ phẫu thuật kim loại sáng loáng sắc lạnh, mũi dao vương vệt máu tươi.
+13. `"item_smartphone"`: Điện thoại di động thông minh hiện đại, màn hình phát ánh sáng xanh lạnh ma mị soi tỏ bóng đêm và quầng sáng hình nón.
+14. `"item_severed_head"`: Thủ cấp đứt lìa vương máu rỉ giọt. Bàn tay túm chặt lọn tóc xách lủng lẳng đầu người bị chém đứt, mắt trợn trừng vô hồn, vệt máu đen rỉ từ hốc mắt và cuống cổ rỉ giọt máu rơi xuống đất. Rất phù hợp kết hợp cùng `face_headless` (ma không đầu tự xách đầu mình) hoặc kẻ sát nhân/chiến tướng xách thủ cấp kẻ thù.
 
 ---
 
@@ -252,14 +261,14 @@ export interface DirectorSceneScript {
   scene_id: string;               // Mã định danh cảnh, ví dụ: "scene_01_graveyard"
   title: string;                  // Tiêu đề cảnh tiếng Việt
   duration_sec: number;           // Thời lượng cảnh (1 đến 60 giây, khuyến nghị 5-8s)
-  theme: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor";
+  theme: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior";
   lighting: {
     sky_preset: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss" | "flickering_fluorescent" | "dim_indoor_night";
     fog_density: number;          // Độ dày sương mù từ 0.0 đến 1.0
     thunder_flash?: boolean;      // Bật chớp giật sấm sét (true/false)
   };
   environment_items: Array<{
-    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs";
+    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right";
     offsetX?: number;
     offsetY?: number;
@@ -269,15 +278,15 @@ export interface DirectorSceneScript {
     id: string;
     base: "male_adult" | "female_adult" | "elder_hunched" | "brute_hulking" | "skeletal_emaciated" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow";
     costume?: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual";
-    face: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered";
-    pose: "pose_standing" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging";
+    face: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless";
+    pose: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging";
     facing: "left" | "right";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
     offsetX?: number;
     offsetY?: number;
     scale?: number;
     opacity?: number;
-    heldItem?: "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel";
+    heldItem?: "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head";
     heldHand?: "right" | "left";
     motion?: {
       targetSlot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
@@ -287,12 +296,12 @@ export interface DirectorSceneScript {
       endTimeSec?: number;
       easing?: "linear" | "ease_in_out" | "ease_in" | "ease_out";
       autoFaceTarget?: boolean;
-      movingPose?: "pose_standing" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging";
+      movingPose?: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging";
     };
   }>;
   details?: Array<{
     id: string;
-    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp";
+    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp" | "detail_broken_mirror";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
     offsetX?: number;
     offsetY?: number;
@@ -485,4 +494,239 @@ export interface DirectorSceneScript {
   "narrative_note": "Người thanh niên rọi đèn pin tháo chạy khi bóng bác sĩ quỷ vấy máu cầm dao mổ lao tới từ thang máy."
 }
 ```
+
+### Ví dụ 4: Chuyến xe bus đêm nửa đêm, hành khách cầm điện thoại di động phát sáng đối mặt oan hồn
+```json
+{
+  "scene_id": "scene_08_midnight_bus",
+  "title": "Cảnh 8: Chuyến Xe Bus Nửa Đêm",
+  "duration_sec": 6,
+  "theme": "vehicle_interior",
+  "lighting": {
+    "sky_preset": "flickering_fluorescent",
+    "fog_density": 0.35,
+    "thunder_flash": false
+  },
+  "environment_items": [
+    { "asset_id": "bus_interior", "slot": "mid_left", "scale": 1.0 }
+  ],
+  "actors": [
+    {
+      "id": "actor_passenger",
+      "base": "male_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_scared",
+      "pose": "pose_holding",
+      "facing": "right",
+      "slot": "mid_left",
+      "offsetX": 20,
+      "scale": 1.0,
+      "heldItem": "item_smartphone",
+      "heldHand": "right",
+      "motion": {
+        "targetSlot": "center",
+        "targetOffsetX": -30,
+        "startTimeSec": 0.5,
+        "endTimeSec": 5.0,
+        "easing": "ease_in_out",
+        "autoFaceTarget": true,
+        "movingPose": "pose_walking"
+      }
+    },
+    {
+      "id": "actor_bus_ghost",
+      "base": "ghost_wraith",
+      "costume": "outfit_shredded_burial",
+      "face": "face_haggard_gaunt",
+      "pose": "pose_floating",
+      "facing": "left",
+      "slot": "air_right",
+      "offsetX": -50,
+      "offsetY": 30,
+      "scale": 1.05
+    }
+  ],
+  "details": [
+    { "id": "detail_cam_bus", "asset_id": "detail_surveillance_camera", "slot": "air_left" },
+    { "id": "detail_lamp_bus", "asset_id": "detail_flickering_ceiling_lamp", "slot": "air_center" }
+  ],
+  "dialogue": "Màn hình điện thoại chớp nháy cuộc gọi từ số lạ lúc 03:33 sáng... Quai nắm xe bus đu đưa trong khoang xe vắng lặng không một bóng người...",
+  "narrative_note": "Hành khách trẻ bước đi dọc lối đi khoang xe bus đêm, soi sáng bằng màn hình smartphone xanh lạnh, bất giác phát hiện bóng ma áo liệm lơ lửng ở hàng ghế cuối."
+}
+```
+
+### Ví dụ 5: Phòng tắm ma ám nửa đêm, bồn tắm rỉ máu và gương vỡ
+```json
+{
+  "scene_id": "scene_09_creepy_bathroom",
+  "title": "Cảnh 9: Ác Mộng Phòng Tắm Nửa Đêm",
+  "duration_sec": 6,
+  "theme": "modern_indoor",
+  "lighting": {
+    "sky_preset": "flickering_fluorescent",
+    "fog_density": 0.6,
+    "thunder_flash": false
+  },
+  "environment_items": [
+    { "asset_id": "creepy_bathtub", "slot": "center", "scale": 1.0 }
+  ],
+  "actors": [
+    {
+      "id": "actor_victim",
+      "base": "female_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_scared",
+      "pose": "pose_shivering",
+      "facing": "right",
+      "slot": "mid_left",
+      "offsetX": 30,
+      "scale": 1.0,
+      "heldItem": "item_smartphone",
+      "heldHand": "right",
+      "motion": {
+        "targetSlot": "center",
+        "targetOffsetX": -80,
+        "startTimeSec": 0.5,
+        "endTimeSec": 4.5,
+        "easing": "ease_in_out",
+        "autoFaceTarget": true,
+        "movingPose": "pose_walking"
+      }
+    },
+    {
+      "id": "actor_tub_ghost",
+      "base": "ghost_wraith",
+      "costume": "outfit_shredded_burial",
+      "face": "face_weeping_ghost",
+      "pose": "pose_floating",
+      "facing": "left",
+      "slot": "air_center",
+      "offsetX": 40,
+      "offsetY": 80,
+      "scale": 1.1
+    }
+  ],
+  "details": [
+    { "id": "detail_mirror_1", "asset_id": "detail_broken_mirror", "slot": "mid_left", "offsetX": -60 },
+    { "id": "detail_lamp_bath", "asset_id": "detail_flickering_ceiling_lamp", "slot": "air_left" }
+  ],
+  "dialogue": "Vòi nước đồng rỉ từng giọt máu tươi xuống đáy bồn tắm rỉ sét... Trên gương soi vỡ nát, dấu bàn tay đỏ ngầu bất ngờ hiện rõ...",
+  "narrative_note": "Cô gái run rẩy cầm điện thoại tiến lại gần bồn tắm ngập nước đục, kinh hoàng nhìn thấy bóng ma trỗi dậy từ làn sương."
+}
+```
+
+### Kịch Bản Mẫu 10: Oan Hồn Không Đầu Đêm Trăng Máu (Headless Specter Apparition)
+```json
+{
+  "scene_id": "scene_10_headless_specter",
+  "title": "Cảnh 10: Oan Hồn Không Đầu Đêm Trăng Máu",
+  "duration_sec": 7,
+  "theme": "rural_graveyard",
+  "lighting": {
+    "sky_preset": "blood_moon",
+    "fog_density": 0.85,
+    "thunder_flash": true
+  },
+  "environment_items": [
+    { "asset_id": "haunted_gallows_tree", "slot": "far_left", "scale": 1.1 },
+    { "asset_id": "ancient_tomb", "slot": "center", "offsetX": 20 }
+  ],
+  "actors": [
+    {
+      "id": "actor_headless_man",
+      "base": "male_adult",
+      "costume": "outfit_tattered_tunic",
+      "face": "face_headless",
+      "pose": "pose_walking",
+      "facing": "right",
+      "slot": "mid_left",
+      "offsetX": -40,
+      "heldItem": "item_severed_head",
+      "heldHand": "right",
+      "motion": {
+        "targetSlot": "center",
+        "targetOffsetX": -60,
+        "startTimeSec": 0.5,
+        "endTimeSec": 5.5,
+        "easing": "ease_in_out",
+        "autoFaceTarget": true,
+        "movingPose": "pose_walking"
+      }
+    },
+    {
+      "id": "actor_terrified_villager",
+      "base": "male_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_scared",
+      "pose": "pose_shivering",
+      "facing": "left",
+      "slot": "far_right",
+      "offsetX": -30,
+      "heldItem": "item_storm_lantern",
+      "heldHand": "left"
+    }
+  ],
+  "details": [
+    { "id": "detail_skull_1", "asset_id": "detail_skull_pile", "slot": "mid_right", "offsetX": -20 },
+    { "id": "detail_wisp_1", "asset_id": "detail_will_o_wisp", "slot": "air_center" }
+  ],
+  "dialogue": "Người đàn ông không có đầu lảo đảo bước ra từ bãi tha ma... Bàn tay vấy máu của hắn túm chặt tóc chiếc thủ cấp đang trừng mắt nhìn thẳng vào kẻ đối diện...",
+  "narrative_note": "Chi tiết kinh dị trung tâm: thực thể không đầu lừng lững bước đi trong đêm trăng máu với cuống cổ đứt lìa, tay xách chiếc đầu lâu rỉ máu."
+}
+```
+
+### Cảnh Mẫu 8: Chuyến Xe Buýt Đêm & Người Đàn Ông Chân Xoay Ngược Lơ Lửng
+
+```json
+{
+  "scene_id": "scene_bus_night_horror",
+  "title": "Chuyến Xe Buýt Đêm Kỳ Dị",
+  "duration_sec": 7,
+  "theme": "vehicle_interior",
+  "lighting": {
+    "sky_preset": "dim_indoor_night",
+    "fog_density": 0.45,
+    "flicker_speed": "flicker_slow"
+  },
+  "environment_items": [
+    { "asset_id": "bus_interior", "slot": "center" }
+  ],
+  "actors": [
+    {
+      "id": "actor_lan",
+      "base": "female_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_scared",
+      "pose": "pose_sitting",
+      "facing": "right",
+      "slot": "mid_left",
+      "offsetX": -30,
+      "offsetY": 0,
+      "scale": 1,
+      "heldItem": "item_smartphone",
+      "heldHand": "right"
+    },
+    {
+      "id": "actor_creepy_man",
+      "base": "male_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_creepy_smile",
+      "pose": "pose_sitting_twisted_legs",
+      "facing": "left",
+      "slot": "mid_right",
+      "offsetX": 40,
+      "offsetY": 0,
+      "scale": 1,
+      "heldItem": "none"
+    }
+  ],
+  "details": [
+    { "id": "detail_flicker_lamp", "asset_id": "detail_flickering_ceiling_lamp", "slot": "air_center" },
+    { "id": "detail_cam", "asset_id": "detail_surveillance_camera", "slot": "air_right" }
+  ],
+  "dialogue": "Lan ngồi co ro trên ghế xe buýt, ánh sáng màn hình điện thoại rọi tỏ nét mặt bàng hoàng của cô khi nhìn xuống phía đối diện: đôi chân của người đàn ông kỳ lạ đó đang xoay ngược hẳn ra sau lưng, hai bàn chân lơ lửng cách mặt sàn vài phân không hề chạm đất...",
+  "narrative_note": "Chi tiết dị dạng kinh dị: hai nhân vật đều đang ngồi trên xe buýt, nhưng người đàn ông mang tư thế pose_sitting_twisted_legs với đôi chân vặn ngược 180 độ lơ lửng trên sàn xe."
+}
+```
+
 

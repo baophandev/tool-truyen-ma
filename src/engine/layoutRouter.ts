@@ -73,7 +73,13 @@ export function getDefaultCostumeForBase(base: CharacterBaseId): CostumeId {
   }
 }
 
-const VALID_THEMES: ThemeId[] = ["rural_graveyard", "abandoned_village", "cursed_swamp", "modern_indoor"];
+const VALID_THEMES: ThemeId[] = [
+  "rural_graveyard",
+  "abandoned_village",
+  "cursed_swamp",
+  "modern_indoor",
+  "vehicle_interior",
+];
 const VALID_SKY_PRESETS: SkyPresetId[] = [
   "blood_moon",
   "foggy_night",
@@ -96,6 +102,8 @@ const VALID_STRUCTURES: StructureId[] = [
   "supermarket_shelf_aisle",
   "creepy_elevator_doors",
   "dining_table_chairs",
+  "bus_interior",
+  "creepy_bathtub",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -135,9 +143,13 @@ const VALID_FACES: CharacterFaceId[] = [
   "face_weeping_ghost",
   "face_sewn_mouth",
   "face_haggard_gaunt",
+  "face_headless",
 ];
 const VALID_POSES: CharacterPoseId[] = [
   "pose_standing",
+  "pose_sitting",
+  "pose_sitting_twisted_legs",
+  "pose_twisted_legs_floating",
   "pose_shivering",
   "pose_walking",
   "pose_floating",
@@ -159,6 +171,8 @@ const VALID_HELD_ITEMS: HeldItemId[] = [
   "item_tattered_umbrella",
   "item_flashlight",
   "item_scalpel",
+  "item_smartphone",
+  "item_severed_head",
 ];
 const VALID_HELD_HANDS: HeldHand[] = ["right", "left"];
 const VALID_DETAILS: DetailId[] = [
@@ -172,6 +186,7 @@ const VALID_DETAILS: DetailId[] = [
   "detail_shopping_cart",
   "detail_surveillance_camera",
   "detail_flickering_ceiling_lamp",
+  "detail_broken_mirror",
 ];
 const VALID_FACINGS: FacingDirection[] = ["left", "right"];
 const VALID_SLOTS: SlotId[] = [
@@ -221,7 +236,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
   const lightingRaw = script.lighting && typeof script.lighting === "object" ? script.lighting : {};
   const sky_preset: SkyPresetId = VALID_SKY_PRESETS.includes(lightingRaw.sky_preset)
     ? lightingRaw.sky_preset
-    : (theme === "modern_indoor" ? "flickering_fluorescent" : "foggy_night");
+    : (theme === "modern_indoor" || theme === "vehicle_interior" ? "flickering_fluorescent" : "foggy_night");
 
   const rawFog = Number(lightingRaw.fog_density);
   const fog_density = !isNaN(rawFog) ? Math.min(1, Math.max(0, rawFog)) : 0.65;

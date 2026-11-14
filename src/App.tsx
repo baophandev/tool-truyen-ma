@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { DirectorSceneScript, ThemeId, SkyPresetId, CharacterBaseId, CostumeId, CharacterFaceId, CharacterPoseId, StructureId } from "./engine/types";
 import { DEFAULT_HORROR_SCENES } from "./engine/defaultScenes";
+import { resetStoredNamedEnvironments } from "./engine/environmentPresets";
 import { PlayerView } from "./components/PlayerView";
 import { EditorView } from "./components/EditorView";
 import { ExporterView } from "./components/ExporterView";
@@ -18,6 +19,7 @@ import {
   Clock,
   Sparkles,
   Compass,
+  RotateCcw,
 } from "lucide-react";
 
 type ActiveTab = "player" | "editor" | "exporter";
@@ -209,6 +211,20 @@ export function App() {
     setActiveTab("player");
   };
 
+  const handleResetProject = () => {
+    const confirmReset = window.confirm(
+      "Bạn có chắc muốn làm mới toàn bộ dự án để làm phim mới?\n\n- Toàn bộ các cảnh hiện tại sẽ được xóa và đặt lại về 1 cảnh mẫu mặc định sạch sẽ.\n- Thư viện bối cảnh lưu tạm sẽ được làm mới về mặc định ban đầu."
+    );
+    if (!confirmReset) return;
+
+    resetStoredNamedEnvironments();
+    const freshScene = createTemplateScene(1);
+    setScenes([freshScene]);
+    setCurrentSceneIndex(0);
+    setActiveTab("player");
+    setIsAiModalOpen(false);
+  };
+
   const totalFilmDuration = scenes.reduce((sum, s) => sum + (s.duration_sec || 6), 0);
 
   return (
@@ -245,6 +261,15 @@ export function App() {
             >
               <Compass className="w-4 h-4 text-amber-300 animate-pulse" />
               <span>✨ Trợ Thủ AI Video 2D</span>
+            </button>
+
+            <button
+              onClick={handleResetProject}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-neutral-900/90 hover:bg-red-950/60 text-neutral-300 hover:text-red-300 border border-neutral-700/80 hover:border-red-800/60 transition-all"
+              title="Xóa hết các cảnh hiện tại và làm mới các bối cảnh lưu tạm để bắt đầu phim mới"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-neutral-400 group-hover:text-red-400" />
+              <span>Reset Dự Án</span>
             </button>
 
             {/* Tab Navigation Switches */}
@@ -393,6 +418,17 @@ export function App() {
               title="Xóa cảnh hiện tại"
             >
               <Trash2 className="w-3.5 h-3.5" />
+            </button>
+
+            <div className="h-4 w-px bg-neutral-800 mx-1" />
+
+            <button
+              onClick={handleResetProject}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-red-950/60 text-xs text-neutral-400 hover:text-red-300 border border-neutral-800 hover:border-red-800/60 transition-all"
+              title="Xóa tất cả các cảnh và làm mới các bối cảnh lưu tạm để làm phim mới"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset Phim Mới</span>
             </button>
           </div>
         </div>

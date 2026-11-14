@@ -92,6 +92,16 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ["mid_left", "center", "mid_right"],
     reason: "Bàn ăn nhà hàng đặt tiếp đất tại khu vực giữa sân khấu (mid_left, center, mid_right).",
   },
+  bus_interior: {
+    name: "Buồng lái tài xế & Máy bán vé xe bus",
+    allowedSlots: ["mid_left", "center", "mid_right"],
+    reason: "Buồng lái tài xế, vô lăng, bảng đồng hồ và máy thu vé xe bus đặt tại khu vực giữa sân khấu (mid_left, center, mid_right) tạo điểm nhấn chân thực trong khoang xe.",
+  },
+  creepy_bathtub: {
+    name: "Bồn tắm rỉ sét ngập máu",
+    allowedSlots: ["mid_left", "center", "mid_right"],
+    reason: "Bồn tắm cổ quái đặt tại khu vực giữa sân khấu (mid_left, center, mid_right) làm tâm điểm kinh hoàng trong phòng tắm.",
+  },
 };
 
 export interface DetailRule {
@@ -151,6 +161,11 @@ export const DETAIL_RULES: Record<DetailId, DetailRule> = {
     allowedSlots: ALL_AIR_SLOT_IDS,
     reason: "Bóng đèn tuýp huỳnh quang chỉ treo trên cao (air_left, air_center, air_right).",
   },
+  detail_broken_mirror: {
+    name: "Gương nhà tắm vỡ nứt vấy máu",
+    allowedSlots: ALL_SLOT_IDS,
+    reason: "Gương nhà tắm có thể gắn tường trên không hoặc đặt tiếp đất dựa tường.",
+  },
 };
 
 const AIR_POSES: CharacterPoseId[] = ["pose_floating", "pose_hanging"];
@@ -172,7 +187,8 @@ export function getAllowedSlotsForActor(actor: Pick<ActorConfig, "base" | "pose"
 
   return {
     allowedSlots: ALL_GROUND_SLOT_IDS,
-    reason: "Nhân vật ở tư thế tiếp đất bắt buộc đứng trên trục Ground Y=800px (far_left -> far_right).",
+    reason:
+      "Nhân vật ở tư thế tiếp đất hoặc ngồi (pose_standing, pose_sitting, pose_sitting_twisted_legs, v.v.) bắt buộc đặt trên trục Ground Y=800px (far_left -> far_right).",
   };
 }
 
