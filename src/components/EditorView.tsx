@@ -994,8 +994,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600"
                       >
                         <option value="face_calm">Mặt bình thường (face_calm - mắt đen nhỏ vô hồn)</option>
-                        <option value="face_scared">Kinh hãi (face_scared - mắt trắng dã, miệng há hốc run rẩy)</option>
-                        <option value="face_screaming_gasp">😱 Há hốc kinh hoàng (face_screaming_gasp - Mắt mở trừng trợn đớp khí, lưỡi đỏ)</option>
+                        <option value="face_scared">Kinh hãi (face_scared - mày nhíu hoảng loạn, khóe miệng trễ viền răng mảnh)</option>
+                        <option value="face_screaming_gasp">😱 Há hốc kinh hoàng (face_screaming_gasp - Mắt mở trừng trợn đớp khí, họng thẳm đen)</option>
                         <option value="face_creepy_smile">Nụ cười ma quái (face_creepy_smile - xé dài tới mang tai)</option>
                         <option value="face_bleeding_eyes">Mắt chảy máu (face_bleeding_eyes - hai vệt máu đen rỉ xuống)</option>
                         <option value="face_old_wrinkled">Mặt già nua nếp nhăn (face_old_wrinkled - trán nhăn, đuôi mắt chùng, móm)</option>

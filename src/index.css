@@ -511,6 +511,50 @@
   transform-origin: 0 14px;
 }
 
+/* 23b. Terrified Jaw Chatter (Răng run va lập cập) */
+@keyframes jaw-chatter {
+  0%, 100% {
+    transform: translateY(0) scaleY(1);
+  }
+  25% {
+    transform: translateY(0.7px) scaleY(0.97);
+  }
+  50% {
+    transform: translateY(-0.3px) scaleY(1.02);
+  }
+  75% {
+    transform: translateY(0.5px) scaleY(0.98);
+  }
+}
+
+.anim-jaw-chatter {
+  animation: jaw-chatter 0.1s linear infinite;
+  transform-origin: 0 12px;
+}
+
+/* 23c. Terror Jitter / Shudder (Khuôn mặt run bần bật vì kinh hãi) */
+@keyframes terror-jitter {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-0.6px, 0.4px);
+  }
+  40% {
+    transform: translate(0.5px, -0.5px);
+  }
+  60% {
+    transform: translate(-0.5px, -0.3px);
+  }
+  80% {
+    transform: translate(0.4px, 0.5px);
+  }
+}
+
+.anim-jitter-slight {
+  animation: terror-jitter 0.12s linear infinite;
+}
+
 /* 24. Subtle Talking Jaw Motion */
 @keyframes talking-jaw {
   0%, 100% {

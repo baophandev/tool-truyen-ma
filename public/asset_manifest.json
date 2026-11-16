@@ -481,12 +481,12 @@
       {
         "id": "face_scared",
         "name": "Kinh hãi tột cùng",
-        "semantic": "Kinh hãi, tròng mắt trắng toát trợn ngược, miệng há hốc run rẩy"
+        "semantic": "Kinh hãi, chân mày nhíu hoảng loạn, tròng mắt trợn trừng, khóe miệng trễ xuống há hốc méo mó rên siết với viền răng trên mảnh tự nhiên"
       },
       {
         "id": "face_screaming_gasp",
         "name": "Há hốc kinh hoàng (Screaming Gasp)",
-        "semantic": "Hai mắt tròn xoe mở to trừng trừng, đồng tử nhỏ đen kịt, miệng há toác hình chữ U đớp lấy từng ngụm khí lộ cuống lưỡi đỏ quạch u uất"
+        "semantic": "Hai mắt tròn xoe mở to trừng trừng, đồng tử nhỏ đen kịt, miệng há toác dọc hình vực thẳm đen ngòm đớp lấy từng ngụm khí lộ hàng răng run giật"
       },
       {
         "id": "face_creepy_smile",

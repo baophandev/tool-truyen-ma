@@ -163,8 +163,8 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
 
 ### 5.3. 15 Biểu Cảm Khuôn Mặt & Đặc Điểm Phần Đầu (Faces - Gắn tại Head Socket)
 - `"face_calm"`: Mặt bình thường, mắt đen nhỏ vô hồn, lạnh lẽo.
-- `"face_scared"`: Kinh hãi tột cùng, tròng mắt trợn trắng, miệng há hốc run rẩy.
-- `"face_screaming_gasp"`: **Há hốc kinh hoàng (Screaming Gasp Face)**: Hai mắt mở to tròn trừng trừng, đồng tử đen nhỏ co rút hoảng loạn, miệng há toác hình chữ U đớp lấy từng ngụm khí lộ cuống lưỡi đỏ quạch u uất. Rất hợp cho các cảnh nhân vật chứng kiến thực thể ma quái đột ngột hiện hình hoặc hoảng loạn cùng cực.
+- `"face_scared"`: **Kinh hãi tột cùng (Scared Trembling Face)**: Chân mày nhíu xếch hoảng loạn (`/  \`), nếp nhăn trán lo lắng, tròng mắt trợn trừng trắng dã, đồng tử co rút, giọt mồ hôi lạnh thái dương, khóe miệng trễ xuống há hốc méo mó rên siết với viền răng trên mảnh tự nhiên và họng sâu đen kịt (tuyệt đối không giống cười hay răng nanh quái vật).
+- `"face_screaming_gasp"`: **Há hốc kinh hoàng (Screaming Gasp Face)**: Chân mày co rút hoảng loạn, hai mắt mở to tròn trừng trừng, đồng tử đen nhỏ co rút hoảng loạn, miệng há toác dọc hình vực thẳm đen ngòm đớp lấy từng ngụm khí lộ hàng răng trên rung giật. Rất hợp cho các cảnh nhân vật chứng kiến thực thể ma quái đột ngột hiện hình hoặc hoảng loạn cùng cực.
 - `"face_creepy_smile"`: Nụ cười ma quái xé toạc dài tới mang tai với hàm răng nhọn.
 - `"face_bleeding_eyes"`: Mắt trắng dã chảy hai vệt máu đen rỉ xuống cằm.
 - `"face_old_wrinkled"`: Mặt già nua nếp nhăn, trán nhăn sâu, đuôi mắt chân chim chùng xuống, khóe rãnh miệng móm tém.

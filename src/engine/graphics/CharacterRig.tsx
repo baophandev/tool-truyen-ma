@@ -1635,9 +1635,12 @@ function resolvePupilAnimation(action?: FacialActionId): string {
 }
 
 function resolveJawAnimation(action?: FacialActionId, faceType?: CharacterFaceId): string {
-  if (action === "creepy_laugh" || faceType === "face_creepy_smile") return "anim-creepy-laugh-jaw";
-  if (action === "terrified_scream" || faceType === "face_screaming_gasp") return "anim-scream-jaw";
+  if (action === "creepy_laugh") return "anim-creepy-laugh-jaw";
+  if (action === "terrified_scream") return "anim-scream-jaw";
   if (action === "talking_jaw") return "anim-talking-jaw";
+  if (faceType === "face_creepy_smile") return "anim-creepy-laugh-jaw";
+  if (faceType === "face_screaming_gasp") return "anim-scream-jaw";
+  if (faceType === "face_scared") return "anim-jaw-chatter";
   return "";
 }
 
@@ -1672,34 +1675,46 @@ const FaceRig: React.FC<{
   switch (face) {
     case "face_screaming_gasp":
       return (
-        <g className="face-screaming-gasp">
-          {/* Terrified high arched eyebrows */}
-          <path d="M -12 -15 Q -7 -18 -2 -14" stroke="#0F172A" strokeWidth="1.6" fill="none" />
-          <path d="M 12 -15 Q 7 -18 2 -14" stroke="#0F172A" strokeWidth="1.6" fill="none" />
+        <g className="face-screaming-gasp anim-jitter-slight">
+          {/* Terrified high distress angled eyebrows (/  \) */}
+          <path d="M -2 -16 Q -6 -15 -12 -11" stroke="#0F172A" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+          <path d="M 2 -16 Q 6 -15 12 -11" stroke="#0F172A" strokeWidth="1.6" strokeLinecap="round" fill="none" />
 
-          {/* Huge round staring white eyeballs matching user reference image */}
+          {/* Forehead dread crease lines */}
+          <line x1="-1" y1="-18" x2="-1" y2="-14" stroke="#0F172A" strokeWidth="1.3" strokeLinecap="round" opacity="0.85" />
+          <line x1="1" y1="-18" x2="1" y2="-14" stroke="#0F172A" strokeWidth="1.3" strokeLinecap="round" opacity="0.85" />
+          <path d="M -9 -20 Q 0 -18 9 -20" stroke="#1E293B" strokeWidth="1" fill="none" opacity="0.75" />
+
+          {/* Huge round staring white eyeballs */}
           <g className={resolveEyeAnimation(facialAction, true)}>
             <ellipse cx="-7" cy="-5" rx="6.5" ry="7.5" fill="#FFFFFF" stroke="#0F172A" strokeWidth="1.4" />
             <ellipse cx="7" cy="-5" rx="6.5" ry="7.5" fill="#FFFFFF" stroke="#0F172A" strokeWidth="1.4" />
-            {/* Round black pupils inside staring eyes with darting or staring */}
+            {/* Shrunken black pupils inside staring eyes */}
             <g className={resolvePupilAnimation(facialAction)}>
-              <circle cx="-7" cy="-5" r="2.5" fill="#000000" />
+              <circle cx="-7" cy="-5" r="2.2" fill="#000000" />
               <circle cx="-6.2" cy="-6" r="0.8" fill="#FFFFFF" />
-              <circle cx="7" cy="-5" r="2.5" fill="#000000" />
+              <circle cx="7" cy="-5" r="2.2" fill="#000000" />
               <circle cx="7.8" cy="-6" r="0.8" fill="#FFFFFF" />
             </g>
           </g>
 
-          {/* Enormous gaping dark mouth with red tongue */}
+          {/* Under-eye dread hollows */}
+          <path d="M -12 3 Q -7 6 -2 3" stroke="#1E293B" strokeWidth="1.2" fill="none" opacity="0.85" />
+          <path d="M 2 3 Q 7 6 12 3" stroke="#1E293B" strokeWidth="1.2" fill="none" opacity="0.85" />
+
+          {/* Iconic Munch 'The Scream' elongated vertical black abyss mouth */}
           <g className={resolveJawAnimation(facialAction, "face_screaming_gasp")}>
             <path
-              d="M -9 7 Q 0 3 9 7 Q 8 26 0 26 Q -8 26 -9 7 Z"
-              fill="#0A0202"
+              d="M -7.5 12 Q 0 8 7.5 12 Q 7 21 5 28 Q 0 30 -5 28 Q -7 21 -7.5 12 Z"
+              fill="#050101"
               stroke="#0F172A"
               strokeWidth="1.4"
             />
-            {/* Dark red tongue inside gaping mouth */}
-            <ellipse cx="0" cy="22" rx="4.5" ry="3.2" fill={COLOR_PALETTE.accent_blood_red} />
+            {/* Exposed trembling upper teeth */}
+            <path d="M -4.8 11 Q 0 8.5 4.8 11 Q 0 11.8 -4.8 11 Z" fill="#F8FAFC" opacity="0.85" />
+
+            {/* Deep dark crimson throat abyss (không phải lưỡi cười) */}
+            <ellipse cx="0" cy="24" rx="3.5" ry="2.2" fill="#200404" />
           </g>
 
           {renderFacialOverlay(facialAction)}
@@ -1740,22 +1755,56 @@ const FaceRig: React.FC<{
     case "face_scared":
       return (
         <g className="face-scared anim-jitter-slight">
+          {/* Terrified distress angled eyebrows (/  \) - inner brows pulled high & tense */}
+          <path d="M -2 -15 Q -6 -14 -11 -10" stroke="#0F172A" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+          <path d="M 2 -15 Q 6 -14 11 -10" stroke="#0F172A" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+
+          {/* Forehead panic tension creases & brow furrow */}
+          <line x1="-1" y1="-17" x2="-1" y2="-13" stroke="#0F172A" strokeWidth="1.2" strokeLinecap="round" opacity="0.85" />
+          <line x1="1" y1="-17" x2="1" y2="-13" stroke="#0F172A" strokeWidth="1.2" strokeLinecap="round" opacity="0.85" />
+          <path d="M -8 -19 Q 0 -17 8 -19" stroke="#1E293B" strokeWidth="1" fill="none" opacity="0.75" />
+
+          {/* Cold sweat bead dripping down temple */}
+          <path d="M -13 -8 Q -14 -4 -13 -1 Q -12 -4 -13 -8 Z" fill="#93C5FD" opacity="0.85" />
+
+          {/* Bulging, wide staring terrified eyes */}
           <g className={resolveEyeAnimation(facialAction, false) || "anim-face-blink-rapid"}>
-            <ellipse cx="-7" cy="-5" rx="5.5" ry="6.5" fill={COLOR_PALETTE.accent_fog_white} stroke="#0F172A" strokeWidth="1" />
-            <ellipse cx="7" cy="-5" rx="5.5" ry="6.5" fill={COLOR_PALETTE.accent_fog_white} stroke="#0F172A" strokeWidth="1" />
+            <ellipse cx="-7" cy="-5" rx="5.8" ry="6.8" fill={COLOR_PALETTE.accent_fog_white} stroke="#0F172A" strokeWidth="1.2" />
+            <ellipse cx="7" cy="-5" rx="5.8" ry="6.8" fill={COLOR_PALETTE.accent_fog_white} stroke="#0F172A" strokeWidth="1.2" />
+            {/* Shrunken panicked pupils */}
             <g className={resolvePupilAnimation(facialAction)}>
-              <circle cx="-7" cy="-5" r="1.6" fill="#000000" />
-              <circle cx="7" cy="-5" r="1.6" fill="#000000" />
+              <circle cx="-7" cy="-5" r="1.5" fill="#000000" />
+              <circle cx="-6.4" cy="-5.8" r="0.6" fill="#FFFFFF" />
+              <circle cx="7" cy="-5" r="1.5" fill="#000000" />
+              <circle cx="7.6" cy="-5.8" r="0.6" fill="#FFFFFF" />
             </g>
           </g>
+
+          {/* Strained under-eye bags / fear tension lines */}
+          <path d="M -11 3 Q -7 5.5 -3 3" stroke="#1E293B" strokeWidth="1.1" fill="none" opacity="0.85" />
+          <path d="M 3 3 Q 7 5.5 11 3" stroke="#1E293B" strokeWidth="1.1" fill="none" opacity="0.85" />
+
+          {/* Downturned trembling horror grimace (Khóe miệng trễ xuống rên siết) */}
           <g className={resolveJawAnimation(facialAction, "face_scared")}>
+            {/* Dark open mouth with corners drooping downward (corners at Y=13.5, top lip center at Y=9) */}
             <path
-              d="M -7 9 Q 0 4 7 9 Q 5 21 0 21 Q -5 21 -7 9 Z"
-              fill="#1A0505"
+              d="M -7 13.5 Q 0 9 7 13.5 Q 5.5 21 0 21.5 Q -5.5 21 -7 13.5 Z"
+              fill="#070202"
               stroke="#0F172A"
-              strokeWidth="1"
+              strokeWidth="1.2"
             />
-            <ellipse cx="0" cy="17" rx="3.5" ry="2.5" fill={COLOR_PALETTE.accent_blood_red} />
+            {/* Subtle, smooth natural upper teeth rim (viền răng trên mảnh, tự nhiên, không chia khối quái dị) */}
+            <path
+              d="M -4.5 11.5 Q 0 9.2 4.5 11.5 Q 0 12.2 -4.5 11.5 Z"
+              fill="#F8FAFC"
+              opacity="0.85"
+            />
+
+            {/* Dark crimson throat depth */}
+            <ellipse cx="0" cy="16.5" rx="3.2" ry="2" fill="#1C0303" />
+
+            {/* Trembling chin crease */}
+            <path d="M -3.5 24.5 Q 0 26 3.5 24.5" stroke="#1E293B" strokeWidth="1.1" fill="none" opacity="0.8" />
           </g>
           {renderFacialOverlay(facialAction)}
         </g>
@@ -1977,7 +2026,10 @@ const FaceRig: React.FC<{
           </g>
           <g className={resolveJawAnimation(facialAction, "face_calm")}>
             {facialAction === "terrified_scream" ? (
-              <path d="M -7 9 Q 0 5 7 9 Q 6 22 0 22 Q -6 22 -7 9 Z" fill="#0A0202" stroke="#0F172A" strokeWidth="1.2" />
+              <g>
+                <path d="M -7 13.5 Q 0 9 7 13.5 Q 5.5 21 0 21.5 Q -5.5 21 -7 13.5 Z" fill="#0A0202" stroke="#0F172A" strokeWidth="1.2" />
+                <path d="M -4.5 11.5 Q 0 9.2 4.5 11.5 Q 0 12.2 -4.5 11.5 Z" fill="#F8FAFC" opacity="0.85" />
+              </g>
             ) : facialAction === "creepy_laugh" ? (
               <path d="M -12 6 Q 0 18 12 6 Q 0 10 -12 6 Z" fill="#2E0505" stroke="#7F1D1D" strokeWidth="1" />
             ) : (
