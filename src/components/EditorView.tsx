@@ -38,6 +38,12 @@ import {
   applyEnvironmentToScene,
 } from "../engine/environmentPresets";
 import {
+  loadStoredNamedCharacters,
+  applyCharacterToActor,
+  addOrUpdateNamedCharacter,
+  extractCharacterFromActor,
+} from "../engine/characterPresets";
+import {
   STRUCTURE_RULES,
   DETAIL_RULES,
   coordsToSlotAssignment,
@@ -920,6 +926,48 @@ export const EditorView: React.FC<EditorViewProps> = ({
 
               {selectedActor ? (
                 <div className="flex flex-col gap-5">
+                {/* RACCORD CAST QUICK-PICK / SAVE */}
+                <div className="bg-purple-950/30 border border-purple-800/40 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-bold text-purple-300">🎭 Khóa Rắc-co Diễn Viên:</span>
+                    <select
+                      onChange={(e) => {
+                        const chars = loadStoredNamedCharacters();
+                        const picked = chars.find((c) => c.id === e.target.value);
+                        if (picked && selectedActor) {
+                          const updated = applyCharacterToActor(selectedActor, picked);
+                          updateActor(selectedActor.id, updated);
+                        }
+                      }}
+                      defaultValue=""
+                      className="bg-black border border-purple-700/60 rounded-lg px-2.5 py-1 text-xs text-purple-200 focus:outline-none"
+                    >
+                      <option value="" disabled>-- Chọn diễn viên mẫu để gán đồng bộ --</option>
+                      {loadStoredNamedCharacters().map((char) => (
+                        <option key={char.id} value={char.id}>
+                          👤 {char.name} ({char.base} | {char.costume})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!selectedActor) return;
+                      const customName = window.prompt("Đặt tên diễn viên để lưu vào Thư viện Khóa Rắc-co:", `Diễn Viên (${selectedActor.id})`);
+                      if (customName && customName.trim()) {
+                        const newChar = extractCharacterFromActor(selectedActor, customName.trim());
+                        addOrUpdateNamedCharacter(newChar);
+                        alert(`Đã lưu "${newChar.name}" vào Dàn Diễn Viên Khóa Rắc-co!`);
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-900/40 hover:bg-purple-800 border border-purple-700/60 text-purple-200 text-xs font-semibold transition-all"
+                    title="Lưu tạo hình nhân vật này vào Thư viện Diễn viên Dùng Lại"
+                  >
+                    <span>⭐ Lưu Vào Thư Viện Diễn Viên</span>
+                  </button>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="flex flex-col gap-4">
                     {/* Character Base */}

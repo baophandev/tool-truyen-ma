@@ -1,4 +1,9 @@
-import type { DirectorSceneScript, NamedEnvironmentPreset, CameraShotType } from "./types";
+import type {
+  DirectorSceneScript,
+  NamedEnvironmentPreset,
+  NamedCharacterPreset,
+  CameraShotType,
+} from "./types";
 import { validateDirectorScript, VALID_CAMERA_SHOTS } from "./layoutRouter";
 import {
   splitStoryIntoVoiceSegments,
@@ -846,6 +851,7 @@ export async function generateFilmFromDescriptions(
   options: {
     apiKey?: string;
     model?: string;
+    availableCharacters?: NamedCharacterPreset[];
   } = {}
 ): Promise<GenerateFilmResult> {
   const apiKey = (options.apiKey || getStoredApiKey()).trim();
@@ -864,6 +870,13 @@ export async function generateFilmFromDescriptions(
       error: "Danh sách phân cảnh rỗng.",
     };
   }
+
+  const castSummary = (options.availableCharacters || [])
+    .map(
+      (c) =>
+        `- Diễn Viên: "${c.name}" (ID: "${c.id}") | Khung thân (Base): "${c.base}" | Trang phục (Costume): "${c.costume}" | Mặt: "${c.face || "face_calm"}" | Đồ vật: "${c.defaultHeldItem || "none"}"`
+    )
+    .join("\n");
 
   const promptSections = sceneSpecs.map((spec, i) => {
     const camReq =
@@ -887,8 +900,12 @@ ${promptSections}
 
 YÊU CẦU ĐẠO DIỄN:
 1. Bạn KHÔNG tự bịa cốt truyện hay thay đổi bối cảnh. Hãy đọc mô tả hành động của từng cảnh và tạo mảng "actors" cùng chuyển động "motion" khớp chính xác 100%.
-2. Giữ nguyên 100% theme, lighting, environment_items và details của bối cảnh được chỉ định cho mỗi cảnh. Các cảnh có chung bối cảnh BẮT BUỘC PHẢI CÓ BỐI CẢNH Y HỆT NHAU.
-3. ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH (CINEMATIC CAMERA - BẮT BUỘC):
+${castSummary ? `2. KHÓA RẮC-CO DIỄN VIÊN (BẮT BUỘC 100%):
+Dưới đây là DÀN DIỄN VIÊN CỐ ĐỊNH CỦA BỘ PHIM:
+${castSummary}
+- Khi phân cảnh có nhân vật xuất hiện, BẮT BUỘC gán đúng "base" và "costume" tương ứng của diễn viên đó. TUYỆT ĐỐI KHÔNG tự tiện đổi sang trang phục khác giữa các phân cảnh để giữ đúng rắc-co điện ảnh!
+3. Giữ nguyên 100% theme, lighting, environment_items và details của bối cảnh được chỉ định cho mỗi cảnh. Các cảnh có chung bối cảnh BẮT BUỘC PHẢI CÓ BỐI CẢNH Y HỆT NHAU.` : `2. Giữ nguyên 100% theme, lighting, environment_items và details của bối cảnh được chỉ định cho mỗi cảnh. Các cảnh có chung bối cảnh BẮT BUỘC PHẢI CÓ BỐI CẢNH Y HỆT NHAU.`}
+4. ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH (CINEMATIC CAMERA - BẮT BUỘC):
    Mỗi cảnh BẮT BUỘC sinh khối "camera" điện ảnh phù hợp (TUYỆT ĐỐI KHÔNG để tất cả đều là "wide" tĩnh):
    - Nếu cảnh có Cỡ Cảnh Chỉ Định, BẮT BUỘC tuân thủ cỡ cảnh đó.
    - Nếu tự động, hãy linh hoạt chuyển đổi theo nhịp điệu kinh dị (ví dụ cảnh tiếp cận dùng "medium", cảnh hù dọa/ma quỷ dùng "close_up" có target_actor_id; camera.shake mặc định là "none", CHỈ dùng shake khi có mô tả động đất, sụp đổ, nổ tung hoặc quỷ dữ vồ jumpscare).
@@ -1080,6 +1097,78 @@ TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:`;
     return { success: true, environment: targetObj };
   } catch (err: any) {
     return { success: false, error: `Lỗi tạo bối cảnh: ${err.message}` };
+  }
+}
+
+/**
+ * AI HELPER: Generate a custom NamedCharacterPreset from a user description to lock continuity (raccord)
+ */
+export async function generateCharacterPresetFromDescription(
+  descriptionPrompt: string,
+  options: {
+    apiKey?: string;
+    model?: string;
+  } = {}
+): Promise<{ success: boolean; character?: NamedCharacterPreset; error?: string }> {
+  const apiKey = (options.apiKey || getStoredApiKey()).trim();
+  const model = options.model || getStoredModel() || "gemini-2.5-flash";
+
+  if (!apiKey) {
+    return {
+      success: false,
+      error: "Chưa có Gemini API Key. Vui lòng cấu hình API Key.",
+    };
+  }
+
+  const userPrompt = `Người dùng muốn tạo một DIỄN VIÊN DÙNG LẠI (Named Character Preset) để khóa rắc-co cho phim hoạt hình kinh dị 2D Limbo:
+Mô tả nhân vật: """${descriptionPrompt}"""
+
+DANH MỤC TÀI NGUYÊN HỆ THỐNG:
+- Khung nhân vật (base): "male_adult" | "female_adult" | "elder_hunched" | "brute_hulking" | "skeletal_emaciated" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow"
+- Trang phục (costume): "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual"
+- Biểu cảm (face): "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless"
+- Đồ vật (defaultHeldItem): "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note"
+
+YÊU CẦU:
+Tạo một đối tượng JSON NamedCharacterPreset hợp lệ 100%:
+- "id": "char_custom_${Date.now().toString(36)}",
+- "name": "Tên diễn viên tiếng Việt (vd: 'Thám Tử Đêm', 'Y Tá Ma Ám')",
+- "description": "Tóm tắt vai trò và tính cách của nhân vật trong cốt truyện",
+- "base": chọn 1 base phù hợp nhất,
+- "costume": chọn 1 costume phù hợp nhất,
+- "face": chọn 1 face đặc trưng,
+- "defaultHeldItem": chọn 1 item phù hợp,
+- "defaultHeldHand": "right" | "left",
+- "scale": number từ 0.7 đến 1.3
+
+TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:`;
+
+  try {
+    const res = await callGeminiApiWithRetry(
+      apiKey,
+      model,
+      GEMINI_DIRECTOR_SYSTEM_INSTRUCTION,
+      userPrompt,
+      { responseMimeType: "application/json", temperature: 0.6 }
+    );
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      return { success: false, error: formatApiError(res, errBody) };
+    }
+
+    const data = await res.json();
+    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+    const parsed = JSON.parse(rawText);
+    const targetObj: NamedCharacterPreset = Array.isArray(parsed) ? parsed[0] : parsed;
+
+    if (!targetObj.name || !targetObj.base) {
+      return { success: false, error: "Dữ liệu nhân vật không hợp lệ." };
+    }
+
+    return { success: true, character: targetObj };
+  } catch (err: any) {
+    return { success: false, error: `Lỗi tạo nhân vật: ${err.message}` };
   }
 }
 
@@ -1327,6 +1416,7 @@ export async function breakdownStoryToSceneDrafts(
     apiKey?: string;
     model?: string;
     voicePace?: VoicePacePreset | number;
+    availableCharacters?: NamedCharacterPreset[];
   } = {}
 ): Promise<BreakdownStoryResult> {
   const apiKey = (options.apiKey || getStoredApiKey()).trim();
@@ -1368,6 +1458,13 @@ export async function breakdownStoryToSceneDrafts(
     )
     .join("\n");
 
+  const charsSummary = (options.availableCharacters || [])
+    .map(
+      (c) =>
+        `- Diễn Viên: "${c.name}" | Khung Thân (Base): "${c.base}" | Trang Phục (Costume): "${c.costume}" | Mặt: "${c.face || "face_calm"}" | Đồ Vật: "${c.defaultHeldItem || "none"}" | Vai Trò: "${c.description || ""}"`
+    )
+    .join("\n");
+
   const segmentsGuidance = voiceSegments
     .map(
       (s) =>
@@ -1390,7 +1487,14 @@ ${segmentsGuidance}
 
 DANH SÁCH BỐI CẢNH DÙNG LẠI HIỆN CÓ TRONG THƯ VIỆN CỦA HỆ THỐNG:
 ${envsSummary}
+${charsSummary ? `
+DANH SÁCH DÀN DIỄN VIÊN CỐ ĐỊNH CỦA BỘ PHIM (BẮT BUỘC KHÓA RẮC-CO 100%):
+${charsSummary}
 
+QUY TẮC RẮC-CO DIỄN VIÊN (BẮT BUỘC):
+- Khi viết mô tả hoạt hình (actionDescription), nếu phân cảnh có sự xuất hiện của nhân vật trong danh sách diễn viên trên, BẮT BUỘC phải mô tả đúng ngoại hình (base) và trang phục (costume) của diễn viên đó.
+- TUYỆT ĐỐI KHÔNG tự tiện đổi sang trang phục hay vóc dáng khác giữa các phân cảnh để đảm bảo tính liên tục (raccord) của phim!
+` : ""}
 QUY TẮC BẮT BUỘC: Ô LỒNG TIẾNG VÀ Ô MÔ TẢ HÀNH ĐỘNG LÀ 2 THỨ HOÀN TOÀN KHÁC NHAU:
 1. Ô LỒNG TIẾNG (dialogue) - CHÍNH LÀ LỜI NÓI CỦA NGƯỜI DÙNG:
    - Trường "dialogue" của phân cảnh i BẮT BUỘC PHẢI LÀ NGUYÊN VĂN LỜI LỒNG TIẾNG của [PHÂN CẢNH ${"${i}"}].

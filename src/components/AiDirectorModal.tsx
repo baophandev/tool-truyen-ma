@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useMemo } from "react";
-import type { DirectorSceneScript, NamedEnvironmentPreset, CameraShotType } from "../engine/types";
+import type {
+  DirectorSceneScript,
+  NamedEnvironmentPreset,
+  NamedCharacterPreset,
+  CameraShotType,
+} from "../engine/types";
 import {
   generateFilmFromDescriptions,
   generateSceneFromDescription,
   generateNamedEnvironmentFromPrompt,
+  generateCharacterPresetFromDescription,
   breakdownStoryToSceneDrafts,
   auditStoryAssets,
   SAMPLE_HORROR_PROMPTS,
@@ -30,6 +36,14 @@ import {
   extractEnvironmentFromScene,
 } from "../engine/environmentPresets";
 import {
+  loadStoredNamedCharacters,
+  resetStoredNamedCharacters,
+  addOrUpdateNamedCharacter,
+  deleteNamedCharacter,
+  extractCharacterFromActor,
+  applyCharacterToActor,
+} from "../engine/characterPresets";
+import {
   Sparkles,
   Key,
   Play,
@@ -53,11 +67,15 @@ import {
   ShieldAlert,
   ShieldCheck,
   Search,
+  Users,
+  UserPlus,
+  UserCheck,
 } from "lucide-react";
 
 export type AiModalMode =
   | "description_film"
   | "environments_manager"
+  | "characters_manager"
   | "re_direct_scene"
   | "full_film"
   | "append_scene";
@@ -71,6 +89,7 @@ interface AiDirectorModalProps {
   onApplyNewFilm: (newScenes: DirectorSceneScript[]) => void;
   onApplySingleScene: (updatedScene: DirectorSceneScript) => void;
   onAppendScene: (newScene: DirectorSceneScript) => void;
+  onAppendScenes?: (newScenes: DirectorSceneScript[]) => void;
   initialMode?: AiModalMode;
 }
 
@@ -88,19 +107,23 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
   onClose,
   currentScene,
   currentSceneIndex,
+  totalScenesCount,
   onApplyNewFilm,
   onApplySingleScene,
+  onAppendScenes,
   initialMode = "description_film",
 }) => {
   // Map legacy mode names if passed
-  const normalizeInitialMode = (m: AiModalMode): "description_film" | "environments_manager" | "re_direct_scene" => {
+  const normalizeInitialMode = (
+    m: AiModalMode
+  ): "description_film" | "environments_manager" | "characters_manager" | "re_direct_scene" => {
     if (m === "full_film" || m === "append_scene") return "description_film";
     return m;
   };
 
-  const [mode, setMode] = useState<"description_film" | "environments_manager" | "re_direct_scene">(() =>
-    normalizeInitialMode(initialMode)
-  );
+  const [mode, setMode] = useState<
+    "description_film" | "environments_manager" | "characters_manager" | "re_direct_scene"
+  >(() => normalizeInitialMode(initialMode));
   const [apiKey, setApiKey] = useState<string>(getStoredApiKey);
   const [showKey, setShowKey] = useState<boolean>(false);
   const [model, setModel] = useState<string>(getStoredModel);
@@ -108,6 +131,13 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
 
   // Environments library state
   const [namedEnvironments, setNamedEnvironments] = useState<NamedEnvironmentPreset[]>(loadStoredNamedEnvironments);
+
+  // Characters / Cast library state (Khóa Rắc-co)
+  const [namedCharacters, setNamedCharacters] = useState<NamedCharacterPreset[]>(loadStoredNamedCharacters);
+  const [customCharPrompt, setCustomCharPrompt] = useState<string>("");
+  const [customCharSaveName, setCustomCharSaveName] = useState<string>("");
+  const [selectedActorToSaveIndex, setSelectedActorToSaveIndex] = useState<number>(0);
+  const [charSaveSuccess, setCharSaveSuccess] = useState<string | null>(null);
 
   // Multi-scene description drafts
   const [sceneCount, setSceneCount] = useState<number>(3);
@@ -282,6 +312,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         apiKey,
         model,
         voicePace,
+        availableCharacters: namedCharacters,
       });
 
       if (!result.success || !result.drafts || result.drafts.length === 0) {
@@ -355,12 +386,14 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
   // Reset assistant state to start a clean new film
   const handleResetAssistant = () => {
     const confirmReset = window.confirm(
-      "Bạn có chắc muốn làm mới toàn bộ trợ thủ AI để viết phim mới?\n\n- Toàn bộ cốt truyện và các phân cảnh đã điền sẽ được xóa sạch.\n- Thư viện bối cảnh sẽ được khôi phục về danh sách chuẩn mặc định (bao gồm phòng tắm, xe bus, bệnh viện...)."
+      "Bạn có chắc muốn làm mới toàn bộ trợ thủ AI để viết phim mới?\n\n- Toàn bộ cốt truyện và các phân cảnh đã điền sẽ được xóa sạch.\n- Thư viện bối cảnh và dàn diễn viên dùng lại (rắc-co) sẽ được khôi phục về danh sách chuẩn mặc định."
     );
     if (!confirmReset) return;
 
     const freshEnvs = resetStoredNamedEnvironments();
+    const freshChars = resetStoredNamedCharacters();
     setNamedEnvironments(freshEnvs);
+    setNamedCharacters(freshChars);
     setRawStoryInput("");
     setLastBreakdownStory("");
     setBreakdownNotice(null);
@@ -397,6 +430,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
           apiKey,
           model,
           voicePace,
+          availableCharacters: namedCharacters,
         });
 
         if (!result.success || !result.drafts || result.drafts.length === 0) {
@@ -464,6 +498,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
       const result = await generateFilmFromDescriptions(specs, {
         apiKey,
         model,
+        availableCharacters: namedCharacters,
       });
 
       clearTimeout(stepTimer1);
@@ -574,10 +609,94 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     setTimeout(() => setEnvSaveSuccess(null), 3000);
   };
 
+  // AI Create Character from Prompt
+  const handleCreateCharacterFromPrompt = async () => {
+    if (!customCharPrompt.trim()) {
+      setErrorMessage("Vui lòng nhập mô tả diễn viên cần tạo.");
+      return;
+    }
+    setIsLoading(true);
+    setErrorMessage(null);
+    setLoadingStep("AI đang thiết kế ngoại hình & trang phục diễn viên...");
+    try {
+      const res = await generateCharacterPresetFromDescription(customCharPrompt, {
+        apiKey,
+        model,
+      });
+
+      if (res.success && res.character) {
+        const updated = addOrUpdateNamedCharacter(res.character);
+        setNamedCharacters(updated);
+        setCustomCharPrompt("");
+        setCharSaveSuccess(`Đã tạo thành công diễn viên: "${res.character.name}"!`);
+        setTimeout(() => setCharSaveSuccess(null), 3500);
+      } else {
+        setErrorMessage(res.error || "Không thể tạo diễn viên mới.");
+      }
+    } catch (err: any) {
+      setErrorMessage(`Lỗi: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+      setLoadingStep("");
+    }
+  };
+
+  // Save selected actor from current scene into Named Characters
+  const handleSaveCurrentActorToCast = () => {
+    const actor = currentScene.actors?.[selectedActorToSaveIndex] || currentScene.actors?.[0];
+    if (!actor) {
+      setErrorMessage("Cảnh hiện tại không có nhân vật nào để lưu.");
+      return;
+    }
+    const name = customCharSaveName.trim() || `Diễn Viên (${actor.id || "Mới"})`;
+    const newChar = extractCharacterFromActor(actor, name);
+    const updated = addOrUpdateNamedCharacter(newChar);
+    setNamedCharacters(updated);
+    setCustomCharSaveName("");
+    setCharSaveSuccess(`Đã lưu "${newChar.name}" vào Dàn diễn viên Rắc-co!`);
+    setTimeout(() => setCharSaveSuccess(null), 3500);
+  };
+
+  // Delete character
+  const handleDeleteCharacter = (id: string) => {
+    const updated = deleteNamedCharacter(id);
+    setNamedCharacters(updated);
+  };
+
+  // Apply character directly to current scene's selected or first actor
+  const handleApplyCharacterToCurrentScene = (char: NamedCharacterPreset) => {
+    if (!currentScene.actors || currentScene.actors.length === 0) {
+      setErrorMessage("Cảnh hiện tại chưa có diễn viên nào để áp dụng tạo hình.");
+      return;
+    }
+    const targetIdx = Math.min(selectedActorToSaveIndex, currentScene.actors.length - 1);
+    const targetActor = currentScene.actors[targetIdx];
+    const updatedActor = applyCharacterToActor(targetActor, char);
+    const nextActors = [...currentScene.actors];
+    nextActors[targetIdx] = updatedActor;
+    onApplySingleScene({
+      ...currentScene,
+      actors: nextActors,
+    });
+    setCharSaveSuccess(`Đã áp dụng tạo hình "${char.name}" vào Cảnh ${currentSceneIndex + 1}!`);
+    setTimeout(() => setCharSaveSuccess(null), 3000);
+  };
+
   // Confirm Handlers
   const handleConfirmApplyFilm = () => {
     if (generatedScenes && generatedScenes.length > 0) {
       onApplyNewFilm(generatedScenes);
+      onClose();
+    }
+  };
+
+  const handleConfirmAppendFilm = () => {
+    if (generatedScenes && generatedScenes.length > 0) {
+      if (onAppendScenes) {
+        onAppendScenes(generatedScenes);
+      } else {
+        onApplyNewFilm(generatedScenes);
+      }
       onClose();
     }
   };
@@ -635,7 +754,10 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                   Đã kết nối
                 </span>
                 <span className="text-[11px] text-neutral-400 font-mono ml-2">
-                  • Thư viện: <strong className="text-white">{namedEnvironments.length} bối cảnh chung</strong>
+                  • Thư viện: <strong className="text-white">{namedEnvironments.length} bối cảnh</strong>
+                </span>
+                <span className="text-[11px] text-neutral-400 font-mono ml-1">
+                  • Rắc-co: <strong className="text-purple-300">{namedCharacters.length} diễn viên</strong>
                 </span>
               </div>
 
@@ -694,7 +816,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
           </div>
 
           {/* MODE TABS SWITCHER */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 p-1 bg-neutral-950/80 rounded-xl border border-neutral-800">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 p-1 bg-neutral-950/80 rounded-xl border border-neutral-800">
             {/* TAB 1 */}
             <button
               onClick={() => {
@@ -709,10 +831,26 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
               }`}
             >
               <Wand2 className="w-4 h-4 text-amber-300" />
-              <span>1. Trợ Thủ Cốt Truyện & Tạo Phim ({sceneCount} Cảnh)</span>
+              <span>1. Trợ Thủ Kịch Bản ({sceneCount} Cảnh)</span>
             </button>
 
             {/* TAB 2 */}
+            <button
+              onClick={() => {
+                setMode("characters_manager");
+                setErrorMessage(null);
+              }}
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
+                mode === "characters_manager"
+                  ? "bg-gradient-to-r from-red-700 to-purple-800 text-white shadow-md shadow-red-950/50"
+                  : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-850"
+              }`}
+            >
+              <Users className="w-4 h-4 text-purple-400" />
+              <span>2. Diễn Viên Rắc-co ({namedCharacters.length})</span>
+            </button>
+
+            {/* TAB 3 */}
             <button
               onClick={() => {
                 setMode("environments_manager");
@@ -725,10 +863,10 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
               }`}
             >
               <Compass className="w-4 h-4 text-cyan-400" />
-              <span>2. Thư Viện Bối Cảnh Dùng Lại ({namedEnvironments.length})</span>
+              <span>3. Bối Cảnh Dùng Lại ({namedEnvironments.length})</span>
             </button>
 
-            {/* TAB 3 */}
+            {/* TAB 4 */}
             <button
               onClick={() => {
                 setMode("re_direct_scene");
@@ -742,7 +880,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
               }`}
             >
               <RotateCcw className="w-4 h-4 text-purple-300" />
-              <span>3. AI Bố Trí Lại Cảnh {currentSceneIndex + 1}</span>
+              <span>4. AI Sửa Cảnh {currentSceneIndex + 1}</span>
             </button>
           </div>
 
@@ -795,6 +933,23 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
 
                 {isAssistantExpanded && (
                   <div className="flex flex-col gap-3 pt-1 border-t border-purple-900/30">
+                    {/* RACCORD CONTINUITY BANNER */}
+                    <div className="bg-purple-950/40 border border-purple-800/60 rounded-xl px-3.5 py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-purple-400 shrink-0" />
+                        <span className="text-neutral-300 font-medium text-[11px]">
+                          <strong className="text-purple-300">Khóa Rắc-co:</strong> {namedCharacters.length} diễn viên cố định ({namedCharacters.slice(0, 3).map((c) => c.name.split(" ")[0]).join(", ")}...)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setMode("characters_manager")}
+                        className="text-purple-300 hover:text-white underline text-[11px] font-mono transition-all"
+                      >
+                        Xem & Chỉnh Dàn Diễn Viên →
+                      </button>
+                    </div>
+
                     {/* Quick Inspirations Chips */}
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span className="text-[11px] text-neutral-400 font-semibold mr-1 flex items-center gap-1">
@@ -1474,7 +1629,198 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
             </div>
           )}
 
-          {/* TAB 3: RE-DIRECT SINGLE SCENE */}
+          {/* TAB 2: CHARACTERS / CAST MANAGER (KHÓA RẮC-CO DIỄN VIÊN DÙNG LẠI) */}
+          {mode === "characters_manager" && (
+            <div className="flex flex-col gap-4">
+              {/* HEADER EXPLANATION */}
+              <div className="bg-gradient-to-r from-purple-950/60 to-neutral-950 p-4 rounded-2xl border border-purple-800/60 flex items-start justify-between gap-3 shadow-lg shadow-purple-950/30">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-purple-900/60 border border-purple-700/60 flex items-center justify-center text-purple-300 shrink-0 mt-0.5">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white tracking-wide m-0 flex items-center gap-2">
+                      <span>DÀN DIỄN VIÊN DÙNG LẠI (KHÓA RẮC-CO DIỄN VIÊN 100%)</span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-900 text-purple-200 border border-purple-700">
+                        {namedCharacters.length} Diễn Viên
+                      </span>
+                    </h3>
+                    <p className="text-xs text-neutral-300 m-0 mt-1 leading-relaxed">
+                      Để làm phim dài 20–30 phút chia nhỏ nhiều hồi, dàn diễn viên này được <strong>lưu vĩnh viễn</strong> cho dự án. Khi AI phân tích kịch bản mới, nó sẽ tự động khóa đúng khung thân (base) và trang phục (costume) của các nhân vật này, đảm bảo không bao giờ bị lệch rắc-co! Khi bạn nhấn <strong>Reset Dự Án / Làm Phim Mới</strong>, dàn diễn viên sẽ được dọn dẹp sạch sẽ để bắt đầu kịch bản mới.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* SUCCESS NOTICE */}
+              {charSaveSuccess && (
+                <div className="p-3 bg-emerald-950/80 border border-emerald-800 rounded-xl flex items-center gap-2 text-xs text-emerald-200 animate-in fade-in">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>{charSaveSuccess}</span>
+                </div>
+              )}
+
+              {/* TOOLS GRID: CREATE & SAVE */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                {/* TOOL 1: AI GENERATE CHARACTER */}
+                <div className="bg-neutral-950/80 border border-neutral-800 rounded-xl p-4 flex flex-col gap-2.5">
+                  <div className="flex items-center gap-2 text-xs font-bold text-white">
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    <span>AI Thiết Kế Diễn Viên Mới Theo Ý Bạn</span>
+                  </div>
+                  <p className="text-[11px] text-neutral-400 m-0">
+                    Mô tả tạo hình và tính cách (ví dụ: <em>Viên thám tử mặc áo hoodie xám cầm đèn pin, nét mặt sợ hãi</em>...)
+                  </p>
+                  <textarea
+                    rows={2}
+                    value={customCharPrompt}
+                    onChange={(e) => setCustomCharPrompt(e.target.value)}
+                    placeholder="Mô tả nhân vật bạn muốn tạo (ví dụ: Cô dâu ma áo dài trắng rách, bác sĩ phẫu thuật áo blouse máu...)"
+                    className="w-full bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-purple-600 resize-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCreateCharacterFromPrompt}
+                    disabled={isLoading}
+                    className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-purple-800 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-semibold transition-all shadow"
+                  >
+                    <UserPlus className="w-3.5 h-3.5 text-amber-300" />
+                    <span>{isLoading ? "Đang tạo..." : "✨ AI Tạo Diễn Viên Này"}</span>
+                  </button>
+                </div>
+
+                {/* TOOL 2: SAVE FROM CURRENT STUDIO SCENE */}
+                <div className="bg-neutral-950/80 border border-neutral-800 rounded-xl p-4 flex flex-col gap-2.5">
+                  <div className="flex items-center gap-2 text-xs font-bold text-white">
+                    <BookmarkPlus className="w-4 h-4 text-cyan-400" />
+                    <span>Lưu Diễn Viên Từ Cảnh {currentSceneIndex + 1} Đang Mở</span>
+                  </div>
+                  <p className="text-[11px] text-neutral-400 m-0">
+                    Lưu nhân vật đang được chọn trong Studio thành một diễn viên dùng lại để các cảnh sau tái sử dụng.
+                  </p>
+                  {currentScene.actors && currentScene.actors.length > 0 ? (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={selectedActorToSaveIndex}
+                          onChange={(e) => setSelectedActorToSaveIndex(Number(e.target.value))}
+                          className="bg-black border border-neutral-800 rounded-lg px-2.5 py-1.5 text-xs text-neutral-200 focus:outline-none"
+                        >
+                          {currentScene.actors.map((act, i) => (
+                            <option key={act.id || i} value={i}>
+                              #{i + 1}: {act.id} ({act.base} - {act.costume || "mặc định"})
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          type="text"
+                          value={customCharSaveName}
+                          onChange={(e) => setCustomCharSaveName(e.target.value)}
+                          placeholder="Đặt tên diễn viên..."
+                          className="flex-1 bg-black border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-neutral-200 focus:outline-none focus:border-cyan-600"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleSaveCurrentActorToCast}
+                        className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-cyan-700 hover:bg-cyan-600 text-white text-xs font-semibold transition-all shadow"
+                      >
+                        <BookmarkPlus className="w-3.5 h-3.5" />
+                        <span>Lưu Vào Dàn Diễn Viên Khóa Rắc-co</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-neutral-500 italic">Cảnh hiện tại không có diễn viên nào để lưu.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* LIST OF SAVED CHARACTERS */}
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-neutral-300">
+                    Dàn Diễn Viên Khóa Rắc-co Trong Thư Viện ({namedCharacters.length}):
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm("Khôi phục danh sách dàn diễn viên về mặc định chuẩn của Limbo Engine?")) {
+                        const fresh = resetStoredNamedCharacters();
+                        setNamedCharacters(fresh);
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-purple-300 border border-neutral-700 text-[11px] transition-all font-medium"
+                    title="Khôi phục lại danh sách dàn diễn viên mặc định"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Khôi phục diễn viên mặc định</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1">
+                  {namedCharacters.map((char) => (
+                    <div
+                      key={char.id}
+                      className="bg-black/60 border border-neutral-800 hover:border-purple-800/60 rounded-xl p-3.5 flex flex-col justify-between gap-3 transition-all"
+                    >
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                            <Users className="w-4 h-4 text-purple-400" />
+                            <span>{char.name}</span>
+                          </h4>
+                          {char.id.startsWith("char_custom_") && (
+                            <button
+                              onClick={() => handleDeleteCharacter(char.id)}
+                              className="text-neutral-500 hover:text-red-400 p-1 transition-all"
+                              title="Xóa diễn viên tùy chỉnh này"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+
+                        {char.description && (
+                          <p className="text-[11px] text-neutral-400 leading-relaxed m-0">
+                            {char.description}
+                          </p>
+                        )}
+
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1 font-mono text-[10px]">
+                          <span className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-amber-300">
+                            Khung: {char.base}
+                          </span>
+                          <span className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-cyan-300">
+                            Đồ: {char.costume}
+                          </span>
+                          {char.face && (
+                            <span className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-neutral-300">
+                              Mặt: {char.face.replace("face_", "")}
+                            </span>
+                          )}
+                          {char.defaultHeldItem && char.defaultHeldItem !== "none" && (
+                            <span className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-red-300">
+                              Cầm: {char.defaultHeldItem.replace("item_", "")}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleApplyCharacterToCurrentScene(char)}
+                        className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-200 text-xs font-semibold transition-all hover:text-purple-300 hover:border-purple-600"
+                        title="Gán tạo hình diễn viên này vào nhân vật của cảnh hiện tại"
+                      >
+                        <UserCheck className="w-3.5 h-3.5 text-purple-400" />
+                        <span>Áp Dụng Cho Diễn Viên Cảnh {currentSceneIndex + 1}</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
           {mode === "re_direct_scene" && (
             <div className="flex flex-col gap-4">
               <div className="p-3 bg-neutral-950/70 border border-neutral-800/80 rounded-xl flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -1618,13 +1964,28 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                 </div>
 
                 {generatedScenes && (
-                  <button
-                    onClick={handleConfirmApplyFilm}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-950/60 transition-all"
-                  >
-                    <Play className="w-3.5 h-3.5" />
-                    <span>Áp Dụng Toàn Bộ Vào Phim Ngay</span>
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {onAppendScenes && totalScenesCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleConfirmAppendFilm}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold shadow-lg shadow-purple-950/60 transition-all border border-purple-500/50"
+                        title="Giữ nguyên các cảnh cũ và nối thêm các cảnh này vào sau (thích hợp làm phim dài chia nhỏ nhiều hồi)"
+                      >
+                        <Plus className="w-3.5 h-3.5 text-amber-300" />
+                        <span>➕ Nối Tiếp Vào Sau Phim ({totalScenesCount} cũ + {generatedScenes.length} mới)</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleConfirmApplyFilm}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-950/60 transition-all"
+                      title="Thay thế toàn bộ phim hiện tại bằng các cảnh vừa tạo"
+                    >
+                      <Play className="w-3.5 h-3.5" />
+                      <span>{totalScenesCount > 0 ? "Thay Thế Toàn Bộ Phim" : "Áp Dụng Vào Phim Ngay"} ({generatedScenes.length} Cảnh)</span>
+                    </button>
+                  </div>
                 )}
 
                 {generatedSingleScene && (

@@ -303,6 +303,22 @@ export interface NamedEnvironmentPreset {
 }
 
 /**
+ * Named Shared Character / Cast Preset
+ * Cấu hình diễn viên/nhân vật dùng lại để khóa rắc-co (continuity) giữa các phân cảnh và các tập
+ */
+export interface NamedCharacterPreset {
+  id: string; // e.g. "char_male_explorer", "char_female_ao_dai"
+  name: string; // Tên nhân vật (ví dụ: "Nam chính (Minh - Nhà báo)", "Oan hồn nữ áo dài")
+  description?: string; // Vai trò ngữ nghĩa (ví dụ: "Nhân vật chính bị truy đuổi trong suốt bộ phim")
+  base: CharacterBaseId; // male_adult, female_adult, elder_hunched, v.v.
+  costume: CostumeId; // outfit_modern_casual, outfit_flowing_ao_dai, v.v.
+  face?: CharacterFaceId; // Biểu cảm đặc trưng (mặc định e.g. face_scared, face_calm)
+  defaultHeldItem?: HeldItemId; // Đồ vật quen thuộc (e.g. item_flashlight)
+  defaultHeldHand?: HeldHand; // "right" | "left"
+  scale?: number; // Tỷ lệ co giãn (mặc định 1.0)
+}
+
+/**
  * Coordinate definition for slot anchors
  */
 export interface SlotAnchor {

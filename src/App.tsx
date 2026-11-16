@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { DirectorSceneScript, ThemeId, SkyPresetId, CharacterBaseId, CostumeId, CharacterFaceId, CharacterPoseId, StructureId } from "./engine/types";
 import { DEFAULT_HORROR_SCENES } from "./engine/defaultScenes";
 import { resetStoredNamedEnvironments } from "./engine/environmentPresets";
+import { resetStoredNamedCharacters } from "./engine/characterPresets";
 import { PlayerView } from "./components/PlayerView";
 import { EditorView } from "./components/EditorView";
 import { ExporterView } from "./components/ExporterView";
@@ -150,6 +151,15 @@ export function App() {
     setIsAiModalOpen(false);
   };
 
+  const handleAppendScenes = (newScenes: DirectorSceneScript[]) => {
+    if (!newScenes || newScenes.length === 0) return;
+    const nextIdx = scenes.length;
+    setScenes((prev) => [...prev, ...newScenes]);
+    setCurrentSceneIndex(nextIdx);
+    setActiveTab("player");
+    setIsAiModalOpen(false);
+  };
+
   const handleApplySingleScene = (updatedScene: DirectorSceneScript) => {
     handleUpdateCurrentScene(updatedScene);
     setActiveTab("player");
@@ -222,11 +232,12 @@ export function App() {
 
   const handleResetProject = () => {
     const confirmReset = window.confirm(
-      "Bạn có chắc muốn làm mới toàn bộ dự án để làm phim mới?\n\n- Toàn bộ các cảnh hiện tại sẽ được xóa và đặt lại về 1 cảnh mẫu mặc định sạch sẽ.\n- Thư viện bối cảnh lưu tạm sẽ được làm mới về mặc định ban đầu."
+      "Bạn có chắc muốn làm mới toàn bộ dự án để làm phim mới?\n\n- Toàn bộ các cảnh hiện tại sẽ được xóa và đặt lại về 1 cảnh mẫu mặc định sạch sẽ.\n- Thư viện bối cảnh và dàn diễn viên dùng lại (rắc-co) sẽ được làm mới về mặc định ban đầu."
     );
     if (!confirmReset) return;
 
     resetStoredNamedEnvironments();
+    resetStoredNamedCharacters();
     const freshScene = createTemplateScene(1);
     setScenes([freshScene]);
     setCurrentSceneIndex(0);
@@ -488,6 +499,7 @@ export function App() {
         onApplyNewFilm={handleApplyNewFilm}
         onApplySingleScene={handleApplySingleScene}
         onAppendScene={handleAppendScene}
+        onAppendScenes={handleAppendScenes}
         initialMode={aiModalMode}
       />
 
