@@ -65,6 +65,7 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"cursed_swamp"`: Đầm lầy u minh (vùng nước chết tĩnh mịch, lau sậy khẳng khiu, sương độc ma trơi).
 - `"modern_indoor"`: Hành lang & Không gian trong nhà hiện đại (hành lang bệnh viện, sảnh khách sạn u ám, siêu thị bỏ hoang, nhà hàng đêm muộn với trần nhà drop-tile, đèn tuýp huỳnh quang, biển báo EXIT và sàn gạch bóng loáng).
 - `"vehicle_interior"`: Khoang xe bus & Tàu xe kinh dị (không gian bên trong xe buýt, xe khách hoặc toa tàu ma quái với trần uốn cong, khoang thoát hiểm, ô cửa sổ đêm nhìn ra đường vắng, hàng ghế hành khách, cột vịn tay màu vàng và sàn cao su chống trượt). BẮT BUỘC dùng cho các cảnh diễn ra bên trong xe buýt/tàu xe để tạo cảm giác ngột ngạt (claustrophobic), TUYỆT ĐỐI KHÔNG dùng modern_indoor.
+- `"urban_night_market"`: Khu chợ đêm & Đường phố đô thị (con phố đô thị sầm uất u tối về đêm với dãy nhà cao tầng mờ ảo, đèn neon rực rỡ chớp nháy, dây điện chằng chịt, dãy lều bạt chợ đêm bày bán cổ vật, mặt đường nhựa ướt sũng bóng nước và hơi nước bốc lên từ nắp cống ngầm). BẮT BUỘC dùng cho các cảnh đô thị ngoài trời, phố xá hiện đại hoặc khu chợ đêm.
 
 ### 3.2. Bầu Trời & Chiếu Sáng (Sky Presets)
 - `"blood_moon"`: Trăng Máu U Uất (Gradient đỏ rực `#2B0808` -> `#0D0202`, trăng đỏ quạch khổng lồ).
@@ -74,7 +75,7 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"flickering_fluorescent"`: Đèn Tuýp Huỳnh Quang Chập Chờn (Ánh sáng xanh ngọc lạnh lẽo trong nhà, bóng tuýp chập chờn, biển báo EXIT xanh lục phát sáng).
 - `"dim_indoor_night"`: Ánh Vàng Đêm Mờ Ảo (Ánh đèn vàng hổ phách u tịch trong khách sạn / nhà hàng đêm muộn).
 
-### 3.3. 14 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
+### 3.3. 17 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
 
 Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ được đặt tại các Slot được phép** sau:
 
@@ -95,6 +96,9 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `dining_table_chairs` | Bàn ăn nhà hàng khăn rách | Bàn ăn phủ khăn trải bàn rách rưới, hai ghế tựa cao, chân nến và chai rượu bám bụi | `["mid_left", "center", "mid_right"]` |
 | `bus_interior` | Buồng lái tài xế & Máy bán vé xe bus | Buồng lái tài xế xe bus với vô lăng thép, bảng đồng hồ LED đỏ, hộp thu vé tự động, ghế lái thủy lực | `["mid_left", "center", "mid_right"]` |
 | `creepy_bathtub` | Bồn tắm rỉ sét ngập máu | Bồn tắm chân vuốt quái thú vintage, thành bồn vấy máu rỉ sét, nước đục ngầu lập lòe vệt tóc trôi dạt và vòi đồng nhỏ giọt máu | `["mid_left", "center", "mid_right"]` |
+| `market_stall_tent` | Quầy hàng / Lều bạt chợ đêm | Khung lều bạt chữ A rách mép, bóng đèn tròn vàng ấm đung đưa, quầy gỗ phủ khăn nỉ đỏ bày đồ cổ, bình gốm nứt và hộp gỗ quỷ ám | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `abandoned_subway_station` | Cổng vào & ga tàu điện ngầm bỏ hoang | Lối xuống hầm ga metro hoang phế, bậc thang bê tông nứt nẻ dẫn vào vực thẳm đen ngòm, lan can sắt gỉ, đèn quả cầu chập chờn và biển hiệu SUBWAY vỡ nát | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `rusty_train_tracks_tunnel` | Đường ray tàu & Đường hầm rỉ sét ẩm mốc | Vòm hầm đường sắt ngầm bê tông sâu hun hút, hai thanh ray thép rỉ sét ánh kim, tà vẹt gỗ mục nát, cáp điện lòng thòng, ống nước rỉ giọt và đèn tín hiệu đỏ ma quái | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 
 ---
 
@@ -217,7 +221,7 @@ Nhân vật có thể cầm đồ vật trên tay thông qua Hand Socket. Vật 
   - `"right"`: Tay trước (mặc định - tay chính quay về phía người xem).
   - `"left"`: Tay sau.
 
-### 6.2. Danh Mục 14 Đồ Vật Cầm Tay Thuần SVG:
+### 6.2. Danh Mục 15 Đồ Vật Cầm Tay Thuần SVG:
 1. `"none"`: Hai tay trống không.
 2. `"item_storm_lantern"`: Đèn bão sắt cổ phát sáng vàng ấm soi rọi màn sương (tỏa quầng sáng ấm xung quanh).
 3. `"item_paper_lantern"`: Đèn lồng giấy đỏ cầm tay cán trúc, tỏa ánh đỏ ma mị kèm tua rua.
@@ -232,6 +236,7 @@ Nhân vật có thể cầm đồ vật trên tay thông qua Hand Socket. Vật 
 12. `"item_scalpel"`: Dao mổ phẫu thuật kim loại sáng loáng sắc lạnh, mũi dao vương vệt máu tươi.
 13. `"item_smartphone"`: Điện thoại di động thông minh hiện đại, màn hình phát ánh sáng xanh lạnh ma mị soi tỏ bóng đêm và quầng sáng hình nón.
 14. `"item_severed_head"`: Thủ cấp đứt lìa vương máu rỉ giọt. Bàn tay túm chặt lọn tóc xách lủng lẳng đầu người bị chém đứt, mắt trợn trừng vô hồn, vệt máu đen rỉ từ hốc mắt và cuống cổ rỉ giọt máu rơi xuống đất. Rất phù hợp kết hợp cùng `face_headless` (ma không đầu tự xách đầu mình) hoặc kẻ sát nhân/chiến tướng xách thủ cấp kẻ thù.
+15. `"item_mysterious_note"`: Mẩu giấy / Lá thư bí ẩn gấp mép vương vệt máu mang thông điệp rùng rợn. Tờ giấy ố vàng nhăn nhúm, các nếp gấp 3D, mép rách răng cưa, vệt máu ngón tay cào xước, dòng chữ viết tay nghuệch ngoạc bằng máu và con dấu sáp đỏ niêm phong. Rất phù hợp cho nhân vật tìm thấy manh mối, di thư tuyệt mệnh hoặc bản đồ chỉ dẫn tới ga ngầm.
 
 ---
 
@@ -772,10 +777,13 @@ Hệ thống cho phép đạo diễn chuyển đổi linh hoạt giữa các c�
 - `target_slot`: Khóa khung nhìn vào một mốc neo slot (ví dụ `"center"` hoặc `"mid_left"`).
 
 ### 9.3. Rung Lắc Ống Kính (`camera.shake`)
-- `"none"`: Không rung.
-- `"subtle_handheld"`: Rung nhẹ tự nhiên kiểu máy quay cầm tay trong đêm.
-- `"creepy_tremor"`: Run rẩy rùng mình khi có tà khí hoặc hồn ma đến gần.
-- `"heavy_jumpscare"`: Giật nảy dữ dội khi có sấm sét, quỷ dữ vồ hoặc cú hù dọa kinh hoàng.
+- `"none"` (Mặc định bắt buộc): Khung hình ổn định, sắc nét, không rung lắc.
+- `"subtle_handheld"`: Dao động nhẹ tự nhiên mô phỏng máy quay cầm tay trong đêm (chỉ dùng khi người dùng yêu cầu góc nhìn máy quay cầm tay).
+- `"creepy_tremor"`: Run rẩy rùng mình khi có tà khí lạnh hoặc chấn động nhẹ.
+- `"heavy_jumpscare"`: Giật nảy dữ dội khi có sấm sét, động đất, nổ tung, quỷ dữ vồ hoặc cú hù dọa kinh hoàng (jumpscare).
+
+> [!IMPORTANT]
+> **QUY TẮC RUNG LẮC:** Mặc định của camera luôn là `"none"`! TUYỆT ĐỐI KHÔNG tự tiện thêm hiệu ứng rung lắc vào tất cả các phân cảnh nếu người dùng không yêu cầu hoặc không có tình tiết động đất, chấn động, nổ tung hay quỷ vồ thình lình.
 
 ### 9.4. Chuyển Động Máy Quay Theo Thời Gian (`camera.motion`)
 - `type`:
@@ -803,7 +811,7 @@ Hệ thống cho phép đạo diễn chuyển đổi linh hoạt giữa các c�
     "shot": "close_up",
     "target_actor_id": "ghost_oan_hon",
     "dutch_angle": -6,
-    "shake": "subtle_handheld",
+    "shake": "none",
     "motion": {
       "type": "push_in",
       "endZoom": 3.6,
@@ -826,6 +834,68 @@ Hệ thống cho phép đạo diễn chuyển đổi linh hoạt giữa các c�
   ],
   "dialogue": "Oan hồn chầm chậm ngẩng đầu lên, từ hai hốc mắt đen ngòm, những giọt máu tươi đặc quánh bắt đầu tuôn trào ròng ròng xuống gò má trắng bệch...",
   "narrative_note": "Cận cảnh khuôn mặt ma nữ khóc ra máu bleeding_tears kết hợp cú push_in ống kính và góc nghiêng ma mị dutch_angle để tạo cảm giác ngột ngạt."
+}
+```
+
+### 9.6. Kịch Bản JSON Mẫu: Chợ Đêm Mưa Neon & Lối Vào Ga Tàu Điện Ngầm Bỏ Hoang
+```json
+{
+  "scene_id": "scene_urban_night_subway_reveal",
+  "title": "Mẩu Giấy Bí Ẩn Dẫn Vào Cổng Ga Tàu Ngầm",
+  "duration_sec": 7,
+  "theme": "urban_night_market",
+  "lighting": {
+    "sky_preset": "foggy_night",
+    "fog_density": 0.75,
+    "thunder_flash": false,
+    "weather": "heavy_rain"
+  },
+  "camera": {
+    "shot": "medium_wide",
+    "target_slot": "center",
+    "shake": "none",
+    "motion": {
+      "type": "pan_right",
+      "startTimeSec": 0.5,
+      "endTimeSec": 6.0,
+      "easing": "ease_in_out"
+    }
+  },
+  "environment_items": [
+    { "asset_id": "market_stall_tent", "slot": "far_left", "scale": 1.0 },
+    { "asset_id": "abandoned_subway_station", "slot": "center", "scale": 1.05 }
+  ],
+  "actors": [
+    {
+      "id": "actor_hai",
+      "base": "male_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_scared",
+      "facialAction": "darting_eyes",
+      "pose": "pose_holding",
+      "facing": "right",
+      "slot": "mid_left",
+      "offsetX": 20,
+      "scale": 1.0,
+      "heldItem": "item_mysterious_note",
+      "heldHand": "right",
+      "motion": {
+        "targetSlot": "center",
+        "targetOffsetX": -80,
+        "startTimeSec": 0.8,
+        "endTimeSec": 5.8,
+        "easing": "ease_in_out",
+        "autoFaceTarget": true,
+        "movingPose": "pose_walking"
+      }
+    }
+  ],
+  "details": [
+    { "id": "detail_lantern_stall", "asset_id": "detail_blood_lantern", "slot": "far_left", "offsetX": 60 },
+    { "id": "detail_subway_camera", "asset_id": "detail_surveillance_camera", "slot": "air_center" }
+  ],
+  "dialogue": "Dưới cơn mưa tầm tã bên dãy lều bạt chợ đêm, mẩu giấy bí ẩn trên tay Hải chỉ dẫn thẳng vào cửa hầm trạm tàu điện ngầm bỏ hoang...",
+  "narrative_note": "Cốt truyện đô thị kinh dị: Hải cầm mẩu giấy ố máu che mưa bước dọc vỉa hè tiến về lối vào trạm ga tàu ngầm bị niêm phong."
 }
 ```
 

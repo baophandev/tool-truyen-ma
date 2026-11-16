@@ -132,6 +132,9 @@ export const SkyLayer: React.FC<{
               fill={isBloodMoon ? "#120303" : isEclipse ? "#030E0B" : "#080B12"}
             />
           </g>
+
+          {/* Urban Overhead Cables & Festoon Lights (when theme is urban_night_market) */}
+          {theme === "urban_night_market" && <UrbanOverheadWiresAndLights />}
         </>
       )}
     </g>
@@ -306,6 +309,93 @@ const IndoorCeilingLayer: React.FC<{ isFluorescent: boolean }> = ({ isFluorescen
 };
 
 /**
+ * URBAN NIGHT MARKET OVERHEAD WIRES & FESTOON STRING LIGHTS
+ */
+const UrbanOverheadWiresAndLights: React.FC = () => {
+  const festoonBulbs = [
+    { x: 120, y: 155, color: "#F59E0B", glow: "url(#urban-neon-amber)", delay: "0s" },
+    { x: 260, y: 178, color: "#EF4444", glow: "url(#blood-moon-glow-radial)", delay: "0.4s" },
+    { x: 420, y: 198, color: "#06B6D4", glow: "url(#urban-neon-cyan)", delay: "0.8s" },
+    { x: 580, y: 212, color: "#EC4899", glow: "url(#urban-neon-magenta)", delay: "1.2s" },
+    { x: 740, y: 220, color: "#F59E0B", glow: "url(#urban-neon-amber)", delay: "0.2s" },
+    { x: 900, y: 222, color: "#10B981", glow: "url(#eclipse-glow-radial)", delay: "0.6s" },
+    { x: 1060, y: 218, color: "#EC4899", glow: "url(#urban-neon-magenta)", delay: "1.0s" },
+    { x: 1220, y: 206, color: "#06B6D4", glow: "url(#urban-neon-cyan)", delay: "0.3s" },
+    { x: 1380, y: 190, color: "#F59E0B", glow: "url(#urban-neon-amber)", delay: "0.7s" },
+    { x: 1540, y: 172, color: "#EF4444", glow: "url(#blood-moon-glow-radial)", delay: "1.1s" },
+    { x: 1700, y: 150, color: "#06B6D4", glow: "url(#urban-neon-cyan)", delay: "0.5s" },
+    { x: 1840, y: 130, color: "#F59E0B", glow: "url(#urban-neon-amber)", delay: "0.9s" },
+  ];
+
+  return (
+    <g className="urban-overhead-wires-and-lights" pointerEvents="none">
+      {/* 1. Sagging high-voltage transmission cables */}
+      <path
+        d="M -200 70 Q 480 140 1020 150 Q 1520 145 2120 80"
+        fill="none"
+        stroke="#060910"
+        strokeWidth="3"
+        opacity="0.9"
+      />
+      <path
+        d="M -200 110 Q 520 190 1060 200 Q 1560 185 2120 120"
+        fill="none"
+        stroke="#080C16"
+        strokeWidth="2.5"
+        opacity="0.85"
+      />
+      <path
+        d="M -200 145 Q 600 235 1100 240 Q 1600 220 2120 155"
+        fill="none"
+        stroke="#05070B"
+        strokeWidth="2"
+        opacity="0.8"
+      />
+
+      {/* 2. Festoon string line supporting market party bulbs */}
+      <path
+        d="M -100 125 Q 960 255 2020 110"
+        fill="none"
+        stroke="#111827"
+        strokeWidth="1.8"
+      />
+
+      {/* 3. Swaying bulb sockets and colorful luminous bulbs */}
+      {festoonBulbs.map((bulb, idx) => (
+        <g
+          key={idx}
+          transform={`translate(${bulb.x}, ${bulb.y})`}
+          className="anim-pendulum-sway"
+          style={{ transformOrigin: "0px -10px", animationDelay: bulb.delay }}
+        >
+          {/* Hanging cord & socket */}
+          <line x1="0" y1="-8" x2="0" y2="4" stroke="#0F172A" strokeWidth="2" />
+          <rect x="-3" y="2" width="6" height="5" rx="1" fill="#1E293B" />
+          {/* Bulb glow halo */}
+          <circle cx="0" cy="11" r="22" fill={bulb.glow} opacity="0.65" />
+          {/* Luminous bulb teardrop */}
+          <circle cx="0" cy="11" r="5" fill={bulb.color} className="anim-flicker-ember" />
+          <circle cx="-1" cy="9" r="1.5" fill="#FFFFFF" opacity="0.8" />
+        </g>
+      ))}
+
+      {/* 4. Small decorative tattered pennant triangular flags */}
+      {[200, 360, 520, 680, 840, 1000, 1160, 1320, 1480, 1640, 1780].map((flagX, i) => {
+        const flagY = 135 + Math.sin(i * 0.55) * 45;
+        return (
+          <polygon
+            key={`flag-${i}`}
+            points={`${flagX - 10},${flagY} ${flagX + 10},${flagY} ${flagX},${flagY + 22}`}
+            fill={i % 2 === 0 ? "#1E1B4B" : "#3B0764"}
+            opacity="0.5"
+          />
+        );
+      })}
+    </g>
+  );
+};
+
+/**
  * LAYER 1: DISTANT BACKGROUND SILHOUETTES
  */
 export const BackgroundLayer: React.FC<{ theme: ThemeId; skyPreset: SkyPresetId }> = ({
@@ -324,6 +414,8 @@ export const BackgroundLayer: React.FC<{ theme: ThemeId; skyPreset: SkyPresetId 
         <IndoorCorridorBackground skyPreset={skyPreset} />
       ) : theme === "vehicle_interior" ? (
         <VehicleInteriorBackground skyPreset={skyPreset} />
+      ) : theme === "urban_night_market" ? (
+        <UrbanNightMarketBackground skyPreset={skyPreset} />
       ) : (
         <>
           {/* Distant Misty Mountain Ridges with overscan */}
@@ -626,6 +718,196 @@ const VehicleInteriorBackground: React.FC<{ skyPreset: SkyPresetId }> = ({ skyPr
 };
 
 /**
+ * URBAN NIGHT MARKET & CITY STREET BACKGROUND
+ * Silhouetted layered skyscrapers, shophouses with fire escapes, air conditioners,
+ * vibrant flickering neon signs ("夜市古玩", "HOTEL 24H", "BAR"), utility poles and street canopies.
+ */
+const UrbanNightMarketBackground: React.FC<{ skyPreset: SkyPresetId }> = ({ skyPreset }) => {
+  const isBlood = skyPreset === "blood_moon";
+  const neonPink = isBlood ? "#DC2626" : "#EC4899";
+  const neonCyan = "#06B6D4";
+  const neonAmber = "#F59E0B";
+
+  return (
+    <g className="urban-night-market-background">
+      {/* 1. Distant Urban Light Pollution Glow at horizon */}
+      <rect
+        x="-400"
+        y="420"
+        width={CANVAS_WIDTH + 800}
+        height="390"
+        fill="url(#mid-mist-grad-foggy_night)"
+        opacity="0.75"
+      />
+
+      {/* 2. Deep Skyline: Distant High-Rise Towers & Rooftop Antennas */}
+      <g className="distant-skyscrapers" fill="#080C14">
+        {/* Tower 1 (Far Left: 0 to 220) */}
+        <rect x="-50" y="260" width="240" height="540" />
+        <line x1="70" y1="180" x2="70" y2="260" stroke="#080C14" strokeWidth="4" />
+        <circle cx="70" cy="180" r="3" fill="#EF4444" className="anim-pulse-eerie" />
+        {/* Tower 2 (Mid Left: 220 to 450) */}
+        <rect x="220" y="320" width="200" height="480" />
+        <rect x="370" y="270" width="110" height="530" />
+        <line x1="425" y1="210" x2="425" y2="270" stroke="#080C14" strokeWidth="3" />
+        <circle cx="425" cy="210" r="2.5" fill="#EF4444" className="anim-pulse-eerie" />
+        {/* Tower 3 (Center Towers: 550 to 980) */}
+        <rect x="580" y="290" width="160" height="510" />
+        <rect x="760" y="220" width="240" height="580" />
+        <polygon points="850,220 880,140 910,220" fill="#060910" />
+        <line x1="880" y1="90" x2="880" y2="140" stroke="#080C14" strokeWidth="3.5" />
+        <circle cx="880" cy="90" r="3.5" fill="#EF4444" className="anim-pulse-eerie" />
+        {/* Tower 4 (Mid Right: 1040 to 1420) */}
+        <rect x="1050" y="310" width="220" height="490" />
+        <rect x="1300" y="250" width="180" height="550" />
+        <line x1="1390" y1="170" x2="1390" y2="250" stroke="#080C14" strokeWidth="3" />
+        <circle cx="1390" cy="170" r="2.5" fill="#EF4444" className="anim-pulse-eerie" />
+        {/* Tower 5 (Far Right: 1520 to 1980) */}
+        <rect x="1520" y="280" width="230" height="520" />
+        <rect x="1780" y="340" width="200" height="460" />
+        <line x1="1635" y1="190" x2="1635" y2="280" stroke="#080C14" strokeWidth="3" />
+        <circle cx="1635" cy="190" r="3" fill="#EF4444" className="anim-pulse-eerie" />
+      </g>
+
+      {/* Scattered Lit Windows in distant buildings */}
+      <g className="skyscraper-windows" fill="#FEF08A" opacity="0.35">
+        {[
+          { x: 20, y: 340 }, { x: 50, y: 380 }, { x: 30, y: 440 }, { x: 80, y: 490 },
+          { x: 250, y: 360 }, { x: 300, y: 420 }, { x: 280, y: 470 }, { x: 410, y: 310 },
+          { x: 610, y: 350 }, { x: 670, y: 400 }, { x: 630, y: 480 }, { x: 800, y: 260 },
+          { x: 850, y: 320 }, { x: 920, y: 280 }, { x: 810, y: 410 }, { x: 940, y: 460 },
+          { x: 1080, y: 370 }, { x: 1150, y: 440 }, { x: 1210, y: 390 }, { x: 1330, y: 300 },
+          { x: 1410, y: 360 }, { x: 1370, y: 450 }, { x: 1560, y: 330 }, { x: 1620, y: 410 },
+          { x: 1690, y: 360 }, { x: 1820, y: 390 }, { x: 1880, y: 450 },
+        ].map((w, idx) => (
+          <rect key={idx} x={w.x} y={w.y} width={7} height={11} rx={1} />
+        ))}
+      </g>
+
+      {/* 3. Mid-Ground Layer: Commercial Shophouses, Alleys & Rooftops (Y = 460 to 800) */}
+      <g className="midground-shophouses" fill="#0A0E17">
+        {/* Shophouse block 1: Left (0 to 360) */}
+        <polygon points="-50,470 190,470 190,490 350,490 350,800 -50,800" />
+        {/* Rooftop Water Tank on Shophouse 1 */}
+        <ellipse cx="90" cy="450" rx="20" ry="8" fill="#0F172A" stroke="#1E293B" strokeWidth="1.5" />
+        <rect x="70" y="450" width="40" height="20" fill="#0A0E17" stroke="#1E293B" strokeWidth="1.5" />
+        <line x1="75" y1="470" x2="75" y2="480" stroke="#1E293B" strokeWidth="2" />
+        <line x1="105" y1="470" x2="105" y2="480" stroke="#1E293B" strokeWidth="2" />
+
+        {/* Shophouse block 2: Mid-Left (370 to 760) */}
+        <polygon points="370,510 520,510 520,530 760,530 760,800 370,800" />
+        {/* Zig-Zag Fire Escape Staircase on Shophouse 2 */}
+        <g stroke="#1E293B" strokeWidth="2" fill="none">
+          <polyline points="480,550 515,580 480,610 515,640 480,670 515,700" />
+          <line x1="475" y1="550" x2="520" y2="550" strokeWidth="3" />
+          <line x1="475" y1="610" x2="520" y2="610" strokeWidth="3" />
+          <line x1="475" y1="670" x2="520" y2="670" strokeWidth="3" />
+        </g>
+
+        {/* Shophouse block 3: Center-Right (1120 to 1540) */}
+        <polygon points="1120,520 1340,520 1340,480 1540,480 1540,800 1120,800" />
+        {/* AC outdoor condenser units */}
+        <rect x="1150" y="560" width="28" height="20" rx="2" fill="#0F172A" stroke="#1E293B" strokeWidth="1" />
+        <circle cx="1160" cy="570" r="6" fill="none" stroke="#334155" strokeWidth="1" />
+        <rect x="1260" y="620" width="28" height="20" rx="2" fill="#0F172A" stroke="#1E293B" strokeWidth="1" />
+        <circle cx="1270" cy="630" r="6" fill="none" stroke="#334155" strokeWidth="1" />
+
+        {/* Shophouse block 4: Far-Right (1560 to 1980) */}
+        <polygon points="1560,500 1780,500 1780,470 1980,470 1980,800 1560,800" />
+      </g>
+
+      {/* 4. Vivid Glowing Neon Signs on Shophouse Facades */}
+      {/* Neon Sign 1: Vertical Cyan & Magenta Sign "NIGHT MARKET / 夜市" (Left Shophouse: X = 230) */}
+      <g transform="translate(230, 520)">
+        <line x1="-12" y1="10" x2="0" y2="10" stroke="#1E293B" strokeWidth="2.5" />
+        <line x1="-12" y1="130" x2="0" y2="130" stroke="#1E293B" strokeWidth="2.5" />
+        <rect x="0" y="0" width="46" height="150" rx="4" fill="#05070B" stroke="#1E293B" strokeWidth="1.5" />
+        <rect x="4" y="4" width="38" height="142" rx="3" fill="url(#urban-neon-cyan)" opacity="0.35" />
+        <rect x="4" y="4" width="38" height="142" rx="3" fill="none" stroke={neonCyan} strokeWidth="2" className="anim-flicker-ember" />
+        <g fill={neonPink} textAnchor="middle" fontSize="18" fontWeight="bold" fontFamily="monospace" className="anim-flicker-fast">
+          <text x="23" y="34">夜</text>
+          <text x="23" y="68">市</text>
+          <text x="23" y="102">古</text>
+          <text x="23" y="134">玩</text>
+        </g>
+      </g>
+
+      {/* Neon Sign 2: Horizontal Amber Sign "HOTEL 24H" (X = 610) */}
+      <g transform="translate(610, 560)">
+        <rect x="-8" y="-18" width="126" height="38" rx="4" fill="#04060A" stroke="#1E293B" strokeWidth="1.5" />
+        <rect x="-5" y="-15" width="120" height="32" rx="3" fill="url(#urban-neon-amber)" opacity="0.3" />
+        <rect x="-5" y="-15" width="120" height="32" rx="3" fill="none" stroke={neonAmber} strokeWidth="1.8" className="anim-flicker-ember" />
+        <text
+          x="55"
+          y="6"
+          textAnchor="middle"
+          fill={neonAmber}
+          fontSize="14"
+          fontWeight="bold"
+          fontFamily="monospace"
+          letterSpacing="2"
+          className="anim-flicker-ember"
+        >
+          HOTEL 24H
+        </text>
+      </g>
+
+      {/* Neon Sign 3: Flashing Downward Arrow Neon Sign (Center Alley: X = 960) */}
+      <g transform="translate(960, 580)" className="anim-pulse-eerie">
+        <polygon points="-16,-20 16,-20 16,5 30,5 0,35 -30,5 -16,5" fill="#030508" stroke="#334155" strokeWidth="1.5" />
+        <polygon
+          points="-12,-16 12,-16 12,3 24,3 0,28 -24,3 -12,3"
+          fill="none"
+          stroke={neonPink}
+          strokeWidth="2.5"
+        />
+        <circle cx="0" cy="0" r="18" fill="url(#urban-neon-magenta)" opacity="0.45" />
+      </g>
+
+      {/* Neon Sign 4: Vertical Glowing Sign "BAR" (Right Shophouse: X = 1460) */}
+      <g transform="translate(1460, 510)">
+        <rect x="0" y="0" width="42" height="135" rx="4" fill="#05070B" stroke="#1E293B" strokeWidth="1.5" />
+        <rect x="4" y="4" width="34" height="127" rx="3" fill="none" stroke={neonCyan} strokeWidth="1.8" className="anim-flicker-fast" />
+        <g fill={neonAmber} textAnchor="middle" fontSize="16" fontWeight="bold" fontFamily="monospace" className="anim-flicker-ember">
+          <text x="21" y="32">B</text>
+          <text x="21" y="60">A</text>
+          <text x="21" y="88">R</text>
+          <text x="21" y="118">⚚</text>
+        </g>
+      </g>
+
+      {/* 5. Utility Poles with Tangled Wire Bundles */}
+      <g className="utility-pole-left">
+        <rect x="325" y="380" width="10" height="420" fill="#060910" stroke="#1E293B" strokeWidth="1" />
+        <line x1="290" y1="410" x2="370" y2="410" stroke="#060910" strokeWidth="5" />
+        <line x1="295" y1="435" x2="365" y2="435" stroke="#060910" strokeWidth="4" />
+        <rect x="340" y="420" width="22" height="40" rx="3" fill="#0B1220" stroke="#1E293B" strokeWidth="1.5" />
+        <circle cx="295" cy="406" r="3" fill="#475569" />
+        <circle cx="365" cy="406" r="3" fill="#475569" />
+        <path d="M 330 435 Q 315 480 325 520" fill="none" stroke="#04060A" strokeWidth="2" />
+        <path d="M 345 440 Q 365 490 335 540" fill="none" stroke="#04060A" strokeWidth="1.8" />
+      </g>
+
+      <g className="utility-pole-right">
+        <rect x="1675" y="390" width="10" height="410" fill="#060910" stroke="#1E293B" strokeWidth="1" />
+        <line x1="1640" y1="420" x2="1720" y2="420" stroke="#060910" strokeWidth="5" />
+        <circle cx="1645" cy="416" r="3" fill="#475569" />
+        <circle cx="1715" cy="416" r="3" fill="#475569" />
+        <path d="M 1680 430 Q 1660 480 1675 530" fill="none" stroke="#04060A" strokeWidth="2" />
+      </g>
+
+      {/* 6. Distant Market Canopy Silhouettes */}
+      <g className="distant-stalls" fill="#080C14" opacity="0.85">
+        <polygon points="120,740 260,720 280,800 100,800" />
+        <polygon points="680,735 840,715 860,800 660,800" />
+        <polygon points="980,730 1140,710 1160,800 960,800" />
+        <polygon points="1520,735 1680,720 1700,800 1500,800" />
+      </g>
+    </g>
+  );
+};
+
+/**
  * PROCEDURAL BAMBOO GROVE
  */
 const BambooGrove: React.FC<{
@@ -751,11 +1033,96 @@ const VehicleFloorLayer: React.FC = () => {
 };
 
 /**
+ * URBAN NIGHT MARKET GROUND LAYER (Sàn bê tông / mặt đường nhựa ẩm ướt, bóng loáng, vạch vàng, nắp cống bốc hơi)
+ */
+const UrbanNightMarketGroundLayer: React.FC = () => {
+  return (
+    <g className="environment-layer-2-ground-urban">
+      {/* 1. Heavy Wet Asphalt Road Surface with Overscan */}
+      <rect
+        x="-400"
+        y={GROUND_Y}
+        width={CANVAS_WIDTH + 800}
+        height={CANVAS_HEIGHT - GROUND_Y + 400}
+        fill="#07090F"
+      />
+
+      {/* 2. Elevated Sidewalk Curb Line (Y = 800px) */}
+      <rect x="-400" y={GROUND_Y} width={CANVAS_WIDTH + 800} height="12" fill="#131B2A" />
+      <line x1="-400" y1={GROUND_Y} x2={CANVAS_WIDTH + 400} y2={GROUND_Y} stroke="#334155" strokeWidth="2.5" />
+      <line x1="-400" y1={GROUND_Y + 12} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 12} stroke="#0A0E17" strokeWidth="2" />
+
+      {/* Curb Stone Vertical Joints */}
+      <g stroke="#090D14" strokeWidth="1.5" opacity="0.75">
+        {[0, 140, 280, 420, 560, 700, 840, 980, 1120, 1260, 1400, 1540, 1680, 1820].map((jointX, idx) => (
+          <line key={idx} x1={jointX} y1={GROUND_Y} x2={jointX} y2={GROUND_Y + 12} />
+        ))}
+      </g>
+
+      {/* 3. Sidewalk Hazard Striping (Painted yellow-black caution curb) */}
+      <line
+        x1="-400"
+        y1={GROUND_Y + 3}
+        x2={CANVAS_WIDTH + 400}
+        y2={GROUND_Y + 3}
+        stroke="#EAB308"
+        strokeWidth="2.5"
+        strokeDasharray="36,24"
+        opacity="0.85"
+      />
+
+      {/* 4. Wet Asphalt Pavement Specular Neon Reflections */}
+      <ellipse cx="260" cy={GROUND_Y + 50} rx="160" ry="24" fill="url(#wet-street-reflection-grad)" opacity="0.8" />
+      <ellipse cx="680" cy={GROUND_Y + 70} rx="210" ry="28" fill="url(#wet-street-reflection-grad)" opacity="0.7" />
+      <ellipse cx="1460" cy={GROUND_Y + 55} rx="190" ry="26" fill="url(#wet-street-reflection-grad)" opacity="0.75" />
+
+      {/* 5. Heavy Cast-Iron Storm Drain / Manhole Cover (X = 960, Y = GROUND_Y + 95) */}
+      <g transform={`translate(960, ${GROUND_Y + 95})`}>
+        <ellipse cx="0" cy="0" rx="68" ry="22" fill="#030508" stroke="#1E293B" strokeWidth="2.5" />
+        <ellipse cx="0" cy="0" rx="60" ry="18" fill="#0B101D" stroke="#334155" strokeWidth="2" />
+        <ellipse cx="0" cy="0" rx="42" ry="12" fill="#070A12" stroke="#1E293B" strokeWidth="1.5" />
+        <line x1="-28" y1="0" x2="28" y2="0" stroke="#020305" strokeWidth="3" />
+        <line x1="-20" y1="-5" x2="20" y2="-5" stroke="#020305" strokeWidth="2.5" />
+        <line x1="-20" y1="5" x2="20" y2="5" stroke="#020305" strokeWidth="2.5" />
+        {/* Steam wisps rising up from sewer vents */}
+        <path
+          d="M -12 -5 Q -25 -40 -15 -80 Q -5 -120 -20 -150"
+          fill="none"
+          stroke="url(#swirling-mist-grad)"
+          strokeWidth="14"
+          strokeLinecap="round"
+          opacity="0.55"
+          className="anim-fog-wave-slow"
+        />
+        <path
+          d="M 10 -5 Q 25 -45 12 -85 Q 0 -125 18 -155"
+          fill="none"
+          stroke="url(#swirling-mist-grad)"
+          strokeWidth="12"
+          strokeLinecap="round"
+          opacity="0.45"
+          className="anim-fog-wave-fast"
+        />
+      </g>
+
+      {/* 6. Receding Asphalt Road Lane Dividers */}
+      <g stroke="#E2E8F0" strokeWidth="2" strokeDasharray="50,45" opacity="0.3">
+        <line x1="-400" y1={GROUND_Y + 160} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 160} />
+      </g>
+    </g>
+  );
+};
+
+/**
  * LAYER 2: MAIN GROUND (Y = 800px)
  */
 export const MainGroundLayer: React.FC<{ theme?: ThemeId }> = ({ theme }) => {
   if (theme === "vehicle_interior") {
     return <VehicleFloorLayer />;
+  }
+
+  if (theme === "urban_night_market") {
+    return <UrbanNightMarketGroundLayer />;
   }
 
   if (theme === "modern_indoor") {
@@ -892,6 +1259,8 @@ export const ForegroundLayer: React.FC<{
           <path d="M 0 0 L 320 0 L 260 70 L 0 50 Z" fill={COLOR_PALETTE.silhouette_primary} />
           <path d="M 1920 0 L 1600 0 L 1660 70 L 1920 50 Z" fill={COLOR_PALETTE.silhouette_primary} />
         </g>
+      ) : theme === "urban_night_market" ? (
+        <UrbanForegroundFraming />
       ) : (
         <>
           {/* Overhanging Branches */}
@@ -915,6 +1284,60 @@ export const ForegroundLayer: React.FC<{
         fill="url(#vignette-grad)"
         style={{ mixBlendMode: "multiply" }}
       />
+    </g>
+  );
+};
+
+/**
+ * URBAN FOREGROUND FRAMING (Cột đèn đường cổ điển hắt sáng xuống, dây điện rủ góc máy)
+ */
+const UrbanForegroundFraming: React.FC = () => {
+  return (
+    <g className="urban-foreground-framing">
+      {/* 1. Vintage Cast-Iron Streetlamp on Far-Left (X = 50) */}
+      <g className="streetlamp-framing">
+        <path d="M 35 1080 L 45 420 L 55 420 L 65 1080 Z" fill={COLOR_PALETTE.silhouette_primary} />
+        <polygon points="25,1080 75,1080 65,1020 35,1020" fill={COLOR_PALETTE.silhouette_secondary} />
+        <path
+          d="M 50 440 C 50 360, 110 330, 130 360 L 130 390"
+          fill="none"
+          stroke={COLOR_PALETTE.silhouette_primary}
+          strokeWidth="7"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 50 400 Q 80 400 100 420"
+          fill="none"
+          stroke={COLOR_PALETTE.silhouette_primary}
+          strokeWidth="3.5"
+        />
+        {/* Hanging Lantern housing */}
+        <g transform="translate(130, 390)">
+          <polygon points="-16,0 16,0 0,-12" fill={COLOR_PALETTE.silhouette_primary} />
+          <polygon points="-14,0 14,0 10,32 -10,32" fill="url(#tent-warm-lantern)" opacity="0.75" />
+          <polygon points="-14,0 14,0 10,32 -10,32" fill="none" stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="2.5" />
+          <circle cx="0" cy="14" r="5" fill="#FEF08A" className="anim-flicker-ember" />
+          <polygon
+            points="0,20 -110,650 250,650"
+            fill="url(#tent-warm-lantern)"
+            opacity="0.18"
+            style={{ mixBlendMode: "screen", pointerEvents: "none" }}
+          />
+        </g>
+      </g>
+
+      {/* 2. Top-Right Dangling Severed Cable */}
+      <path
+        d="M 1920 0 Q 1810 110 1830 180"
+        fill="none"
+        stroke={COLOR_PALETTE.silhouette_primary}
+        strokeWidth="3.5"
+      />
+      <circle cx="1830" cy="180" r="2.5" fill="#EF4444" className="anim-flicker-fast" />
+
+      {/* 3. Vignette shadows at extreme screen borders */}
+      <rect x="0" y="0" width="100" height={CANVAS_HEIGHT} fill="url(#left-shadow-vignette)" opacity="0.75" />
+      <rect x={CANVAS_WIDTH - 100} y="0" width="100" height={CANVAS_HEIGHT} fill="url(#right-shadow-vignette)" opacity="0.75" />
     </g>
   );
 };

@@ -33,6 +33,9 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "dining_table_chairs" && <DiningTableChairs />}
       {id === "bus_interior" && <BusInterior />}
       {id === "creepy_bathtub" && <CreepyBathtub />}
+      {id === "market_stall_tent" && <MarketStallTent />}
+      {id === "abandoned_subway_station" && <AbandonedSubwayStation />}
+      {id === "rusty_train_tracks_tunnel" && <RustyTrainTracksTunnel />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -1062,6 +1065,545 @@ const CreepyBathtub: React.FC = () => {
         <circle cx="-25" cy="-42" r="2.2" fill="#DC2626" className="anim-pulse-eerie" />
         <line x1="-25" y1="-40" x2="-25" y2="-25" stroke="#991B1B" strokeWidth="1" strokeDasharray="3,3" />
         <circle cx="-25" cy="-22" r="1.8" fill="#DC2626" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 16. MARKET STALL & ANTIQUE TENT (Quầy hàng / Lều bạt chợ đêm)
+ * Ground anchor: [0, 0] at bottom-center (Y=800px)
+ */
+const MarketStallTent: React.FC = () => {
+  return (
+    <g className="structure-market-stall-tent">
+      {/* 1. Heavy Metal Frame Leg Uprights anchored on ground */}
+      <line x1="-140" y1="0" x2="-125" y2="-180" stroke="#1E293B" strokeWidth="4" />
+      <line x1="140" y1="0" x2="125" y2="-180" stroke="#1E293B" strokeWidth="4" />
+      <line x1="-95" y1="0" x2="-85" y2="-180" stroke="#0F172A" strokeWidth="3" />
+      <line x1="95" y1="0" x2="85" y2="-180" stroke="#0F172A" strokeWidth="3" />
+
+      {/* Frame Diagonal Cross Braces */}
+      <line x1="-140" y1="0" x2="-85" y2="-180" stroke="#111827" strokeWidth="1.8" />
+      <line x1="140" y1="0" x2="85" y2="-180" stroke="#111827" strokeWidth="1.8" />
+      <line x1="-125" y1="-180" x2="125" y2="-180" stroke="#1E293B" strokeWidth="3" />
+
+      {/* 2. Roof Canopy Structure (A-Frame Tent Peak at Y = -275) */}
+      {/* Back interior canopy shadow */}
+      <polygon points="0,-275 -155,-175 155,-175" fill="#05070B" />
+
+      {/* Hanging Warm Overhead Bulb & Wire underneath canopy */}
+      <line x1="0" y1="-275" x2="0" y2="-205" stroke="#0A0E17" strokeWidth="2" />
+      <rect x="-3" y="-205" width="6" height="6" rx="1" fill="#1E293B" />
+      {/* Warm Ambient Glow Cone */}
+      <circle cx="0" cy="-195" r="65" fill="url(#tent-warm-lantern)" opacity="0.8" />
+      <circle cx="0" cy="-195" r="7" fill="#FEF08A" className="anim-flicker-ember" />
+      {/* Wire protective cage around bulb */}
+      <path d="M -7 -200 L 0 -185 L 7 -200" fill="none" stroke="#475569" strokeWidth="1.2" />
+
+      {/* Front Outer Canopy Fabric Panels */}
+      <polygon points="0,-275 -160,-175 -75,-175" fill="#0A0F1D" stroke="#1E293B" strokeWidth="1.5" />
+      <polygon points="0,-275 -75,-175 0,-175" fill="#0F172A" stroke="#1E293B" strokeWidth="1.5" />
+      <polygon points="0,-275 0,-175 75,-175" fill="#0B1322" stroke="#1E293B" strokeWidth="1.5" />
+      <polygon points="0,-275 75,-175 160,-175" fill="#090E1A" stroke="#1E293B" strokeWidth="1.5" />
+      {/* Center Ridge Seam Pipe */}
+      <line x1="0" y1="-275" x2="0" y2="-175" stroke="#334155" strokeWidth="2.5" />
+
+      {/* Wavy Torn Scalloped Valance / Fringe (Rèm bạt rách mép tua rua) */}
+      <path
+        d="M -160 -175 Q -145 -160 -130 -175 Q -115 -158 -100 -175 Q -85 -162 -70 -175 Q -55 -159 -40 -175 Q -25 -163 -10 -175 Q 5 -160 20 -175 Q 35 -162 50 -175 Q 65 -160 80 -175 Q 95 -164 110 -175 Q 125 -158 140 -175 Q 150 -162 160 -175 L 160 -178 L -160 -178 Z"
+        fill="#080C16"
+        stroke="#1E293B"
+        strokeWidth="1.2"
+      />
+
+      {/* 3. Antique Counter Table (Mặt bàn gỗ bày đồ cổ) */}
+      {/* Wooden X-Trestle Table Legs touching Ground Y = 0 */}
+      <line x1="-115" y1="0" x2="-80" y2="-90" stroke="#1C1917" strokeWidth="6" />
+      <line x1="-80" y1="0" x2="-115" y2="-90" stroke="#1C1917" strokeWidth="6" />
+      <line x1="115" y1="0" x2="80" y2="-90" stroke="#1C1917" strokeWidth="6" />
+      <line x1="80" y1="0" x2="115" y2="-90" stroke="#1C1917" strokeWidth="6" />
+      <line x1="-120" y1="0" x2="120" y2="0" stroke="#0C0A09" strokeWidth="3" />
+
+      {/* Deep Red Torn Felt Runner Cloth hanging off counter */}
+      <polygon
+        points="-120,-85 120,-85 110,-42 90,-48 70,-40 40,-52 0,-44 -40,-50 -70,-42 -100,-48 -115,-40"
+        fill="#450A0A"
+        stroke="#7F1D1D"
+        strokeWidth="1"
+      />
+      {/* Stained streaks on cloth */}
+      <line x1="-30" y1="-85" x2="-28" y2="-45" stroke="#1F0404" strokeWidth="4" />
+      <line x1="45" y1="-85" x2="47" y2="-42" stroke="#1F0404" strokeWidth="3" />
+
+      {/* Solid Wooden Tabletop Plank */}
+      <rect x="-132" y="-95" width="264" height="12" rx="2" fill="#1C1917" stroke="#292524" strokeWidth="2" />
+      <line x1="-130" y1="-92" x2="130" y2="-92" stroke="#44403C" strokeWidth="1.5" />
+
+      {/* 4. Antiques, Relics & Curious Objects on Table */}
+      {/* Antique 1: Ancient Cracked Ceramic Urn (Left) */}
+      <g transform="translate(-85, -95)">
+        <path d="M -12 0 L -16 -24 Q -22 -38 0 -42 Q 22 -38 16 -24 L 12 0 Z" fill="#0A0E17" stroke="#1E293B" strokeWidth="1.5" />
+        <ellipse cx="0" cy="-42" rx="10" ry="3" fill="#05070B" stroke="#334155" strokeWidth="1" />
+        {/* Crack zig-zag */}
+        <path d="M -4 -38 L 2 -26 L -3 -15 L 4 0" fill="none" stroke="#DC2626" strokeWidth="1" />
+      </g>
+
+      {/* Antique 2: Stack of Old Manuscripts & Occult Scrolls (Center-Left) */}
+      <g transform="translate(-35, -95)">
+        <rect x="-18" y="-8" width="36" height="8" rx="1" fill="#78350F" stroke="#451A03" strokeWidth="1" />
+        <rect x="-16" y="-15" width="32" height="7" rx="1" fill="#92400E" stroke="#78350F" strokeWidth="1" />
+        <rect x="-15" y="-22" width="30" height="7" rx="1" fill="#B45309" stroke="#92400E" strokeWidth="1" />
+        {/* Tied hemp string */}
+        <line x1="0" y1="-23" x2="0" y2="0" stroke="#FDE68A" strokeWidth="1.5" />
+      </g>
+
+      {/* Antique 3: Cursed Ornate Wooden Relic Box ajar with Eerie Glow (Center-Right) */}
+      <g transform="translate(35, -95)">
+        {/* Box Base */}
+        <rect x="-18" y="-22" width="36" height="22" rx="2" fill="#0A0A0C" stroke="#78350F" strokeWidth="1.5" />
+        {/* Eerie internal red glow escaping ajar lid */}
+        <ellipse cx="0" cy="-22" rx="14" ry="5" fill="#DC2626" className="anim-pulse-eerie" />
+        {/* Tilted Open Lid */}
+        <polygon points="-19,-22 19,-28 17,-33 -21,-27" fill="#1C1917" stroke="#92400E" strokeWidth="1.5" />
+        {/* Metal lock hasp */}
+        <rect x="-2" y="-18" width="4" height="8" fill="#D4AF37" />
+      </g>
+
+      {/* Antique 4: Calling Bell / Ritual Tam Thanh Bell (Right) */}
+      <g transform="translate(85, -95)">
+        <path d="M -8 0 Q -10 -15 0 -22 Q 10 -15 8 0 Z" fill="#78350F" stroke="#B45309" strokeWidth="1.5" />
+        <circle cx="0" cy="-24" r="3.5" fill="#D4AF37" />
+        <circle cx="0" cy="0" r="2" fill="#FACC15" />
+      </g>
+
+      {/* 5. Hanging Wooden Placard Sign: "ĐỒ CỔ / 古玩" */}
+      <g transform="translate(0, -145)">
+        {/* Hanging ropes from canopy frame */}
+        <line x1="-28" y1="-30" x2="-28" y2="0" stroke="#78350F" strokeWidth="1.5" />
+        <line x1="28" y1="-30" x2="28" y2="0" stroke="#78350F" strokeWidth="1.5" />
+        {/* Wooden board */}
+        <rect x="-35" y="0" width="70" height="25" rx="3" fill="#0B0908" stroke="#44403C" strokeWidth="1.5" />
+        <text
+          x="0"
+          y="16"
+          textAnchor="middle"
+          fill="#D4AF37"
+          fontSize="10"
+          fontWeight="bold"
+          fontFamily="monospace"
+          letterSpacing="1.5"
+        >
+          TIỆM ĐỒ CỔ
+        </text>
+      </g>
+
+      {/* 6. Ground Storage Crates & Burlap Sacks at foot */}
+      {/* Heavy Weathered Wooden Crate on Left */}
+      <g transform="translate(-135, 0)">
+        <rect x="-22" y="-34" width="44" height="34" fill="#14110E" stroke="#292524" strokeWidth="1.5" />
+        <line x1="-22" y1="-34" x2="22" y2="0" stroke="#292524" strokeWidth="1.5" />
+        <line x1="-22" y1="0" x2="22" y2="-34" stroke="#292524" strokeWidth="1.5" />
+        <rect x="-20" y="-32" width="40" height="4" fill="#292524" opacity="0.6" />
+      </g>
+
+      {/* Slumped Burlap Sack on Right */}
+      <g transform="translate(130, 0)">
+        <ellipse cx="0" cy="-15" rx="20" ry="15" fill="#1C140E" stroke="#451A03" strokeWidth="1.5" />
+        <polygon points="-8,-28 8,-28 0,-34" fill="#2E1B0F" />
+        <circle cx="0" cy="-27" r="2.5" fill="#78350F" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 17. ABANDONED SUBWAY STATION ENTRANCE (Cổng vào & Ga tàu điện ngầm bỏ hoang)
+ * Ground anchor: [0, 0] at bottom-center (Y=800px)
+ */
+const AbandonedSubwayStation: React.FC = () => {
+  return (
+    <g className="structure-abandoned-subway-station">
+      {/* 1. Deep Subterranean Chasm / Pitch Darkness Stair Void */}
+      <rect x="-140" y="-220" width="280" height="220" fill="url(#subway-tunnel-depth)" />
+
+      {/* 2. Concrete Stairwell Receding into Abyss (7 Perspective Steps) */}
+      {[
+        { y: 0, w: 240, h: 12 },
+        { y: -16, w: 224, h: 11 },
+        { y: -32, w: 208, h: 10 },
+        { y: -48, w: 192, h: 9 },
+        { y: -64, w: 176, h: 8 },
+        { y: -80, w: 160, h: 8 },
+        { y: -96, w: 144, h: 7 },
+      ].map((step, idx) => (
+        <g key={idx}>
+          {/* Step Riser (Vertical face) */}
+          <rect
+            x={-step.w / 2}
+            y={step.y - step.h}
+            width={step.w}
+            height={step.h}
+            fill="#090E17"
+            stroke="#1E293B"
+            strokeWidth="1"
+          />
+          {/* Step Tread Highlight (Horizontal top tread) */}
+          <line
+            x1={-step.w / 2}
+            y1={step.y - step.h}
+            x2={step.w / 2}
+            y2={step.y - step.h}
+            stroke="#334155"
+            strokeWidth="1.5"
+          />
+        </g>
+      ))}
+
+      {/* Slime & Blood Runoff dripping down the center of steps */}
+      <path
+        d="M -15 -110 Q 5 -80 -8 -50 Q 12 -20 -4 0"
+        fill="none"
+        stroke="#7F1D1D"
+        strokeWidth="4"
+        opacity="0.8"
+      />
+      <circle cx="-4" cy="0" r="3" fill="#DC2626" />
+
+      {/* 3. Tiled Subway Flank Walls (Left and Right retaining walls) */}
+      {/* Left Wall */}
+      <polygon points="-190,0 -130,-120 -130,-240 -190,-240" fill="#070A12" stroke="#1E293B" strokeWidth="2" />
+      {/* Right Wall */}
+      <polygon points="190,0 130,-120 130,-240 190,-240" fill="#070A12" stroke="#1E293B" strokeWidth="2" />
+      {/* Subway Tile Grooves on Walls */}
+      <line x1="-180" y1="-60" x2="-140" y2="-60" stroke="#151E2E" strokeWidth="1" />
+      <line x1="-180" y1="-120" x2="-130" y2="-120" stroke="#151E2E" strokeWidth="1" />
+      <line x1="-180" y1="-180" x2="-130" y2="-180" stroke="#151E2E" strokeWidth="1" />
+      <line x1="180" y1="-60" x2="140" y2="-60" stroke="#151E2E" strokeWidth="1" />
+      <line x1="180" y1="-120" x2="130" y2="-120" stroke="#151E2E" strokeWidth="1" />
+      <line x1="180" y1="-180" x2="130" y2="-180" stroke="#151E2E" strokeWidth="1" />
+
+      {/* Cryptic Bloody Graffiti on Left Wall */}
+      <text
+        x="-165"
+        y="-140"
+        fill="#991B1B"
+        fontSize="12"
+        fontWeight="bold"
+        fontFamily="sans-serif"
+        transform="rotate(-25, -165, -140)"
+        opacity="0.85"
+      >
+        CẤM VÀO
+      </text>
+
+      {/* 4. Heavy Industrial Iron Railing (Lan can sắt rỉ sét hai bên) */}
+      {/* Left Railing */}
+      <g className="subway-railing-left">
+        <line x1="-155" y1="0" x2="-155" y2="-210" stroke="#0F172A" strokeWidth="5" />
+        <line x1="-135" y1="0" x2="-135" y2="-120" stroke="#0F172A" strokeWidth="4" />
+        <line x1="-170" y1="0" x2="-170" y2="-160" stroke="#0F172A" strokeWidth="4" />
+        <line x1="-175" y1="-160" x2="-135" y2="-120" stroke="#334155" strokeWidth="4" />
+        {/* Baluster vertical bars */}
+        {[-165, -155, -145].map((bx, i) => (
+          <line key={i} x1={bx} y1="-10" x2={bx} y2="-135" stroke="#1E293B" strokeWidth="2" />
+        ))}
+      </g>
+
+      {/* Right Railing */}
+      <g className="subway-railing-right">
+        <line x1="155" y1="0" x2="155" y2="-210" stroke="#0F172A" strokeWidth="5" />
+        <line x1="135" y1="0" x2="135" y2="-120" stroke="#0F172A" strokeWidth="4" />
+        <line x1="170" y1="0" x2="170" y2="-160" stroke="#0F172A" strokeWidth="4" />
+        <line x1="175" y1="-160" x2="135" y2="-120" stroke="#334155" strokeWidth="4" />
+        {[145, 155, 165].map((bx, i) => (
+          <line key={i} x1={bx} y1="-10" x2={bx} y2="-135" stroke="#1E293B" strokeWidth="2" />
+        ))}
+      </g>
+
+      {/* 5. Wrought-Iron Entrance Pylons with Glowing Globe Lanterns */}
+      {/* Left Pylon & Globe */}
+      <g transform="translate(-155, -210)">
+        <rect x="-8" y="0" width="16" height="28" rx="2" fill="#0A0E17" stroke="#1E293B" strokeWidth="1.5" />
+        {/* Brass collar */}
+        <circle cx="0" cy="-4" r="7" fill="#1E293B" />
+        {/* Glowing Spherical Glass Globe */}
+        <circle cx="0" cy="-22" r="18" fill="url(#urban-neon-cyan)" opacity="0.8" />
+        <circle cx="0" cy="-22" r="16" fill="#A5F3FC" opacity="0.9" className="anim-pulse-eerie" />
+        {/* Cracked glass fissure */}
+        <path d="M -6 -28 L 2 -20 L -3 -12 L 4 -7" fill="none" stroke="#083344" strokeWidth="1.5" />
+        {/* Metal finial cap */}
+        <polygon points="-6,-38 6,-38 0,-46" fill="#0F172A" stroke="#334155" strokeWidth="1" />
+      </g>
+
+      {/* Right Pylon & Globe (Flickering / Damaged) */}
+      <g transform="translate(155, -210)">
+        <rect x="-8" y="0" width="16" height="28" rx="2" fill="#0A0E17" stroke="#1E293B" strokeWidth="1.5" />
+        <circle cx="0" cy="-4" r="7" fill="#1E293B" />
+        <circle cx="0" cy="-22" r="18" fill="url(#urban-neon-cyan)" opacity="0.4" className="anim-flicker-fast" />
+        <circle cx="0" cy="-22" r="16" fill="#67E8F9" opacity="0.5" className="anim-flicker-fast" />
+        <polygon points="-6,-38 6,-38 0,-46" fill="#0F172A" stroke="#334155" strokeWidth="1" />
+      </g>
+
+      {/* 6. Grand Overhead Entrance Arch & Illuminated Signboard */}
+      {/* Arch Bridge Beam between pylons */}
+      <path
+        d="M -155 -230 C -155 -320, 155 -320, 155 -230"
+        fill="none"
+        stroke="#0B0F19"
+        strokeWidth="10"
+      />
+      <path
+        d="M -155 -230 C -155 -320, 155 -320, 155 -230"
+        fill="none"
+        stroke="#334155"
+        strokeWidth="3"
+      />
+
+      {/* Illuminated Station Signboard (Y = -310 to -260) */}
+      <g transform="translate(0, -290)">
+        {/* Sign Metal Box */}
+        <rect x="-115" y="-22" width="230" height="44" rx="4" fill="#05070B" stroke="#334155" strokeWidth="2.5" />
+        {/* Background Acrylic Glow */}
+        <rect x="-108" y="-16" width="216" height="32" rx="2" fill="url(#urban-neon-cyan)" opacity="0.25" />
+        <rect x="-108" y="-16" width="216" height="32" rx="2" fill="none" stroke="#06B6D4" strokeWidth="1" opacity="0.7" />
+        {/* Metro Roundel Symbol */}
+        <circle cx="-85" cy="0" r="11" fill="#DC2626" />
+        <text x="-85" y="4" textAnchor="middle" fill="#FFFFFF" fontSize="12" fontWeight="bold">M</text>
+        {/* Station Name Typography */}
+        <text
+          x="12"
+          y="5"
+          textAnchor="middle"
+          fill="#E2E8F0"
+          fontSize="14"
+          fontWeight="bold"
+          fontFamily="monospace"
+          letterSpacing="2"
+          className="anim-flicker-ember"
+        >
+          SUBWAY / GA NGẦM
+        </text>
+        {/* Shattered acrylic fracture on right of sign */}
+        <path d="M 75 -16 L 85 4 L 98 -6 L 108 16" fill="none" stroke="#083344" strokeWidth="1.8" />
+      </g>
+
+      {/* 7. Torn Yellow Hazard / Police Caution Tape fluttering across entrance */}
+      <g className="subway-caution-tape">
+        {/* Left piece */}
+        <path
+          d="M -155 -150 Q -90 -125 -30 -130"
+          fill="none"
+          stroke="#EAB308"
+          strokeWidth="6"
+        />
+        <path
+          d="M -155 -150 Q -90 -125 -30 -130"
+          fill="none"
+          stroke="#000000"
+          strokeWidth="6"
+          strokeDasharray="14,12"
+        />
+        {/* Right piece hanging down */}
+        <path
+          d="M 155 -150 Q 80 -120 20 -70"
+          fill="none"
+          stroke="#EAB308"
+          strokeWidth="6"
+        />
+        <path
+          d="M 155 -150 Q 80 -120 20 -70"
+          fill="none"
+          stroke="#000000"
+          strokeWidth="6"
+          strokeDasharray="14,12"
+        />
+      </g>
+
+      {/* 8. Dangling Padlock & Broken Iron Chain on Railing */}
+      <g transform="translate(-135, -120)">
+        <circle cx="0" cy="8" r="4" fill="none" stroke="#64748B" strokeWidth="2" />
+        <circle cx="0" cy="16" r="4" fill="none" stroke="#64748B" strokeWidth="2" />
+        <rect x="-5" y="20" width="10" height="12" rx="1.5" fill="#78350F" stroke="#451A03" strokeWidth="1" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 18. RUSTY TRAIN TRACKS & TUNNEL VAULT (Đường ray tàu & Đường hầm rỉ sét ẩm mốc)
+ * Ground anchor: [0, 0] at bottom-center (Y=800px)
+ */
+const RustyTrainTracksTunnel: React.FC = () => {
+  return (
+    <g className="structure-rusty-train-tracks-tunnel">
+      {/* 1. Deep Vanishing-Point Pitch Blackness Tunnel Interior */}
+      <path
+        d="M -190 0 L -190 -220 C -190 -370, 190 -370, 190 -220 L 190 0 Z"
+        fill="url(#subway-tunnel-depth)"
+      />
+
+      {/* Concentric Receding Inner Arch Rings (Perspective Tunnel Depth) */}
+      {/* Ring 2 (Mid-distance) */}
+      <path
+        d="M -140 0 L -140 -170 C -140 -280, 140 -280, 140 -170 L 140 0 Z"
+        fill="#04060A"
+        stroke="#1E293B"
+        strokeWidth="2.5"
+      />
+      {/* Ring 3 (Deep-distance) */}
+      <path
+        d="M -90 0 L -90 -120 C -90 -200, 90 -200, 90 -120 L 90 0 Z"
+        fill="#010204"
+        stroke="#151E2E"
+        strokeWidth="2"
+      />
+      {/* Deepest Abyss Tunnel Center */}
+      <ellipse cx="0" cy="-100" rx="45" ry="55" fill="#000000" />
+
+      {/* 2. Massive Concrete Outer Tunnel Vault (Front Arch Ring) */}
+      <path
+        d="M -210 0 L -210 -230 C -210 -385, 210 -385, 210 -230 L 210 0 L 180 0 L 180 -225 C 180 -355, -180 -355, -180 -225 L -180 0 Z"
+        fill="#080C14"
+        stroke="#1E293B"
+        strokeWidth="3"
+      />
+
+      {/* Concrete Arch Keystone & Radial Segment Seams */}
+      <g stroke="#1E293B" strokeWidth="2" opacity="0.65">
+        <line x1="0" y1="-385" x2="0" y2="-355" />
+        <line x1="-80" y1="-375" x2="-68" y2="-348" />
+        <line x1="80" y1="-375" x2="68" y2="-348" />
+        <line x1="-155" y1="-340" x2="-135" y2="-320" />
+        <line x1="155" y1="-340" x2="135" y2="-320" />
+        <line x1="-200" y1="-280" x2="-175" y2="-270" />
+        <line x1="200" y1="-280" x2="175" y2="-270" />
+      </g>
+
+      {/* 3. Ballast Crushed Rock Bed along the floor */}
+      <g fill="#0B101D" opacity="0.8">
+        {[-160, -130, -100, -70, -40, -10, 20, 50, 80, 110, 140, 160].map((rx, idx) => (
+          <ellipse key={idx} cx={rx} cy={-2} rx={14} ry={6} />
+        ))}
+      </g>
+
+      {/* 4. Wooden Railway Ties (Thanh tà vẹt gỗ mục nát) */}
+      {[
+        { y: 0, w: 220, h: 10 },
+        { y: -22, w: 180, h: 9 },
+        { y: -48, w: 145, h: 8 },
+        { y: -76, w: 115, h: 7 },
+        { y: -106, w: 88, h: 6 },
+        { y: -138, w: 66, h: 5 },
+        { y: -170, w: 48, h: 4 },
+      ].map((tie, idx) => (
+        <g key={idx}>
+          {/* Wooden Tie Beam */}
+          <rect
+            x={-tie.w / 2}
+            y={tie.y - tie.h}
+            width={tie.w}
+            height={tie.h}
+            rx={1}
+            fill="#1C140E"
+            stroke="#29180C"
+            strokeWidth="1.5"
+          />
+          {/* Metal Tie Tie-Plates */}
+          <rect x={-tie.w / 2 + 15} y={tie.y - tie.h - 1} width={8} height={tie.h + 2} fill="#451A03" />
+          <rect x={tie.w / 2 - 23} y={tie.y - tie.h - 1} width={8} height={tie.h + 2} fill="#451A03" />
+        </g>
+      ))}
+
+      {/* 5. Two Heavy Rusty Steel Rails (Hai thanh ray rỉ sét) */}
+      {/* Left Steel Rail: Converging into distance */}
+      {/* Rail Shadow Base */}
+      <path d="M -98 0 L -20 -185 L -16 -185 L -92 0 Z" fill="#2E1005" />
+      {/* Rail Steel Crown with Rusty Orange-Amber Metallic Glint */}
+      <path
+        d="M -94 0 L -18 -185"
+        stroke="#B45309"
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M -94 0 L -18 -185"
+        stroke="#F59E0B"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        opacity="0.85"
+      />
+
+      {/* Right Steel Rail: Converging into distance */}
+      {/* Rail Shadow Base */}
+      <path d="M 92 0 L 16 -185 L 20 -185 L 98 0 Z" fill="#2E1005" />
+      {/* Rail Steel Crown */}
+      <path
+        d="M 94 0 L 18 -185"
+        stroke="#B45309"
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M 94 0 L 18 -185"
+        stroke="#F59E0B"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        opacity="0.85"
+      />
+
+      {/* Stagnant Murky Water Puddle between rails */}
+      <ellipse cx="0" cy="-35" rx="38" ry="10" fill="#0A0605" stroke="#78350F" strokeWidth="1" opacity="0.8" />
+      {/* Red reflection on puddle from signal light */}
+      <ellipse cx="8" cy="-35" rx="14" ry="4" fill="#DC2626" opacity="0.45" />
+
+      {/* 6. High-Voltage Overhead Tunnel Cables & Wires */}
+      <path
+        d="M -180 -250 Q -100 -310 0 -315 Q 100 -310 180 -250"
+        fill="none"
+        stroke="#060910"
+        strokeWidth="5"
+      />
+      <path
+        d="M -180 -220 Q -90 -280 0 -285 Q 90 -280 180 -220"
+        fill="none"
+        stroke="#0B101D"
+        strokeWidth="3.5"
+      />
+      {/* Severed dangling loose cable on ceiling */}
+      <path
+        d="M -40 -312 Q -25 -270 -35 -240 Q -45 -215 -38 -195"
+        fill="none"
+        stroke="#0F172A"
+        strokeWidth="2.5"
+      />
+      <circle cx="-38" cy="-195" r="2" fill="#38BDF8" className="anim-flicker-fast" />
+
+      {/* 7. Drainage Pipe on Left Wall with Dripping Water Droplets */}
+      <g transform="translate(-178, -120)">
+        <rect x="-8" y="-120" width="16" height="180" fill="#0E1626" stroke="#1E293B" strokeWidth="1.5" />
+        <rect x="-11" y="-80" width="22" height="8" rx="1" fill="#334155" />
+        <rect x="-11" y="-20" width="22" height="8" rx="1" fill="#334155" />
+        <path d="M 0 60 Q 15 70 25 75" fill="none" stroke="#0E1626" strokeWidth="6" />
+        {/* Dripping Water droplets */}
+        <circle cx="25" cy="85" r="2.2" fill="#38BDF8" className="anim-pulse-eerie" />
+        <circle cx="25" cy="105" r="1.8" fill="#38BDF8" opacity="0.6" />
+      </g>
+
+      {/* 8. Railway Signal Lantern on Right Tunnel Wall (Red Warning Eye) */}
+      <g transform="translate(160, -220)">
+        {/* Wall Mounting Bracket */}
+        <line x1="-15" y1="0" x2="0" y2="0" stroke="#334155" strokeWidth="3" />
+        <line x1="-15" y1="20" x2="0" y2="0" stroke="#334155" strokeWidth="2" />
+        {/* Signal Steel Casing */}
+        <rect x="0" y="-22" width="24" height="44" rx="4" fill="#060910" stroke="#1E293B" strokeWidth="2" />
+        {/* Protective Sun Hood over top lens */}
+        <path d="M 0 -10 Q 12 -22 24 -10" fill="none" stroke="#334155" strokeWidth="3" />
+        {/* Red Glowing Bullseye Signal Lens */}
+        <circle cx="12" cy="-5" r="8" fill="#DC2626" className="anim-pulse-eerie" />
+        <circle cx="12" cy="-5" r="22" fill="url(#blood-moon-glow-radial)" opacity="0.65" />
+        {/* Lower Unlit Amber Lens */}
+        <circle cx="12" cy="12" r="5" fill="#451A03" stroke="#78350F" strokeWidth="1" />
       </g>
     </g>
   );

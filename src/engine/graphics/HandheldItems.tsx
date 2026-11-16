@@ -23,6 +23,7 @@ export const HELD_ITEM_CATALOG: HeldItemMeta[] = [
   { id: "item_scalpel", name: "Dao mổ phẫu thuật sắc lạnh", desc: "Dao mổ kim loại sáng loáng vương vệt máu" },
   { id: "item_smartphone", name: "Điện thoại di động phát sáng", desc: "Màn hình smartphone xanh lạnh ma mị soi tỏ bóng đêm" },
   { id: "item_severed_head", name: "Thủ cấp đứt lìa vương máu", desc: "Đầu người bị chém đứt túm tóc xách tay, mắt trợn trừng, máu rỉ giọt" },
+  { id: "item_mysterious_note", name: "Mẩu giấy bí ẩn vương máu", desc: "Mẩu giấy / lá thư cũ nát viết thông điệp rùng rợn trên tay" },
 ];
 
 interface HandheldItemRendererProps {
@@ -446,6 +447,48 @@ function renderHeldItemSvg(itemId: Exclude<HeldItemId, "none">) {
           <ellipse cx="0" cy="36" rx="4" ry="1.5" fill="#7F1D1D" />
           {/* Exposed bone fragment */}
           <rect x="-1" y="34.5" width="2" height="3" rx="0.5" fill="#E2E8F0" stroke="#0F172A" strokeWidth="0.6" />
+        </g>
+      );
+
+    case "item_mysterious_note":
+      return (
+        <g className="held-mysterious-note anim-sway-subtle" transform="translate(0, 0) rotate(8)">
+          {/* Faint eerie aura around cursed letter */}
+          <ellipse cx="6" cy="18" rx="18" ry="22" fill="url(#candle-eerie-glow)" opacity="0.35" />
+
+          {/* Folded / Crumpled Parchment Paper Sheet anchored at thumb grip [0, 0] */}
+          {/* Main Paper Body with torn irregular edges */}
+          <polygon
+            points="-3,0 18,2 22,26 16,33 6,31 -2,35 -6,28 -3,14"
+            fill="url(#note-parchment-grad)"
+            stroke="#78350F"
+            strokeWidth="0.8"
+          />
+
+          {/* Crumple 3D diagonal fold lines */}
+          <line x1="-3" y1="0" x2="16" y2="18" stroke="#CA8A04" strokeWidth="0.8" opacity="0.7" />
+          <line x1="6" y1="12" x2="-2" y2="35" stroke="#B45309" strokeWidth="0.8" opacity="0.6" />
+          <line x1="10" y1="2" x2="22" y2="26" stroke="#E2BD6E" strokeWidth="0.6" opacity="0.7" />
+
+          {/* Dark Blood Smear / Thumbprint at grip point */}
+          <ellipse cx="0" cy="3" rx="3.5" ry="4.5" fill="#991B1B" opacity="0.75" />
+          <ellipse cx="1" cy="4" rx="2" ry="2.5" fill="#450A0A" />
+
+          {/* Cryptic handwritten scribbles / runes in dried blood & ink */}
+          <g stroke="#1C1917" strokeWidth="0.9" strokeLinecap="round" opacity="0.85">
+            <line x1="2" y1="8" x2="14" y2="9" />
+            <line x1="0" y1="13" x2="16" y2="14" />
+            <line x1="1" y1="18" x2="13" y2="19" stroke="#991B1B" />
+            <line x1="-1" y1="23" x2="11" y2="24" stroke="#7F1D1D" />
+          </g>
+
+          {/* Broken Red Wax Seal remnant */}
+          <circle cx="14" cy="27" r="3.5" fill="#991B1B" stroke="#450A0A" strokeWidth="0.6" />
+          <circle cx="14" cy="27" r="1.8" fill="#DC2626" />
+
+          {/* Dripping blood drop from corner of note */}
+          <path d="M 6 31 Q 6 37 6 39" stroke="#DC2626" strokeWidth="1" strokeLinecap="round" />
+          <circle cx="6" cy="39" r="1.2" fill="#DC2626" className="anim-pulse-eerie" />
         </g>
       );
   }

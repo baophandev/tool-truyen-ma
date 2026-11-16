@@ -15,6 +15,7 @@ import {
   Film,
   Layers,
   Info,
+  Activity,
 } from "lucide-react";
 
 interface PlayerViewProps {
@@ -23,6 +24,7 @@ interface PlayerViewProps {
   onSelectScene: (index: number) => void;
   showGizmo: boolean;
   onToggleGizmo: () => void;
+  onDisableAllShake?: () => void;
 }
 
 export const PlayerView: React.FC<PlayerViewProps> = ({
@@ -31,6 +33,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   onSelectScene,
   showGizmo,
   onToggleGizmo,
+  onDisableAllShake,
 }) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -157,6 +160,18 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             <Layers className="w-4 h-4" />
             <span>{showGizmo ? "Tắt Lưới Neo" : "Hiện Lưới Neo"}</span>
           </button>
+
+          {/* Quick Disable All Shake if any scene has shake */}
+          {scenes.some((s) => s.camera?.shake && s.camera.shake !== "none") && onDisableAllShake && (
+            <button
+              onClick={onDisableAllShake}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-950/70 hover:bg-amber-900/90 text-amber-300 border border-amber-800/60 shadow-lg shadow-amber-950/30 transition-all"
+              title="Tắt toàn bộ hiệu ứng rung lắc ống kính cho tất cả phân cảnh để ổn định hình ảnh"
+            >
+              <Activity className="w-4 h-4 text-amber-400" />
+              <span>Tắt Rung Lắc</span>
+            </button>
+          )}
         </div>
       </div>
 

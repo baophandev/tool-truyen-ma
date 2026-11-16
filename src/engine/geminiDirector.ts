@@ -1,5 +1,5 @@
-import type { DirectorSceneScript, NamedEnvironmentPreset } from "./types";
-import { validateDirectorScript } from "./layoutRouter";
+import type { DirectorSceneScript, NamedEnvironmentPreset, CameraShotType } from "./types";
+import { validateDirectorScript, VALID_CAMERA_SHOTS } from "./layoutRouter";
 
 export const DEFAULT_GEMINI_API_KEY =
   import.meta.env.VITE_GEMINI_API_KEY || "";
@@ -39,6 +39,34 @@ export function setStoredModel(model: string): void {
   } catch {
     // Ignore storage errors
   }
+}
+
+/**
+ * Detects if user description or story explicitly asks for earthquake/shake/shock impact.
+ */
+export function hasShakeKeywords(text: string | string[]): boolean {
+  if (!text) return false;
+  const str = Array.isArray(text) ? text.join(" ") : text;
+  return /động đất|earthquake|rung lắc|rung chuyển|chấn động|sập đổ|sụp đổ|nổ tung|jumpscare|vồ lấy|giật nảy|chấn kinh/i.test(str);
+}
+
+/**
+ * Sanitizes camera shake: if user did not explicitly describe earthquake or violent shock,
+ * enforce camera shake to "none" so scenes don't vibrate unintentionally.
+ */
+export function sanitizeSceneShake(scene: DirectorSceneScript, sourceText: string | string[]): DirectorSceneScript {
+  if (scene.camera && scene.camera.shake && scene.camera.shake !== "none") {
+    if (!hasShakeKeywords(sourceText)) {
+      return {
+        ...scene,
+        camera: {
+          ...scene.camera,
+          shake: "none",
+        },
+      };
+    }
+  }
+  return scene;
 }
 
 /**
@@ -167,7 +195,8 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
 - Đường Line tiếp đất liên tục: Có thể dùng offsetX để nhân vật đứng ở bất kỳ tọa độ X nào từ 80px đến 1840px (X_thực = slot.X + offsetX). Với nhân vật tiếp đất, offsetY BẮT BUỘC bằng 0.
 
 2. KHO TÀI NGUYÊN HỢP LỆ (CHỈ ĐƯỢC DÙNG CÁC ID SAU, KHÔNG ĐƯỢC TỰ BỊA ID MỚI):
-- Themes: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior"
+- Themes: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior" | "urban_night_market"
+  * "urban_night_market": Khu chợ đêm & đường phố đô thị rực rỡ ánh đèn neon chớp giật, dây lều bạt cổ vật, mặt đường nhựa bóng loáng trong mưa lạnh.
   * "vehicle_interior": Toàn bộ khoang bên trong xe bus / tàu hỏa (trần cong, ô cửa sổ nhìn ra đường đêm, ghế xe bus, cột tay vịn vàng với chuông bấm). BẮT BUỘC dùng cho cảnh trong xe, KHÔNG dùng modern_indoor vì modern_indoor là sảnh hành lang rộng lớn.
 - Sky presets (Bầu trời & Chiếu sáng):
   * "blood_moon" (Trăng máu đỏ rực)
@@ -180,7 +209,7 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
   * "creepy_banyan_tree", "haunted_gallows_tree" -> CHỈ ĐẶT Ở: "far_left" | "far_right"
   * "ancient_tomb", "abandoned_shrine", "creepy_well", "hospital_operating_bed", "hotel_reception_desk", "creepy_elevator_doors", "dining_table_chairs", "bus_interior", "creepy_bathtub" -> CHỈ ĐẶT Ở: "mid_left" | "center" | "mid_right"
   * "dilapidated_hut", "broken_wooden_bridge", "supermarket_shelf_aisle" -> CHỈ ĐẶT Ở: "far_left" | "center" | "far_right"
-  * "scarecrow_of_the_damned" -> Đặt ở mọi ground slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right"
+  * "scarecrow_of_the_damned", "market_stall_tent", "abandoned_subway_station", "rusty_train_tracks_tunnel" -> Đặt ở mọi ground slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right"
 - Details (Đạo cụ cảnh):
   * "detail_black_crow", "detail_broken_mirror" -> Tất cả 5 ground slots và 3 air slots
   * "detail_will_o_wisp" -> "air_left" | "air_center" | "air_right" | "mid_left" | "center" | "mid_right"
@@ -221,16 +250,126 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
     - "pose_sitting": Nhân vật ngồi ngay ngắn trên ghế / sàn xe (ví dụ Lan ngồi ghế).
     - "pose_sitting_twisted_legs": Tư thế dị dạng kinh dị - thân trên ngồi trên ghế, đôi chân bị xoay ngược 180 độ ra phía sau lưng, hai bàn chân lơ lửng cách mặt sàn vài phân không chạm đất (người đàn ông ma quái trên xe buýt). BẮT BUỘC ở Ground Slot (offsetY = 0).
 - Actor Handheld Items (Đồ vật cầm tay qua Hand Socket):
-  * "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" (Thủ cấp đứt lìa xách tay)
+  * "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" (Mẩu giấy / lá thư bí ẩn vương máu)
   * "heldHand": "right" (tay trước) | "left" (tay sau)
 - Chuyển động A -> B (motion tweening):
   * NẾU NHÂN VẬT ĐỨNG YÊN KHÔNG DI CHUYỂN: BỎ HẲN trường "motion" (TUYỆT ĐỐI KHÔNG để null hay {}).
   * CHỈ KHI nhân vật thực sự di chuyển từ điểm A sang điểm B mới thêm:
     "motion": { "targetSlot": SlotId, "targetOffsetX": number, "targetOffsetY": 0, "startTimeSec": number, "endTimeSec": number, "easing": "linear"|"ease_in_out"|"ease_in"|"ease_out", "autoFaceTarget": true, "movingPose": "pose_walking"|"pose_floating"|"pose_crawling"|"pose_reaching" }
 
-3. QUY ĐỊNH ĐỊNH DẠNG ĐẦU RA:
+3. QUY TẮC ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH (CINEMATIC CAMERA SYSTEM - BẮT BUỘC ĐẠO DIỄN SỬ DỤNG LINH HOẠT):
+Mỗi phân cảnh BẮT BUỘC có khối "camera" để điều phối góc nhìn điện ảnh, TUYỆT ĐỐI KHÔNG để toàn bộ các cảnh đều là "wide" đơn điệu! Khai thác triệt để độ phân giải vector vô hạn của SVG (không vỡ hạt khi zoom):
+- "shot" (7 Cỡ cảnh chuẩn):
+  * "extreme_wide": Đại cảnh (0.88x) - Cảnh mở màn hoặc kết thúc mênh mông, nhân vật lọt thỏm cô độc giữa không gian hiểm ác, cánh đồng ma trăng máu.
+  * "wide": Toàn cảnh (1.0x) - Thiết lập không gian sân khấu 1920x1080, thấy rõ tất cả các công trình và nhân vật.
+  * "medium_wide": Trung toàn cảnh (1.45x) - Từ đầu gối lên, nhân vật tương tác với công trình (đứng trước mộ, bàn mổ, bồn tắm, quầy lễ tân).
+  * "medium": Trung cảnh (1.9x) - Từ thắt lưng lên, nhấn mạnh hành động rút kiếm gỗ đào, thắp đèn, soi đèn pin, cầm dao mổ, rung chuông.
+  * "close_up": Cận cảnh (2.85x) - Từ ngực lên đầu! BẮT BUỘC khi biểu cảm kinh hoàng ("face_scared", "face_screaming_gasp", "face_bleeding_eyes", "face_creepy_smile").
+  * "extreme_close_up": Đặc tả (4.3x) - Phóng đại tối đa vào tròng mắt rỉ máu, nụ cười xé toạc, mũi dao mổ, bùa dán trán cương thi.
+  * "dutch_tilt": Góc nghiêng ma mị (1.6x, dutch_angle: -6 đến -10 độ) - Tà khí xâm lấn, điên loạn, bất an, bóp méo không gian thực tại.
+- "target_actor_id": Khóa mục tiêu vào ID nhân vật chính (ví dụ "actor_1", "ghost_oan_hon"). KHI DÙNG "medium", "close_up", "extreme_close_up", "dutch_tilt" BẮT BUỘC ĐIỀN TRƯỜNG NÀY ĐỂ CAMERA TỰ ĐỘNG CĂN TẦM MẶT VÀ BÁM THEO NHÂN VẬT (TRACKING SHOT)!
+- "target_slot": Neo khung nhìn vào một slot ("center", "mid_left", "mid_right", "far_left", "far_right") nếu không khóa theo actor.
+- "shake": Hiệu ứng rung giật ống kính:
+  * "none": Mặc định (bình thường, ổn định, không rung). QUY TẮC BẮT BUỘC: Mặc định luôn là "none" để khung hình sắc nét, tĩnh tại. TUYỆT ĐỐI KHÔNG tự tiện thêm shake vào các cảnh thông thường nếu người dùng không yêu cầu.
+  * "subtle_handheld": Dao động máy quay cầm tay tự nhiên (chỉ dùng khi người dùng yêu cầu góc nhìn cầm tay).
+  * "creepy_tremor": Run rẩy rùng mình khi có tà khí lạnh hoặc chấn động nhẹ.
+  * "heavy_jumpscare": Giật nảy dữ dội (CHỈ DÙNG khi người dùng có mô tả động đất, sụp đổ, nổ tung, hoặc quỷ dữ vồ giật mình).
+- "motion" (Chuyển động máy quay sinh động - tùy chọn):
+  * "type": "push_in" (zoom từ từ tiến sát vào mặt đối tượng - tăng hồi hộp nghẹt thở) | "pull_out" (zoom lùi xa để lộ bóng ma sau lưng) | "pan_left" | "pan_right" | "follow_actor" (bám theo bước chân nhân vật).
+  * "endZoom": Hệ số zoom đích (ví dụ 3.2 khi push_in từ medium vào close_up).
+  * "startTimeSec", "endTimeSec": Thời gian bắt đầu và kết thúc (ví dụ 0.5 đến duration - 0.5).
+  * "easing": "ease_in_out" | "linear" | "ease_in" | "ease_out".
+
+4. QUY ĐỊNH ĐỊNH DẠNG ĐẦU RA:
 - BẮT BUỘC xuất ra CHÍNH XÁC MỘT JSON ARRAY gồm danh sách các cảnh (hoặc 1 JSON object nếu chỉ yêu cầu 1 cảnh duy nhất).
 - KHÔNG thêm bất kỳ lời giải thích ngoài lề nào, chỉ trả về chuỗi JSON thuần.`;
+
+/**
+ * Formats API errors with user-friendly messages for 503 / 429 overloads.
+ */
+function formatApiError(res: Response, errBody: string): string {
+  try {
+    const errJson = JSON.parse(errBody);
+    if (errJson.error?.message) {
+      if (res.status === 503) {
+        return `Máy chủ Gemini đang quá tải tạm thời (HTTP 503: High demand). Hệ thống đã tự động thử lại nhưng máy chủ Google vẫn bận. Vui lòng thử lại sau 30 giây hoặc chọn model khác trong phần Cấu hình.`;
+      }
+      return `Lỗi Gemini API (${res.status}): ${errJson.error.message}`;
+    }
+  } catch {
+    // raw text fallback
+  }
+  return `Lỗi Gemini API (Mã HTTP ${res.status}): ${errBody}`;
+}
+
+/**
+ * Safe Gemini fetch helper with Exponential Backoff retry and automatic model fallback.
+ */
+async function callGeminiApiWithRetry(
+  apiKey: string,
+  model: string,
+  systemInstructionText: string,
+  userPromptText: string,
+  generationConfig: any = { responseMimeType: "application/json", temperature: 0.5 },
+  maxRetries: number = 2
+): Promise<Response> {
+  const modelsToTry = [model];
+  // Auto-fallback: If primary model is overloaded (503), failover to 2.0-flash or 1.5-flash
+  if (model.includes("2.5") && !modelsToTry.includes("gemini-2.0-flash")) {
+    modelsToTry.push("gemini-2.0-flash");
+  } else if (!modelsToTry.includes("gemini-1.5-flash")) {
+    modelsToTry.push("gemini-1.5-flash");
+  }
+
+  let lastRes: Response | null = null;
+
+  for (const currentModel of modelsToTry) {
+    let attempt = 0;
+    let delay = 1200;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
+
+    while (attempt <= maxRetries) {
+      attempt++;
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemInstructionText }] },
+            contents: [{ parts: [{ text: userPromptText }] }],
+            generationConfig,
+          }),
+        });
+
+        lastRes = res;
+
+        // If success or normal client error (400, 401, 403, 404), return immediately
+        if (res.ok) {
+          return res;
+        }
+
+        // Retry only on server load errors: 503 (Overloaded), 429 (Rate limit), 500 (Internal)
+        if (res.status !== 503 && res.status !== 429 && res.status !== 500) {
+          return res;
+        }
+
+        if (attempt <= maxRetries) {
+          const jitter = Math.random() * 400;
+          await new Promise((resolve) => setTimeout(resolve, delay + jitter));
+          delay *= 1.8;
+        }
+      } catch (networkErr) {
+        if (attempt > maxRetries && currentModel === modelsToTry[modelsToTry.length - 1]) {
+          throw networkErr;
+        }
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        delay *= 1.8;
+      }
+    }
+  }
+
+  return lastRes!;
+}
 
 export interface GenerateFilmResult {
   success: boolean;
@@ -292,17 +431,40 @@ YÊU CẦU ĐẠO DIỄN BẮT BUỘC:
    ${effectiveSceneCount >= 4 ? `- Đối tượng JSON thứ 4 trong mảng trả về BẮT BUỘC phải là đạo diễn cho [PHÂN CẢNH 4].` : ""}
    ${effectiveSceneCount >= 5 ? `- Đối tượng JSON thứ 5 trong mảng trả về BẮT BUỘC phải là đạo diễn cho [PHÂN CẢNH 5].` : ""}
 2. Bố trí chuẩn xác tài nguyên theo GEMINI_DIRECTOR_ASSETS.md:
-   - theme: "rural_graveyard" | "abandoned_village" | "cursed_swamp"
-   - lighting (sky_preset: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss", fog_density: 0.5 - 0.9, thunder_flash: boolean)
+   - theme: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior"
+   - lighting (sky_preset: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss" | "flickering_fluorescent" | "dim_indoor_night", fog_density: 0.5 - 0.9, thunder_flash: boolean)
    - structures & details tuân thủ tuyệt đối quy tắc vị trí neo (Ground Slots vs Air Slots, cây đa/cây gallows chỉ ở far_left/far_right, miếu/mộ/giếng ở giữa...)
    - actors: base, costume, face, pose, facing, slot, continuous offsetX, heldItem, heldHand
    - motion: chuyển động A -> B (nếu nhân vật di chuyển từ vị trí xuất phát tới vị trí đích)
-3. Mỗi cảnh có tiêu đề (title), thời lượng (duration_sec: 5-8), phụ đề lời thoại rùng rợn (dialogue) và ghi chú đạo diễn (narrative_note).
-4. Đảm bảo nhân vật và trang phục nhất quán giữa các cảnh nếu cùng một nhân vật xuất hiện xuyên suốt.
+3. ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH (CINEMATIC CAMERA - BẮT BUỘC SỬ DỤNG):
+   Mỗi cảnh BẮT BUỘC có khối "camera" sinh động theo nhịp điệu kinh dị (TUYỆT ĐỐI KHÔNG để tất cả đều là "wide"):
+   - Cỡ cảnh ("shot"): "wide" (mở màn/bao quát) -> "medium_wide" / "medium" (hành động/tiếp cận) -> "close_up" / "extreme_close_up" (kinh hãi/hé lộ ma quỷ) -> "dutch_tilt" (tà khí/hoảng loạn).
+   - "target_actor_id": Khóa mục tiêu vào ID nhân vật chính (ví dụ "actor_1") để camera bám theo mặt nhân vật khi di chuyển.
+   - "shake": "none" (MẶC ĐỊNH BẮT BUỘC) | "subtle_handheld" | "creepy_tremor" | "heavy_jumpscare". QUY TẮC RUNG LẮC: Mặc định luôn là "none". TUYỆT ĐỐI KHÔNG tự ý thêm hiệu ứng rung lắc vào mọi phân cảnh. CHỈ sử dụng khi người dùng MÔ TẢ RÕ động đất, sụp đổ, nổ tung hoặc jumpscare giật mình. Cảnh đi lại, đứng nhìn, quan sát, trăng rằm, sương mù... BẮT BUỘC để "none".
+   - "motion": Tùy chọn chuyển động máy ("push_in" zoom cận tăng căng thẳng, "follow_actor" bám theo nhân vật di chuyển).
+4. Mỗi cảnh có tiêu đề (title), thời lượng (duration_sec: 5-8), phụ đề lời thoại rùng rợn (dialogue) và ghi chú đạo diễn (narrative_note).
+5. Đảm bảo nhân vật và trang phục nhất quán giữa các cảnh nếu cùng một nhân vật xuất hiện xuyên suốt.
 
 Trả về một JSON ARRAY gồm đúng ${effectiveSceneCount} đối tượng DirectorSceneScript:
 [
-  { "scene_id": "scene_01_...", "title": "...", "duration_sec": 6, "theme": "...", "lighting": { ... }, "environment_items": [ ... ], "actors": [ ... ], "details": [ ... ], "dialogue": "...", "narrative_note": "..." },
+  {
+    "scene_id": "scene_01_...",
+    "title": "...",
+    "duration_sec": 6,
+    "theme": "...",
+    "lighting": { "sky_preset": "foggy_night", "fog_density": 0.6 },
+    "camera": {
+      "shot": "medium_wide",
+      "target_actor_id": "actor_1",
+      "shake": "none",
+      "motion": { "type": "push_in", "endZoom": 2.2, "startTimeSec": 0.5, "endTimeSec": 5, "easing": "ease_in_out" }
+    },
+    "environment_items": [ ... ],
+    "actors": [ ... ],
+    "details": [ ... ],
+    "dialogue": "...",
+    "narrative_note": "..."
+  },
   ...
 ]`;
   } else {
@@ -314,52 +476,49 @@ ${storyPrompt}
 Yêu cầu cho chuỗi ${effectiveSceneCount} cảnh:
 1. Các cảnh phải có sự liên kết cốt truyện liền mạch, căng thẳng dồn dập (Cảnh 1 thiết lập bối cảnh, Cảnh 2 phát hiện điều bất thường/chạm trán, Cảnh 3 cao trào rùng rợn/bị rượt đuổi).
 2. Tận dụng tối đa nhân vật, trang phục, khuôn mặt, đồ vật cầm tay (đèn bão, kiếm gỗ đào, nến, bùa...) và chuyển động Điểm A -> Điểm B để câu chuyện sống động.
-3. Mỗi cảnh có tiêu đề (title), thời lượng (duration_sec: 5-8), phụ đề lời thoại rùng rợn (dialogue) và ghi chú đạo diễn (narrative_note).
-4. Tuân thủ 100% quy tắc vị trí neo (Ground Slots cho dáng tiếp đất, Air Slots cho dáng bay; cây đa/cây treo cổ chỉ ở rìa; mộ/giếng/miếu ở giữa...).
+3. ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH (CINEMATIC CAMERA - BẮT BUỘC):
+   Mỗi cảnh BẮT BUỘC có khối "camera" sinh động theo nhịp điệu kinh dị (TUYỆT ĐỐI KHÔNG để tất cả đều là "wide" tĩnh):
+   - Cảnh 1 (Thiết lập): "shot": "wide" hoặc "extreme_wide", "shake": "none".
+   - Cảnh 2 (Thăm dò / Hành động): "shot": "medium" hoặc "medium_wide" (target_actor_id vào nhân vật, shake: "none").
+   - Cảnh 3 (Cao trào / Jumpscare): "shot": "close_up" hoặc "extreme_close_up" (target_actor_id vào khuôn mặt quỷ/nạn nhân, motion: push_in; CHỈ dùng shake nếu có mô tả động đất, nổ hoặc jumpscare, còn lại để "none").
+   - Cảnh tà khí / dị dạng: "shot": "dutch_tilt" (dutch_angle: -6 đến -10 độ, shake: "none").
+4. Mỗi cảnh có tiêu đề (title), thời lượng (duration_sec: 5-8), phụ đề lời thoại rùng rợn (dialogue) và ghi chú đạo diễn (narrative_note).
+5. Tuân thủ 100% quy tắc vị trí neo (Ground Slots cho dáng tiếp đất, Air Slots cho dáng bay; cây đa/cây treo cổ chỉ ở rìa; mộ/giếng/miếu ở giữa...).
 
 Trả về một JSON ARRAY gồm đúng ${effectiveSceneCount} đối tượng DirectorSceneScript:
 [
-  { "scene_id": "scene_01_...", "title": "...", "duration_sec": 6, "theme": "...", "lighting": { ... }, "environment_items": [ ... ], "actors": [ ... ], "details": [ ... ], "dialogue": "...", "narrative_note": "..." },
+  {
+    "scene_id": "scene_01_...",
+    "title": "...",
+    "duration_sec": 6,
+    "theme": "...",
+    "lighting": { "sky_preset": "blood_moon", "fog_density": 0.6 },
+    "camera": {
+      "shot": "wide",
+      "shake": "none"
+    },
+    "environment_items": [ ... ],
+    "actors": [ ... ],
+    "details": [ ... ],
+    "dialogue": "...",
+    "narrative_note": "..."
+  },
   ...
 ]`;
   }
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: GEMINI_DIRECTOR_SYSTEM_INSTRUCTION }],
-        },
-        contents: [
-          {
-            parts: [{ text: userPrompt }],
-          },
-        ],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.7,
-        },
-      }),
-    });
+    const res = await callGeminiApiWithRetry(
+      apiKey,
+      model,
+      GEMINI_DIRECTOR_SYSTEM_INSTRUCTION,
+      userPrompt,
+      { responseMimeType: "application/json", temperature: 0.7 }
+    );
 
     if (!res.ok) {
       const errBody = await res.text();
-      let errorMsg = `Lỗi Gemini API (Mã HTTP ${res.status})`;
-      try {
-        const errJson = JSON.parse(errBody);
-        if (errJson.error && errJson.error.message) {
-          errorMsg = errJson.error.message;
-        }
-      } catch {
-        // use raw error
-      }
-      return { success: false, error: errorMsg };
+      return { success: false, error: formatApiError(res, errBody) };
     }
 
     const data = await res.json();
@@ -404,12 +563,12 @@ Trả về một JSON ARRAY gồm đúng ${effectiveSceneCount} đối tượng 
 
       const val = validateDirectorScript(rawScene);
       if (val.valid && val.normalized) {
-        validScenes.push(val.normalized);
+        validScenes.push(sanitizeSceneShake(val.normalized, storyPrompt));
       } else {
         validationErrors.push(`Cảnh ${idx + 1}: ${val.errors.join("; ")}`);
         // If normalization is still salvageable, push it
         if (val.normalized) {
-          validScenes.push(val.normalized);
+          validScenes.push(sanitizeSceneShake(val.normalized, storyPrompt));
         }
       }
     });
@@ -468,35 +627,25 @@ ${userInstruction}
 
 Hãy điều chỉnh cảnh trên dựa theo yêu cầu của người dùng, giữ nguyên scene_id hoặc cập nhật hợp lý.
 Đảm bảo tuân thủ 100% quy tắc vị trí neo, theme, structures, actors, handheld items và motion A -> B.
+LƯU Ý VỀ GÓC MÁY (CAMERA): Nếu người dùng yêu cầu thay đổi góc máy (ví dụ cận cảnh, đặc tả, góc nghiêng, rung giật jumpscare, zoom vào đối tượng...), hãy cập nhật hoặc bổ sung khối "camera" chuẩn xác:
+- "shot": "extreme_wide" | "wide" | "medium_wide" | "medium" | "close_up" | "extreme_close_up" | "dutch_tilt"
+- "target_actor_id": khóa vào id nhân vật nếu là góc cận/trung
+- "shake": "none" | "subtle_handheld" | "creepy_tremor" | "heavy_jumpscare"
+- "motion": "push_in" | "pull_out" | "follow_actor"...
 Trả về CHÍNH XÁC MỘT JSON OBJECT duy nhất:`;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: GEMINI_DIRECTOR_SYSTEM_INSTRUCTION }],
-        },
-        contents: [
-          {
-            parts: [{ text: userPrompt }],
-          },
-        ],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.6,
-        },
-      }),
-    });
+    const res = await callGeminiApiWithRetry(
+      apiKey,
+      model,
+      GEMINI_DIRECTOR_SYSTEM_INSTRUCTION,
+      userPrompt,
+      { responseMimeType: "application/json", temperature: 0.6 }
+    );
 
     if (!res.ok) {
       const errBody = await res.text();
-      return { success: false, error: `Lỗi Gemini API: ${errBody}` };
+      return { success: false, error: formatApiError(res, errBody) };
     }
 
     const data = await res.json();
@@ -506,9 +655,9 @@ Trả về CHÍNH XÁC MỘT JSON OBJECT duy nhất:`;
 
     const val = validateDirectorScript(targetObj);
     if (val.valid && val.normalized) {
-      return { success: true, scene: val.normalized, rawText };
+      return { success: true, scene: sanitizeSceneShake(val.normalized, userInstruction), rawText };
     } else if (val.normalized) {
-      return { success: true, scene: val.normalized, rawText };
+      return { success: true, scene: sanitizeSceneShake(val.normalized, userInstruction), rawText };
     }
 
     return {
@@ -538,6 +687,7 @@ export async function generateSceneFromDescription(
     apiKey?: string;
     model?: string;
     sceneIndex?: number;
+    cameraShot?: CameraShotType | "auto";
   } = {}
 ): Promise<GenerateSceneResult> {
   const apiKey = (options.apiKey || getStoredApiKey()).trim();
@@ -551,6 +701,11 @@ export async function generateSceneFromDescription(
       error: "Chưa có Gemini API Key. Vui lòng cấu hình API Key.",
     };
   }
+
+  const cameraGuidance =
+    options.cameraShot && options.cameraShot !== "auto"
+      ? `- Cỡ Cảnh Chỉ Định (BẮT BUỘC): Dùng camera.shot = "${options.cameraShot}", gán target_actor_id = "actor_1", shake mặc định là "none" (chỉ bật rung nếu mô tả có động đất, nổ tung hoặc jumpscare giật mình).`
+      : `- Cỡ Cảnh Điện Ảnh: Tự động chọn góc máy kịch tính ("wide", "medium_wide", "medium", "close_up", "extreme_close_up", "dutch_tilt"). Khi quay cận cảnh khuôn mặt, bắt buộc dùng "close_up" có target_actor_id = "actor_1". Shake mặc định là "none" (chỉ dùng "heavy_jumpscare" hoặc "creepy_tremor" khi có động đất, chấn động dữ dội hoặc quỷ dữ vồ jumpscare).`;
 
   const userPrompt = `BẠN LÀ CỖ MÁY ĐẠO DIỄN HOẠT HÌNH 2D THEO MÔ TẢ TRỰC TIẾP (DIRECT DESCRIPTION-DRIVEN 2D ENGINE).
 BỐI CẢNH DƯỚI ĐÂY ĐÃ ĐƯỢC NGƯỜI DÙNG CỐ ĐỊNH 100% (BẮT BUỘC GIỮ NGUYÊN BỐI CẢNH NÀY ĐỂ TRÁNH LỆCH CẢNH):
@@ -572,12 +727,14 @@ NHIỆM VỤ CỦA BẠN:
    - Chọn đúng face: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless"
    - BẮT BUỘC có "facing": "left" | "right" (hướng mặt nhìn trái hoặc phải).
    - Chọn đúng pose và vị trí slot tiếp đất (offsetY = 0): "far_left" (250) | "mid_left" (600) | "center" (960) | "mid_right" (1320) | "far_right" (1670). (Nếu pose_floating/pose_hanging dùng air_left | air_center | air_right).
-   - Chọn đúng heldItem & heldHand: "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "none".
+   - Chọn đúng heldItem & heldHand: "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "none".
    - Nếu có di chuyển A -> B: gắn khối "motion" { targetSlot, targetOffsetX: 0, startTimeSec: 0.2, endTimeSec: ${duration - 0.5}, easing: "ease_in_out", autoFaceTarget: true, movingPose: "pose_walking"|"pose_floating"|"pose_crawling" }.
    - Nếu nhân vật ĐỨNG YÊN KHÔNG DI CHUYỂN: BỎ HẲN trường "motion" (TUYỆT ĐỐI KHÔNG để null hay {}).
-2. Đặt tiêu đề ngắn gọn (title) phản ánh đúng hành động.
-3. Sinh 1 câu phụ đề lời thoại rùng rợn (dialogue) phù hợp với hành động.
-4. GIỮ NGUYÊN 100% theme, lighting, environment_items và details từ bối cảnh đã cố định.
+2. THIẾT LẬP GÓC MÁY ĐIỆN ẢNH (BẮT BUỘC):
+   ${cameraGuidance}
+3. Đặt tiêu đề ngắn gọn (title) phản ánh đúng hành động.
+4. Sinh 1 câu phụ đề lời thoại rùng rợn (dialogue) phù hợp với hành động.
+5. GIỮ NGUYÊN 100% theme, lighting, environment_items và details từ bối cảnh đã cố định.
 
 TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
 {
@@ -586,6 +743,18 @@ TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
   "duration_sec": ${duration},
   "theme": "${environment.theme}",
   "lighting": ${JSON.stringify(environment.lighting)},
+  "camera": {
+    "shot": "${options.cameraShot && options.cameraShot !== "auto" ? options.cameraShot : "medium_wide"}",
+    "target_actor_id": "actor_1",
+    "shake": "none",
+    "motion": {
+      "type": "push_in",
+      "endZoom": 2.2,
+      "startTimeSec": 0.5,
+      "endTimeSec": ${duration - 0.5},
+      "easing": "ease_in_out"
+    }
+  },
   "environment_items": ${JSON.stringify(environment.environment_items)},
   "actors": [
     {
@@ -609,20 +778,17 @@ TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
 }`;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: GEMINI_DIRECTOR_SYSTEM_INSTRUCTION }] },
-        contents: [{ parts: [{ text: userPrompt }] }],
-        generationConfig: { responseMimeType: "application/json", temperature: 0.5 },
-      }),
-    });
+    const res = await callGeminiApiWithRetry(
+      apiKey,
+      model,
+      GEMINI_DIRECTOR_SYSTEM_INSTRUCTION,
+      userPrompt,
+      { responseMimeType: "application/json", temperature: 0.5 }
+    );
 
     if (!res.ok) {
       const errBody = await res.text();
-      return { success: false, error: `Lỗi Gemini API: ${errBody}` };
+      return { success: false, error: formatApiError(res, errBody) };
     }
 
     const data = await res.json();
@@ -638,7 +804,7 @@ TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
 
     const val = validateDirectorScript(targetObj);
     if (val.normalized) {
-      return { success: true, scene: val.normalized, rawText };
+      return { success: true, scene: sanitizeSceneShake(val.normalized, actionDescription), rawText };
     }
 
     return {
@@ -663,6 +829,7 @@ export interface SceneDescriptionSpec {
   duration_sec?: number;
   title?: string;
   dialogue?: string;
+  cameraShot?: CameraShotType | "auto";
 }
 
 /**
@@ -694,12 +861,18 @@ export async function generateFilmFromDescriptions(
   }
 
   const promptSections = sceneSpecs.map((spec, i) => {
+    const camReq =
+      spec.cameraShot && spec.cameraShot !== "auto"
+        ? `- Cỡ Cảnh Chỉ Định (BẮT BUỘC): "${spec.cameraShot}" (khóa target_actor_id vào nhân vật chính)`
+        : `- Cỡ Cảnh: Tự động đạo diễn góc máy điện ảnh kịch tính (wide, medium_wide, medium, close_up, extreme_close_up, dutch_tilt) với shake: "none" (chỉ bật rung khi có động đất/chấn động).`;
+
     return `[CẢNH ${i + 1}]:
 - Bối Cảnh Cố Định: "${spec.environment.name}" (Theme: "${spec.environment.theme}", Sky: "${spec.environment.lighting.sky_preset}")
 - Công trình cố định: ${JSON.stringify(spec.environment.environment_items.map((e) => e.asset_id))}
 - Mô Tả Hành Động & Nhân Vật: """${spec.actionDescription.trim() || "Nhân vật bước đi cẩn trọng trong màn đêm."}"""
 - Lời thoại / Phụ đề: """${spec.dialogue ? spec.dialogue.trim() : "..."}"""
-- Thời lượng: ${spec.duration_sec || 6}s`;
+- Thời lượng: ${spec.duration_sec || 6}s
+${camReq}`;
   }).join("\n\n");
 
   const userPrompt = `BẠN LÀ CỖ MÁY ĐẠO DIỄN HOẠT HÌNH 2D THEO MÔ TẢ TRỰC TIẾP.
@@ -710,7 +883,12 @@ ${promptSections}
 YÊU CẦU ĐẠO DIỄN:
 1. Bạn KHÔNG tự bịa cốt truyện hay thay đổi bối cảnh. Hãy đọc mô tả hành động của từng cảnh và tạo mảng "actors" cùng chuyển động "motion" khớp chính xác 100%.
 2. Giữ nguyên 100% theme, lighting, environment_items và details của bối cảnh được chỉ định cho mỗi cảnh. Các cảnh có chung bối cảnh BẮT BUỘC PHẢI CÓ BỐI CẢNH Y HỆT NHAU.
-3. QUY ĐỊNH CHO MỖI ACTOR TRONG DANH SÁCH "actors":
+3. ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH (CINEMATIC CAMERA - BẮT BUỘC):
+   Mỗi cảnh BẮT BUỘC sinh khối "camera" điện ảnh phù hợp (TUYỆT ĐỐI KHÔNG để tất cả đều là "wide" tĩnh):
+   - Nếu cảnh có Cỡ Cảnh Chỉ Định, BẮT BUỘC tuân thủ cỡ cảnh đó.
+   - Nếu tự động, hãy linh hoạt chuyển đổi theo nhịp điệu kinh dị (ví dụ cảnh tiếp cận dùng "medium", cảnh hù dọa/ma quỷ dùng "close_up" có target_actor_id; camera.shake mặc định là "none", CHỈ dùng shake khi có mô tả động đất, sụp đổ, nổ tung hoặc quỷ dữ vồ jumpscare).
+   - Khi dùng "medium", "close_up", "extreme_close_up", "dutch_tilt", BẮT BUỘC điền target_actor_id trỏ vào ID nhân vật chính (ví dụ "actor_1") để camera bám theo!
+4. QUY ĐỊNH CHO MỖI ACTOR TRONG DANH SÁCH "actors":
    - "id": id duy nhất ví dụ "actor_1", "actor_2"
    - "facing": "left" | "right" (BẮT BUỘC CÓ trên mọi actor).
    - "base": "male_adult" | "female_adult" | "elder_hunched" | "brute_hulking" | "skeletal_emaciated" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow"
@@ -719,10 +897,10 @@ YÊU CẦU ĐẠO DIỄN:
    - "pose": "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_crawling" | "pose_reaching" (ở ground slots) | "pose_floating" | "pose_hanging" (ở air slots)
    - "slot": "far_left" | "mid_left" | "center" | "mid_right" | "far_right" (hoặc "air_left" | "air_center" | "air_right")
    - "offsetX": 0, "offsetY": 0 (nếu tiếp đất thì offsetY bắt buộc bằng 0)
-   - "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head"
+   - "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note"
    - "heldHand": "right" | "left"
    - "motion": NẾU NHÂN VẬT ĐỨNG YÊN THÌ BỎ HẲN TRƯỜNG NÀY (TUYỆT ĐỐI KHÔNG để null hay {}). Chỉ khi nhân vật di chuyển từ điểm A sang điểm B mới thêm khối: { "targetSlot": "mid_right", "targetOffsetX": 0, "startTimeSec": 0.2, "endTimeSec": 5, "easing": "ease_in_out", "autoFaceTarget": true, "movingPose": "pose_walking" }.
-4. Xuất ra một JSON ARRAY gồm đúng ${sceneSpecs.length} đối tượng DirectorSceneScript:
+5. Xuất ra một JSON ARRAY gồm đúng ${sceneSpecs.length} đối tượng DirectorSceneScript:
 [
   {
     "scene_id": "scene_01",
@@ -730,6 +908,12 @@ YÊU CẦU ĐẠO DIỄN:
     "duration_sec": 6,
     "theme": "...",
     "lighting": { ... },
+    "camera": {
+      "shot": "medium_wide",
+      "target_actor_id": "actor_1",
+      "shake": "none",
+      "motion": { "type": "push_in", "endZoom": 2.2, "startTimeSec": 0.5, "endTimeSec": 5, "easing": "ease_in_out" }
+    },
     "environment_items": [ ... ],
     "actors": [
       {
@@ -753,20 +937,17 @@ YÊU CẦU ĐẠO DIỄN:
 ]`;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: GEMINI_DIRECTOR_SYSTEM_INSTRUCTION }] },
-        contents: [{ parts: [{ text: userPrompt }] }],
-        generationConfig: { responseMimeType: "application/json", temperature: 0.5 },
-      }),
-    });
+    const res = await callGeminiApiWithRetry(
+      apiKey,
+      model,
+      GEMINI_DIRECTOR_SYSTEM_INSTRUCTION,
+      userPrompt,
+      { responseMimeType: "application/json", temperature: 0.5 }
+    );
 
     if (!res.ok) {
       const errBody = await res.text();
-      return { success: false, error: `Lỗi Gemini API: ${errBody}` };
+      return { success: false, error: formatApiError(res, errBody) };
     }
 
     const data = await res.json();
@@ -788,9 +969,22 @@ YÊU CẦU ĐẠO DIỄN:
       if (spec.title) sc.title = spec.title;
       if (spec.dialogue && spec.dialogue.trim()) sc.dialogue = spec.dialogue.trim();
 
+      // Enforce cameraShot if specified
+      if (spec.cameraShot && spec.cameraShot !== "auto") {
+        if (!sc.camera || typeof sc.camera !== "object") {
+          sc.camera = { shot: spec.cameraShot, target_actor_id: sc.actors?.[0]?.id };
+        } else {
+          sc.camera.shot = spec.cameraShot;
+          if (!sc.camera.target_actor_id && sc.actors?.[0]?.id) {
+            sc.camera.target_actor_id = sc.actors[0].id;
+          }
+        }
+      }
+
       const val = validateDirectorScript(sc);
       if (val.normalized) {
-        validScenes.push(val.normalized);
+        const spec = sceneSpecs[idx];
+        validScenes.push(sanitizeSceneShake(val.normalized, spec?.actionDescription || ""));
       } else {
         validationErrors.push(`Cảnh ${idx + 1}: ${val.errors.join("; ")}`);
       }
@@ -856,20 +1050,17 @@ KHÔNG thêm nhân vật vào đây (chỉ tạo bối cảnh môi trường).
 TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:`;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: GEMINI_DIRECTOR_SYSTEM_INSTRUCTION }] },
-        contents: [{ parts: [{ text: userPrompt }] }],
-        generationConfig: { responseMimeType: "application/json", temperature: 0.6 },
-      }),
-    });
+    const res = await callGeminiApiWithRetry(
+      apiKey,
+      model,
+      GEMINI_DIRECTOR_SYSTEM_INSTRUCTION,
+      userPrompt,
+      { responseMimeType: "application/json", temperature: 0.6 }
+    );
 
     if (!res.ok) {
       const errBody = await res.text();
-      return { success: false, error: `Lỗi Gemini API: ${errBody}` };
+      return { success: false, error: formatApiError(res, errBody) };
     }
 
     const data = await res.json();
@@ -896,6 +1087,7 @@ export interface AutoFillSceneDraft {
   actionDescription: string;
   dialogue?: string;
   duration_sec: number;
+  cameraShot?: CameraShotType;
 }
 
 export interface MissingAssetItem {
@@ -1009,8 +1201,9 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "item_scalpel" (dao mổ phẫu thuật)
    - "item_smartphone" (điện thoại di động phát sáng)
    - "item_severed_head" (thủ cấp đứt lìa xách tay)
+   - "item_mysterious_note" (mẩu giấy bí ẩn vương máu)
 
-5. CÔNG TRÌNH BỐI CẢNH (Structures - 14 công trình):
+5. CÔNG TRÌNH BỐI CẢNH (Structures - 17 công trình):
    - "creepy_banyan_tree" (Cây đa cổ thụ)
    - "haunted_gallows_tree" (Cây treo cổ rủ cành)
    - "ancient_tomb" (Ngôi mộ cổ và bia đá)
@@ -1026,6 +1219,9 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "dining_table_chairs" (Bàn ăn nhà hàng)
    - "bus_interior" (Nội thất xe bus đêm bỏ hoang)
    - "creepy_bathtub" (Bồn tắm rỉ sét ngập máu)
+   - "market_stall_tent" (Quầy hàng / lều bạt chợ đêm)
+   - "abandoned_subway_station" (Cổng ga tàu điện ngầm bỏ hoang)
+   - "rusty_train_tracks_tunnel" (Đường ray tàu & đường hầm rỉ sét)
 
 6. ĐẠO CỤ BỐI CẢNH (Details - 11 đạo cụ):
    - "detail_black_crow" (Quạ đen)
@@ -1041,7 +1237,7 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "detail_broken_mirror" (Gương nhà tắm vỡ nứt vấy máu)
 
 7. THEMES & SKY PRESETS:
-   - Themes: rural_graveyard, abandoned_village, cursed_swamp, modern_indoor, vehicle_interior (Bối cảnh trong xe buýt/tàu xe BẮT BUỘC dùng vehicle_interior)
+   - Themes: rural_graveyard, abandoned_village, cursed_swamp, modern_indoor, vehicle_interior, urban_night_market (Chợ đêm & phố xá đô thị ngoài trời dùng urban_night_market, bên trong xe buýt/tàu xe dùng vehicle_interior)
    - Sky: blood_moon, foggy_night, stormy_dark, eclipse_abyss, flickering_fluorescent, dim_indoor_night
 
 YÊU CẦU KIỂM TRA ĐỐI CHIẾU:
@@ -1069,16 +1265,13 @@ TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
 }`;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: GEMINI_DIRECTOR_SYSTEM_INSTRUCTION }] },
-        contents: [{ parts: [{ text: userPrompt }] }],
-        generationConfig: { responseMimeType: "application/json", temperature: 0.2 },
-      }),
-    });
+    const res = await callGeminiApiWithRetry(
+      apiKey,
+      model,
+      GEMINI_DIRECTOR_SYSTEM_INSTRUCTION,
+      userPrompt,
+      { responseMimeType: "application/json", temperature: 0.2 }
+    );
 
     if (!res.ok) {
       const errBody = await res.text();
@@ -1087,7 +1280,7 @@ TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
         isSufficient: false,
         missingAssets: [],
         summary: "Lỗi kết nối Gemini API",
-        error: `Lỗi Gemini API: ${errBody}`,
+        error: formatApiError(res, errBody),
       };
     }
 
@@ -1190,17 +1383,27 @@ YÊU CẦU ĐẶC BIỆT DÀNH CHO TRỢ THỦ BIÊN KỊCH:
    - Viết mô tả hành động trực tiếp, chi tiết, sống động theo đúng tài nguyên của Limbo Engine:
      * Nhân vật (bases): "male_adult" (lữ khách, nam thanh niên), "female_adult" (thiếu nữ tóc dài), "elder_hunched" (bà lão, cụ già), "brute_hulking" (đồ tể, hộ pháp), "skeletal_emaciated" (kẻ gầy trơ xương, ngạ quỷ), "ghost_wraith" (bóng ma lơ lửng), "creepy_child" (đứa trẻ ma), "jiangshi_corpse" (cương thi phong kiến), "demon_shadow" (quỷ bóng đen sừng cong).
      * Trang phục (costumes): "outfit_tattered_tunic" (áo tơi nông phu), "outfit_flowing_ao_dai" (áo dài ma mị), "outfit_shrouded_cloak" (áo choàng trùm đầu), "outfit_mandarin_court" (quan phục triều đình), "outfit_monk_cassock" (áo cà sa pháp sư), "outfit_shredded_burial" (vải liệm tử thi), "outfit_ancient_armor" (giáp tướng cổ), "outfit_child_pajamas" (yếm hoa trẻ thơ), "outfit_doctor_coat" (áo blouse bác sĩ), "outfit_patient_gown" (áo bệnh nhân), "outfit_modern_casual" (đồ hiện đại).
-     * Đồ vật cầm tay (held items): đèn bão sắt ("item_storm_lantern"), lồng đèn giấy ("item_paper_lantern"), nến triệu hồn ("item_soul_candle"), kiếm gỗ đào ("item_peach_wood_sword"), bùa vàng ("item_yellow_talisman"), liềm rỉ sét ("item_rusty_sickle"), chuông đồng ("item_ritual_bell"), búp bê vải ("item_tattered_doll"), ô rách ("item_tattered_umbrella"), đèn pin ("item_flashlight"), dao mổ ("item_scalpel"), điện thoại di động ("item_smartphone"), thủ cấp đứt lìa ("item_severed_head").
+     * Đồ vật cầm tay (held items): đèn bão sắt ("item_storm_lantern"), lồng đèn giấy ("item_paper_lantern"), nến triệu hồn ("item_soul_candle"), kiếm gỗ đào ("item_peach_wood_sword"), bùa vàng ("item_yellow_talisman"), liềm rỉ sét ("item_rusty_sickle"), chuông đồng ("item_ritual_bell"), búp bê vải ("item_tattered_doll"), ô rách ("item_tattered_umbrella"), đèn pin ("item_flashlight"), dao mổ ("item_scalpel"), điện thoại di động ("item_smartphone"), thủ cấp đứt lìa ("item_severed_head"), mẩu giấy bí ẩn vương máu ("item_mysterious_note").
      * Hướng nhìn và di chuyển A -> B: bước đi từ trái qua phải, bước lùi hoảng sợ, sà xuống rượt đuổi, nhảy cứng đờ...
 4. TIÊU ĐỀ (title): Ngắn gọn, có số thứ tự (ví dụ: "Cảnh 1: Lạc Bước Bãi Tha Ma", "Cảnh 2: Hồn Ma Áo Liệm Xuất Hiện").
 5. LỜI THOẠI / PHỤ ĐỀ (dialogue): Một câu phụ đề rùng rợn, ma quái hoặc độc thoại nội tâm gắn liền với diễn biến cảnh.
 6. THỜI LƯỢNG (duration_sec): Từ 5 đến 8 giây.
+7. GỢI Ý CỠ CẢNH ĐIỆN ẢNH (cameraShot):
+   Đề xuất cỡ cảnh cho từng phân cảnh để tạo nhịp điệu phim phong phú (tránh tất cả đều là wide):
+   - "extreme_wide": Đại cảnh mở màn/kết thúc
+   - "wide": Toàn cảnh thiết lập
+   - "medium_wide": Trung toàn cảnh tương tác
+   - "medium": Trung cảnh hành động / cầm đồ vật
+   - "close_up": Cận cảnh biểu cảm kinh hãi / ma quỷ xuất hiện
+   - "extreme_close_up": Đặc tả mắt / quỷ dị
+   - "dutch_tilt": Góc nghiêng ma mị / tà khí
 
 TRẢ VỀ CHÍNH XÁC MỘT JSON ARRAY gồm danh sách các đối tượng AutoFillSceneDraft (KHÔNG kèm chữ giải thích):
 [
   {
     "title": "Cảnh 1: ...",
     "environmentId": "id_bối_cảnh_chọn_từ_danh_sách",
+    "cameraShot": "wide",
     "actionDescription": "Mô tả chi tiết nhân vật làm gì...",
     "dialogue": "Lời thoại rùng rợn...",
     "duration_sec": 6
@@ -1208,20 +1411,17 @@ TRẢ VỀ CHÍNH XÁC MỘT JSON ARRAY gồm danh sách các đối tượng Au
 ]`;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: GEMINI_DIRECTOR_SYSTEM_INSTRUCTION }] },
-        contents: [{ parts: [{ text: userPrompt }] }],
-        generationConfig: { responseMimeType: "application/json", temperature: 0.5 },
-      }),
-    });
+    const res = await callGeminiApiWithRetry(
+      apiKey,
+      model,
+      GEMINI_DIRECTOR_SYSTEM_INSTRUCTION,
+      userPrompt,
+      { responseMimeType: "application/json", temperature: 0.5 }
+    );
 
     if (!res.ok) {
       const errBody = await res.text();
-      return { success: false, error: `Lỗi Gemini API: ${errBody}` };
+      return { success: false, error: formatApiError(res, errBody) };
     }
 
     const data = await res.json();
@@ -1247,12 +1447,18 @@ TRẢ VỀ CHÍNH XÁC MỘT JSON ARRAY gồm danh sách các đối tượng Au
       if (!envId || !validEnvIds.has(envId)) {
         envId = fallbackEnvId;
       }
+      const validShot =
+        item.cameraShot && VALID_CAMERA_SHOTS.includes(item.cameraShot)
+          ? item.cameraShot
+          : undefined;
+
       return {
         title: item.title || `Cảnh ${idx + 1}: Diễn Biến Cốt Truyện`,
         environmentId: envId,
         actionDescription: item.actionDescription || "Nhân vật bước đi cẩn trọng trong bóng tối.",
         dialogue: item.dialogue || undefined,
         duration_sec: Math.max(3, Math.min(20, Number(item.duration_sec) || 6)),
+        cameraShot: validShot,
       };
     });
 

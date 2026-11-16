@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import type { DirectorSceneScript, NamedEnvironmentPreset } from "../engine/types";
+import type { DirectorSceneScript, NamedEnvironmentPreset, CameraShotType } from "../engine/types";
 import {
   generateFilmFromDescriptions,
   generateSceneFromDescription,
@@ -40,6 +40,7 @@ import {
   Trash2,
   Plus,
   Check,
+  Camera,
   Wand2,
   RefreshCw,
   ShieldAlert,
@@ -72,6 +73,7 @@ interface SceneDraftSpec {
   duration_sec: number;
   title: string;
   dialogue?: string;
+  cameraShot?: CameraShotType | "auto";
 }
 
 export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
@@ -114,6 +116,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         actionDescription:
           "Người nông dân mặc áo tơi sờn rách cầm đèn bão sắt bước từ bên trái sang giữa, run rẩy dừng lại trước bia mộ cổ.",
         duration_sec: 6,
+        cameraShot: "wide",
       },
       {
         environmentId: env1, // Shared environment 100% same background!
@@ -121,6 +124,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         actionDescription:
           "Một bóng ma quấn vải liệm tử thi hiện hình lơ lửng trên không trung nhìn chằm chằm, người nông dân sợ hãi giơ đèn bão lùi lại.",
         duration_sec: 6,
+        cameraShot: "close_up",
       },
       {
         environmentId: env2, // Move to next set
@@ -128,6 +132,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         actionDescription:
           "Người nông dân tháo chạy tới trước cửa miếu hoang, pháp sư mặc áo cà sa cầm kiếm gỗ đào và bùa vàng xuất hiện nghênh chiến.",
         duration_sec: 7,
+        cameraShot: "medium_wide",
       },
     ];
   });
@@ -153,6 +158,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     "Cho bóng ma quấn vải liệm bay từ trên cao xuống rượt đuổi lữ khách, lữ khách cầm đèn bão hoảng loạn cắm đầu bỏ chạy."
   );
   const [singleSceneDuration, setSingleSceneDuration] = useState<number>(currentScene.duration_sec || 6);
+  const [singleSceneCameraShot, setSingleSceneCameraShot] = useState<CameraShotType | "auto">("auto");
 
   // New environment creation state
   const [newEnvPrompt, setNewEnvPrompt] = useState<string>(
@@ -202,6 +208,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
             title: `Cảnh ${num}: Diễn Biến Tiếp`,
             actionDescription: "",
             duration_sec: 6,
+            cameraShot: "auto",
           });
         }
       } else if (newCount < next.length) {
@@ -249,6 +256,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
             actionDescription: d.actionDescription,
             dialogue: d.dialogue || "",
             duration_sec: d.duration_sec,
+            cameraShot: d.cameraShot || "auto",
           }))
         );
         setLastBreakdownStory(rawStoryInput.trim());
@@ -394,6 +402,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         duration_sec: draft.duration_sec || 6,
         title: draft.title || undefined,
         dialogue: draft.dialogue || undefined,
+        cameraShot: draft.cameraShot || "auto",
       };
     });
 
@@ -454,6 +463,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         apiKey,
         model,
         sceneIndex: currentSceneIndex,
+        cameraShot: singleSceneCameraShot,
       });
 
       if (!result.success || !result.scene) {
@@ -633,6 +643,9 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                   >
                     <option value="gemini-2.5-flash">gemini-2.5-flash (Khuyên dùng: Phản hồi tức thì)</option>
                     <option value="gemini-2.5-pro">gemini-2.5-pro (Suy luận sâu)</option>
+                    <option value="gemini-2.0-flash">gemini-2.0-flash (Tốc độ cao & ổn định)</option>
+                    <option value="gemini-1.5-flash">gemini-1.5-flash (Flash ổn định)</option>
+                    <option value="gemini-1.5-pro">gemini-1.5-pro (Kinh điển)</option>
                   </select>
                 </div>
               </div>
@@ -1079,23 +1092,45 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                           />
                         </div>
 
-                        {/* Environment Selector Dropdown */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] text-neutral-400">Khóa Bối Cảnh:</span>
-                          <select
-                            value={draft.environmentId}
-                            onChange={(e) => handleUpdateDraft(idx, "environmentId", e.target.value)}
-                            className="bg-neutral-900 border border-neutral-700 rounded-lg px-2.5 py-1 text-xs text-amber-200 font-medium focus:outline-none focus:border-amber-400"
-                          >
-                            {namedEnvironments.map((env) => (
-                              <option key={env.id} value={env.id}>
-                                📍 {env.name} ({env.theme})
-                              </option>
-                            ))}
-                          </select>
+                        {/* Environment & Camera Selectors */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[11px] text-neutral-400">Bối Cảnh:</span>
+                            <select
+                              value={draft.environmentId}
+                              onChange={(e) => handleUpdateDraft(idx, "environmentId", e.target.value)}
+                              className="bg-neutral-900 border border-neutral-700 rounded-lg px-2 py-1 text-xs text-amber-200 font-medium focus:outline-none focus:border-amber-400"
+                            >
+                              {namedEnvironments.map((env) => (
+                                <option key={env.id} value={env.id}>
+                                  📍 {env.name} ({env.theme})
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Camera Shot Selector Dropdown */}
+                          <div className="flex items-center gap-1.5 bg-neutral-900/90 border border-purple-900/60 rounded-lg px-2 py-0.5">
+                            <Camera className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                            <span className="text-[11px] text-neutral-400">Góc máy:</span>
+                            <select
+                              value={draft.cameraShot || "auto"}
+                              onChange={(e) => handleUpdateDraft(idx, "cameraShot", e.target.value)}
+                              className="bg-transparent text-xs text-purple-200 font-medium focus:outline-none cursor-pointer"
+                            >
+                              <option value="auto">🎬 Tự động (AI tối ưu)</option>
+                              <option value="wide">🎥 Toàn cảnh (Wide 1.0x)</option>
+                              <option value="extreme_wide">🎥 Đại cảnh (Extreme Wide 0.88x)</option>
+                              <option value="medium_wide">🎥 Trung toàn (Medium Wide 1.45x)</option>
+                              <option value="medium">🎥 Trung cảnh (Medium 1.9x)</option>
+                              <option value="close_up">🎥 Cận cảnh (Close-Up 2.85x)</option>
+                              <option value="extreme_close_up">🎥 Đặc tả (Extreme Close-Up 4.3x)</option>
+                              <option value="dutch_tilt">🎥 Góc nghiêng ma mị (Dutch -7.5°)</option>
+                            </select>
+                          </div>
 
                           {/* Duration */}
-                          <div className="flex items-center gap-1 font-mono text-xs text-neutral-300 ml-1">
+                          <div className="flex items-center gap-1 font-mono text-xs text-neutral-300">
                             <input
                               type="number"
                               min="3"
@@ -1390,17 +1425,38 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                 ))}
               </div>
 
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-neutral-400">Thời lượng cảnh:</span>
-                <input
-                  type="number"
-                  min="3"
-                  max="20"
-                  value={singleSceneDuration}
-                  onChange={(e) => setSingleSceneDuration(parseFloat(e.target.value) || 6)}
-                  className="w-16 bg-black border border-neutral-800 rounded-lg px-2 py-1 text-center text-xs text-cyan-300 font-bold focus:outline-none"
-                />
-                <span className="text-xs text-neutral-400">giây</span>
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-neutral-400">Thời lượng cảnh:</span>
+                  <input
+                    type="number"
+                    min="3"
+                    max="20"
+                    value={singleSceneDuration}
+                    onChange={(e) => setSingleSceneDuration(parseFloat(e.target.value) || 6)}
+                    className="w-16 bg-black border border-neutral-800 rounded-lg px-2 py-1 text-center text-xs text-cyan-300 font-bold focus:outline-none"
+                  />
+                  <span className="text-xs text-neutral-400">giây</span>
+                </div>
+
+                <div className="flex items-center gap-1.5 bg-neutral-900/90 border border-purple-900/60 rounded-lg px-2.5 py-1">
+                  <Camera className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                  <span className="text-xs text-neutral-400">Góc máy:</span>
+                  <select
+                    value={singleSceneCameraShot}
+                    onChange={(e) => setSingleSceneCameraShot(e.target.value as any)}
+                    className="bg-transparent text-xs text-purple-200 font-medium focus:outline-none cursor-pointer"
+                  >
+                    <option value="auto">🎬 Tự động (AI chọn góc máy)</option>
+                    <option value="wide">🎥 Toàn cảnh (Wide 1.0x)</option>
+                    <option value="extreme_wide">🎥 Đại cảnh (Extreme Wide 0.88x)</option>
+                    <option value="medium_wide">🎥 Trung toàn (Medium Wide 1.45x)</option>
+                    <option value="medium">🎥 Trung cảnh (Medium 1.9x)</option>
+                    <option value="close_up">🎥 Cận cảnh (Close-Up 2.85x)</option>
+                    <option value="extreme_close_up">🎥 Đặc tả (Extreme Close-Up 4.3x)</option>
+                    <option value="dutch_tilt">🎥 Góc nghiêng ma mị (Dutch -7.5°)</option>
+                  </select>
+                </div>
               </div>
 
               <button
@@ -1498,6 +1554,11 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 font-mono text-[10px]">
+                        {sc.camera && sc.camera.shot && (
+                          <span className="px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800/80 font-mono text-[10px] flex items-center gap-1">
+                            🎥 {sc.camera.shot.toUpperCase()} ({sc.camera.zoom ? `${sc.camera.zoom.toFixed(2)}x` : "1.0x"}{sc.camera.dutch_angle ? ` | ${sc.camera.dutch_angle > 0 ? "+" : ""}${sc.camera.dutch_angle}°` : ""}{sc.camera.shake && sc.camera.shake !== "none" ? ` | ⚡${sc.camera.shake}` : ""})
+                          </span>
+                        )}
                         <span className="px-2 py-0.5 rounded bg-neutral-900 text-neutral-300 border border-neutral-800">
                           {sc.duration_sec || 6}s
                         </span>

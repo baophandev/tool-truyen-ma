@@ -128,6 +128,15 @@ export function App() {
     });
   };
 
+  const handleDisableAllShake = () => {
+    setScenes((prev) =>
+      prev.map((sc) => ({
+        ...sc,
+        camera: sc.camera ? { ...sc.camera, shake: "none" } : undefined,
+      }))
+    );
+  };
+
   const handleOpenAiDirector = (mode: AiModalMode = "description_film") => {
     setAiModalMode(mode);
     setIsAiModalOpen(true);
@@ -444,6 +453,7 @@ export function App() {
             onSelectScene={(idx) => setCurrentSceneIndex(idx)}
             showGizmo={showGizmo}
             onToggleGizmo={() => setShowGizmo(!showGizmo)}
+            onDisableAllShake={handleDisableAllShake}
           />
         )}
 
@@ -454,6 +464,7 @@ export function App() {
             onChangeScene={handleUpdateCurrentScene}
             onResetScene={handleResetCurrentScene}
             onOpenAiDirector={handleOpenAiDirector}
+            onDisableAllShake={handleDisableAllShake}
           />
         )}
 

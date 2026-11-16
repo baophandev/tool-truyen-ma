@@ -87,6 +87,7 @@ const VALID_THEMES: ThemeId[] = [
   "cursed_swamp",
   "modern_indoor",
   "vehicle_interior",
+  "urban_night_market",
 ];
 const VALID_SKY_PRESETS: SkyPresetId[] = [
   "blood_moon",
@@ -121,6 +122,9 @@ const VALID_STRUCTURES: StructureId[] = [
   "dining_table_chairs",
   "bus_interior",
   "creepy_bathtub",
+  "market_stall_tent",
+  "abandoned_subway_station",
+  "rusty_train_tracks_tunnel",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -202,6 +206,7 @@ const VALID_HELD_ITEMS: HeldItemId[] = [
   "item_scalpel",
   "item_smartphone",
   "item_severed_head",
+  "item_mysterious_note",
 ];
 const VALID_HELD_HANDS: HeldHand[] = ["right", "left"];
 const VALID_DETAILS: DetailId[] = [

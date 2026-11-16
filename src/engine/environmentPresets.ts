@@ -438,6 +438,68 @@ export const DEFAULT_NAMED_ENVIRONMENTS: NamedEnvironmentPreset[] = [
       },
     ],
   },
+  {
+    id: "env_urban_night_market_rain",
+    name: "Chợ Đêm Đô Thị Mưa Neon",
+    description: "Khu chợ đêm đô thị rực rỡ ánh đèn neon chớp giật trong cơn mưa đêm rả rích, quầy lều bạt bày bán cổ vật bí ẩn ven đường, mặt đường nhựa bóng loáng phản chiếu ánh sáng ma mị.",
+    theme: "urban_night_market",
+    lighting: {
+      sky_preset: "foggy_night",
+      fog_density: 0.75,
+      thunder_flash: false,
+      weather: "heavy_rain",
+    },
+    environment_items: [
+      {
+        asset_id: "market_stall_tent",
+        slot: "center",
+        scale: 1.0,
+      },
+    ],
+    details: [
+      {
+        id: "detail_lantern_market",
+        asset_id: "detail_blood_lantern",
+        slot: "mid_left",
+        offsetX: -50,
+      },
+    ],
+  },
+  {
+    id: "env_abandoned_subway_tracks",
+    name: "Trạm Ga & Đường Hầm Tàu Điện Ngầm Bỏ Hoang",
+    description: "Lối vào trạm tàu điện ngầm rỉ sét bị niêm phong và đường hầm sâu hun hút ẩm mốc với đường ray rỉ sét, đèn tín hiệu đỏ chập chờn và nước rỉ tí tách.",
+    theme: "urban_night_market",
+    lighting: {
+      sky_preset: "dim_indoor_night",
+      fog_density: 0.7,
+      thunder_flash: false,
+    },
+    environment_items: [
+      {
+        asset_id: "abandoned_subway_station",
+        slot: "mid_left",
+        scale: 1.0,
+      },
+      {
+        asset_id: "rusty_train_tracks_tunnel",
+        slot: "mid_right",
+        scale: 1.0,
+      },
+    ],
+    details: [
+      {
+        id: "detail_camera_subway",
+        asset_id: "detail_surveillance_camera",
+        slot: "air_left",
+      },
+      {
+        id: "detail_lamp_subway",
+        asset_id: "detail_flickering_ceiling_lamp",
+        slot: "air_right",
+      },
+    ],
+  },
 ];
 
 const STORAGE_KEY_ENVIRONMENTS = "limbo_named_environments_v1";

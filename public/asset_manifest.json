@@ -40,6 +40,12 @@
         "name": "Khoang xe bus & Tàu xe kinh dị",
         "desc": "Không gian bên trong xe buýt, xe khách hoặc toa tàu ma quái với trần uốn cong, ô cửa sổ đêm nhìn ra đường vắng, hàng ghế hành khách, cột vịn tay màu vàng và sàn cao su chống trượt",
         "sky_options": ["flickering_fluorescent", "foggy_night", "stormy_dark"]
+      },
+      {
+        "id": "urban_night_market",
+        "name": "Khu chợ đêm & Đường phố đô thị",
+        "desc": "Con phố đô thị sầm uất u tối về đêm với dãy nhà cao tầng mờ ảo, đèn neon rực rỡ chớp nháy, dây điện chằng chịt, lều bạt chợ đêm bày bán cổ vật, mặt đường nhựa ướt sũng bóng nước và hơi nước bốc lên từ nắp cống ngầm",
+        "sky_options": ["foggy_night", "stormy_dark", "blood_moon", "dim_indoor_night"]
       }
     ],
     "sky_presets": [
@@ -296,6 +302,36 @@
         "layer": "midground",
         "width": 300,
         "height": 180,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "market_stall_tent",
+        "name": "Quầy hàng / Lều bạt chợ đêm",
+        "semantic_role": "Khung lều bạt chữ A rách mép, bóng đèn tròn vàng ấm đung đưa, quầy gỗ phủ khăn nỉ đỏ bày đồ cổ, bình gốm nứt và hộp gỗ quỷ ám",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 320,
+        "height": 280,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "abandoned_subway_station",
+        "name": "Cổng vào & ga tàu điện ngầm bỏ hoang",
+        "semantic_role": "Lối xuống hầm ga metro hoang phế, bậc thang bê tông nứt nẻ dẫn vào vực thẳm đen ngòm, lan can sắt gỉ, đèn quả cầu chập chờn và biển hiệu SUBWAY vỡ nát",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 380,
+        "height": 360,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "rusty_train_tracks_tunnel",
+        "name": "Đường ray tàu & Đường hầm rỉ sét ẩm mốc",
+        "semantic_role": "Vòm hầm đường sắt ngầm bê tông sâu hun hút, hai thanh ray thép rỉ sét ánh kim, tà vẹt gỗ mục nát, cáp điện lòng thòng, ống nước rỉ giọt và đèn tín hiệu đỏ ma quái",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 420,
+        "height": 385,
         "anchor": "bottom-center"
       }
     ]
@@ -626,7 +662,8 @@
       { "id": "item_flashlight", "name": "Đèn pin rọi nón sáng kinh dị" },
       { "id": "item_scalpel", "name": "Dao mổ phẫu thuật sắc lạnh" },
       { "id": "item_smartphone", "name": "Điện thoại di động phát sáng" },
-      { "id": "item_severed_head", "name": "Thủ cấp đứt lìa vương máu" }
+      { "id": "item_severed_head", "name": "Thủ cấp đứt lìa vương máu" },
+      { "id": "item_mysterious_note", "name": "Mẩu giấy bí ẩn vương máu" }
     ]
   },
   "details": [

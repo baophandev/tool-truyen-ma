@@ -77,6 +77,7 @@ interface EditorViewProps {
   onChangeScene: (updated: DirectorSceneScript) => void;
   onResetScene: () => void;
   onOpenAiDirector?: (mode?: "description_film" | "environments_manager" | "re_direct_scene" | "full_film" | "append_scene") => void;
+  onDisableAllShake?: () => void;
 }
 
 export const EditorView: React.FC<EditorViewProps> = ({
@@ -84,6 +85,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
   onChangeScene,
   onResetScene,
   onOpenAiDirector,
+  onDisableAllShake,
 }) => {
   const [activeTab, setActiveTab] = useState<"actors" | "structures" | "details" | "lighting" | "camera" | "story">("actors");
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity>(() => {
@@ -1681,6 +1683,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="dining_table_chairs">Bàn ăn nhà hàng khăn rách (dining_table_chairs)</option>
                         <option value="bus_interior">Buồng lái tài xế & máy bán vé xe bus (bus_interior)</option>
                         <option value="creepy_bathtub">Bồn tắm rỉ sét ngập máu (creepy_bathtub)</option>
+                        <option value="market_stall_tent">Quầy hàng / Lều bạt chợ đêm (market_stall_tent)</option>
+                        <option value="abandoned_subway_station">Cổng vào & ga tàu điện ngầm bỏ hoang (abandoned_subway_station)</option>
+                        <option value="rusty_train_tracks_tunnel">Đường ray tàu & đường hầm rỉ sét (rusty_train_tracks_tunnel)</option>
                       </select>
                     </div>
 
@@ -2100,6 +2105,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       <option value="cursed_swamp">Đầm lầy u minh (cursed_swamp)</option>
                       <option value="modern_indoor">Hành lang & Không gian trong nhà hiện đại (modern_indoor)</option>
                       <option value="vehicle_interior">Khoang Xe Bus & Tàu Xe Kinh Dị (vehicle_interior)</option>
+                      <option value="urban_night_market">Khu Chợ Đêm & Đường Phố Đô Thị (urban_night_market)</option>
                     </select>
                   </div>
 
@@ -2453,7 +2459,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center text-xs">
                   <span className="font-semibold text-neutral-300">Rung Lắc Ống Kính (Tremor / Shake):</span>
-                  <span className="font-mono text-cyan-400 font-bold">
+                  <span className={`font-mono font-bold ${scene.camera?.shake && scene.camera.shake !== "none" ? "text-amber-400" : "text-emerald-400"}`}>
                     {scene.camera?.shake || "none"}
                   </span>
                 </div>
@@ -2468,13 +2474,39 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   }}
                   className="bg-black border border-neutral-700 rounded-lg p-2 text-xs text-neutral-200 focus:outline-none focus:border-cyan-500 font-mono"
                 >
-                  <option value="none">Tĩnh Lặng (Không rung)</option>
-                  <option value="subtle_handheld">📹 Máy Quay Cầm Tay (Rung nhẹ chân thực)</option>
+                  <option value="none">Tĩnh Lặng (Không rung - Khuyên dùng)</option>
+                  <option value="subtle_handheld">📹 Máy Quay Cầm Tay (Dao động nhẹ tự nhiên)</option>
                   <option value="creepy_tremor">👻 Rùng Rợn / Tà Khí (Run rẩy rùng mình)</option>
-                  <option value="heavy_jumpscare">⚡ Động Đất / Jumpscare (Giật nảy dữ dội)</option>
+                  <option value="heavy_jumpscare">⚡ Động Đất / Jumpscare (Chấn động dữ dội)</option>
                 </select>
+
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {scene.camera?.shake && scene.camera.shake !== "none" && (
+                    <button
+                      onClick={() => {
+                        const current = scene.camera || { shot: "wide" };
+                        onChangeScene({
+                          ...scene,
+                          camera: { ...current, shake: "none" },
+                        });
+                      }}
+                      className="px-2.5 py-1 text-[11px] font-medium rounded bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 transition-all"
+                    >
+                      Tắt rung cảnh này
+                    </button>
+                  )}
+                  {onDisableAllShake && (
+                    <button
+                      onClick={onDisableAllShake}
+                      className="px-2.5 py-1 text-[11px] font-medium rounded bg-amber-950/70 hover:bg-amber-900/90 text-amber-300 border border-amber-800/60 transition-all"
+                    >
+                      Tắt rung toàn bộ phân cảnh trong phim
+                    </button>
+                  )}
+                </div>
+
                 <span className="text-[10px] text-neutral-400">
-                  Rung máy hữu cơ đa tần số, rất hiệu quả cho phân đoạn giật mình!
+                  Mặc định luôn là &quot;Không rung&quot; để hình ảnh tĩnh và sắc nét. Chỉ bật rung khi có động đất, nổ hoặc jumpscare.
                 </span>
               </div>
             </div>

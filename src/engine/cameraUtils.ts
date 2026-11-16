@@ -93,13 +93,17 @@ export const CAMERA_SHOT_PRESETS: Record<CameraShotType, CameraShotPresetInfo> =
 
 export const SHAKE_AMPLITUDES: Record<CameraShakeIntensity, number> = {
   none: 0,
-  subtle_handheld: 3.5,
-  creepy_tremor: 8.5,
-  heavy_jumpscare: 22.0,
+  subtle_handheld: 1.5,
+  creepy_tremor: 5.0,
+  heavy_jumpscare: 18.0,
 };
 
 /**
  * Computes deterministic multi-frequency harmonic shake offset and rotation.
+ * - 'none': Completely stable, zero jitter (default).
+ * - 'subtle_handheld': Slow organic handheld breathing sway (~0.3-0.7 Hz), no high-frequency jitter.
+ * - 'creepy_tremor': Eerie shivering tremor (~2-4 Hz).
+ * - 'heavy_jumpscare': Violent shock impact / earthquake tremor (~5-8 Hz).
  */
 export function generateCameraShake(
   intensity: CameraShakeIntensity = "none",
@@ -111,9 +115,26 @@ export function generateCameraShake(
   }
 
   const t = timeSec;
-  // Multi-frequency harmonic sinusoids to simulate organic handheld/shock tremor
-  const dx = amp * (Math.sin(t * 19.3) * 0.65 + Math.sin(t * 41.7) * 0.35);
-  const dy = amp * (Math.cos(t * 23.1) * 0.65 + Math.cos(t * 47.9) * 0.35);
+
+  if (intensity === "subtle_handheld") {
+    // Smooth, organic handheld breathing drift - never rapid mechanical vibration
+    const dx = amp * (Math.sin(t * 2.1) * 0.7 + Math.sin(t * 4.3) * 0.3);
+    const dy = amp * (Math.cos(t * 1.8) * 0.7 + Math.cos(t * 3.6) * 0.3);
+    const dAngle = amp * 0.04 * Math.sin(t * 1.4);
+    return { offset: { x: dx, y: dy }, angle: dAngle };
+  }
+
+  if (intensity === "creepy_tremor") {
+    // Eerie cold shiver / ghostly tremor
+    const dx = amp * (Math.sin(t * 11.2) * 0.6 + Math.sin(t * 19.5) * 0.4);
+    const dy = amp * (Math.cos(t * 13.4) * 0.6 + Math.cos(t * 22.1) * 0.4);
+    const dAngle = amp * 0.05 * Math.sin(t * 9.8);
+    return { offset: { x: dx, y: dy }, angle: dAngle };
+  }
+
+  // Heavy jumpscare / earthquake shock: high-energy multi-frequency impact
+  const dx = amp * (Math.sin(t * 19.3) * 0.65 + Math.sin(t * 37.7) * 0.35);
+  const dy = amp * (Math.cos(t * 23.1) * 0.65 + Math.cos(t * 43.9) * 0.35);
   const dAngle = amp * 0.075 * Math.sin(t * 16.5);
 
   return {

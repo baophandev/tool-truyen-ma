@@ -8,7 +8,8 @@ export type ThemeId =
   | "abandoned_village"
   | "cursed_swamp"
   | "modern_indoor"
-  | "vehicle_interior";
+  | "vehicle_interior"
+  | "urban_night_market";
 
 export type SkyPresetId =
   | "blood_moon"
@@ -33,7 +34,10 @@ export type StructureId =
   | "creepy_elevator_doors"
   | "dining_table_chairs"
   | "bus_interior"
-  | "creepy_bathtub";
+  | "creepy_bathtub"
+  | "market_stall_tent"
+  | "abandoned_subway_station"
+  | "rusty_train_tracks_tunnel";
 
 export type DetailId =
   | "detail_black_crow"
@@ -127,7 +131,8 @@ export type HeldItemId =
   | "item_flashlight"
   | "item_scalpel"
   | "item_smartphone"
-  | "item_severed_head";       // Thủ cấp đứt lìa túm tóc xách tay vương máu rỉ giọt
+  | "item_severed_head"       // Thủ cấp đứt lìa túm tóc xách tay vương máu rỉ giọt
+  | "item_mysterious_note";   // Mẩu giấy / lá thư bí ẩn vương máu mang thông điệp kinh hoàng
 
 export type HeldHand = "right" | "left";
 

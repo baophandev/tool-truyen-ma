@@ -250,6 +250,56 @@ export const SvgDefs: React.FC = () => {
         <stop offset="60%" stopColor="#000000" stopOpacity="0.4" />
         <stop offset="100%" stopColor="#000000" stopOpacity="0" />
       </linearGradient>
+
+      {/* 9. URBAN NIGHT MARKET & SUBWAY ASSET GRADIENTS */}
+      <radialGradient id="urban-neon-cyan" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="rgba(34, 211, 238, 0.85)" />
+        <stop offset="45%" stopColor="rgba(6, 182, 212, 0.4)" />
+        <stop offset="80%" stopColor="rgba(8, 145, 178, 0.12)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </radialGradient>
+
+      <radialGradient id="urban-neon-magenta" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="rgba(244, 63, 94, 0.85)" />
+        <stop offset="45%" stopColor="rgba(236, 72, 153, 0.38)" />
+        <stop offset="80%" stopColor="rgba(190, 24, 93, 0.1)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </radialGradient>
+
+      <radialGradient id="urban-neon-amber" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="rgba(251, 191, 36, 0.85)" />
+        <stop offset="45%" stopColor="rgba(245, 158, 11, 0.4)" />
+        <stop offset="80%" stopColor="rgba(217, 119, 6, 0.12)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </radialGradient>
+
+      <radialGradient id="subway-tunnel-depth" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#000000" stopOpacity="1" />
+        <stop offset="40%" stopColor="#030508" stopOpacity="0.95" />
+        <stop offset="75%" stopColor="#0A0E17" stopOpacity="0.7" />
+        <stop offset="100%" stopColor="#0F172A" stopOpacity="0" />
+      </radialGradient>
+
+      <linearGradient id="wet-street-reflection-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="rgba(34, 211, 238, 0.25)" />
+        <stop offset="35%" stopColor="rgba(236, 72, 153, 0.18)" />
+        <stop offset="70%" stopColor="rgba(245, 158, 11, 0.12)" />
+        <stop offset="100%" stopColor="rgba(6, 8, 14, 0)" />
+      </linearGradient>
+
+      <linearGradient id="note-parchment-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FEF3C7" />
+        <stop offset="45%" stopColor="#FDE68A" />
+        <stop offset="80%" stopColor="#E2BD6E" />
+        <stop offset="100%" stopColor="#CA8A04" />
+      </linearGradient>
+
+      <radialGradient id="tent-warm-lantern" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="rgba(254, 240, 138, 0.9)" />
+        <stop offset="30%" stopColor="rgba(245, 158, 11, 0.55)" />
+        <stop offset="70%" stopColor="rgba(180, 83, 9, 0.18)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </radialGradient>
     </defs>
   );
 };

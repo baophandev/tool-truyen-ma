@@ -102,6 +102,21 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ["mid_left", "center", "mid_right"],
     reason: "Bồn tắm cổ quái đặt tại khu vực giữa sân khấu (mid_left, center, mid_right) làm tâm điểm kinh hoàng trong phòng tắm.",
   },
+  market_stall_tent: {
+    name: "Quầy hàng / Lều bạt chợ đêm",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Quầy hàng chợ đêm có thể đặt tại bất kỳ vị trí nào trên trục Ground Y=800px để tạo dãy chợ sầm uất hoặc làm điểm trao đổi cổ vật bí hiểm.",
+  },
+  abandoned_subway_station: {
+    name: "Cổng vào ga tàu điện ngầm bỏ hoang",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Cổng ga tàu điện ngầm bỏ hoang có thể đặt ở rìa lối vào hoặc trung tâm sân khấu trên trục Ground Y=800px làm tâm điểm dẫn dụ vào thế giới ngầm.",
+  },
+  rusty_train_tracks_tunnel: {
+    name: "Đường ray tàu & Đường hầm rỉ sét",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Đường hầm và đường ray tàu rỉ sét ẩm mốc có thể đặt tại trung tâm hoặc hai bên khung hình tiếp đất Y=800px tạo chiều sâu hun hút.",
+  },
 };
 
 export interface DetailRule {
