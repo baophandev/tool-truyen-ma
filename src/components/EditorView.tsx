@@ -19,7 +19,12 @@ import type {
   EnvironmentItemConfig,
   DetailItemConfig,
   SelectedEntity,
+  SubtitleStyleId,
+  SubtitleAnimId,
+  WeatherEffectId,
+  FacialActionId,
 } from "../engine/types";
+import { SUBTITLE_THEMES, resolveSubtitleStyle } from "../engine/subtitleUtils";
 import { SceneRenderer, type DragSnapMode } from "../engine/SceneRenderer";
 import { ALL_SLOTS, GROUND_Y } from "../engine/constants";
 import { HELD_ITEM_CATALOG } from "../engine/graphics/HandheldItems";
@@ -971,6 +976,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       >
                         <option value="face_calm">Mặt bình thường (face_calm - mắt đen nhỏ vô hồn)</option>
                         <option value="face_scared">Kinh hãi (face_scared - mắt trắng dã, miệng há hốc run rẩy)</option>
+                        <option value="face_screaming_gasp">😱 Há hốc kinh hoàng (face_screaming_gasp - Mắt mở trừng trợn đớp khí, lưỡi đỏ)</option>
                         <option value="face_creepy_smile">Nụ cười ma quái (face_creepy_smile - xé dài tới mang tai)</option>
                         <option value="face_bleeding_eyes">Mắt chảy máu (face_bleeding_eyes - hai vệt máu đen rỉ xuống)</option>
                         <option value="face_old_wrinkled">Mặt già nua nếp nhăn (face_old_wrinkled - trán nhăn, đuôi mắt chùng, móm)</option>
@@ -983,6 +989,37 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="face_glowing_hollow">Hốc mắt miệng rực lửa ma trơi (face_glowing_hollow)</option>
                         <option value="face_talisman_covered">Dán bùa vàng chu sa che trán (face_talisman_covered)</option>
                         <option value="face_headless">Không đầu / Cổ đứt lìa (face_headless - Cuống cổ đứt lìa lộ xương, máu rỉ)</option>
+                      </select>
+                    </div>
+
+                    {/* Facial Action / Micro-Animation */}
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-neutral-300">
+                          3b. Cử Động Gương Mặt (Facial Action):
+                        </label>
+                        <span className="text-[10px] bg-red-950/80 text-red-300 border border-red-800/60 px-1.5 py-0.2 rounded font-mono">
+                          Micro-Anim
+                        </span>
+                      </div>
+                      <select
+                        value={selectedActor.facialAction || "none"}
+                        onChange={(e) =>
+                          updateActor(selectedActor.id, {
+                            facialAction: e.target.value as FacialActionId,
+                          })
+                        }
+                        className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600"
+                      >
+                        <option value="none">Giữ nét mặt tĩnh (none)</option>
+                        <option value="blink_natural">👀 Chớp mắt tự nhiên (blink_natural - nháy mắt tự nhiên đều đặn)</option>
+                        <option value="blink_nervous">⚡ Chớp mắt lia lịa hoảng loạn (blink_nervous - nháy liên hồi)</option>
+                        <option value="darting_eyes">👁️ Liếc mắt dáo dác qua lại (darting_eyes - dò xét bóng tối xung quanh)</option>
+                        <option value="crying_tears">😭 Rơi lệ khóc ròng (crying_tears - dòng lệ trắng bạc tuôn chảy)</option>
+                        <option value="bleeding_tears">🩸 Khóc rỉ máu (bleeding_tears - hai dòng huyết lệ đỏ tuôn rỉ)</option>
+                        <option value="creepy_laugh">😈 Cười ma quái giật rung (creepy_laugh - hàm giật rung nhe răng)</option>
+                        <option value="terrified_scream">😱 Há to đớp khí kinh hãi (terrified_scream - hàm run rẩy gào thét)</option>
+                        <option value="talking_jaw">🗣️ Cử động môi nói / thì thào (talking_jaw - mở khép môi liên tục)</option>
                       </select>
                     </div>
 
@@ -2120,6 +2157,42 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     className="w-4 h-4 accent-red-600 rounded"
                   />
                 </div>
+
+                {/* Weather Effect Selector */}
+                <div className="flex flex-col gap-1.5 pt-3 border-t border-neutral-800">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-neutral-300">
+                      Hiệu Ứng Khí Quyển & Thời Tiết (Weather):
+                    </span>
+                    <span className="text-[10px] bg-red-950/80 text-red-300 border border-red-800/60 px-1.5 py-0.2 rounded font-mono">
+                      Procedural SVG
+                    </span>
+                  </div>
+                  <select
+                    value={scene.lighting.weather || "none"}
+                    onChange={(e) =>
+                      onChangeScene({
+                        ...scene,
+                        lighting: {
+                          ...scene.lighting,
+                          weather: e.target.value as WeatherEffectId,
+                        },
+                      })
+                    }
+                    className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600 font-mono"
+                  >
+                    <option value="none">Trời Yên Tĩnh (Không có hiệu ứng thời tiết)</option>
+                    <option value="heavy_rain">🌧️ Mưa Rào Bão Tối (Vệt mưa xiên & văng nước tiếp đất)</option>
+                    <option value="storm_thunder">⚡ Cuồng Phong Sấm Sét (Mưa dông dữ dội & chớp giật)</option>
+                    <option value="blood_rain">🩸 Mưa Máu Nguyền Rủa (Vệt máu đỏ & vũng máu loang trên đất)</option>
+                    <option value="floating_embers">🔥 Tàn Tro Lửa Âm Ty (Đốm than đỏ/vàng lập lòe cuộn gió)</option>
+                    <option value="drifting_ash">🌫️ Tro Tàn Oan Khuất (Bụi tro xám bạc lả tả kiểu Silent Hill)</option>
+                    <option value="haunted_mist">👻 Sương Mù Cuộn Xoáy (Dải sương mù lập thể ma quái đa tầng)</option>
+                  </select>
+                  <p className="text-[11px] text-neutral-400">
+                    Thời tiết được sinh 100% bằng code vector SVG và chuyển động đồng bộ cả trong khi phát trực tiếp lẫn khi xuất video WebM.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -2194,7 +2267,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 />
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-2">
                 <label className="text-xs font-semibold text-neutral-300">
                   Lời Thoại / Phụ Đề Điện Ảnh (Hiển thị đáy màn hình):
                 </label>
@@ -2205,6 +2278,87 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   placeholder="Lời thoại rùng rợn..."
                   className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600"
                 />
+
+                {/* Subtitle Style & Animation Controls */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1 p-3 bg-neutral-950/70 border border-neutral-800/80 rounded-xl">
+                  {/* Style selector */}
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[11px] font-semibold text-neutral-400">
+                      Phong Cách Viền Bóng Điện Ảnh:
+                    </span>
+                    <select
+                      value={scene.subtitle_style || "auto"}
+                      onChange={(e) =>
+                        onChangeScene({
+                          ...scene,
+                          subtitle_style: e.target.value as SubtitleStyleId,
+                        })
+                      }
+                      className="bg-neutral-900 border border-neutral-800 text-neutral-200 text-xs rounded-lg p-2 focus:outline-none focus:border-red-600 font-mono"
+                    >
+                      <option value="auto">Tự động (Theo Bầu Trời Cảnh)</option>
+                      <option value="blood_red">🩸 Viền Bóng Đỏ Máu (Trăng Máu / Oan Hồn)</option>
+                      <option value="smoky_grey">🌫️ Viền Bóng Xám Khói (Sương Đêm / Âm Ty)</option>
+                      <option value="emerald_phantom">💚 Lân Tinh Quỷ Dị (Nhật Thực / Cương Thi)</option>
+                      <option value="candle_amber">🕯️ Vàng Nến Âm Ty (Bùa Chu Sa / Nến Hồn)</option>
+                      <option value="cyan_fluorescent">⚡ Xanh Băng Huỳnh Quang (Bệnh Viện / Xe Buýt)</option>
+                    </select>
+                  </div>
+
+                  {/* Animation selector */}
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[11px] font-semibold text-neutral-400">
+                      Hiệu Ứng Xuất Hiện (Animation):
+                    </span>
+                    <select
+                      value={scene.subtitle_anim || "typewriter_fade"}
+                      onChange={(e) =>
+                        onChangeScene({
+                          ...scene,
+                          subtitle_anim: e.target.value as SubtitleAnimId,
+                        })
+                      }
+                      className="bg-neutral-900 border border-neutral-800 text-neutral-200 text-xs rounded-lg p-2 focus:outline-none focus:border-red-600 font-mono"
+                    >
+                      <option value="typewriter_fade">✨ Gõ Chữ & Hiện Mờ (Typewriter Fade - Điện Ảnh)</option>
+                      <option value="word_by_word">🔤 Từng Từ Nối Tiếp (Word by Word)</option>
+                      <option value="smooth_fade">🌫️ Mờ Dần Toàn Câu (Smooth Fade)</option>
+                      <option value="static">⏸️ Hiển Thị Tĩnh (Static Full)</option>
+                    </select>
+                  </div>
+
+                  {/* Live Style Preview Strip */}
+                  {scene.dialogue && (
+                    <div className="col-span-1 sm:col-span-2 pt-2 border-t border-neutral-800/80 flex flex-col gap-1">
+                      <span className="text-[10px] text-neutral-400 font-mono">
+                        Xem trước mẫu chữ điện ảnh (Cormorant Garamond):
+                      </span>
+                      {(() => {
+                        const styleKey = resolveSubtitleStyle(
+                          scene.lighting?.sky_preset,
+                          scene.subtitle_style
+                        );
+                        const themeDef = SUBTITLE_THEMES[styleKey];
+                        return (
+                          <div
+                            className="p-3 rounded-lg text-center overflow-hidden"
+                            style={{ background: themeDef.backdropGradientCss }}
+                          >
+                            <span
+                              className="font-cinematic-serif italic text-base md:text-lg font-semibold tracking-wider select-none leading-relaxed"
+                              style={{
+                                color: themeDef.textColor,
+                                textShadow: themeDef.textShadowCss,
+                              }}
+                            >
+                              "{scene.dialogue}"
+                            </span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex flex-col gap-1.5">

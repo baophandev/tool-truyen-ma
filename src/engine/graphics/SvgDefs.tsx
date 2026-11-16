@@ -83,6 +83,40 @@ export const SvgDefs: React.FC = () => {
         <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
       </radialGradient>
 
+      {/* 2c. PROCEDURAL WEATHER & PARTICLE ASSET GRADIENTS */}
+      <radialGradient id="ember-glow-radial" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#FEF08A" stopOpacity="1" />
+        <stop offset="35%" stopColor="#F97316" stopOpacity="0.85" />
+        <stop offset="70%" stopColor="#DC2626" stopOpacity="0.35" />
+        <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+      </radialGradient>
+
+      <radialGradient id="blood-puddle-radial" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#991B1B" stopOpacity="0.85" />
+        <stop offset="50%" stopColor="#7F1D1D" stopOpacity="0.5" />
+        <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+      </radialGradient>
+
+      <linearGradient id="rain-streak-blue" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#A5F3FC" stopOpacity="0.05" />
+        <stop offset="70%" stopColor="#BAE6FD" stopOpacity="0.75" />
+        <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.95" />
+      </linearGradient>
+
+      <linearGradient id="rain-streak-blood" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#7F1D1D" stopOpacity="0.05" />
+        <stop offset="65%" stopColor="#DC2626" stopOpacity="0.8" />
+        <stop offset="100%" stopColor="#EF4444" stopOpacity="1" />
+      </linearGradient>
+
+      <linearGradient id="swirling-mist-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#E2E8F0" stopOpacity="0" />
+        <stop offset="25%" stopColor="#E2E8F0" stopOpacity="0.22" />
+        <stop offset="50%" stopColor="#CBD5E1" stopOpacity="0.32" />
+        <stop offset="75%" stopColor="#94A3B8" stopOpacity="0.18" />
+        <stop offset="100%" stopColor="#E2E8F0" stopOpacity="0" />
+      </linearGradient>
+
       {/* 3. MIDGROUND MIST GRADIENTS */}
       <linearGradient id="mid-mist-grad-blood_moon" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stopColor="rgba(153, 27, 27, 0)" />

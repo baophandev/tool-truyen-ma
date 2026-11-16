@@ -75,6 +75,7 @@ export type CostumeId =
 export type CharacterFaceId =
   | "face_calm"
   | "face_scared"
+  | "face_screaming_gasp"       // Há hốc kinh hoàng / Mắt tròn trừng trợn đớp khí (Screaming Gasp Tongue)
   | "face_creepy_smile"
   | "face_bleeding_eyes"
   | "face_faceless"
@@ -87,6 +88,17 @@ export type CharacterFaceId =
   | "face_sewn_mouth"
   | "face_haggard_gaunt"
   | "face_headless";           // Không đầu / Cổ chém lìa vương máu (Headless Severed Neck)
+
+export type FacialActionId =
+  | "none"
+  | "blink_natural"            // Chớp mắt tự nhiên (đều đặn nhịp nhàng)
+  | "blink_nervous"            // Chớp mắt lia lịa hoảng loạn (nháy liên hồi)
+  | "darting_eyes"             // Liếc mắt dáo dác qua lại (dò xét bóng tối)
+  | "crying_tears"             // Rơi lệ khóc ròng (dòng lệ tuôn trào)
+  | "bleeding_tears"           // Khóc ra máu (dòng máu tươi rỉ từ hốc mắt)
+  | "creepy_laugh"             // Cười ma quái giật rung (khuôn miệng co giật)
+  | "terrified_scream"         // Há to đớp khí trong kinh hãi (quivering jaw scream)
+  | "talking_jaw";             // Cử động môi nói / thì thào theo lời thoại
 
 export type CharacterPoseId =
   | "pose_standing"
@@ -166,6 +178,7 @@ export interface ActorConfig {
   base: CharacterBaseId;
   costume?: CostumeId; // Modular Clothing / Outfit Asset
   face: CharacterFaceId;
+  facialAction?: FacialActionId; // Dynamic facial action (blinking, eye darting, weeping, laughing, etc.)
   pose: CharacterPoseId;
   facing: FacingDirection;
   slot: SlotId;
@@ -178,12 +191,36 @@ export interface ActorConfig {
   motion?: ActorMotionConfig; // Optional A -> B keyframe movement
 }
 
+export type WeatherEffectId =
+  | "none"
+  | "heavy_rain"
+  | "storm_thunder"
+  | "blood_rain"
+  | "floating_embers"
+  | "drifting_ash"
+  | "haunted_mist";
+
 export interface DirectorLightingConfig {
   sky_preset: SkyPresetId;
   fog_density: number; // 0.0 to 1.0
   ambient_tint?: string;
   thunder_flash?: boolean;
+  weather?: WeatherEffectId;
 }
+
+export type SubtitleStyleId =
+  | "auto"
+  | "blood_red"
+  | "smoky_grey"
+  | "emerald_phantom"
+  | "candle_amber"
+  | "cyan_fluorescent";
+
+export type SubtitleAnimId =
+  | "typewriter_fade"
+  | "word_by_word"
+  | "smooth_fade"
+  | "static";
 
 export interface DirectorSceneScript {
   scene_id: string;
@@ -195,6 +232,8 @@ export interface DirectorSceneScript {
   actors: ActorConfig[];
   details?: DetailItemConfig[];
   dialogue?: string;
+  subtitle_style?: SubtitleStyleId;
+  subtitle_anim?: SubtitleAnimId;
   narrative_note?: string;
 }
 

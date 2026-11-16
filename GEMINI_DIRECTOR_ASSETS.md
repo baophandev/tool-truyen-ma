@@ -157,9 +157,10 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
 - `"outfit_patient_gown"`: Bộ quần áo bệnh nhân sọc xanh nhạt rộng thùng thình, buộc dây sau gáy, vạt áo lấm lem rách rưới.
 - `"outfit_modern_casual"`: Áo khoác hoodie hiện đại màu xám đen có khóa kéo, dây rút, quần jean ôm và giày thể thao đế trắng.
 
-### 5.3. 14 Biểu Cảm Khuôn Mặt & Đặc Điểm Phần Đầu (Faces - Gắn tại Head Socket)
+### 5.3. 15 Biểu Cảm Khuôn Mặt & Đặc Điểm Phần Đầu (Faces - Gắn tại Head Socket)
 - `"face_calm"`: Mặt bình thường, mắt đen nhỏ vô hồn, lạnh lẽo.
 - `"face_scared"`: Kinh hãi tột cùng, tròng mắt trợn trắng, miệng há hốc run rẩy.
+- `"face_screaming_gasp"`: **Há hốc kinh hoàng (Screaming Gasp Face)**: Hai mắt mở to tròn trừng trừng, đồng tử đen nhỏ co rút hoảng loạn, miệng há toác hình chữ U đớp lấy từng ngụm khí lộ cuống lưỡi đỏ quạch u uất. Rất hợp cho các cảnh nhân vật chứng kiến thực thể ma quái đột ngột hiện hình hoặc hoảng loạn cùng cực.
 - `"face_creepy_smile"`: Nụ cười ma quái xé toạc dài tới mang tai với hàm răng nhọn.
 - `"face_bleeding_eyes"`: Mắt trắng dã chảy hai vệt máu đen rỉ xuống cằm.
 - `"face_old_wrinkled"`: Mặt già nua nếp nhăn, trán nhăn sâu, đuôi mắt chân chim chùng xuống, khóe rãnh miệng móm tém.
@@ -173,7 +174,23 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
 - `"face_talisman_covered"`: Lá bùa vàng chu sa che kín từ trán xuống miệng, bay phấp phới.
 - `"face_headless"`: Không đầu / Cổ đứt lìa (Headless Severed Neck). BẮT BUỘC dùng cho cốt truyện nhân vật không đầu (người đàn ông không đầu, tử sĩ cụt đầu, oan hồn mất đầu). Engine sẽ loại bỏ hoàn toàn đầu, tóc, mũ và nón, thay bằng cuống cổ chém đứt nham nhở, lộ đốt sống cổ trắng xám, máu tươi và máu đông rỉ rách nhỏ giọt xuống vạt áo kèm làn khói oán khí bốc lên nghi ngút.
 
-### 5.4. 10 Tư Thế Động Tác (Poses) & Quy Định Vùng Đứng Bắt Buộc
+### 5.4. Cử Động Gương Mặt & Vi Chuyển Động (Facial Actions / Micro-Animations)
+
+Giúp nhân vật sống động, không bị đơ cứng như ảnh tĩnh mà liên tục có phản xạ sinh lý và biểu cảm chân thực:
+
+| Facial Action ID | Tên Cử Động | Hiệu Ứng Thị Giác & Ngữ Nghĩa |
+| :--- | :--- | :--- |
+| `"none"` | Tĩnh lặng | Giữ nguyên ngũ quan tĩnh không chuyển động. |
+| `"blink_natural"` | Chớp mắt tự nhiên | Nháy mắt đều đặn chu kỳ 3.6s, tạo cảm giác nhân vật còn sống và đang chăm chú nhìn. |
+| `"blink_nervous"` | Chớp mắt lia lịa hoảng sợ | Nháy mắt liên tục tần số cao (0.8s) kèm giật nhẹ, biểu lộ tâm trạng căng thẳng tột độ. |
+| `"darting_eyes"` | Liếc mắt dáo dác | Con ngươi đảo lia lịa từ trái sang phải rồi nhìn thẳng, lùng sục bóng tối xung quanh tìm đường thoát. |
+| `"crying_tears"` | Rơi lệ khóc ròng | Hai dòng lệ trắng bạc trong suốt từ khóe mắt chảy dài xuống cằm theo chu kỳ tuần hoàn. |
+| `"bleeding_tears"` | Khóc rỉ máu | Hai dòng huyết lệ đỏ thẫm rỉ từ hốc mắt tuôn dài xuống ngực, tăng mạnh tử khí và oan hồn. |
+| `"creepy_laugh"` | Cười ma quái giật rung | Khung miệng/hàm co giật lên xuống liên tục nhịp nhanh, tạo cảm giác đang cười khúc khích điên loạn. |
+| `"terrified_scream"` | Há to đớp khí gào thét | Xương hàm mở rộng tối đa, run rẩy bần bật như đang thét lên không ra tiếng trong ác mộng. |
+| `"talking_jaw"` | Cử động môi nói / thì thào | Môi khép mở tự nhiên chu kỳ 0.6s, mô phỏng nhân vật đang đọc lời thoại hoặc niệm chú. |
+
+### 5.5. 10 Tư Thế Động Tác (Poses) & Quy Định Vùng Đứng Bắt Buộc
 
 | Pose ID | Tên Tư Thế | Loại Vùng | Quy Định Vị Trí Slot Bắt Buộc | Mô Tả Ngữ Nghĩa & Đặc Điểm Hình Học |
 | :--- | :--- | :--- | :--- | :--- |
@@ -266,6 +283,7 @@ export interface DirectorSceneScript {
     sky_preset: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss" | "flickering_fluorescent" | "dim_indoor_night";
     fog_density: number;          // Độ dày sương mù từ 0.0 đến 1.0
     thunder_flash?: boolean;      // Bật chớp giật sấm sét (true/false)
+    weather?: "none" | "heavy_rain" | "storm_thunder" | "blood_rain" | "floating_embers" | "drifting_ash" | "haunted_mist"; // Hiệu ứng thời tiết & hạt khí quyển thuần code
   };
   environment_items: Array<{
     asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub";
@@ -278,7 +296,8 @@ export interface DirectorSceneScript {
     id: string;
     base: "male_adult" | "female_adult" | "elder_hunched" | "brute_hulking" | "skeletal_emaciated" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow";
     costume?: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual";
-    face: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless";
+    face: "face_calm" | "face_scared" | "face_screaming_gasp" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless";
+    facialAction?: "none" | "blink_natural" | "blink_nervous" | "darting_eyes" | "crying_tears" | "bleeding_tears" | "creepy_laugh" | "terrified_scream" | "talking_jaw";
     pose: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging";
     facing: "left" | "right";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
@@ -308,6 +327,8 @@ export interface DirectorSceneScript {
     scale?: number;
   }>;
   dialogue?: string;              // Lời thoại / Phụ đề điện ảnh hiển thị đáy màn hình
+  subtitle_style?: "blood_red" | "smoky_grey" | "emerald_phantom" | "candle_amber" | "cyan_fluorescent"; // Font & theme chữ phụ đề cổ điển/kinh dị
+  subtitle_anim?: "typewriter" | "word_fade" | "classic_fade"; // Hiệu ứng chữ xuất hiện theo nhịp diễn biến câu chuyện
   narrative_note?: string;        // Ghi chú tâm lý & chỉ đạo nghệ thuật của đạo diễn
 }
 ```

@@ -9,6 +9,7 @@ export const DEFAULT_HORROR_SCENES: DirectorSceneScript[] = [
     lighting: {
       sky_preset: "foggy_night",
       fog_density: 0.65,
+      weather: "drifting_ash",
     },
     environment_items: [
       {
@@ -73,6 +74,7 @@ export const DEFAULT_HORROR_SCENES: DirectorSceneScript[] = [
       sky_preset: "blood_moon",
       fog_density: 0.85,
       thunder_flash: false,
+      weather: "blood_rain",
     },
     environment_items: [
       {
@@ -146,6 +148,7 @@ export const DEFAULT_HORROR_SCENES: DirectorSceneScript[] = [
       sky_preset: "stormy_dark",
       fog_density: 0.5,
       thunder_flash: true,
+      weather: "storm_thunder",
     },
     environment_items: [
       {
@@ -207,6 +210,7 @@ export const DEFAULT_HORROR_SCENES: DirectorSceneScript[] = [
       sky_preset: "foggy_night",
       fog_density: 0.7,
       thunder_flash: false,
+      weather: "floating_embers",
     },
     environment_items: [
       {
@@ -281,6 +285,7 @@ export const DEFAULT_HORROR_SCENES: DirectorSceneScript[] = [
       sky_preset: "eclipse_abyss",
       fog_density: 0.8,
       thunder_flash: false,
+      weather: "haunted_mist",
     },
     environment_items: [
       {

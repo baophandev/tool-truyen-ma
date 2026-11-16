@@ -15,6 +15,10 @@ import type {
   StructureId,
   ThemeId,
   SkyPresetId,
+  SubtitleStyleId,
+  SubtitleAnimId,
+  WeatherEffectId,
+  FacialActionId,
 } from "./types";
 import {
   DETAIL_RULES,
@@ -88,6 +92,15 @@ const VALID_SKY_PRESETS: SkyPresetId[] = [
   "flickering_fluorescent",
   "dim_indoor_night",
 ];
+export const VALID_WEATHER_EFFECTS: WeatherEffectId[] = [
+  "none",
+  "heavy_rain",
+  "storm_thunder",
+  "blood_rain",
+  "floating_embers",
+  "drifting_ash",
+  "haunted_mist",
+];
 const VALID_STRUCTURES: StructureId[] = [
   "creepy_banyan_tree",
   "ancient_tomb",
@@ -132,6 +145,7 @@ const VALID_COSTUMES: CostumeId[] = [
 const VALID_FACES: CharacterFaceId[] = [
   "face_calm",
   "face_scared",
+  "face_screaming_gasp",
   "face_creepy_smile",
   "face_bleeding_eyes",
   "face_faceless",
@@ -144,6 +158,17 @@ const VALID_FACES: CharacterFaceId[] = [
   "face_sewn_mouth",
   "face_haggard_gaunt",
   "face_headless",
+];
+export const VALID_FACIAL_ACTIONS: FacialActionId[] = [
+  "none",
+  "blink_natural",
+  "blink_nervous",
+  "darting_eyes",
+  "crying_tears",
+  "bleeding_tears",
+  "creepy_laugh",
+  "terrified_scream",
+  "talking_jaw",
 ];
 const VALID_POSES: CharacterPoseId[] = [
   "pose_standing",
@@ -242,6 +267,10 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
   const fog_density = !isNaN(rawFog) ? Math.min(1, Math.max(0, rawFog)) : 0.65;
   const thunder_flash = Boolean(lightingRaw.thunder_flash);
   const ambient_tint = lightingRaw.ambient_tint;
+  const rawWeather = lightingRaw.weather;
+  const weather: WeatherEffectId = VALID_WEATHER_EFFECTS.includes(rawWeather)
+    ? rawWeather
+    : (sky_preset === "stormy_dark" ? "storm_thunder" : "none");
 
   // 4. Environment Items (Structures)
   const environment_items: DirectorSceneScript["environment_items"] = [];
@@ -280,6 +309,9 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       ? actor.costume
       : getDefaultCostumeForBase(base);
     const face: CharacterFaceId = VALID_FACES.includes(actor.face) ? actor.face : "face_calm";
+    const facialAction: FacialActionId | undefined = VALID_FACIAL_ACTIONS.includes(actor.facialAction)
+      ? actor.facialAction
+      : undefined;
     const pose: CharacterPoseId = VALID_POSES.includes(actor.pose) ? actor.pose : "pose_standing";
 
     const actorRule = getAllowedSlotsForActor({ base, pose });
@@ -372,6 +404,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       base,
       costume,
       face,
+      ...(facialAction ? { facialAction } : {}),
       pose,
       facing,
       slot,
@@ -432,6 +465,28 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
   const dialogue = typeof script.dialogue === "string" ? script.dialogue.trim() : "";
   const narrative_note = typeof script.narrative_note === "string" ? script.narrative_note.trim() : "";
 
+  const VALID_SUBTITLE_STYLES: SubtitleStyleId[] = [
+    "auto",
+    "blood_red",
+    "smoky_grey",
+    "emerald_phantom",
+    "candle_amber",
+    "cyan_fluorescent",
+  ];
+  const VALID_SUBTITLE_ANIMS: SubtitleAnimId[] = [
+    "typewriter_fade",
+    "word_by_word",
+    "smooth_fade",
+    "static",
+  ];
+
+  const subtitle_style = VALID_SUBTITLE_STYLES.includes(script.subtitle_style)
+    ? script.subtitle_style
+    : undefined;
+  const subtitle_anim = VALID_SUBTITLE_ANIMS.includes(script.subtitle_anim)
+    ? script.subtitle_anim
+    : undefined;
+
   const normalized: DirectorSceneScript = {
     scene_id,
     title,
@@ -442,11 +497,14 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       fog_density,
       thunder_flash,
       ambient_tint,
+      weather,
     },
     environment_items,
     actors,
     details,
     dialogue,
+    subtitle_style,
+    subtitle_anim,
     narrative_note,
   };
 

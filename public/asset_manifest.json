@@ -110,6 +110,43 @@
         }
       }
     ],
+    "weather_effects": [
+      {
+        "id": "none",
+        "name": "Trời Yên Tĩnh",
+        "desc": "Không có hiệu ứng hạt thời tiết đặc biệt"
+      },
+      {
+        "id": "heavy_rain",
+        "name": "Mưa Rào Bão Tối",
+        "desc": "Vệt mưa xiên chéo rơi tốc độ cao, bắn tung tóe giọt nước tiếp đất tại Y=800px"
+      },
+      {
+        "id": "storm_thunder",
+        "name": "Cuồng Phong Sấm Sét",
+        "desc": "Mưa giông dữ dội góc xiên mạnh kết hợp chớp sáng rạch ngang trời"
+      },
+      {
+        "id": "blood_rain",
+        "name": "Mưa Máu Nguyền Rủa",
+        "desc": "Vệt mưa đỏ thẫm chu sa rỉ từ trời cao kèm vũng máu loang trên nền đất"
+      },
+      {
+        "id": "floating_embers",
+        "name": "Tàn Tro Lửa Âm Ty",
+        "desc": "Các đốm than đỏ/vàng lập lòe phát sáng trôi lơ lửng cuộn theo luồng gió ma quái"
+      },
+      {
+        "id": "drifting_ash",
+        "name": "Tro Tàn Oan Khuất",
+        "desc": "Mảnh tro xám bạc lơ lửng rơi chậm rãi như tuyết đen buốt giá phong cách Silent Hill"
+      },
+      {
+        "id": "haunted_mist",
+        "name": "Sương Mù Cuộn Xoáy",
+        "desc": "Dải sương mù lập thể ma quái đa tầng cuộn quanh chân nhân vật và tiền cảnh"
+      }
+    ],
     "structures": [
       {
         "id": "creepy_banyan_tree",
@@ -411,6 +448,11 @@
         "semantic": "Kinh hãi, tròng mắt trắng toát trợn ngược, miệng há hốc run rẩy"
       },
       {
+        "id": "face_screaming_gasp",
+        "name": "Há hốc kinh hoàng (Screaming Gasp)",
+        "semantic": "Hai mắt tròn xoe mở to trừng trừng, đồng tử nhỏ đen kịt, miệng há toác hình chữ U đớp lấy từng ngụm khí lộ cuống lưỡi đỏ quạch u uất"
+      },
+      {
         "id": "face_creepy_smile",
         "name": "Nụ cười ma quái",
         "semantic": "Nụ cười ma quái xé dài tới mang tai rợn người"
@@ -469,6 +511,53 @@
         "id": "face_headless",
         "name": "Không đầu / Cổ đứt lìa (Headless Severed Neck)",
         "semantic": "Vắng mặt hoàn toàn phần đầu, cuống cổ chém đứt nham nhở lộ đốt sống cổ trắng xám, máu tươi và máu đông rỉ giọt xuống vạt áo kèm làn khói oán khí bốc lên nghi ngút"
+      }
+    ],
+    "facial_actions": [
+      {
+        "id": "none",
+        "name": "Tĩnh lặng",
+        "desc": "Giữ nguyên ngũ quan tĩnh không chuyển động"
+      },
+      {
+        "id": "blink_natural",
+        "name": "Chớp mắt tự nhiên",
+        "desc": "Nháy mắt đều đặn chu kỳ 3.6s, tạo cảm giác nhân vật sống động và đang quan sát"
+      },
+      {
+        "id": "blink_nervous",
+        "name": "Chớp mắt lia lịa hoảng sợ",
+        "desc": "Nháy mắt liên tục tần số cao (0.8s) kèm giật nhẹ, biểu lộ sự căng thẳng tột độ"
+      },
+      {
+        "id": "darting_eyes",
+        "name": "Liếc mắt dáo dác",
+        "desc": "Con ngươi đảo qua lại liên tục từ trái sang phải để lùng sục bóng tối xung quanh"
+      },
+      {
+        "id": "crying_tears",
+        "name": "Rơi lệ khóc ròng",
+        "desc": "Hai dòng lệ trắng bạc trong suốt từ khóe mắt chảy dài xuống cằm"
+      },
+      {
+        "id": "bleeding_tears",
+        "name": "Khóc rỉ máu",
+        "desc": "Hai dòng huyết lệ đỏ thẫm rỉ từ hốc mắt tuôn dài xuống ngực"
+      },
+      {
+        "id": "creepy_laugh",
+        "name": "Cười ma quái giật rung",
+        "desc": "Khung miệng/hàm co giật lên xuống liên tục nhịp nhanh như đang cười khúc khích điên loạn"
+      },
+      {
+        "id": "terrified_scream",
+        "name": "Há to đớp khí gào thét",
+        "desc": "Xương hàm mở rộng tối đa và run rẩy bần bật như đang thét lên trong cơn ác mộng"
+      },
+      {
+        "id": "talking_jaw",
+        "name": "Cử động môi nói / thì thào",
+        "desc": "Môi khép mở tự nhiên chu kỳ 0.6s mô phỏng nhân vật đang đối thoại hoặc niệm chú"
       }
     ],
     "poses": [

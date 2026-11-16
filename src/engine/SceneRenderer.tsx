@@ -22,6 +22,7 @@ import {
 } from "./placementRules";
 import { SvgDefs } from "./graphics/SvgDefs";
 import { SkyLayer, BackgroundLayer, MainGroundLayer, ForegroundLayer } from "./graphics/Environments";
+import { WeatherLayer } from "./graphics/WeatherLayer";
 import { StructureRenderer } from "./graphics/Structures";
 import { CharacterRig } from "./graphics/CharacterRig";
 import { DetailRenderer } from "./graphics/Details";
@@ -712,6 +713,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                     base={actor.base}
                     costume={actor.costume}
                     face={actor.face}
+                    facialAction={actor.facialAction}
                     pose={evaluated.pose}
                     facing={evaluated.facing}
                     scale={actor.scale || 1}
@@ -772,6 +774,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                       base={actor.base}
                       costume={actor.costume}
                       face={actor.face}
+                      facialAction={actor.facialAction}
                       pose={actor.motion.movingPose || actor.pose}
                       facing={ghostFacing}
                       scale={actor.scale || 1}
@@ -888,6 +891,17 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
             })}
           </g>
         </g>
+
+        {/* PROCEDURAL WEATHER & ATMOSPHERIC PARTICLE LAYER (Rain, Blood Rain, Embers, Ash, Haunted Mist) */}
+        {((lighting.weather && lighting.weather !== "none") || lighting.sky_preset === "stormy_dark") && (
+          <g id="layer-weather-atmospheric" pointerEvents="none">
+            <WeatherLayer
+              weather={lighting.weather || (lighting.sky_preset === "stormy_dark" ? "storm_thunder" : "none")}
+              currentTime={currentTime}
+              thunderFlash={lighting.thunder_flash}
+            />
+          </g>
+        )}
 
         {/* LAYER 3 (z-index 30): FOREGROUND MIST, DRY BRANCHES, VIGNETTE */}
         <g id="layer-3-foreground">

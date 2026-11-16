@@ -2,6 +2,7 @@ import React from "react";
 import type {
   CharacterBaseId,
   CharacterFaceId,
+  FacialActionId,
   CharacterPoseId,
   CostumeId,
   FacingDirection,
@@ -157,6 +158,7 @@ interface CharacterRigProps {
   base: CharacterBaseId;
   costume?: CostumeId;
   face: CharacterFaceId;
+  facialAction?: FacialActionId;
   pose: CharacterPoseId;
   facing: FacingDirection;
   scale?: number;
@@ -285,6 +287,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
   base,
   costume,
   face,
+  facialAction,
   pose,
   facing,
   scale = 1,
@@ -319,6 +322,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
         base={base}
         costume={activeCostume}
         face={face}
+        facialAction={facialAction}
         scale={finalScale}
         flip={flip}
         opacity={opacity}
@@ -629,7 +633,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
             </g>
           )}
 
-          <FaceRig face={face} />
+          <FaceRig face={face} facialAction={facialAction} />
         </g>
       )}
 
@@ -1617,8 +1621,91 @@ const ArmsRig: React.FC<{
  * INTERCHANGEABLE FACE RIG
  * =========================================================
  */
-const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
+function resolveEyeAnimation(action?: FacialActionId, defaultBlink = true): string {
+  if (action === "blink_nervous") return "anim-face-blink-rapid";
+  if (action === "blink_natural" || (defaultBlink && (!action || action === "none"))) {
+    return "anim-face-blink";
+  }
+  return "";
+}
+
+function resolvePupilAnimation(action?: FacialActionId): string {
+  if (action === "darting_eyes") return "anim-pupil-dart";
+  return "";
+}
+
+function resolveJawAnimation(action?: FacialActionId, faceType?: CharacterFaceId): string {
+  if (action === "creepy_laugh" || faceType === "face_creepy_smile") return "anim-creepy-laugh-jaw";
+  if (action === "terrified_scream" || faceType === "face_screaming_gasp") return "anim-scream-jaw";
+  if (action === "talking_jaw") return "anim-talking-jaw";
+  return "";
+}
+
+function renderFacialOverlay(action?: FacialActionId): React.ReactNode {
+  if (action === "crying_tears") {
+    return (
+      <g className="face-tear-streams" pointerEvents="none">
+        <path d="M -7 -1 Q -8 10 -7 20" stroke="#93C5FD" strokeWidth="1.2" fill="none" opacity="0.85" className="anim-tear-stream" />
+        <circle cx="-7" cy="21" r="1.2" fill="#E0F2FE" />
+        <path d="M 7 -1 Q 8 10 7 20" stroke="#93C5FD" strokeWidth="1.2" fill="none" opacity="0.85" className="anim-tear-stream" />
+        <circle cx="7" cy="21" r="1.2" fill="#E0F2FE" />
+      </g>
+    );
+  }
+  if (action === "bleeding_tears") {
+    return (
+      <g className="face-blood-streams" pointerEvents="none">
+        <path d="M -7 -1 Q -8 11 -7 24" stroke="#DC2626" strokeWidth="1.6" fill="none" className="anim-blood-tear-stream" />
+        <circle cx="-7" cy="25" r="1.6" fill="#991B1B" />
+        <path d="M 7 -1 Q 8 11 7 24" stroke="#DC2626" strokeWidth="1.6" fill="none" className="anim-blood-tear-stream" />
+        <circle cx="7" cy="25" r="1.6" fill="#991B1B" />
+      </g>
+    );
+  }
+  return null;
+}
+
+const FaceRig: React.FC<{
+  face: CharacterFaceId;
+  facialAction?: FacialActionId;
+}> = ({ face, facialAction }) => {
   switch (face) {
+    case "face_screaming_gasp":
+      return (
+        <g className="face-screaming-gasp">
+          {/* Terrified high arched eyebrows */}
+          <path d="M -12 -15 Q -7 -18 -2 -14" stroke="#0F172A" strokeWidth="1.6" fill="none" />
+          <path d="M 12 -15 Q 7 -18 2 -14" stroke="#0F172A" strokeWidth="1.6" fill="none" />
+
+          {/* Huge round staring white eyeballs matching user reference image */}
+          <g className={resolveEyeAnimation(facialAction, true)}>
+            <ellipse cx="-7" cy="-5" rx="6.5" ry="7.5" fill="#FFFFFF" stroke="#0F172A" strokeWidth="1.4" />
+            <ellipse cx="7" cy="-5" rx="6.5" ry="7.5" fill="#FFFFFF" stroke="#0F172A" strokeWidth="1.4" />
+            {/* Round black pupils inside staring eyes with darting or staring */}
+            <g className={resolvePupilAnimation(facialAction)}>
+              <circle cx="-7" cy="-5" r="2.5" fill="#000000" />
+              <circle cx="-6.2" cy="-6" r="0.8" fill="#FFFFFF" />
+              <circle cx="7" cy="-5" r="2.5" fill="#000000" />
+              <circle cx="7.8" cy="-6" r="0.8" fill="#FFFFFF" />
+            </g>
+          </g>
+
+          {/* Enormous gaping dark mouth with red tongue */}
+          <g className={resolveJawAnimation(facialAction, "face_screaming_gasp")}>
+            <path
+              d="M -9 7 Q 0 3 9 7 Q 8 26 0 26 Q -8 26 -9 7 Z"
+              fill="#0A0202"
+              stroke="#0F172A"
+              strokeWidth="1.4"
+            />
+            {/* Dark red tongue inside gaping mouth */}
+            <ellipse cx="0" cy="22" rx="4.5" ry="3.2" fill={COLOR_PALETTE.accent_blood_red} />
+          </g>
+
+          {renderFacialOverlay(facialAction)}
+        </g>
+      );
+
     case "face_faceless":
       return (
         <g className="face-faceless">
@@ -1653,32 +1740,44 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
     case "face_scared":
       return (
         <g className="face-scared anim-jitter-slight">
-          <ellipse cx="-7" cy="-5" rx="5.5" ry="6.5" fill={COLOR_PALETTE.accent_fog_white} stroke="#0F172A" strokeWidth="1" />
-          <ellipse cx="7" cy="-5" rx="5.5" ry="6.5" fill={COLOR_PALETTE.accent_fog_white} stroke="#0F172A" strokeWidth="1" />
-          <circle cx="-7" cy="-5" r="1.6" fill="#000000" />
-          <circle cx="7" cy="-5" r="1.6" fill="#000000" />
-          <path
-            d="M -7 9 Q 0 4 7 9 Q 5 21 0 21 Q -5 21 -7 9 Z"
-            fill="#1A0505"
-            stroke="#0F172A"
-            strokeWidth="1"
-          />
-          <ellipse cx="0" cy="17" rx="3.5" ry="2.5" fill={COLOR_PALETTE.accent_blood_red} />
+          <g className={resolveEyeAnimation(facialAction, false) || "anim-face-blink-rapid"}>
+            <ellipse cx="-7" cy="-5" rx="5.5" ry="6.5" fill={COLOR_PALETTE.accent_fog_white} stroke="#0F172A" strokeWidth="1" />
+            <ellipse cx="7" cy="-5" rx="5.5" ry="6.5" fill={COLOR_PALETTE.accent_fog_white} stroke="#0F172A" strokeWidth="1" />
+            <g className={resolvePupilAnimation(facialAction)}>
+              <circle cx="-7" cy="-5" r="1.6" fill="#000000" />
+              <circle cx="7" cy="-5" r="1.6" fill="#000000" />
+            </g>
+          </g>
+          <g className={resolveJawAnimation(facialAction, "face_scared")}>
+            <path
+              d="M -7 9 Q 0 4 7 9 Q 5 21 0 21 Q -5 21 -7 9 Z"
+              fill="#1A0505"
+              stroke="#0F172A"
+              strokeWidth="1"
+            />
+            <ellipse cx="0" cy="17" rx="3.5" ry="2.5" fill={COLOR_PALETTE.accent_blood_red} />
+          </g>
+          {renderFacialOverlay(facialAction)}
         </g>
       );
 
     case "face_creepy_smile":
       return (
         <g className="face-creepy-smile">
-          <path d="M -12 -7 Q -7 -12 -2 -7 Q -7 -5 -12 -7 Z" fill={COLOR_PALETTE.accent_fog_white} stroke="#0F172A" strokeWidth="0.9" />
-          <path d="M 2 -7 Q 7 -12 12 -7 Q 7 -5 2 -7 Z" fill={COLOR_PALETTE.accent_fog_white} stroke="#0F172A" strokeWidth="0.9" />
-          <path d="M -18 3 Q 0 26 18 3 Q 0 8 -18 3 Z" fill="#3B0505" stroke={COLOR_PALETTE.accent_blood_red} strokeWidth="1.2" />
-          <polygon points="-14,5 -12,12 -10,6" fill={COLOR_PALETTE.accent_fog_white} />
-          <polygon points="-9,6 -7,14 -5,7" fill={COLOR_PALETTE.accent_fog_white} />
-          <polygon points="-4,7 -2,15 0,7" fill={COLOR_PALETTE.accent_fog_white} />
-          <polygon points="1,7 3,15 5,7" fill={COLOR_PALETTE.accent_fog_white} />
-          <polygon points="6,6 8,14 10,6" fill={COLOR_PALETTE.accent_fog_white} />
-          <polygon points="11,5 13,12 15,5" fill={COLOR_PALETTE.accent_fog_white} />
+          <g className={resolveEyeAnimation(facialAction, false)}>
+            <path d="M -12 -7 Q -7 -12 -2 -7 Q -7 -5 -12 -7 Z" fill={COLOR_PALETTE.accent_fog_white} stroke="#0F172A" strokeWidth="0.9" />
+            <path d="M 2 -7 Q 7 -12 12 -7 Q 7 -5 2 -7 Z" fill={COLOR_PALETTE.accent_fog_white} stroke="#0F172A" strokeWidth="0.9" />
+          </g>
+          <g className={resolveJawAnimation(facialAction, "face_creepy_smile")}>
+            <path d="M -18 3 Q 0 26 18 3 Q 0 8 -18 3 Z" fill="#3B0505" stroke={COLOR_PALETTE.accent_blood_red} strokeWidth="1.2" />
+            <polygon points="-14,5 -12,12 -10,6" fill={COLOR_PALETTE.accent_fog_white} />
+            <polygon points="-9,6 -7,14 -5,7" fill={COLOR_PALETTE.accent_fog_white} />
+            <polygon points="-4,7 -2,15 0,7" fill={COLOR_PALETTE.accent_fog_white} />
+            <polygon points="1,7 3,15 5,7" fill={COLOR_PALETTE.accent_fog_white} />
+            <polygon points="6,6 8,14 10,6" fill={COLOR_PALETTE.accent_fog_white} />
+            <polygon points="11,5 13,12 15,5" fill={COLOR_PALETTE.accent_fog_white} />
+          </g>
+          {renderFacialOverlay(facialAction)}
         </g>
       );
 
@@ -1691,6 +1790,8 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
           <circle cx="-7" cy="25" r="1.8" fill={COLOR_PALETTE.accent_blood_red} />
           <path d="M 6 -1 L 6 22 L 8 22 L 8 -1 Z" fill={COLOR_PALETTE.accent_blood_red} />
           <circle cx="7" cy="23" r="1.8" fill={COLOR_PALETTE.accent_blood_red} />
+          <path d="M -7 -1 Q -8 11 -7 25" stroke="#EF4444" strokeWidth="1.4" fill="none" className="anim-blood-tear-stream" />
+          <path d="M 7 -1 Q 8 11 7 25" stroke="#EF4444" strokeWidth="1.4" fill="none" className="anim-blood-tear-stream" />
           <line x1="-5" y1="12" x2="5" y2="12" stroke="#1F1212" strokeWidth="1.3" />
         </g>
       );
@@ -1702,22 +1803,27 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
           <path d="M -12 -18 Q 0 -15 12 -18" stroke="#4A3B32" strokeWidth="1" fill="none" opacity="0.8" />
           <path d="M -9 -14 Q 0 -11 9 -14" stroke="#4A3B32" strokeWidth="1" fill="none" opacity="0.8" />
           {/* Drooping old eyelids and dim eyes */}
-          <path d="M -9 -6 Q -6 -9 -3 -6" stroke="#2B1D16" strokeWidth="1.2" fill="none" />
-          <ellipse cx="-6" cy="-4" rx="2.2" ry="1.4" fill="#1C1917" />
-          <circle cx="-6.5" cy="-4.5" r="0.6" fill="#CBD5E1" />
+          <g className={resolveEyeAnimation(facialAction, true)}>
+            <path d="M -9 -6 Q -6 -9 -3 -6" stroke="#2B1D16" strokeWidth="1.2" fill="none" />
+            <ellipse cx="-6" cy="-4" rx="2.2" ry="1.4" fill="#1C1917" />
+            <circle cx="-6.5" cy="-4.5" r="0.6" fill="#CBD5E1" />
+            <path d="M 3 -6 Q 6 -9 9 -6" stroke="#2B1D16" strokeWidth="1.2" fill="none" />
+            <ellipse cx="6" cy="-4" rx="2.2" ry="1.4" fill="#1C1917" />
+            <circle cx="5.5" cy="-4.5" r="0.6" fill="#CBD5E1" />
+          </g>
           {/* Crow's feet wrinkles near eyes */}
           <path d="M -9 -5 L -14 -7 M -10 -4 L -15 -4 M -9 -3 L -13 -1" stroke="#4A3B32" strokeWidth="0.8" />
-          <path d="M 3 -6 Q 6 -9 9 -6" stroke="#2B1D16" strokeWidth="1.2" fill="none" />
-          <ellipse cx="6" cy="-4" rx="2.2" ry="1.4" fill="#1C1917" />
-          <circle cx="5.5" cy="-4.5" r="0.6" fill="#CBD5E1" />
           <path d="M 9 -5 L 14 -7 M 10 -4 L 15 -4 M 9 -3 L 13 -1" stroke="#4A3B32" strokeWidth="0.8" />
           {/* Deep nasolabial folds */}
           <path d="M -7 4 Q -9 12 -5 18" stroke="#3A2820" strokeWidth="1.2" fill="none" />
           <path d="M 7 4 Q 9 12 5 18" stroke="#3A2820" strokeWidth="1.2" fill="none" />
           {/* Sunken toothless mouth */}
-          <path d="M -5 14 Q 0 12 5 14" stroke="#1C1917" strokeWidth="1.8" fill="none" />
+          <g className={resolveJawAnimation(facialAction, "face_old_wrinkled")}>
+            <path d="M -5 14 Q 0 12 5 14" stroke="#1C1917" strokeWidth="1.8" fill="none" />
+          </g>
           {/* Chin wrinkles */}
           <path d="M -4 20 Q 0 22 4 20" stroke="#4A3B32" strokeWidth="0.9" fill="none" />
+          {renderFacialOverlay(facialAction)}
         </g>
       );
 
@@ -1729,20 +1835,25 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
           <polygon points="12,-12 2,-4 2,-6 12,-15" fill="#1F2937" />
           <line x1="-1" y1="-8" x2="-1" y2="-1" stroke="#450A0A" strokeWidth="1.5" />
           <line x1="1" y1="-8" x2="1" y2="-1" stroke="#450A0A" strokeWidth="1.5" />
-          {/* Piercing bloodshot red-rimmed glare */}
-          <ellipse cx="-6" cy="-3" rx="4.5" ry="3.5" fill="#450A0A" />
-          <circle cx="-6" cy="-3" r="2.2" fill={COLOR_PALETTE.accent_blood_red} />
-          <circle cx="-6" cy="-3" r="0.8" fill="#FFFFFF" />
-          <ellipse cx="6" cy="-3" rx="4.5" ry="3.5" fill="#450A0A" />
-          <circle cx="6" cy="-3" r="2.2" fill={COLOR_PALETTE.accent_blood_red} />
-          <circle cx="6" cy="-3" r="0.8" fill="#FFFFFF" />
+          {/* Piercing bloodshot red-rimmed glare with darting/staring */}
+          <g className={resolveEyeAnimation(facialAction, false)}>
+            <ellipse cx="-6" cy="-3" rx="4.5" ry="3.5" fill="#450A0A" />
+            <circle cx="-6" cy="-3" r="2.2" fill={COLOR_PALETTE.accent_blood_red} />
+            <circle cx="-6" cy="-3" r="0.8" fill="#FFFFFF" />
+            <ellipse cx="6" cy="-3" rx="4.5" ry="3.5" fill="#450A0A" />
+            <circle cx="6" cy="-3" r="2.2" fill={COLOR_PALETTE.accent_blood_red} />
+            <circle cx="6" cy="-3" r="0.8" fill="#FFFFFF" />
+          </g>
           {/* Snarl teeth & menacing open grimace */}
-          <path d="M -9 8 Q 0 4 9 8 Q 8 20 0 20 Q -8 20 -9 8 Z" fill="#2A0404" stroke="#7F1D1D" strokeWidth="1" />
-          {/* Sharp fangs */}
-          <polygon points="-7,8 -5,14 -4,8" fill="#F8FAFC" />
-          <polygon points="4,8 5,14 7,8" fill="#F8FAFC" />
-          <polygon points="-5,19 -4,15 -3,19" fill="#F8FAFC" />
-          <polygon points="3,19 4,15 5,19" fill="#F8FAFC" />
+          <g className={resolveJawAnimation(facialAction, "face_rage_furious")}>
+            <path d="M -9 8 Q 0 4 9 8 Q 8 20 0 20 Q -8 20 -9 8 Z" fill="#2A0404" stroke="#7F1D1D" strokeWidth="1" />
+            {/* Sharp fangs */}
+            <polygon points="-7,8 -5,14 -4,8" fill="#F8FAFC" />
+            <polygon points="4,8 5,14 7,8" fill="#F8FAFC" />
+            <polygon points="-5,19 -4,15 -3,19" fill="#F8FAFC" />
+            <polygon points="3,19 4,15 5,19" fill="#F8FAFC" />
+          </g>
+          {renderFacialOverlay(facialAction)}
         </g>
       );
 
@@ -1753,13 +1864,18 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
           <ellipse cx="-7" cy="-4" rx="6.5" ry="5.5" fill="#1E1B2E" opacity="0.85" />
           <ellipse cx="7" cy="-4" rx="6.5" ry="5.5" fill="#1E1B2E" opacity="0.85" />
           {/* Wide dead glassy white pupilless eyes */}
-          <ellipse cx="-7" cy="-4" rx="4.5" ry="4" fill="#E2E8F0" stroke="#0F172A" strokeWidth="0.8" />
-          <circle cx="-7" cy="-4" r="1.5" fill="#94A3B8" opacity="0.5" />
-          <ellipse cx="7" cy="-4" rx="4.5" ry="4" fill="#E2E8F0" stroke="#0F172A" strokeWidth="0.8" />
-          <circle cx="7" cy="-4" r="1.5" fill="#94A3B8" opacity="0.5" />
+          <g className={resolveEyeAnimation(facialAction, true)}>
+            <ellipse cx="-7" cy="-4" rx="4.5" ry="4" fill="#E2E8F0" stroke="#0F172A" strokeWidth="0.8" />
+            <circle cx="-7" cy="-4" r="1.5" fill="#94A3B8" opacity="0.5" />
+            <ellipse cx="7" cy="-4" rx="4.5" ry="4" fill="#E2E8F0" stroke="#0F172A" strokeWidth="0.8" />
+            <circle cx="7" cy="-4" r="1.5" fill="#94A3B8" opacity="0.5" />
+          </g>
           {/* Cold bluish dead lips hanging slack */}
-          <path d="M -6 11 Q 0 9 6 11 Q 4 16 0 16 Q -4 16 -6 11 Z" fill="#2E1026" stroke="#4C1D45" strokeWidth="1" />
-          <line x1="-7" y1="11" x2="7" y2="11" stroke="#0F0814" strokeWidth="1.2" />
+          <g className={resolveJawAnimation(facialAction, "face_pale_corpse")}>
+            <path d="M -6 11 Q 0 9 6 11 Q 4 16 0 16 Q -4 16 -6 11 Z" fill="#2E1026" stroke="#4C1D45" strokeWidth="1" />
+            <line x1="-7" y1="11" x2="7" y2="11" stroke="#0F0814" strokeWidth="1.2" />
+          </g>
+          {renderFacialOverlay(facialAction)}
         </g>
       );
 
@@ -1777,8 +1893,12 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
           <circle cx="-5.5" cy="25" r="1.5" fill="#09090B" />
           <path d="M 6 -2 L 7 12 L 5 21 L 6 21 L 8 11 L 6 -2 Z" fill="#09090B" />
           <circle cx="5.5" cy="23" r="1.4" fill="#09090B" />
+          <path d="M -6 -2 Q -7 10 -6 20" stroke="#93C5FD" strokeWidth="1.2" fill="none" opacity="0.85" className="anim-tear-stream" />
+          <path d="M 6 -2 Q 7 10 6 20" stroke="#93C5FD" strokeWidth="1.2" fill="none" opacity="0.85" className="anim-tear-stream" />
           {/* Melancholy trembling mouth */}
-          <path d="M -5 13 Q 0 10 5 13 Q 0 15 -5 13 Z" fill="#1C1917" stroke="#451A03" strokeWidth="0.8" />
+          <g className={resolveJawAnimation(facialAction, "face_weeping_ghost")}>
+            <path d="M -5 13 Q 0 10 5 13 Q 0 15 -5 13 Z" fill="#1C1917" stroke="#451A03" strokeWidth="0.8" />
+          </g>
         </g>
       );
 
@@ -1786,12 +1906,16 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
       return (
         <g className="face-sewn-mouth anim-jitter-slight">
           {/* Wide terrified bulging eyes */}
-          <ellipse cx="-7" cy="-5" rx="5.5" ry="6.5" fill="#F8FAFC" stroke="#0F172A" strokeWidth="1" />
-          <circle cx="-7" cy="-5" r="1.8" fill="#000000" />
-          <circle cx="-6" cy="-6" r="0.8" fill="#FFFFFF" />
-          <ellipse cx="7" cy="-5" rx="5.5" ry="6.5" fill="#F8FAFC" stroke="#0F172A" strokeWidth="1" />
-          <circle cx="7" cy="-5" r="1.8" fill="#000000" />
-          <circle cx="8" cy="-6" r="0.8" fill="#FFFFFF" />
+          <g className={resolveEyeAnimation(facialAction, false)}>
+            <ellipse cx="-7" cy="-5" rx="5.5" ry="6.5" fill="#F8FAFC" stroke="#0F172A" strokeWidth="1" />
+            <ellipse cx="7" cy="-5" rx="5.5" ry="6.5" fill="#F8FAFC" stroke="#0F172A" strokeWidth="1" />
+            <g className={resolvePupilAnimation(facialAction)}>
+              <circle cx="-7" cy="-5" r="1.8" fill="#000000" />
+              <circle cx="-6" cy="-6" r="0.8" fill="#FFFFFF" />
+              <circle cx="7" cy="-5" r="1.8" fill="#000000" />
+              <circle cx="8" cy="-6" r="0.8" fill="#FFFFFF" />
+            </g>
+          </g>
           {/* Lips clamped shut with stitch line */}
           <line x1="-12" y1="12" x2="12" y2="12" stroke="#450A0A" strokeWidth="2" />
           {/* Cross stitches (X stitches) with blood dots */}
@@ -1803,6 +1927,7 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
               <circle cx={x} cy="16" r="0.9" fill={COLOR_PALETTE.accent_blood_red} />
             </g>
           ))}
+          {renderFacialOverlay(facialAction)}
         </g>
       );
 
@@ -1812,11 +1937,15 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
           {/* Deep dark hollow eye sockets */}
           <ellipse cx="-7" cy="-4" rx="7" ry="6" fill="#18181B" opacity="0.9" />
           <ellipse cx="7" cy="-4" rx="7" ry="6" fill="#18181B" opacity="0.9" />
-          {/* Unnerving pinprick stare in darkness */}
-          <circle cx="-7" cy="-4" r="2.8" fill="#E2E8F0" />
-          <circle cx="-7" cy="-4" r="1" fill="#000000" />
-          <circle cx="7" cy="-4" r="2.8" fill="#E2E8F0" />
-          <circle cx="7" cy="-4" r="1" fill="#000000" />
+          {/* Unnerving pinprick stare in darkness with darting pupils */}
+          <g className={resolveEyeAnimation(facialAction, true)}>
+            <circle cx="-7" cy="-4" r="2.8" fill="#E2E8F0" />
+            <circle cx="7" cy="-4" r="2.8" fill="#E2E8F0" />
+            <g className={resolvePupilAnimation(facialAction)}>
+              <circle cx="-7" cy="-4" r="1.2" fill="#000000" />
+              <circle cx="7" cy="-4" r="1.2" fill="#000000" />
+            </g>
+          </g>
           {/* Sharp prominent cheekbones */}
           <path d="M -15 2 L -7 6" stroke="#3F3F46" strokeWidth="1.5" />
           <path d="M 15 2 L 7 6" stroke="#3F3F46" strokeWidth="1.5" />
@@ -1824,7 +1953,10 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
           <ellipse cx="-11" cy="9" rx="3" ry="5" fill="#18181B" opacity="0.35" />
           <ellipse cx="11" cy="9" rx="3" ry="5" fill="#18181B" opacity="0.35" />
           {/* Chapped parted lips */}
-          <ellipse cx="0" cy="14" rx="4" ry="2.5" fill="#18181B" stroke="#52525B" strokeWidth="0.8" />
+          <g className={resolveJawAnimation(facialAction, "face_haggard_gaunt")}>
+            <ellipse cx="0" cy="14" rx="4" ry="2.5" fill="#18181B" stroke="#52525B" strokeWidth="0.8" />
+          </g>
+          {renderFacialOverlay(facialAction)}
         </g>
       );
 
@@ -1835,11 +1967,24 @@ const FaceRig: React.FC<{ face: CharacterFaceId }> = ({ face }) => {
     default:
       return (
         <g className="face-calm">
-          <circle cx="-6" cy="-4" r="2.6" fill="#0F172A" />
-          <circle cx="6" cy="-4" r="2.6" fill="#0F172A" />
-          <circle cx="-5.5" cy="-4.5" r="0.8" fill={COLOR_PALETTE.accent_fog_white} />
-          <circle cx="6.5" cy="-4.5" r="0.8" fill={COLOR_PALETTE.accent_fog_white} />
-          <line x1="-4" y1="11" x2="4" y2="11" stroke="#1F172A" strokeWidth="1.4" strokeLinecap="round" />
+          <g className={resolveEyeAnimation(facialAction, true)}>
+            <g className={resolvePupilAnimation(facialAction)}>
+              <circle cx="-6" cy="-4" r="2.6" fill="#0F172A" />
+              <circle cx="6" cy="-4" r="2.6" fill="#0F172A" />
+              <circle cx="-5.5" cy="-4.5" r="0.8" fill={COLOR_PALETTE.accent_fog_white} />
+              <circle cx="6.5" cy="-4.5" r="0.8" fill={COLOR_PALETTE.accent_fog_white} />
+            </g>
+          </g>
+          <g className={resolveJawAnimation(facialAction, "face_calm")}>
+            {facialAction === "terrified_scream" ? (
+              <path d="M -7 9 Q 0 5 7 9 Q 6 22 0 22 Q -6 22 -7 9 Z" fill="#0A0202" stroke="#0F172A" strokeWidth="1.2" />
+            ) : facialAction === "creepy_laugh" ? (
+              <path d="M -12 6 Q 0 18 12 6 Q 0 10 -12 6 Z" fill="#2E0505" stroke="#7F1D1D" strokeWidth="1" />
+            ) : (
+              <line x1="-4" y1="11" x2="4" y2="11" stroke="#1F172A" strokeWidth="1.4" strokeLinecap="round" />
+            )}
+          </g>
+          {renderFacialOverlay(facialAction)}
         </g>
       );
   }
@@ -1856,6 +2001,7 @@ interface CrawlingSideRigProps {
   base: CharacterBaseId;
   costume: CostumeId;
   face: CharacterFaceId;
+  facialAction?: FacialActionId;
   scale: number;
   flip: number;
   opacity: number;
@@ -1872,6 +2018,7 @@ const CrawlingSideRig: React.FC<CrawlingSideRigProps> = ({
   base,
   costume,
   face,
+  facialAction,
   scale,
   flip,
   opacity,
@@ -2164,7 +2311,7 @@ const CrawlingSideRig: React.FC<CrawlingSideRigProps> = ({
           )}
 
           {/* Face Expression Rig */}
-          <FaceRig face={face} />
+          <FaceRig face={face} facialAction={facialAction} />
         </g>
       )}
 
