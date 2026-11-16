@@ -1,5 +1,10 @@
 import type { DirectorSceneScript, NamedEnvironmentPreset, CameraShotType } from "./types";
 import { validateDirectorScript, VALID_CAMERA_SHOTS } from "./layoutRouter";
+import {
+  splitStoryIntoVoiceSegments,
+  type VoicePacePreset,
+  type VoiceSegment,
+} from "./voicePacingUtils";
 
 export const DEFAULT_GEMINI_API_KEY =
   import.meta.env.VITE_GEMINI_API_KEY || "";
@@ -1321,6 +1326,7 @@ export async function breakdownStoryToSceneDrafts(
     targetSceneCount?: number | "auto";
     apiKey?: string;
     model?: string;
+    voicePace?: VoicePacePreset | number;
   } = {}
 ): Promise<BreakdownStoryResult> {
   const apiKey = (options.apiKey || getStoredApiKey()).trim();
@@ -1340,6 +1346,21 @@ export async function breakdownStoryToSceneDrafts(
     };
   }
 
+  // 1. CHIA PHÂN ĐOẠN VOICE-OVER THEO NGUYÊN VĂN BẢN GỐC & TÍNH TOÁN THỜI LƯỢNG GIỌNG ĐỌC
+  const voiceSegments: VoiceSegment[] = splitStoryIntoVoiceSegments(storyPrompt, {
+    targetSceneCount: options.targetSceneCount,
+    pace: options.voicePace || "normal_narrative",
+  });
+
+  if (voiceSegments.length === 0) {
+    return {
+      success: false,
+      error: "Không thể phân tích nội dung câu chuyện thành các phân đoạn kịch bản.",
+    };
+  }
+
+  const effectiveCount = voiceSegments.length;
+
   const envsSummary = availableEnvironments
     .map(
       (env) =>
@@ -1347,66 +1368,64 @@ export async function breakdownStoryToSceneDrafts(
     )
     .join("\n");
 
-  const countRequirement =
-    options.targetSceneCount && options.targetSceneCount !== "auto"
-      ? `BẮT BUỘC phân chia thành đúng ${options.targetSceneCount} phân cảnh.`
-      : `Hãy tự động phân tích nhịp điệu cốt truyện và chia thành từ 2 đến 5 phân cảnh phù hợp nhất.`;
+  const segmentsGuidance = voiceSegments
+    .map(
+      (s) =>
+        `[PHÂN CẢNH ${s.index}]:
+- LỜI LỒNG TIẾNG (SUBTITLE / DIALOGUE GỐC): """${s.text}"""
+- THỜI LƯỢNG ƯỚC LƯỢNG THEO GIỌNG ĐỌC: ${s.estimatedDurationSec} giây (${s.wordCount} từ)`
+    )
+    .join("\n\n");
 
-  const userPrompt = `BẠN LÀ TRỢ THỦ BIÊN KỊCH HOẠT HÌNH KINH DỊ BÓNG ĐEN 2D (LIMBO ENGINE SCRIPT BREAKDOWN ASSISTANT).
-Nhiệm vụ của bạn là nhận cốt truyện thô từ người dùng, phân tích và tự động bóc tách thành các phân cảnh hoàn chỉnh để ĐIỀN TỰ ĐỘNG VÀO CÁC TRƯỜNG THÔNG TIN (AUTO-FILL).
+  const userPrompt = `BẠN LÀ ĐẠO DIỄN HOẠT HÌNH KINH DỊ BÓNG ĐEN 2D (LIMBO HORROR ENGINE DIRECTOR).
+Dưới đây là cốt truyện gốc và danh sách ${effectiveCount} phân đoạn lồng tiếng tuần tự của người dùng.
 
-CỐT TRUYỆN CỦA NGƯỜI DÙNG:
+CỐT TRUYỆN GỐC TOÀN BỘ CỦA NGƯỜI DÙNG:
 """
 ${storyPrompt.trim()}
 """
 
+DANH SÁCH ${effectiveCount} PHÂN CẢNH VÀ LỜI LỒNG TIẾNG NGUYÊN VĂN TƯƠNG ỨNG:
+${segmentsGuidance}
+
 DANH SÁCH BỐI CẢNH DÙNG LẠI HIỆN CÓ TRONG THƯ VIỆN CỦA HỆ THỐNG:
 ${envsSummary}
 
-YÊU CẦU ĐẶC BIỆT DÀNH CHO TRỢ THỦ BIÊN KỊCH:
-1. SỐ LƯỢNG PHÂN CẢNH: ${countRequirement}
-2. QUY TẮC KHÓA BỐI CẢNH DÙNG LẠI (CRITICAL - SCENE CONTINUITY):
-   - Mọi cảnh BẮT BUỘC phải chọn 1 "environmentId" từ danh sách bối cảnh trên (chính xác ID, không tự bịa).
-   - CHỌN ĐÚNG BỐI CẢNH PHÙ HỢP VỚI KHÔNG GIAN CỐT TRUYỆN:
-     * Cốt truyện về phòng tắm, bồn tắm, soi gương, vòi nước -> CHỌN ID: "env_creepy_bathroom"
-     * Cốt truyện về xe bus, trạm xe, ghế xe bus, khoang xe -> CHỌN ID: "env_midnight_bus"
-     * Cốt truyện về bệnh viện, giường mổ, phẫu thuật, bác sĩ -> CHỌN ID: "env_haunted_hospital"
-     * Cốt truyện về khách sạn, sảnh, quầy lễ tân, thang máy -> CHỌN ID: "env_creepy_hotel_corridor"
-     * Cốt truyện về siêu thị, quầy hàng, xe đẩy -> CHỌN ID: "env_abandoned_supermarket"
-     * Cốt truyện về nhà hàng, bàn ăn, nến rượu -> CHỌN ID: "env_dark_restaurant"
-     * Cốt truyện về bãi tha ma, bia mộ, khói hương, cây đa -> CHỌN ID: "env_graveyard_foggy"
-     * Cốt truyện về đường làng, miếu hoang, lều tranh, cương thi -> CHỌN ID: "env_abandoned_shrine_blood_moon"
-     * Cốt truyện về đầm lầy, cầu gỗ, giếng cạn -> CHỌN ID: "env_cursed_swamp_eclipse"
-   - NGUYÊN TẮC VÀNG: Nếu các cảnh liên tiếp diễn ra ở cùng một không gian / địa điểm (ví dụ lữ khách bước đi trong bãi tha ma rồi gặp ma hiện hình, hoặc ở miếu hoang rồi đối đầu cương thi), BẮT BUỘC PHẢI DÙNG CHUNG 1 "environmentId" để bối cảnh được giữ nguyên 100%, không bị lệch hay nhảy bối cảnh!
-   - Chỉ đổi sang "environmentId" khác khi cốt truyện thực sự chuyển địa điểm (ví dụ từ bãi tha ma chạy tới miếu hoang).
-3. MÔ TẢ HÀNH ĐỘNG NHÂN VẬT (actionDescription):
-   - Viết mô tả hành động trực tiếp, chi tiết, sống động theo đúng tài nguyên của Limbo Engine:
-     * Nhân vật (bases): "male_adult" (lữ khách, nam thanh niên), "female_adult" (thiếu nữ tóc dài), "elder_hunched" (bà lão, cụ già), "brute_hulking" (đồ tể, hộ pháp), "skeletal_emaciated" (kẻ gầy trơ xương, ngạ quỷ), "ghost_wraith" (bóng ma lơ lửng), "creepy_child" (đứa trẻ ma), "jiangshi_corpse" (cương thi phong kiến), "demon_shadow" (quỷ bóng đen sừng cong).
-     * Trang phục (costumes): "outfit_tattered_tunic" (áo tơi nông phu), "outfit_flowing_ao_dai" (áo dài ma mị), "outfit_shrouded_cloak" (áo choàng trùm đầu), "outfit_mandarin_court" (quan phục triều đình), "outfit_monk_cassock" (áo cà sa pháp sư), "outfit_shredded_burial" (vải liệm tử thi), "outfit_ancient_armor" (giáp tướng cổ), "outfit_child_pajamas" (yếm hoa trẻ thơ), "outfit_doctor_coat" (áo blouse bác sĩ), "outfit_patient_gown" (áo bệnh nhân), "outfit_modern_casual" (đồ hiện đại).
-     * Đồ vật cầm tay (held items): đèn bão sắt ("item_storm_lantern"), lồng đèn giấy ("item_paper_lantern"), nến triệu hồn ("item_soul_candle"), kiếm gỗ đào ("item_peach_wood_sword"), bùa vàng ("item_yellow_talisman"), liềm rỉ sét ("item_rusty_sickle"), chuông đồng ("item_ritual_bell"), búp bê vải ("item_tattered_doll"), ô rách ("item_tattered_umbrella"), đèn pin ("item_flashlight"), dao mổ ("item_scalpel"), điện thoại di động ("item_smartphone"), thủ cấp đứt lìa ("item_severed_head"), mẩu giấy bí ẩn vương máu ("item_mysterious_note").
-     * Hướng nhìn và di chuyển A -> B: bước đi từ trái qua phải, bước lùi hoảng sợ, sà xuống rượt đuổi, nhảy cứng đờ...
-4. TIÊU ĐỀ (title): Ngắn gọn, có số thứ tự (ví dụ: "Cảnh 1: Lạc Bước Bãi Tha Ma", "Cảnh 2: Hồn Ma Áo Liệm Xuất Hiện").
-5. LỜI THOẠI / PHỤ ĐỀ (dialogue): Một câu phụ đề rùng rợn, ma quái hoặc độc thoại nội tâm gắn liền với diễn biến cảnh.
-6. THỜI LƯỢNG (duration_sec): Từ 5 đến 8 giây.
-7. GỢI Ý CỠ CẢNH ĐIỆN ẢNH (cameraShot):
-   Đề xuất cỡ cảnh cho từng phân cảnh để tạo nhịp điệu phim phong phú (tránh tất cả đều là wide):
-   - "extreme_wide": Đại cảnh mở màn/kết thúc
-   - "wide": Toàn cảnh thiết lập
-   - "medium_wide": Trung toàn cảnh tương tác
-   - "medium": Trung cảnh hành động / cầm đồ vật
-   - "close_up": Cận cảnh biểu cảm kinh hãi / ma quỷ xuất hiện
-   - "extreme_close_up": Đặc tả mắt / quỷ dị
-   - "dutch_tilt": Góc nghiêng ma mị / tà khí
+QUY TẮC BẮT BUỘC: Ô LỒNG TIẾNG VÀ Ô MÔ TẢ HÀNH ĐỘNG LÀ 2 THỨ HOÀN TOÀN KHÁC NHAU:
+1. Ô LỒNG TIẾNG (dialogue) - CHÍNH LÀ LỜI NÓI CỦA NGƯỜI DÙNG:
+   - Trường "dialogue" của phân cảnh i BẮT BUỘC PHẢI LÀ NGUYÊN VĂN LỜI LỒNG TIẾNG của [PHÂN CẢNH ${"${i}"}].
+   - Giữ nguyên 100% câu chữ, TUYỆT ĐỐI KHÔNG sửa đổi, không tóm tắt, không bịa câu khác.
 
-TRẢ VỀ CHÍNH XÁC MỘT JSON ARRAY gồm danh sách các đối tượng AutoFillSceneDraft (KHÔNG kèm chữ giải thích):
+2. Ô MÔ TẢ HÀNH ĐỘNG NHÂN VẬT (actionDescription) - BẮT BUỘC LÀ ĐẠO DIỄN HOẠT HÌNH 2D CHI TIẾT (từ 25 - 50 từ):
+   - Đây là chỉ đạo diễn xuất và bố trí sân khấu hoạt họa 2D cho Limbo Engine.
+   - BẮT BUỘC PHẢI MÔ TẢ ĐẦY ĐỦ 5 YẾU TỐ:
+     * Nhân vật là ai (bases): nam thanh niên ('male_adult'), thiếu nữ tóc dài ('female_adult'), bà lão còng lưng ('elder_hunched'), quỷ bóng đen ('demon_shadow'), bóng ma bay ('ghost_wraith'), cương thi ('jiangshi_corpse'), quái vật lực lưỡng ('brute_hulking')...
+     * Mặc trang phục gì (costumes): áo hoodie hiện đại ('outfit_modern_casual'), áo tơi nông phu sờn rách ('outfit_tattered_tunic'), áo dài tà rách ('outfit_flowing_ao_dai'), áo blouse bác sĩ vấy máu ('outfit_doctor_coat'), vải liệm tử thi ('outfit_shredded_burial'), giáp cổ ('outfit_ancient_armor')...
+     * Biểu cảm mặt (faces): hoảng sợ ('face_scared'), bình tĩnh ('face_calm'), nụ cười ma quái ('face_creepy_smile'), mắt rỉ máu ('face_bleeding_eyes')...
+     * Cầm đồ vật gì trên tay (held items): đèn pin ('item_flashlight'), đèn bão sắt ('item_storm_lantern'), ô rách ('item_tattered_umbrella'), điện thoại di động ('item_smartphone'), dao mổ ('item_scalpel'), kiếm gỗ đào ('item_peach_wood_sword')...
+     * Động tác và di chuyển A -> B: nhân vật đứng ở đâu, bước đi từ vị trí nào sang vị trí nào (ví dụ: 'bước từ far_left sang center', 'run rẩy lùi lại mid_left', 'bóng ma từ trên cao air_right sà xuống rượt đuổi').
+   - TUYỆT ĐỐI CẤM KHÔNG ĐƯỢC VIẾT TÓM TẮT CHUNG CHUNG như "Nhân vật làm theo lời kể", "Nhân vật rời khỏi...", "Nhân vật thực hiện hành động phù hợp..."! BẮT BUỘC phải viết mô tả hoạt hình chi tiết, sống động!
+
+VÍ DỤ MẪU CHUẨN XÁC:
+- Lời lồng tiếng (dialogue): "Rời khỏi quán cà phê vắng lặng dưới cơn mưa tầm tã, tôi rảo bước qua con hẻm tối không một bóng đèn."
+- Mô tả hoạt hình (actionDescription): "Người thanh niên mặc áo hoodie hiện đại tay cầm chiếc ô rách bước đi vội vã từ góc trái (far_left) sang giữa khung hình (center) dưới cơn mưa bão, khuôn mặt hoảng sợ dáo dác nhìn vào bóng tối con hẻm."
+
+3. THỜI LƯỢNG PHÂN CẢNH (duration_sec):
+   - Đặt "duration_sec" đúng bằng thời lượng ước lượng theo giọng đọc đã ghi ở từng phân cảnh.
+4. KHÓA BỐI CẢNH DÙNG LẠI (environmentId):
+   - Chọn đúng bối cảnh phù hợp. Các cảnh chung địa điểm BẮT BUỘC dùng chung environmentId để không bị lệch cảnh.
+5. GÓC MÁY ĐIỆN ẢNH (cameraShot):
+   - Tự động chọn góc máy phong phú: "wide", "medium_wide", "medium", "close_up", "extreme_close_up", "dutch_tilt".
+
+TRẢ VỀ CHÍNH XÁC MỘT JSON ARRAY GỒM ĐÚNG ${effectiveCount} ĐỐI TƯỢNG AutoFillSceneDraft (KHÔNG kèm lời giải thích):
 [
   {
-    "title": "Cảnh 1: ...",
-    "environmentId": "id_bối_cảnh_chọn_từ_danh_sách",
+    "title": "Cảnh 1: Khởi Hành Trong Mưa Đêm",
+    "environmentId": "id_bối_cảnh",
     "cameraShot": "wide",
-    "actionDescription": "Mô tả chi tiết nhân vật làm gì...",
-    "dialogue": "Lời thoại rùng rợn...",
-    "duration_sec": 6
+    "actionDescription": "Người thanh niên mặc áo hoodie hiện đại tay cầm chiếc ô rách bước đi vội vã từ bên trái (far_left) sang giữa khung hình (center), khuôn mặt hoảng sợ nhìn dáo dác vào bóng tối.",
+    "dialogue": "Rời khỏi quán cà phê vắng lặng dưới cơn mưa tầm tã, tôi rảo bước qua con hẻm tối không một bóng đèn.",
+    "duration_sec": 6.5
   }
 ]`;
 
@@ -1442,7 +1461,9 @@ TRẢ VỀ CHÍNH XÁC MỘT JSON ARRAY gồm danh sách các đối tượng Au
     const validEnvIds = new Set(availableEnvironments.map((e) => e.id));
     const fallbackEnvId = availableEnvironments[0]?.id || "env_graveyard_foggy";
 
-    const drafts: AutoFillSceneDraft[] = rawScenes.map((item, idx) => {
+    // HẬU KIỂM BẮT BUỘC: Bảo toàn 100% lời thoại lồng tiếng và đảm bảo actionDescription chi tiết, sống động
+    const drafts: AutoFillSceneDraft[] = voiceSegments.map((seg, idx) => {
+      const item = rawScenes[idx] || {};
       let envId = item.environmentId;
       if (!envId || !validEnvIds.has(envId)) {
         envId = fallbackEnvId;
@@ -1452,12 +1473,38 @@ TRẢ VỀ CHÍNH XÁC MỘT JSON ARRAY gồm danh sách các đối tượng Au
           ? item.cameraShot
           : undefined;
 
+      const aiDuration = Number(item.duration_sec);
+      const effectiveDuration =
+        !isNaN(aiDuration) && aiDuration >= 3.5 && Math.abs(aiDuration - seg.estimatedDurationSec) <= 1.5
+          ? aiDuration
+          : seg.estimatedDurationSec;
+
+      // Xử lý actionDescription: đảm bảo luôn là một mô tả hoạt hình chi tiết, không bao giờ cụt lủn hay lặp lại lời dẫn
+      let actionDesc = item.actionDescription && typeof item.actionDescription === "string"
+        ? item.actionDescription.trim()
+        : "";
+
+      // Nếu actionDescription bị rỗng hoặc chứa câu văn chung chung
+      if (!actionDesc || actionDesc.length < 15 || /phù hợp với lời dẫn/i.test(actionDesc)) {
+        // Nhận diện bối cảnh để tạo mô tả hoạt họa chi tiết
+        const isModern = /phòng tắm|xe buýt|bệnh viện|khách sạn|siêu thị|quán|cà phê|hẻm|đường phố|hoodie|modern|hospital|hotel|bus/i.test(
+          seg.text + " " + envId
+        );
+        if (isModern) {
+          actionDesc = `Người thanh niên mặc áo hoodie hiện đại tay cầm đèn pin bước đi cẩn trọng từ bên trái qua giữa khung hình, khuôn mặt hoảng sợ nhìn dáo dác vào bóng tối.`;
+        } else {
+          actionDesc = `Người nông dân mặc áo tơi sờn rách tay cầm đèn bão sắt bước đi run rẩy từ góc trái sang giữa khung hình, dè chừng tà khí ma quái xung quanh.`;
+        }
+      }
+
       return {
-        title: item.title || `Cảnh ${idx + 1}: Diễn Biến Cốt Truyện`,
+        title: item.title || `Cảnh ${seg.index}: Diễn Biến Cốt Truyện`,
         environmentId: envId,
-        actionDescription: item.actionDescription || "Nhân vật bước đi cẩn trọng trong bóng tối.",
-        dialogue: item.dialogue || undefined,
-        duration_sec: Math.max(3, Math.min(20, Number(item.duration_sec) || 6)),
+        actionDescription: actionDesc,
+        // BẢO TOÀN NGUYÊN VĂN BẢN GỐC 100% CHO LỒNG TIẾNG & SUBTITLE:
+        dialogue: seg.text,
+        // THỜI LƯỢNG ƯỚC LƯỢNG THEO TỐC ĐỘ GIỌNG ĐỌC:
+        duration_sec: Math.max(3.5, Math.min(20, Math.round(effectiveDuration * 10) / 10)),
         cameraShot: validShot,
       };
     });

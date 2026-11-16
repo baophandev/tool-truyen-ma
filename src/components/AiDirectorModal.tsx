@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import type { DirectorSceneScript, NamedEnvironmentPreset, CameraShotType } from "../engine/types";
 import {
   generateFilmFromDescriptions,
@@ -14,6 +14,13 @@ import {
   type SceneDescriptionSpec,
   type AssetAuditResult,
 } from "../engine/geminiDirector";
+import {
+  VOICE_PACE_PRESETS,
+  estimateVoiceDurationSec,
+  countWords,
+  analyzeStoryPacing,
+  type VoicePacePreset,
+} from "../engine/voicePacingUtils";
 import {
   loadStoredNamedEnvironments,
   resetStoredNamedEnvironments,
@@ -141,9 +148,15 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
   const [rawStoryInput, setRawStoryInput] = useState<string>("");
   const [lastBreakdownStory, setLastBreakdownStory] = useState<string>("");
   const [targetSceneCount, setTargetSceneCount] = useState<number | "auto">("auto");
+  const [voicePace, setVoicePace] = useState<VoicePacePreset>("normal_narrative");
   const [isBreakingDown, setIsBreakingDown] = useState<boolean>(false);
   const [breakdownNotice, setBreakdownNotice] = useState<string | null>(null);
   const [isAssistantExpanded, setIsAssistantExpanded] = useState<boolean>(true);
+
+  // Realtime Voice-Over Pacing Statistics calculated from user story
+  const storyPacingStats = useMemo(() => {
+    return analyzeStoryPacing(rawStoryInput, voicePace, targetSceneCount);
+  }, [rawStoryInput, voicePace, targetSceneCount]);
 
   // Asset Audit state (Kiểm tra tài nguyên theo GEMINI_DIRECTOR_ASSETS.md)
   const [assetAudit, setAssetAudit] = useState<AssetAuditResult | null>(null);
@@ -226,6 +239,32 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     });
   };
 
+  // Update dialogue with automatic voice duration recalculation
+  const handleUpdateDialogue = (index: number, newDialogue: string) => {
+    setSceneDrafts((prev) => {
+      const next = [...prev];
+      const updated = { ...next[index], dialogue: newDialogue };
+      if (newDialogue.trim()) {
+        updated.duration_sec = estimateVoiceDurationSec(newDialogue, voicePace);
+      }
+      next[index] = updated;
+      return next;
+    });
+  };
+
+  // Recalculate duration for a single draft based on its dialogue and chosen voice pace
+  const handleRecalculateDuration = (index: number) => {
+    setSceneDrafts((prev) => {
+      const next = [...prev];
+      const text = next[index].dialogue || next[index].actionDescription || "";
+      next[index] = {
+        ...next[index],
+        duration_sec: estimateVoiceDurationSec(text, voicePace),
+      };
+      return next;
+    });
+  };
+
   // Auto-breakdown story to auto-fill scene drafts
   const handleAutoBreakdownStory = async () => {
     if (!rawStoryInput.trim()) {
@@ -242,6 +281,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         targetSceneCount,
         apiKey,
         model,
+        voicePace,
       });
 
       if (!result.success || !result.drafts || result.drafts.length === 0) {
@@ -262,7 +302,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         setLastBreakdownStory(rawStoryInput.trim());
 
         setBreakdownNotice(
-          `✨ Trợ thủ AI đã tự động điền thành công ${drafts.length} phân cảnh! Toàn bộ bối cảnh dùng lại và mô tả hành động đã được điền sẵn vào các thẻ bên dưới.`
+          `✨ Trợ thủ AI đã tự động điền thành công ${drafts.length} phân cảnh! Toàn bộ lời lồng tiếng nguyên văn và thời lượng ước tính theo nhịp đọc đã được điền sẵn.`
         );
       }
     } catch (err: any) {
@@ -356,6 +396,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
           targetSceneCount,
           apiKey,
           model,
+          voicePace,
         });
 
         if (!result.success || !result.drafts || result.drafts.length === 0) {
@@ -785,6 +826,52 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                       />
                     </div>
 
+                    {/* Realtime Voice-Over Pacing & Speech Estimation Bar */}
+                    {storyPacingStats.totalWords > 0 && (
+                      <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-purple-950/40 border border-purple-800/60 text-xs animate-in fade-in">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold text-neutral-300 flex items-center gap-1.5">
+                            🎙️ Tốc độ giọng đọc:
+                          </span>
+                          <div className="flex items-center gap-1">
+                            {(["slow_horror", "normal_narrative", "fast_tense"] as const).map((pKey) => {
+                              const p = VOICE_PACE_PRESETS[pKey];
+                              const isSelected = voicePace === pKey;
+                              return (
+                                <button
+                                  key={pKey}
+                                  type="button"
+                                  onClick={() => setVoicePace(pKey)}
+                                  className={`px-2 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                                    isSelected
+                                      ? "bg-purple-700 text-white shadow ring-1 ring-purple-300 font-semibold"
+                                      : "bg-neutral-900 text-neutral-400 hover:text-neutral-200"
+                                  }`}
+                                  title={p.description}
+                                >
+                                  {p.label} ({p.wordsPerSecond} từ/s)
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-[11px] font-mono text-neutral-300 bg-neutral-950/80 px-2.5 py-1 rounded-lg border border-neutral-800">
+                          <span>
+                            Tổng: <strong className="text-amber-300">{storyPacingStats.totalWords} từ</strong>
+                          </span>
+                          <span className="text-neutral-600">•</span>
+                          <span>
+                            Dự kiến: <strong className="text-cyan-300">~{storyPacingStats.totalEstimatedDurationSec}s</strong>
+                          </span>
+                          <span className="text-neutral-600">•</span>
+                          <span>
+                            Khuyên chia: <strong className="text-purple-300">{storyPacingStats.suggestedSceneCount} cảnh</strong>
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
                     {/* 3-Step Pipeline Flow Banner */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 py-1 text-xs">
                       <div
@@ -1164,17 +1251,40 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                         />
                       </div>
 
-                      {/* Dialogue / Subtitle */}
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[11px] font-semibold text-neutral-400">
-                          Phụ đề / Lời thoại nhân vật trong cảnh:
-                        </label>
-                        <input
-                          type="text"
+                      {/* Dialogue / Subtitle / Voice-Over */}
+                      <div className="flex flex-col gap-1.5 bg-neutral-950/70 p-2.5 rounded-lg border border-purple-950/80">
+                        <div className="flex flex-wrap items-center justify-between text-[11px]">
+                          <label className="font-semibold text-purple-300 flex items-center gap-1">
+                            <span>🎙️ Lời Lồng Tiếng & Phụ Đề Cảnh Này:</span>
+                            <span className="text-[10px] text-amber-300/80 font-normal">
+                              (Khớp nguyên văn cốt truyện)
+                            </span>
+                          </label>
+                          <div className="flex items-center gap-2 font-mono text-[10px]">
+                            <span className="text-neutral-400">
+                              {countWords(draft.dialogue)} từ
+                            </span>
+                            <span className="text-neutral-600">•</span>
+                            <span className="text-cyan-300">
+                              ~{estimateVoiceDurationSec(draft.dialogue || "", voicePace)}s giọng đọc
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleRecalculateDuration(idx)}
+                              className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-900 hover:bg-neutral-800 text-amber-300 border border-neutral-700/80 transition-all font-sans font-semibold"
+                              title="Tự động tính lại số giây của cảnh theo tốc độ đọc câu này"
+                            >
+                              ⚡ Tính lại giây
+                            </button>
+                          </div>
+                        </div>
+
+                        <textarea
+                          rows={2}
                           value={draft.dialogue || ""}
-                          onChange={(e) => handleUpdateDraft(idx, "dialogue", e.target.value)}
-                          placeholder="Ví dụ: Đêm ba mươi sao lạnh thấu xương... có tiếng ai gọi tên mình?"
-                          className="w-full bg-neutral-950 border border-neutral-800/80 rounded-lg px-2.5 py-1 text-xs text-red-200 italic font-serif focus:outline-none focus:border-red-600"
+                          onChange={(e) => handleUpdateDialogue(idx, e.target.value)}
+                          placeholder="Nhập câu thoại hoặc đoạn truyện bạn sẽ đọc lồng tiếng trong phân cảnh này..."
+                          className="w-full bg-black/90 border border-purple-950/90 focus:border-purple-500 rounded-lg p-2 text-xs text-red-200 italic font-serif focus:outline-none resize-none leading-relaxed transition-all"
                         />
                       </div>
                     </div>
