@@ -23,7 +23,11 @@ import type {
   SubtitleAnimId,
   WeatherEffectId,
   FacialActionId,
+  CameraShotType,
+  CameraMotionType,
+  CameraShakeIntensity,
 } from "../engine/types";
+import { CAMERA_SHOT_PRESETS } from "../engine/cameraUtils";
 import { SUBTITLE_THEMES, resolveSubtitleStyle } from "../engine/subtitleUtils";
 import { SceneRenderer, type DragSnapMode } from "../engine/SceneRenderer";
 import { ALL_SLOTS, GROUND_Y } from "../engine/constants";
@@ -65,6 +69,7 @@ import {
   Pause,
   ArrowRight,
   Compass,
+  Camera,
 } from "lucide-react";
 
 interface EditorViewProps {
@@ -80,7 +85,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
   onResetScene,
   onOpenAiDirector,
 }) => {
-  const [activeTab, setActiveTab] = useState<"actors" | "structures" | "details" | "lighting" | "story">("actors");
+  const [activeTab, setActiveTab] = useState<"actors" | "structures" | "details" | "lighting" | "camera" | "story">("actors");
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity>(() => {
     if (scene.actors.length > 0) return { type: "actor", id: scene.actors[0].id };
     if (scene.environment_items.length > 0) return { type: "structure", index: 0 };
@@ -849,6 +854,18 @@ export const EditorView: React.FC<EditorViewProps> = ({
           >
             <CloudMoon className="w-4 h-4 text-blue-400" />
             <span>Bầu Trời, Sương Mù & Ánh Sáng</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("camera")}
+            className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-medium transition-all text-left ${
+              activeTab === "camera"
+                ? "bg-red-800/80 text-white font-semibold shadow-lg shadow-red-950/40"
+                : "text-neutral-400 hover:bg-neutral-800/60 hover:text-neutral-200"
+            }`}
+          >
+            <Camera className="w-4 h-4 text-cyan-400" />
+            <span>Góc Máy & Điện Ảnh (Camera)</span>
           </button>
 
           <button
@@ -2194,6 +2211,473 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: CINEMATIC CAMERA SYSTEM */}
+        {activeTab === "camera" && (
+          <div className="flex flex-col gap-5">
+            {/* Header info */}
+            <div className="bg-gradient-to-r from-cyan-950/40 via-neutral-900 to-black border border-cyan-800/50 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg shadow-cyan-950/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-cyan-950/80 border border-cyan-500/50 flex items-center justify-center shrink-0">
+                  <Camera className="w-5 h-5 text-cyan-300" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <span>Hệ Thống Góc Máy Điện Ảnh (Cinematic Camera Engine)</span>
+                    <span className="text-[10px] bg-cyan-900/80 text-cyan-200 border border-cyan-700/60 px-2 py-0.5 rounded font-mono">
+                      Multi-Layer Parallax 2.5D
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-neutral-400 mt-0.5">
+                    Đổi cự ly toàn cảnh, trung cảnh, cận cảnh khuôn mặt ma mị, góc nghiêng Dutch Angle và rung giật jumpscare bằng 100% vector SVG sắc nét vô hạn!
+                  </p>
+                </div>
+              </div>
+
+              {/* Reset Camera Button */}
+              {scene.camera && scene.camera.shot !== "wide" && (
+                <button
+                  type="button"
+                  onClick={() => onChangeScene({ ...scene, camera: undefined })}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-xs text-neutral-300 transition-all shrink-0"
+                  title="Trả về Cảnh toàn chuẩn (1920x1080)"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Về Toàn Cảnh Mặc Định</span>
+                </button>
+              )}
+            </div>
+
+            {/* Section 1: Shot Size Presets */}
+            <div className="flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-cyan-200">
+                  1. Chọn Cỡ Cảnh Chuẩn (Shot Sizes):
+                </label>
+                <span className="text-[11px] text-neutral-400 font-mono">
+                  Đang chọn:{" "}
+                  <strong className="text-cyan-300">
+                    {CAMERA_SHOT_PRESETS[scene.camera?.shot || "wide"]?.name || "Toàn cảnh"}
+                  </strong>
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
+                {(Object.entries(CAMERA_SHOT_PRESETS) as [CameraShotType, typeof CAMERA_SHOT_PRESETS[CameraShotType]][]).map(
+                  ([shotKey, info]) => {
+                    const isSelected = (scene.camera?.shot || "wide") === shotKey;
+                    return (
+                      <button
+                        key={`cam-shot-${shotKey}`}
+                        type="button"
+                        onClick={() => {
+                          const current = scene.camera || {};
+                          onChangeScene({
+                            ...scene,
+                            camera: {
+                              ...current,
+                              shot: shotKey,
+                              zoom: info.defaultZoom,
+                              dutch_angle: info.defaultDutch,
+                            },
+                          });
+                        }}
+                        className={`flex flex-col text-left p-3 rounded-xl border transition-all ${
+                          isSelected
+                            ? "bg-cyan-950/80 border-cyan-400 shadow-md shadow-cyan-950/50"
+                            : "bg-black/60 border-neutral-800 hover:border-neutral-700 hover:bg-neutral-900/60"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1 mb-1">
+                          <span
+                            className={`text-xs font-bold ${
+                              isSelected ? "text-cyan-300" : "text-neutral-200"
+                            }`}
+                          >
+                            {info.name.split("(")[0].trim()}
+                          </span>
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/60 text-neutral-400 border border-neutral-800">
+                            {info.defaultZoom}x
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-neutral-400 line-clamp-2 leading-relaxed">
+                          {info.description}
+                        </p>
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+            </div>
+
+            {/* Section 2: Target Focus Lock */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-black/40 border border-neutral-800 p-4 rounded-xl">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-neutral-300">
+                  2. Khóa Tiêu Điểm Theo Nhân Vật (Target Actor):
+                </label>
+                <select
+                  value={scene.camera?.target_actor_id || ""}
+                  onChange={(e) => {
+                    const val = e.target.value.trim();
+                    const current = scene.camera || { shot: "wide" };
+                    onChangeScene({
+                      ...scene,
+                      camera: {
+                        ...current,
+                        target_actor_id: val || undefined,
+                        target_slot: val ? undefined : current.target_slot,
+                      },
+                    });
+                  }}
+                  className="bg-black border border-neutral-700 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-cyan-500 font-mono"
+                >
+                  <option value="">-- Trung tâm sân khấu (Không khóa nhân vật) --</option>
+                  {scene.actors.map((actor) => (
+                    <option key={`focus-actor-${actor.id}`} value={actor.id}>
+                      🎯 Nhân vật: {actor.id} ({actor.slot} | {actor.base})
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[10px] text-neutral-400">
+                  Khi chọn nhân vật, ống kính tự động nhắm thẳng tầm mặt. Nếu nhân vật di chuyển từ A → B, camera sẽ tự động trượt theo!
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-neutral-300">
+                  Khóa Tiêu Điểm Theo Mốc Neo Slot (Target Slot):
+                </label>
+                <select
+                  value={scene.camera?.target_slot || ""}
+                  disabled={Boolean(scene.camera?.target_actor_id)}
+                  onChange={(e) => {
+                    const val = e.target.value as SlotId;
+                    const current = scene.camera || { shot: "wide" };
+                    onChangeScene({
+                      ...scene,
+                      camera: {
+                        ...current,
+                        target_slot: val || undefined,
+                      },
+                    });
+                  }}
+                  className={`bg-black border border-neutral-700 rounded-lg p-2.5 text-xs font-mono focus:outline-none focus:border-cyan-500 ${
+                    scene.camera?.target_actor_id
+                      ? "opacity-40 cursor-not-allowed text-neutral-500"
+                      : "text-neutral-200"
+                  }`}
+                >
+                  <option value="">-- Trung tâm màn hình (Center) --</option>
+                  {Object.values(ALL_SLOTS).map((slot) => (
+                    <option key={`focus-slot-${slot.id}`} value={slot.id}>
+                      Mốc neo: {slot.name} ({slot.id} - X:{slot.x})
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[10px] text-neutral-400">
+                  {scene.camera?.target_actor_id
+                    ? "(Đang ưu tiên bám theo nhân vật)"
+                    : "Khóa khung nhìn vào một vị trí cụ thể trên sân khấu."}
+                </p>
+              </div>
+            </div>
+
+            {/* Section 3: Lens Sliders & Angle */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-neutral-950 border border-neutral-800 p-4 rounded-xl">
+              {/* Zoom Slider */}
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-semibold text-neutral-300">Độ Phóng Đại (Zoom):</span>
+                  <span className="font-mono text-cyan-400 font-bold">
+                    {(scene.camera?.zoom ?? CAMERA_SHOT_PRESETS[scene.camera?.shot || "wide"]?.defaultZoom ?? 1.0).toFixed(2)}x
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0.8"
+                  max="5.0"
+                  step="0.05"
+                  value={scene.camera?.zoom ?? CAMERA_SHOT_PRESETS[scene.camera?.shot || "wide"]?.defaultZoom ?? 1.0}
+                  onChange={(e) => {
+                    const current = scene.camera || { shot: "wide" };
+                    onChangeScene({
+                      ...scene,
+                      camera: { ...current, zoom: parseFloat(e.target.value) },
+                    });
+                  }}
+                  className="w-full accent-cyan-400 cursor-pointer"
+                />
+                <div className="flex justify-between text-[10px] text-neutral-500 font-mono">
+                  <span>0.8x (Bao quát)</span>
+                  <span>1.0x</span>
+                  <span>2.8x (Cận)</span>
+                  <span>5.0x (Đặc tả)</span>
+                </div>
+              </div>
+
+              {/* Dutch Angle Slider */}
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-semibold text-neutral-300">Góc Nghiêng Ma Mị (Dutch Angle):</span>
+                  <span className="font-mono text-cyan-400 font-bold">
+                    {(scene.camera?.dutch_angle ?? CAMERA_SHOT_PRESETS[scene.camera?.shot || "wide"]?.defaultDutch ?? 0).toFixed(1)}°
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="-15"
+                  max="15"
+                  step="0.5"
+                  value={scene.camera?.dutch_angle ?? CAMERA_SHOT_PRESETS[scene.camera?.shot || "wide"]?.defaultDutch ?? 0}
+                  onChange={(e) => {
+                    const current = scene.camera || { shot: "wide" };
+                    onChangeScene({
+                      ...scene,
+                      camera: { ...current, dutch_angle: parseFloat(e.target.value) },
+                    });
+                  }}
+                  className="w-full accent-cyan-400 cursor-pointer"
+                />
+                <div className="flex justify-between text-[10px] text-neutral-500 font-mono">
+                  <span>-15° (Nghiêng trái)</span>
+                  <span>0° (Thẳng)</span>
+                  <span>+15° (Nghiêng phải)</span>
+                </div>
+              </div>
+
+              {/* Shake Intensity */}
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-semibold text-neutral-300">Rung Lắc Ống Kính (Tremor / Shake):</span>
+                  <span className="font-mono text-cyan-400 font-bold">
+                    {scene.camera?.shake || "none"}
+                  </span>
+                </div>
+                <select
+                  value={scene.camera?.shake || "none"}
+                  onChange={(e) => {
+                    const current = scene.camera || { shot: "wide" };
+                    onChangeScene({
+                      ...scene,
+                      camera: { ...current, shake: e.target.value as CameraShakeIntensity },
+                    });
+                  }}
+                  className="bg-black border border-neutral-700 rounded-lg p-2 text-xs text-neutral-200 focus:outline-none focus:border-cyan-500 font-mono"
+                >
+                  <option value="none">Tĩnh Lặng (Không rung)</option>
+                  <option value="subtle_handheld">📹 Máy Quay Cầm Tay (Rung nhẹ chân thực)</option>
+                  <option value="creepy_tremor">👻 Rùng Rợn / Tà Khí (Run rẩy rùng mình)</option>
+                  <option value="heavy_jumpscare">⚡ Động Đất / Jumpscare (Giật nảy dữ dội)</option>
+                </select>
+                <span className="text-[10px] text-neutral-400">
+                  Rung máy hữu cơ đa tần số, rất hiệu quả cho phân đoạn giật mình!
+                </span>
+              </div>
+            </div>
+
+            {/* Section 4: Dynamic Camera Motion over Time */}
+            <div className="bg-neutral-950 border border-neutral-800 p-4 rounded-xl flex flex-col gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h4 className="text-xs font-bold text-white flex items-center gap-2">
+                    <span>Chuyển Động Máy Quay Theo Thời Gian (Dynamic Camera Motion)</span>
+                    {scene.camera?.motion && scene.camera.motion.type !== "static" && (
+                      <span className="text-[10px] bg-emerald-900/80 text-emerald-200 px-1.5 py-0.2 rounded font-mono">
+                        Active Motion
+                      </span>
+                    )}
+                  </h4>
+                  <p className="text-[11px] text-neutral-400">
+                    Máy quay tự động zoom tiến vào (Dolly In), lùi xa (Pull Out) hoặc lia quét từ từ trong suốt thời lượng cảnh.
+                  </p>
+                </div>
+
+                {scene.camera?.motion ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = scene.camera || { shot: "wide" };
+                      onChangeScene({
+                        ...scene,
+                        camera: { ...current, motion: undefined },
+                      });
+                    }}
+                    className="text-xs text-red-400 hover:text-red-300 transition-all font-medium"
+                  >
+                    Tắt chuyển động
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = scene.camera || { shot: "wide" };
+                      onChangeScene({
+                        ...scene,
+                        camera: {
+                          ...current,
+                          motion: {
+                            type: "push_in",
+                            endZoom: Math.min(4.5, (current.zoom || 1.0) * 1.6),
+                            startTimeSec: 0,
+                            endTimeSec: sceneDuration,
+                            easing: "ease_in_out",
+                          },
+                        },
+                      });
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-800 hover:bg-cyan-700 text-white text-xs font-semibold transition-all"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>+ Thêm Chuyển Động Camera</span>
+                  </button>
+                )}
+              </div>
+
+              {scene.camera?.motion && (
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2 border-t border-neutral-850">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-semibold text-neutral-300">
+                      Kiểu Chuyển Động:
+                    </label>
+                    <select
+                      value={scene.camera.motion.type}
+                      onChange={(e) => {
+                        const current = scene.camera!;
+                        onChangeScene({
+                          ...scene,
+                          camera: {
+                            ...current,
+                            motion: {
+                              ...current.motion!,
+                              type: e.target.value as CameraMotionType,
+                            },
+                          },
+                        });
+                      }}
+                      className="bg-black border border-neutral-700 rounded-lg p-2 text-xs text-neutral-200 font-mono"
+                    >
+                      <option value="push_in">Zoom Dần Vào (Push In / Dolly In)</option>
+                      <option value="pull_out">Zoom Dần Ra (Pull Out / Dolly Out)</option>
+                      <option value="pan_left">Lia Ống Kính Sang Trái</option>
+                      <option value="pan_right">Lia Ống Kính Sang Phải</option>
+                      <option value="tilt_up">Lia Ngước Lên Trời (Tilt Up)</option>
+                      <option value="tilt_down">Lia Chúc Xuống Đất (Tilt Down)</option>
+                      <option value="follow_actor">Bám Theo Nhân Vật Di Chuyển</option>
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-semibold text-neutral-300">
+                      Zoom Đích (End Zoom):
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0.8"
+                      max="5.0"
+                      value={scene.camera.motion.endZoom ?? (scene.camera.zoom || 1.0) * 1.5}
+                      onChange={(e) => {
+                        const current = scene.camera!;
+                        onChangeScene({
+                          ...scene,
+                          camera: {
+                            ...current,
+                            motion: {
+                              ...current.motion!,
+                              endZoom: parseFloat(e.target.value),
+                            },
+                          },
+                        });
+                      }}
+                      className="bg-black border border-neutral-700 rounded-lg p-2 text-xs text-cyan-300 font-mono font-bold"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-semibold text-neutral-300">
+                      Thời Gian (Bắt đầu → Kết thúc):
+                    </label>
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="number"
+                        min="0"
+                        max={sceneDuration}
+                        step="0.5"
+                        value={scene.camera.motion.startTimeSec ?? 0}
+                        onChange={(e) => {
+                          const current = scene.camera!;
+                          onChangeScene({
+                            ...scene,
+                            camera: {
+                              ...current,
+                              motion: {
+                                ...current.motion!,
+                                startTimeSec: parseFloat(e.target.value),
+                              },
+                            },
+                          });
+                        }}
+                        className="w-16 bg-black border border-neutral-700 rounded-lg p-2 text-xs text-neutral-200 font-mono text-center"
+                      />
+                      <span className="text-neutral-500 font-mono">→</span>
+                      <input
+                        type="number"
+                        min="0"
+                        max={sceneDuration}
+                        step="0.5"
+                        value={scene.camera.motion.endTimeSec ?? sceneDuration}
+                        onChange={(e) => {
+                          const current = scene.camera!;
+                          onChangeScene({
+                            ...scene,
+                            camera: {
+                              ...current,
+                              motion: {
+                                ...current.motion!,
+                                endTimeSec: parseFloat(e.target.value),
+                              },
+                            },
+                          });
+                        }}
+                        className="w-16 bg-black border border-neutral-700 rounded-lg p-2 text-xs text-neutral-200 font-mono text-center"
+                      />
+                      <span className="text-[11px] text-neutral-400 font-mono">giây</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-semibold text-neutral-300">
+                      Đường Cong Gia Tốc (Easing):
+                    </label>
+                    <select
+                      value={scene.camera.motion.easing || "ease_in_out"}
+                      onChange={(e) => {
+                        const current = scene.camera!;
+                        onChangeScene({
+                          ...scene,
+                          camera: {
+                            ...current,
+                            motion: {
+                              ...current.motion!,
+                              easing: e.target.value as EasingType,
+                            },
+                          },
+                        });
+                      }}
+                      className="bg-black border border-neutral-700 rounded-lg p-2 text-xs text-neutral-200 font-mono"
+                    >
+                      <option value="ease_in_out">Mượt Mà Hai Đầu (Ease In Out)</option>
+                      <option value="linear">Đều Đặn Tuyến Tính (Linear)</option>
+                      <option value="ease_in">Chậm Ban Đầu, Nhanh Dần (Ease In)</option>
+                      <option value="ease_out">Nhanh Ban Đầu, Hãm Phanh (Ease Out)</option>
+                    </select>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

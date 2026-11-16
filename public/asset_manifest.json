@@ -720,5 +720,34 @@
       "autoFaceTarget": "Boolean - tự quay mặt về phía Điểm B khi di chuyển (mặc định true)",
       "movingPose": "CharacterPoseId dùng trong lúc đang di chuyển (ví dụ pose_walking hoặc pose_floating)"
     }
+  },
+  "camera_system": {
+    "version": "1.0",
+    "description": "Hệ thống góc máy và cự ly ống kính điện ảnh (Multi-Layer Parallax 2.5D)",
+    "shot_types": [
+      { "id": "extreme_wide", "name": "Đại cảnh", "default_zoom": 0.88, "desc": "Bao quát mênh mông, nhân vật lọt thỏm cô độc" },
+      { "id": "wide", "name": "Toàn cảnh", "default_zoom": 1.0, "desc": "Khung nhìn tiêu chuẩn toàn bộ sân khấu 1920x1080" },
+      { "id": "medium_wide", "name": "Trung toàn cảnh", "default_zoom": 1.45, "desc": "Từ đầu gối lên, tương tác bối cảnh" },
+      { "id": "medium", "name": "Trung cảnh", "default_zoom": 1.9, "desc": "Từ thắt lưng lên, nhấn mạnh cử chỉ tay và vũ khí" },
+      { "id": "close_up", "name": "Cận cảnh", "default_zoom": 2.85, "desc": "Từ ngực lên đầu, thấy rõ biểu cảm khuôn mặt kinh hoàng" },
+      { "id": "extreme_close_up", "name": "Đặc tả", "default_zoom": 4.3, "desc": "Tập trung tối đa vào đôi mắt rỉ máu hoặc nụ cười quái dị" },
+      { "id": "dutch_tilt", "name": "Góc nghiêng ma mị", "default_zoom": 1.6, "default_dutch": -7.5, "desc": "Góc quay nghiêng tạo cảm giác điên loạn, tà khí" }
+    ],
+    "motion_types": [
+      "static",
+      "pan_left",
+      "pan_right",
+      "tilt_up",
+      "tilt_down",
+      "push_in",
+      "pull_out",
+      "follow_actor"
+    ],
+    "shake_intensities": [
+      "none",
+      "subtle_handheld",
+      "creepy_tremor",
+      "heavy_jumpscare"
+    ]
   }
 }

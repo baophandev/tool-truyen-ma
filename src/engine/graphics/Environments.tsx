@@ -21,21 +21,21 @@ export const SkyLayer: React.FC<{
 
   return (
     <g className="environment-layer-0-sky">
-      {/* Dynamic Sky Background Gradient */}
+      {/* Dynamic Sky Background Gradient with cinematic camera overscan margin */}
       <rect
-        x="0"
-        y="0"
-        width={CANVAS_WIDTH}
-        height={CANVAS_HEIGHT}
+        x="-400"
+        y="-200"
+        width={CANVAS_WIDTH + 800}
+        height={CANVAS_HEIGHT + 400}
         fill={`url(#sky-grad-${skyPreset})`}
       />
 
       {/* Lightning Flash Overlay */}
       <rect
-        x="0"
-        y="0"
-        width={CANVAS_WIDTH}
-        height={CANVAS_HEIGHT}
+        x="-400"
+        y="-200"
+        width={CANVAS_WIDTH + 800}
+        height={CANVAS_HEIGHT + 400}
         fill="#FFFFFF"
         opacity={thunderFlash ? 0.65 : 0}
         className={isStormy ? "anim-lightning-flash" : ""}
@@ -326,19 +326,19 @@ export const BackgroundLayer: React.FC<{ theme: ThemeId; skyPreset: SkyPresetId 
         <VehicleInteriorBackground skyPreset={skyPreset} />
       ) : (
         <>
-          {/* Distant Misty Mountain Ridges */}
+          {/* Distant Misty Mountain Ridges with overscan */}
           <path
-            d="M 0 580 C 250 480, 500 560, 750 510 C 1000 460, 1250 540, 1500 490 C 1700 450, 1850 500, 1920 480 L 1920 800 L 0 800 Z"
+            d="M -400 580 L 0 580 C 250 480, 500 560, 750 510 C 1000 460, 1250 540, 1500 490 C 1700 450, 1850 500, 1920 480 L 2320 480 L 2320 850 L -400 850 Z"
             fill={mountainColor}
             opacity="0.8"
           />
 
-          {/* Mid-distance Mist */}
+          {/* Mid-distance Mist with overscan */}
           <rect
-            x="0"
+            x="-400"
             y="500"
-            width={CANVAS_WIDTH}
-            height="300"
+            width={CANVAS_WIDTH + 800}
+            height="350"
             fill={`url(#mid-mist-grad-${skyPreset})`}
             opacity="0.6"
           />
@@ -701,33 +701,33 @@ const SwampReeds: React.FC<{ x: number; y: number; scale: number; color: string 
 const VehicleFloorLayer: React.FC = () => {
   return (
     <g className="environment-layer-2-ground-vehicle">
-      {/* 1. Solid Heavy-Duty Transit Floor */}
+      {/* 1. Solid Heavy-Duty Transit Floor with overscan */}
       <rect
-        x="0"
+        x="-400"
         y={GROUND_Y}
-        width={CANVAS_WIDTH}
-        height={CANVAS_HEIGHT - GROUND_Y}
+        width={CANVAS_WIDTH + 800}
+        height={CANVAS_HEIGHT - GROUND_Y + 400}
         fill="#06080F"
       />
 
       {/* 2. Ribbed Anti-Slip Rubber Floor Grooves */}
       <g stroke="#0E131E" strokeWidth="2" opacity="0.8">
-        <line x1="0" y1={GROUND_Y + 25} x2={CANVAS_WIDTH} y2={GROUND_Y + 25} />
-        <line x1="0" y1={GROUND_Y + 50} x2={CANVAS_WIDTH} y2={GROUND_Y + 50} />
-        <line x1="0" y1={GROUND_Y + 75} x2={CANVAS_WIDTH} y2={GROUND_Y + 75} />
-        <line x1="0" y1={GROUND_Y + 100} x2={CANVAS_WIDTH} y2={GROUND_Y + 100} />
-        <line x1="0" y1={GROUND_Y + 130} x2={CANVAS_WIDTH} y2={GROUND_Y + 130} />
-        <line x1="0" y1={GROUND_Y + 165} x2={CANVAS_WIDTH} y2={GROUND_Y + 165} />
-        <line x1="0" y1={GROUND_Y + 205} x2={CANVAS_WIDTH} y2={GROUND_Y + 205} />
-        <line x1="0" y1={GROUND_Y + 245} x2={CANVAS_WIDTH} y2={GROUND_Y + 245} />
+        <line x1="-400" y1={GROUND_Y + 25} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 25} />
+        <line x1="-400" y1={GROUND_Y + 50} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 50} />
+        <line x1="-400" y1={GROUND_Y + 75} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 75} />
+        <line x1="-400" y1={GROUND_Y + 100} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 100} />
+        <line x1="-400" y1={GROUND_Y + 130} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 130} />
+        <line x1="-400" y1={GROUND_Y + 165} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 165} />
+        <line x1="-400" y1={GROUND_Y + 205} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 205} />
+        <line x1="-400" y1={GROUND_Y + 245} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 245} />
       </g>
 
       {/* 3. Vivid Yellow Safety Caution Boundary Lines along Ground Line Y = 800 */}
-      <line x1="0" y1={GROUND_Y} x2={CANVAS_WIDTH} y2={GROUND_Y} stroke="#CA8A04" strokeWidth="3" />
+      <line x1="-400" y1={GROUND_Y} x2={CANVAS_WIDTH + 400} y2={GROUND_Y} stroke="#CA8A04" strokeWidth="3" />
       <line
-        x1="0"
+        x1="-400"
         y1={GROUND_Y + 8}
-        x2={CANVAS_WIDTH}
+        x2={CANVAS_WIDTH + 400}
         y2={GROUND_Y + 8}
         stroke="#EAB308"
         strokeWidth="2.5"
@@ -761,17 +761,17 @@ export const MainGroundLayer: React.FC<{ theme?: ThemeId }> = ({ theme }) => {
   if (theme === "modern_indoor") {
     return (
       <g className="environment-layer-2-ground-indoor">
-        {/* Solid Indoor Floor */}
+        {/* Solid Indoor Floor with overscan */}
         <rect
-          x="0"
+          x="-400"
           y={GROUND_Y}
-          width={CANVAS_WIDTH}
-          height={CANVAS_HEIGHT - GROUND_Y}
+          width={CANVAS_WIDTH + 800}
+          height={CANVAS_HEIGHT - GROUND_Y + 400}
           fill={COLOR_PALETTE.silhouette_primary}
         />
         {/* Floor Sheen Line & Base Trim */}
-        <line x1="0" y1={GROUND_Y} x2={CANVAS_WIDTH} y2={GROUND_Y} stroke="#1E293B" strokeWidth="2" />
-        <line x1="0" y1={GROUND_Y + 12} x2={CANVAS_WIDTH} y2={GROUND_Y + 12} stroke="#0B0F17" strokeWidth="2" />
+        <line x1="-400" y1={GROUND_Y} x2={CANVAS_WIDTH + 400} y2={GROUND_Y} stroke="#1E293B" strokeWidth="2" />
+        <line x1="-400" y1={GROUND_Y + 12} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 12} stroke="#0B0F17" strokeWidth="2" />
         {/* Polished Floor Tile Seams */}
         <g stroke="#141A24" strokeWidth="1.5" opacity="0.6">
           <line x1="160" y1={GROUND_Y} x2="80" y2={CANVAS_HEIGHT} />
@@ -781,9 +781,9 @@ export const MainGroundLayer: React.FC<{ theme?: ThemeId }> = ({ theme }) => {
           <line x1="1200" y1={GROUND_Y} x2="1240" y2={CANVAS_HEIGHT} />
           <line x1="1500" y1={GROUND_Y} x2="1580" y2={CANVAS_HEIGHT} />
           <line x1="1760" y1={GROUND_Y} x2="1840" y2={CANVAS_HEIGHT} />
-          <line x1="0" y1={GROUND_Y + 60} x2={CANVAS_WIDTH} y2={GROUND_Y + 60} />
-          <line x1="0" y1={GROUND_Y + 140} x2={CANVAS_WIDTH} y2={GROUND_Y + 140} />
-          <line x1="0" y1={GROUND_Y + 220} x2={CANVAS_WIDTH} y2={GROUND_Y + 220} />
+          <line x1="-400" y1={GROUND_Y + 60} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 60} />
+          <line x1="-400" y1={GROUND_Y + 140} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 140} />
+          <line x1="-400" y1={GROUND_Y + 220} x2={CANVAS_WIDTH + 400} y2={GROUND_Y + 220} />
         </g>
       </g>
     );
@@ -792,20 +792,22 @@ export const MainGroundLayer: React.FC<{ theme?: ThemeId }> = ({ theme }) => {
   return (
     <g className="environment-layer-2-ground">
       <rect
-        x="0"
+        x="-400"
         y={GROUND_Y}
-        width={CANVAS_WIDTH}
-        height={CANVAS_HEIGHT - GROUND_Y}
+        width={CANVAS_WIDTH + 800}
+        height={CANVAS_HEIGHT - GROUND_Y + 400}
         fill={COLOR_PALETTE.silhouette_primary}
       />
       <path
-        d={`M 0 ${GROUND_Y} 
+        d={`M -400 ${GROUND_Y}
+           L 0 ${GROUND_Y} 
            Q 250 ${GROUND_Y} 400 ${GROUND_Y - 8}
            Q 600 ${GROUND_Y} 780 ${GROUND_Y + 6}
            Q 960 ${GROUND_Y} 1150 ${GROUND_Y - 10}
            Q 1320 ${GROUND_Y} 1500 ${GROUND_Y + 8}
            Q 1670 ${GROUND_Y} 1920 ${GROUND_Y}
-           L 1920 ${CANVAS_HEIGHT} L 0 ${CANVAS_HEIGHT} Z`}
+           L 2320 ${GROUND_Y}
+           L 2320 ${CANVAS_HEIGHT + 400} L -400 ${CANVAS_HEIGHT + 400} Z`}
         fill={COLOR_PALETTE.silhouette_primary}
       />
       <g fill={COLOR_PALETTE.silhouette_secondary}>

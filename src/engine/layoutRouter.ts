@@ -19,6 +19,10 @@ import type {
   SubtitleAnimId,
   WeatherEffectId,
   FacialActionId,
+  DirectorCameraConfig,
+  CameraShotType,
+  CameraMotionType,
+  CameraShakeIntensity,
 } from "./types";
 import {
   DETAIL_RULES,
@@ -223,6 +227,34 @@ const VALID_SLOTS: SlotId[] = [
   "air_left",
   "air_center",
   "air_right",
+];
+
+export const VALID_CAMERA_SHOTS: CameraShotType[] = [
+  "extreme_wide",
+  "wide",
+  "medium_wide",
+  "medium",
+  "close_up",
+  "extreme_close_up",
+  "dutch_tilt",
+];
+
+export const VALID_CAMERA_MOTIONS: CameraMotionType[] = [
+  "static",
+  "pan_left",
+  "pan_right",
+  "tilt_up",
+  "tilt_down",
+  "push_in",
+  "pull_out",
+  "follow_actor",
+];
+
+export const VALID_CAMERA_SHAKES: CameraShakeIntensity[] = [
+  "none",
+  "subtle_handheld",
+  "creepy_tremor",
+  "heavy_jumpscare",
 ];
 
 /**
@@ -487,6 +519,75 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     ? script.subtitle_anim
     : undefined;
 
+  // 7. Camera Configuration with Self-Healing
+  let camera: DirectorCameraConfig | undefined = undefined;
+  if (script.camera && typeof script.camera === "object") {
+    const rawCam = script.camera;
+    const shot = VALID_CAMERA_SHOTS.includes(rawCam.shot) ? rawCam.shot : "wide";
+    const target_slot = VALID_SLOTS.includes(rawCam.target_slot) ? rawCam.target_slot : undefined;
+    const target_actor_id =
+      typeof rawCam.target_actor_id === "string" && rawCam.target_actor_id.trim()
+        ? rawCam.target_actor_id.trim()
+        : undefined;
+
+    const zoom =
+      typeof rawCam.zoom === "number" && !isNaN(rawCam.zoom)
+        ? Math.max(0.5, Math.min(6.0, rawCam.zoom))
+        : undefined;
+    const pan_x = typeof rawCam.pan_x === "number" && !isNaN(rawCam.pan_x) ? rawCam.pan_x : undefined;
+    const pan_y = typeof rawCam.pan_y === "number" && !isNaN(rawCam.pan_y) ? rawCam.pan_y : undefined;
+    const dutch_angle =
+      typeof rawCam.dutch_angle === "number" && !isNaN(rawCam.dutch_angle)
+        ? Math.max(-25, Math.min(25, rawCam.dutch_angle))
+        : undefined;
+    const shake = VALID_CAMERA_SHAKES.includes(rawCam.shake) ? rawCam.shake : undefined;
+
+    let motion = undefined;
+    if (rawCam.motion && typeof rawCam.motion === "object") {
+      const rawMot = rawCam.motion;
+      if (VALID_CAMERA_MOTIONS.includes(rawMot.type)) {
+        motion = {
+          type: rawMot.type as CameraMotionType,
+          endShot: VALID_CAMERA_SHOTS.includes(rawMot.endShot) ? rawMot.endShot : undefined,
+          endZoom: typeof rawMot.endZoom === "number" && !isNaN(rawMot.endZoom) ? rawMot.endZoom : undefined,
+          endPanX: typeof rawMot.endPanX === "number" && !isNaN(rawMot.endPanX) ? rawMot.endPanX : undefined,
+          endPanY: typeof rawMot.endPanY === "number" && !isNaN(rawMot.endPanY) ? rawMot.endPanY : undefined,
+          endDutchAngle:
+            typeof rawMot.endDutchAngle === "number" && !isNaN(rawMot.endDutchAngle)
+              ? rawMot.endDutchAngle
+              : undefined,
+          startTimeSec:
+            typeof rawMot.startTimeSec === "number" && !isNaN(rawMot.startTimeSec)
+              ? Math.max(0, rawMot.startTimeSec)
+              : 0,
+          endTimeSec:
+            typeof rawMot.endTimeSec === "number" && !isNaN(rawMot.endTimeSec)
+              ? Math.max(0, rawMot.endTimeSec)
+              : duration_sec,
+          easing:
+            rawMot.easing === "linear" ||
+            rawMot.easing === "ease_in" ||
+            rawMot.easing === "ease_out" ||
+            rawMot.easing === "ease_in_out"
+              ? rawMot.easing
+              : "ease_in_out",
+        };
+      }
+    }
+
+    camera = {
+      shot,
+      target_slot,
+      target_actor_id,
+      zoom,
+      pan_x,
+      pan_y,
+      dutch_angle,
+      shake,
+      motion,
+    };
+  }
+
   const normalized: DirectorSceneScript = {
     scene_id,
     title,
@@ -499,6 +600,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       ambient_tint,
       weather,
     },
+    camera,
     environment_items,
     actors,
     details,

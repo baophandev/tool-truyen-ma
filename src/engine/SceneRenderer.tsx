@@ -28,6 +28,7 @@ import { CharacterRig } from "./graphics/CharacterRig";
 import { DetailRenderer } from "./graphics/Details";
 import { soundEngine } from "./AudioSynthesizer";
 import { evaluateActorAtTime } from "./motionUtils";
+import { evaluateCameraAtTime, CAMERA_SHOT_PRESETS } from "./cameraUtils";
 
 export type DragSnapMode = "strict_slot" | "allowed_offset";
 
@@ -91,6 +92,15 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
   const { theme, lighting, environment_items = [], actors = [], details = [], dialogue } = script;
   const internalSvgRef = useRef<SVGSVGElement | null>(null);
   const activeSvgRef = externalSvgRef || internalSvgRef;
+  const worldLayerRef = useRef<SVGGElement | null>(null);
+
+  // Realtime Evaluated Camera State
+  const cameraState = evaluateCameraAtTime(
+    script.camera,
+    actors,
+    currentTime,
+    script.duration_sec || 6
+  );
 
   const [dragSession, setDragSession] = useState<DragSession | null>(null);
   const dragSessionRef = useRef<DragSession | null>(null);
@@ -128,7 +138,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
   const activeSelectionRules = getSelectionRuleInfo(effectiveSelection);
   const activeRuleAllowedSlots = dragSession?.allowedSlots ?? activeSelectionRules?.allowedSlots ?? null;
 
-  // Helper: Convert client PointerEvent to SVG ViewBox (0..1920, 0..1080) coordinates
+  // Helper: Convert client PointerEvent to SVG World (0..1920, Y=800) coordinates, automatically inverting Camera Matrix
   const getSvgCoordinates = (e: React.PointerEvent | PointerEvent): { x: number; y: number } => {
     const svg = activeSvgRef.current;
     if (!svg) return { x: e.clientX, y: e.clientY };
@@ -137,7 +147,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
       const pt = svg.createSVGPoint();
       pt.x = e.clientX;
       pt.y = e.clientY;
-      const ctm = svg.getScreenCTM();
+      const ctm = worldLayerRef.current?.getScreenCTM() || svg.getScreenCTM();
       if (ctm) {
         const transformed = pt.matrixTransform(ctm.inverse());
         return { x: transformed.x, y: transformed.y };
@@ -496,8 +506,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
         {/* COMMON SVG DEFINITIONS */}
         <SvgDefs />
 
-        {/* LAYER 0 (z-index 0): SKY, MOON, CLOUDS, THUNDER */}
-        <g id="layer-0-sky">
+        {/* LAYER 0 (z-index 0): SKY, MOON, CLOUDS, THUNDER (Damped Parallax: 0.15) */}
+        <g id="layer-0-sky" transform={cameraState.skyTransform}>
           <SkyLayer
             skyPreset={lighting.sky_preset}
             thunderFlash={lighting.thunder_flash}
@@ -505,16 +515,16 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
           />
         </g>
 
-        {/* LAYER 1 (z-index 10): DISTANT BACKGROUND */}
-        <g id="layer-1-background">
+        {/* LAYER 1 (z-index 10): DISTANT BACKGROUND (Damped Parallax: 0.45) */}
+        <g id="layer-1-background" transform={cameraState.bgTransform}>
           <BackgroundLayer
             theme={theme}
             skyPreset={lighting.sky_preset}
           />
         </g>
 
-        {/* LAYER 2 (z-index 20): MAIN GROUND & MIDGROUND OBJECTS */}
-        <g id="layer-2-ground-world">
+        {/* LAYER 2 (z-index 20): MAIN GROUND & MIDGROUND OBJECTS (Camera World Matrix: 1.0) */}
+        <g id="layer-2-ground-world" ref={worldLayerRef} transform={cameraState.worldTransform}>
           {/* Main Ground Surface */}
           <MainGroundLayer theme={theme} />
 
@@ -903,8 +913,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
           </g>
         )}
 
-        {/* LAYER 3 (z-index 30): FOREGROUND MIST, DRY BRANCHES, VIGNETTE */}
-        <g id="layer-3-foreground">
+        {/* LAYER 3 (z-index 30): FOREGROUND MIST, DRY BRANCHES, VIGNETTE (Foreground Parallax: 1.35) */}
+        <g id="layer-3-foreground" transform={cameraState.fgTransform}>
           <ForegroundLayer
             fogDensity={lighting.fog_density}
             skyPreset={lighting.sky_preset}
@@ -1223,6 +1233,97 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                     )})`}
               </text>
             </g>
+          </g>
+        )}
+
+        {/* CINEMATIC CAMERA HUD OVERLAY (Visible when Gizmo is on or custom camera is active) */}
+        {(showGizmo || (script.camera && script.camera.shot !== "wide")) && (
+          <g id="camera-hud-group" pointerEvents="none">
+            {/* Top-Left Lens Status Badge */}
+            <g transform="translate(24, 24)">
+              <rect
+                x="0"
+                y="0"
+                width="310"
+                height="36"
+                rx="6"
+                fill="#060910"
+                stroke="#38BDF8"
+                strokeWidth="1.5"
+                opacity="0.92"
+                filter="drop-shadow(0 2px 8px rgba(0,0,0,0.85))"
+              />
+              <circle
+                cx="18"
+                cy="18"
+                r="4.5"
+                fill={cameraState.isMoving ? "#F59E0B" : "#38BDF8"}
+                className={cameraState.isMoving ? "anim-pulse-slow" : ""}
+              />
+              <text
+                x="32"
+                y="22"
+                fill="#E0F2FE"
+                fontSize="12"
+                fontFamily="monospace"
+                fontWeight="bold"
+              >
+                🎥 {CAMERA_SHOT_PRESETS[cameraState.shot]?.name.split("(")[0].trim().toUpperCase() || "TOÀN CẢNH"} ({cameraState.zoom.toFixed(2)}x{cameraState.dutchAngle !== 0 ? ` | ${cameraState.dutchAngle > 0 ? "+" : ""}${cameraState.dutchAngle.toFixed(1)}°` : ""})
+              </text>
+            </g>
+
+            {/* CINEMATIC CAMERA SAFE FRAME & GUIDES (SMPTE 90% Action Safe / 80% Title Safe) */}
+            {showGizmo && (
+              <g id="camera-safe-frame-guides" opacity="0.65">
+                {/* 1. 90% Action Safe Area Boundary */}
+                <rect
+                  x="96"
+                  y="54"
+                  width="1728"
+                  height="972"
+                  fill="none"
+                  stroke="#38BDF8"
+                  strokeWidth="1"
+                  strokeDasharray="8,6"
+                />
+                <text x="108" y="72" fill="#38BDF8" fontSize="10" fontFamily="monospace">
+                  90% ACTION SAFE
+                </text>
+
+                {/* 2. 80% Title Safe Area Boundary */}
+                <rect
+                  x="192"
+                  y="108"
+                  width="1536"
+                  height="864"
+                  fill="none"
+                  stroke="#F59E0B"
+                  strokeWidth="1"
+                  strokeDasharray="4,4"
+                  opacity="0.6"
+                />
+                <text x="204" y="124" fill="#F59E0B" fontSize="10" fontFamily="monospace">
+                  80% TITLE SAFE
+                </text>
+
+                {/* 3. Center Optical Crosshair */}
+                <g stroke="#38BDF8" strokeWidth="1.2" opacity="0.75">
+                  <line x1="940" y1="540" x2="980" y2="540" />
+                  <line x1="960" y1="520" x2="960" y2="560" />
+                  <circle cx="960" cy="540" r="14" fill="none" stroke="#38BDF8" strokeWidth="1" strokeDasharray="3,3" />
+                </g>
+
+                {/* 4. Four Viewport Framing Brackets at Screen Edges */}
+                {/* Top-Left Bracket */}
+                <path d="M 40 70 L 40 40 L 70 40" fill="none" stroke="#38BDF8" strokeWidth="2.5" />
+                {/* Top-Right Bracket */}
+                <path d="M 1850 40 L 1880 40 L 1880 70" fill="none" stroke="#38BDF8" strokeWidth="2.5" />
+                {/* Bottom-Left Bracket */}
+                <path d="M 40 1010 L 40 1040 L 70 1040" fill="none" stroke="#38BDF8" strokeWidth="2.5" />
+                {/* Bottom-Right Bracket */}
+                <path d="M 1850 1040 L 1880 1040 L 1880 1010" fill="none" stroke="#38BDF8" strokeWidth="2.5" />
+              </g>
+            )}
           </g>
         )}
       </svg>

@@ -750,4 +750,84 @@ export interface DirectorSceneScript {
 }
 ```
 
+---
+
+## 9. HỆ THỐNG GÓC MÁY ĐIỆN ẢNH (CINEMATIC CAMERA SYSTEM)
+
+Hệ thống cho phép đạo diễn chuyển đổi linh hoạt giữa các cỡ cảnh và hiệu ứng ống kính để tăng tối đa cảm xúc rùng rợn, khai thác triệt để độ phân giải vector vô hạn của SVG (không bao giờ vỡ hạt khi zoom).
+
+### 9.1. 7 Cỡ Cảnh Chuẩn (`camera.shot`)
+| Shot ID | Tên Tiếng Việt | Zoom Mặc Định | Mô Tả & Tác Dụng Ngữ Nghĩa |
+| :--- | :--- | :--- | :--- |
+| `extreme_wide` | Đại cảnh | `0.88x` | Bao quát mênh mông, nhân vật lọt thỏm cô độc giữa không gian hiểm ác |
+| `wide` | Toàn cảnh | `1.0x` | *(Mặc định)* Toàn bộ sân khấu 1920x1080, thấy đầy đủ 5 vị trí đất |
+| `medium_wide` | Trung toàn cảnh | `1.45x` | Đóng khung từ đầu gối lên, thấy rõ nhân vật tương tác với công trình |
+| `medium` | Trung cảnh | `1.9x` | Từ thắt lưng lên đầu, nhấn mạnh vào hành động tay, bùa chú, vũ khí |
+| `close_up` | Cận cảnh | `2.85x` | Từ ngực lên đầu, thấy rõ biểu cảm kinh hãi, mắt chớp, miệng há hốc |
+| `extreme_close_up` | Đặc tả | `4.3x` | Phóng đại tối đa vào tròng mắt rỉ máu, nụ cười quái đản, mũi dao găm |
+| `dutch_tilt` | Góc nghiêng ma mị | `1.6x` (Góc: `-7.5°`) | Camera nghiêng tạo cảm giác điên loạn, bất an, tà khí bóp méo thực tại |
+
+### 9.2. Khóa Tiêu Điểm Thông Minh (`target_actor_id` & `target_slot`)
+- `target_actor_id`: Điền ID của nhân vật (ví dụ `"actor_lan"`). Camera tự động căn góc tầm mặt nhân vật. Nếu nhân vật đang di chuyển A → B, camera sẽ **tự động bám theo nhân vật theo thời gian thực (Tracking Shot)**!
+- `target_slot`: Khóa khung nhìn vào một mốc neo slot (ví dụ `"center"` hoặc `"mid_left"`).
+
+### 9.3. Rung Lắc Ống Kính (`camera.shake`)
+- `"none"`: Không rung.
+- `"subtle_handheld"`: Rung nhẹ tự nhiên kiểu máy quay cầm tay trong đêm.
+- `"creepy_tremor"`: Run rẩy rùng mình khi có tà khí hoặc hồn ma đến gần.
+- `"heavy_jumpscare"`: Giật nảy dữ dội khi có sấm sét, quỷ dữ vồ hoặc cú hù dọa kinh hoàng.
+
+### 9.4. Chuyển Động Máy Quay Theo Thời Gian (`camera.motion`)
+- `type`:
+  - `"push_in"`: Zoom từ từ tiến sát vào mặt đối tượng (Dolly In - tăng hồi hộp).
+  - `"pull_out"`: Zoom từ từ lùi ra xa (Dolly Out - làm lộ bóng đen sau lưng).
+  - `"pan_left"` / `"pan_right"`: Lia máy sang trái/phải.
+  - `"tilt_up"` / `"tilt_down"`: Lia máy lên trời/xuống đất.
+  - `"follow_actor"`: Camera bám theo bước chân nhân vật di chuyển.
+- `endZoom`: Hệ số zoom đích.
+- `startTimeSec`, `endTimeSec`: Thời điểm bắt đầu và kết thúc chuyển động.
+- `easing`: `"ease_in_out"` | `"linear"` | `"ease_in"` | `"ease_out"`.
+
+### 9.5. Kịch Bản JSON Mẫu Có Góc Máy Cận Cảnh & Rung Chấn
+```json
+{
+  "scene_id": "scene_close_up_ghost_reveal",
+  "title": "Khuôn Mặt Oan Hồn Xuất Hiện",
+  "duration_sec": 5,
+  "theme": "rural_graveyard",
+  "lighting": {
+    "sky_preset": "blood_moon",
+    "fog_density": 0.6
+  },
+  "camera": {
+    "shot": "close_up",
+    "target_actor_id": "ghost_oan_hon",
+    "dutch_angle": -6,
+    "shake": "subtle_handheld",
+    "motion": {
+      "type": "push_in",
+      "endZoom": 3.6,
+      "startTimeSec": 1.0,
+      "endTimeSec": 4.5,
+      "easing": "ease_in_out"
+    }
+  },
+  "actors": [
+    {
+      "id": "ghost_oan_hon",
+      "base": "female_adult",
+      "costume": "outfit_shredded_burial",
+      "face": "face_screaming_gasp",
+      "facialAction": "bleeding_tears",
+      "pose": "pose_floating",
+      "facing": "left",
+      "slot": "center"
+    }
+  ],
+  "dialogue": "Oan hồn chầm chậm ngẩng đầu lên, từ hai hốc mắt đen ngòm, những giọt máu tươi đặc quánh bắt đầu tuôn trào ròng ròng xuống gò má trắng bệch...",
+  "narrative_note": "Cận cảnh khuôn mặt ma nữ khóc ra máu bleeding_tears kết hợp cú push_in ống kính và góc nghiêng ma mị dutch_angle để tạo cảm giác ngột ngạt."
+}
+```
+
+
 

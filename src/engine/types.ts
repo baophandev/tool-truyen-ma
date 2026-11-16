@@ -222,12 +222,58 @@ export type SubtitleAnimId =
   | "smooth_fade"
   | "static";
 
+export type CameraShotType =
+  | "extreme_wide"     // Đại cảnh (bao quát mênh mông, nhân vật cô độc lọt thỏm)
+  | "wide"             // Toàn cảnh (mặc định, toàn bộ sân khấu 1920x1080)
+  | "medium_wide"      // Trung toàn cảnh (từ đầu gối lên, tương tác môi trường)
+  | "medium"           // Trung cảnh (từ thắt lưng lên, hành động vũ khí/bùa chú)
+  | "close_up"         // Cận cảnh (từ ngực lên mặt, biểu cảm rùng rợn)
+  | "extreme_close_up" // Đặc tả (chỉ thấy đôi mắt rỉ máu, nụ cười quái dị)
+  | "dutch_tilt";      // Góc nghiêng ma mị (tâm lý bất an, tà khí)
+
+export type CameraMotionType =
+  | "static"           // Máy quay cố định
+  | "pan_left"         // Lia máy sang trái
+  | "pan_right"        // Lia máy sang phải
+  | "tilt_up"          // Lia từ đất lên trời
+  | "tilt_down"        // Lia từ trời xuống đất
+  | "push_in"          // Zoom từ từ vào đối tượng (Dolly In)
+  | "pull_out"         // Zoom từ từ lùi ra xa (Dolly Out)
+  | "follow_actor";    // Bám theo nhân vật di chuyển
+
+export type CameraShakeIntensity = "none" | "subtle_handheld" | "creepy_tremor" | "heavy_jumpscare";
+
+export interface CameraMotionConfig {
+  type: CameraMotionType;
+  endShot?: CameraShotType;
+  endZoom?: number;
+  endPanX?: number;
+  endPanY?: number;
+  endDutchAngle?: number;
+  startTimeSec?: number;  // Default: 0
+  endTimeSec?: number;    // Default: scene duration
+  easing?: EasingType;    // Default: "ease_in_out"
+}
+
+export interface DirectorCameraConfig {
+  shot?: CameraShotType;              // Cỡ cảnh chuẩn
+  target_slot?: SlotId;               // Điểm ngắm theo slot
+  target_actor_id?: string;           // Khóa mục tiêu theo nhân vật
+  zoom?: number;                      // Hệ số zoom tự do (0.8x - 5.0x, default theo shot)
+  pan_x?: number;                     // Tinh chỉnh tọa độ X (px)
+  pan_y?: number;                     // Tinh chỉnh tọa độ Y (px)
+  dutch_angle?: number;               // Góc xoay nghiêng (-15 đến 15 độ)
+  shake?: CameraShakeIntensity;       // Rung lắc ống kính
+  motion?: CameraMotionConfig;        // Chuyển động máy quay theo thời gian
+}
+
 export interface DirectorSceneScript {
   scene_id: string;
   title?: string;
   duration_sec?: number;
   theme: ThemeId;
   lighting: DirectorLightingConfig;
+  camera?: DirectorCameraConfig;
   environment_items: EnvironmentItemConfig[];
   actors: ActorConfig[];
   details?: DetailItemConfig[];
