@@ -29,6 +29,10 @@ import { DetailRenderer } from "./graphics/Details";
 import { soundEngine } from "./AudioSynthesizer";
 import { evaluateActorAtTime } from "./motionUtils";
 import { evaluateCameraAtTime, CAMERA_SHOT_PRESETS } from "./cameraUtils";
+import {
+  generateTimedSubtitleCues,
+  getActiveSubtitleCue,
+} from "./subtitleUtils";
 
 export type DragSnapMode = "strict_slot" | "allowed_offset";
 
@@ -101,6 +105,15 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
     currentTime,
     script.duration_sec || 6
   );
+
+  // Realtime Timed Subtitle Cues (Splits long paragraph into bite-sized sequential 1-line cues)
+  const subtitleCues = React.useMemo(() => {
+    return generateTimedSubtitleCues(dialogue, script.duration_sec || 6);
+  }, [dialogue, script.duration_sec]);
+
+  const activeCue = React.useMemo(() => {
+    return getActiveSubtitleCue(subtitleCues, currentTime);
+  }, [subtitleCues, currentTime]);
 
   const [dragSession, setDragSession] = useState<DragSession | null>(null);
   const dragSessionRef = useRef<DragSession | null>(null);
@@ -1328,11 +1341,12 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
         )}
       </svg>
 
-      {/* PROFESSIONAL CINEMATIC SUBTITLE OVERLAY */}
-      {showSubtitles && dialogue && (
+      {/* BASIC CLEAN WHITE CINEMATIC SUBTITLE OVERLAY (SLICED BY TIMED CUES) */}
+      {showSubtitles && activeCue && (
         <div className="absolute bottom-6 md:bottom-8 inset-x-0 flex justify-center pointer-events-none px-6 z-20">
           <p
-            className="max-w-4xl text-center text-white text-xs sm:text-sm md:text-base font-normal tracking-wide select-none leading-relaxed"
+            key={activeCue.index}
+            className="max-w-4xl text-center text-white text-xs sm:text-sm md:text-base font-normal tracking-wide select-none leading-relaxed transition-all duration-200"
             style={{
               fontFamily:
                 "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
@@ -1340,7 +1354,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                 "0 1px 2px #000000, 0 0 4px #000000, 0 0 8px rgba(0,0,0,0.95)",
             }}
           >
-            {dialogue}
+            {activeCue.text}
           </p>
         </div>
       )}

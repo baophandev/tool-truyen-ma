@@ -5,6 +5,11 @@
  * - Realtime Video Recording via HTML5 Canvas & MediaRecorder
  */
 
+import {
+  generateTimedSubtitleCues,
+  getActiveSubtitleCue,
+} from "./subtitleUtils";
+
 export function downloadFile(content: string | Blob, filename: string, mimeType: string) {
   const blob = typeof content === "string" ? new Blob([content], { type: mimeType }) : content;
   const url = URL.createObjectURL(blob);
@@ -31,13 +36,20 @@ export function exportSvgFile(svgElement: SVGSVGElement, filename: string) {
   downloadFile(source, filename, "image/svg+xml;charset=utf-8");
 }
 
-function drawCinemaSubtitle(
+export function drawCinemaSubtitle(
   ctx: CanvasRenderingContext2D,
-  text?: string,
+  dialogue?: string,
   width = 1920,
-  height = 1080
+  height = 1080,
+  timeSec?: number,
+  durationSec = 6
 ) {
-  if (!text || !text.trim()) return;
+  if (!dialogue || !dialogue.trim()) return;
+
+  const cues = generateTimedSubtitleCues(dialogue, durationSec);
+  const activeCue = getActiveSubtitleCue(cues, timeSec);
+  if (!activeCue || !activeCue.text.trim()) return;
+
   ctx.save();
   ctx.font = "normal 30px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
   ctx.textAlign = "center";
@@ -47,7 +59,7 @@ function drawCinemaSubtitle(
   ctx.shadowBlur = 8;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 2;
-  ctx.fillText(text.trim(), width / 2, height - 55);
+  ctx.fillText(activeCue.text.trim(), width / 2, height - 55);
   ctx.restore();
 }
 
@@ -79,7 +91,7 @@ export async function exportPngSnapshot(
   ctx.fillStyle = "#0A0A0C";
   ctx.fillRect(0, 0, width, height);
   ctx.drawImage(img, 0, 0, width, height);
-  drawCinemaSubtitle(ctx, dialogue, width, height);
+  drawCinemaSubtitle(ctx, dialogue, width, height, 0, 6);
   URL.revokeObjectURL(url);
 
   canvas.toBlob((blob) => {
@@ -172,7 +184,7 @@ export async function recordSvgToVideo(
           ctx.fillStyle = "#0A0A0C";
           ctx.fillRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
-          drawCinemaSubtitle(ctx, dialogue, width, height);
+          drawCinemaSubtitle(ctx, dialogue, width, height, timeSec, durationSec);
           URL.revokeObjectURL(url);
         } catch (err) {
           console.warn("Frame capture error:", err);

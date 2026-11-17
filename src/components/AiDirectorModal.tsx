@@ -441,12 +441,13 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
 
         const drafts = result.drafts;
         setSceneCount(drafts.length);
-        const mappedDrafts = drafts.map((d) => ({
+        const mappedDrafts: SceneDraftSpec[] = drafts.map((d) => ({
           environmentId: d.environmentId,
           title: d.title,
           actionDescription: d.actionDescription,
           dialogue: d.dialogue || "",
           duration_sec: d.duration_sec,
+          cameraShot: (d.cameraShot || "auto") as CameraShotType | "auto",
         }));
         setSceneDrafts(mappedDrafts);
         setLastBreakdownStory(rawStoryInput.trim());

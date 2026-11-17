@@ -28,7 +28,7 @@ import type {
   CameraShakeIntensity,
 } from "../engine/types";
 import { CAMERA_SHOT_PRESETS } from "../engine/cameraUtils";
-import { SUBTITLE_THEMES, resolveSubtitleStyle } from "../engine/subtitleUtils";
+import { generateTimedSubtitleCues } from "../engine/subtitleUtils";
 import { SceneRenderer, type DragSnapMode } from "../engine/SceneRenderer";
 import { ALL_SLOTS, GROUND_Y } from "../engine/constants";
 import { HELD_ITEM_CATALOG } from "../engine/graphics/HandheldItems";
@@ -2843,6 +2843,54 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600"
                 />
 
+                {/* Automatic Sequential Subtitle Cue Breakdown Preview */}
+                {(() => {
+                  const editorCues = generateTimedSubtitleCues(scene.dialogue, scene.duration_sec || 6);
+                  if (editorCues.length <= 1) return null;
+                  return (
+                    <div className="flex flex-col gap-1.5 p-3 bg-purple-950/25 border border-purple-800/40 rounded-xl animate-in fade-in">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-semibold text-purple-300 flex items-center gap-1.5">
+                          <span>🎬 Đã tự động chia nhỏ ({editorCues.length} phân đoạn hiển thị tuần tự):</span>
+                        </span>
+                        <span className="text-[10px] text-neutral-400 font-mono">
+                          Bấm để tua xem thử
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1 mt-1 max-h-36 overflow-y-auto pr-1">
+                        {editorCues.map((cue) => {
+                          const isActive =
+                            previewTime !== null &&
+                            previewTime >= cue.startTimeSec &&
+                            previewTime < cue.endTimeSec;
+                          return (
+                            <div
+                              key={cue.index}
+                              onClick={() => setPreviewTime(cue.startTimeSec + 0.1)}
+                              className={`flex items-start justify-between gap-2 p-1.5 rounded-lg text-xs cursor-pointer transition-all ${
+                                isActive
+                                  ? "bg-purple-900/60 border border-purple-500/80 text-white font-medium shadow-sm"
+                                  : "bg-black/40 hover:bg-neutral-900 text-neutral-300 border border-neutral-800/60"
+                              }`}
+                              title="Bấm để tua màn hình xem thử đoạn này"
+                            >
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="w-5 h-5 rounded-md bg-neutral-800 text-neutral-300 font-mono text-[10px] font-bold flex items-center justify-center shrink-0">
+                                  {cue.index}
+                                </span>
+                                <span className="italic leading-relaxed truncate">"{cue.text}"</span>
+                              </div>
+                              <span className="font-mono text-[10px] text-amber-300 shrink-0">
+                                {cue.startTimeSec.toFixed(1)}s - {cue.endTimeSec.toFixed(1)}s
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* Subtitle Style & Animation Controls */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1 p-3 bg-neutral-950/70 border border-neutral-800/80 rounded-xl">
                   {/* Style selector */}
@@ -2895,31 +2943,21 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   {scene.dialogue && (
                     <div className="col-span-1 sm:col-span-2 pt-2 border-t border-neutral-800/80 flex flex-col gap-1">
                       <span className="text-[10px] text-neutral-400 font-mono">
-                        Xem trước mẫu chữ điện ảnh (Cormorant Garamond):
+                        Xem trước phụ đề chữ trắng basic:
                       </span>
-                      {(() => {
-                        const styleKey = resolveSubtitleStyle(
-                          scene.lighting?.sky_preset,
-                          scene.subtitle_style
-                        );
-                        const themeDef = SUBTITLE_THEMES[styleKey];
-                        return (
-                          <div
-                            className="p-3 rounded-lg text-center overflow-hidden"
-                            style={{ background: themeDef.backdropGradientCss }}
-                          >
-                            <span
-                              className="font-cinematic-serif italic text-base md:text-lg font-semibold tracking-wider select-none leading-relaxed"
-                              style={{
-                                color: themeDef.textColor,
-                                textShadow: themeDef.textShadowCss,
-                              }}
-                            >
-                              "{scene.dialogue}"
-                            </span>
-                          </div>
-                        );
-                      })()}
+                      <div className="p-3 rounded-lg text-center bg-black/60 border border-neutral-900">
+                        <span
+                          className="text-white text-sm md:text-base font-normal tracking-wide select-none leading-relaxed"
+                          style={{
+                            fontFamily:
+                              "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+                            textShadow:
+                              "0 1px 2px #000000, 0 0 4px #000000, 0 0 8px rgba(0,0,0,0.95)",
+                          }}
+                        >
+                          "{scene.dialogue}"
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>

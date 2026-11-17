@@ -121,6 +121,214 @@ export function resolveSubtitleStyle(
   }
 }
 
+export interface TimedSubtitleCue {
+  index: number;
+  text: string;
+  startTimeSec: number;
+  endTimeSec: number;
+  wordCount: number;
+}
+
+/**
+ * Splits a long dialogue paragraph into balanced, bite-sized subtitle lines (typically 7-12 words).
+ * Slices cleanly at sentence delimiters, commas, dashes, and conjunctions
+ * while strictly preserving 100% of the raw text and punctuation.
+ */
+export function splitIntoSubtitleChunks(rawText: string, maxWordsPerChunk = 12): string[] {
+  if (!rawText || !rawText.trim()) return [];
+
+  const text = rawText.trim();
+  const words = text.split(/\s+/).filter(Boolean);
+  const totalWords = words.length;
+
+  // If already short enough, return as single chunk
+  if (totalWords <= maxWordsPerChunk + 2) {
+    return [text];
+  }
+
+  // 1. Split into primary sentences
+  const sentenceRegex = /([^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$)/g;
+  const rawSentences = text.match(sentenceRegex) || [text];
+
+  const preliminaryChunks: string[] = [];
+
+  for (const s of rawSentences) {
+    const sTrimmed = s.trim();
+    if (!sTrimmed) continue;
+
+    const sWordsCount = sTrimmed.split(/\s+/).filter(Boolean).length;
+    if (sWordsCount <= maxWordsPerChunk + 2) {
+      preliminaryChunks.push(sTrimmed);
+      continue;
+    }
+
+    // Split sentence by punctuation marks: comma, semicolon, dash, ellipses
+    const clauseRegex = /([^,;:\-–—]+(?:[,;:\-–—]+|\s*$))/g;
+    const rawClauses = sTrimmed.match(clauseRegex) || [sTrimmed];
+
+    let currentBuffer = "";
+
+    for (const c of rawClauses) {
+      const cTrimmed = c.trim();
+      if (!cTrimmed) continue;
+
+      const candidate = currentBuffer ? `${currentBuffer} ${cTrimmed}` : cTrimmed;
+      const candidateWords = candidate.split(/\s+/).filter(Boolean).length;
+
+      if (candidateWords > maxWordsPerChunk && currentBuffer) {
+        preliminaryChunks.push(currentBuffer.trim());
+        currentBuffer = cTrimmed;
+      } else {
+        currentBuffer = candidate;
+      }
+    }
+
+    if (currentBuffer.trim()) {
+      preliminaryChunks.push(currentBuffer.trim());
+    }
+  }
+
+  // 2. Further split any chunk that is still too long (> maxWordsPerChunk + 3)
+  const refinedChunks: string[] = [];
+  for (const chunk of preliminaryChunks) {
+    const chunkWords = chunk.split(/\s+/).filter(Boolean);
+    if (chunkWords.length <= maxWordsPerChunk + 3) {
+      refinedChunks.push(chunk);
+    } else {
+      const half = Math.ceil(chunkWords.length / 2);
+      const conjunctions = [
+        "để",
+        "mà",
+        "nhưng",
+        "và",
+        "khi",
+        "nơi",
+        "với",
+        "rồi",
+        "cho",
+        "lúc",
+        "song",
+        "tuy",
+        "bởi",
+        "vì",
+      ];
+      let splitIdx = half;
+      for (let offset = 0; offset <= 3; offset++) {
+        const left = half - offset;
+        const right = half + offset;
+        if (left > 3 && left < chunkWords.length - 3 && conjunctions.includes(chunkWords[left].toLowerCase())) {
+          splitIdx = left;
+          break;
+        }
+        if (right > 3 && right < chunkWords.length - 3 && conjunctions.includes(chunkWords[right].toLowerCase())) {
+          splitIdx = right;
+          break;
+        }
+      }
+
+      const p1 = chunkWords.slice(0, splitIdx).join(" ");
+      const p2 = chunkWords.slice(splitIdx).join(" ");
+      refinedChunks.push(p1, p2);
+    }
+  }
+
+  // 3. Balance trailing tiny chunk (< 4 words) into previous chunk
+  const finalChunks: string[] = [];
+  for (let i = 0; i < refinedChunks.length; i++) {
+    const chunk = refinedChunks[i];
+    const chunkWordsCount = chunk.split(/\s+/).filter(Boolean).length;
+    if (finalChunks.length > 0 && chunkWordsCount < 4 && i === refinedChunks.length - 1) {
+      finalChunks[finalChunks.length - 1] = `${finalChunks[finalChunks.length - 1]} ${chunk}`;
+    } else {
+      finalChunks.push(chunk);
+    }
+  }
+
+  return finalChunks.filter(Boolean);
+}
+
+/**
+ * Generates timed subtitle cues for a scene.
+ * Partitions the scene's duration proportionally across all subtitle chunks.
+ */
+export function generateTimedSubtitleCues(
+  dialogue?: string,
+  sceneDurationSec = 6,
+  maxWordsPerChunk = 12
+): TimedSubtitleCue[] {
+  if (!dialogue || !dialogue.trim()) return [];
+
+  const chunks = splitIntoSubtitleChunks(dialogue, maxWordsPerChunk);
+  if (chunks.length === 0) return [];
+
+  const safeDuration = Math.max(2.0, sceneDurationSec);
+
+  if (chunks.length === 1) {
+    return [
+      {
+        index: 1,
+        text: chunks[0],
+        startTimeSec: 0,
+        endTimeSec: safeDuration,
+        wordCount: chunks[0].split(/\s+/).filter(Boolean).length,
+      },
+    ];
+  }
+
+  // Calculate weights based on reading duration
+  const weights = chunks.map((c) => {
+    const w = c.split(/\s+/).filter(Boolean).length;
+    const midPauses = (c.match(/[,;:\-–—]|\.{3}/g) || []).length;
+    const endPauses = (c.match(/[.!?]/g) || []).length;
+    const pauses = midPauses * 0.35 + endPauses * 0.5;
+    return Math.max(1.0, w / 2.4 + pauses);
+  });
+
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+
+  let currentStart = 0;
+  return chunks.map((chunk, idx) => {
+    const isLast = idx === chunks.length - 1;
+    const duration = isLast
+      ? safeDuration - currentStart
+      : (weights[idx] / totalWeight) * safeDuration;
+    const endTime = isLast ? safeDuration : currentStart + duration;
+
+    const cue: TimedSubtitleCue = {
+      index: idx + 1,
+      text: chunk,
+      startTimeSec: Math.round(currentStart * 100) / 100,
+      endTimeSec: Math.round(endTime * 100) / 100,
+      wordCount: chunk.split(/\s+/).filter(Boolean).length,
+    };
+    currentStart = endTime;
+    return cue;
+  });
+}
+
+/**
+ * Retrieves the currently active subtitle cue for a given playback time in seconds.
+ */
+export function getActiveSubtitleCue(
+  cues: TimedSubtitleCue[],
+  currentTimeSec?: number
+): TimedSubtitleCue | null {
+  if (!cues || cues.length === 0) return null;
+
+  // Static preview without active playback: return the first cue
+  if (currentTimeSec === undefined || isNaN(currentTimeSec)) {
+    return cues[0];
+  }
+
+  const t = Math.max(0, currentTimeSec);
+
+  const match = cues.find((c) => t >= c.startTimeSec && t < c.endTimeSec);
+  if (match) return match;
+
+  if (t < cues[0].startTimeSec) return cues[0];
+  return cues[cues.length - 1];
+}
+
 export interface WordEvaluation {
   text: string;
   opacity: number;

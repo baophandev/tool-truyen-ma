@@ -342,3 +342,244 @@ export function analyzeStoryPacing(
     pace,
   };
 }
+
+function stripEnclosingPunctuation(str: string): string {
+  return str.replace(/^[“"'"«\[(\s.,!?:;]+|[”"'"»\])\s.,!?:;]+$/g, "").trim();
+}
+
+function getFirstNWords(text: string, n = 4): string {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  return words.slice(0, n).join(" ");
+}
+
+function getLastNWords(text: string, n = 4): string {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  return words.slice(-n).join(" ");
+}
+
+function normalizeSimple(str: string): string {
+  return str.toLowerCase().replace(/[.,!?:;'"“”‘’\-–—()[\]]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function adjustOpeningQuoteBoundary(story: string, cutPos: number, currentCursor: number): number {
+  let pos = cutPos;
+  while (pos > currentCursor && /[“"'"«\[(—\-]/.test(story[pos - 1])) {
+    pos--;
+  }
+  return pos;
+}
+
+/**
+ * Adjust proposed slices count to match targetCount if specified
+ */
+function adjustProposedSliceCount(proposedSlices: string[], targetCount?: number | "auto"): string[] {
+  if (!targetCount || targetCount === "auto" || proposedSlices.length === targetCount) {
+    return proposedSlices;
+  }
+
+  const slices = [...proposedSlices];
+
+  // If fewer slices than targetCount, split longest slice at natural sentence boundary
+  while (slices.length < targetCount) {
+    let longestIdx = 0;
+    let maxWords = 0;
+    for (let i = 0; i < slices.length; i++) {
+      const w = countWords(slices[i]);
+      if (w > maxWords) {
+        maxWords = w;
+        longestIdx = i;
+      }
+    }
+
+    if (maxWords < 6) break;
+
+    const textToSplit = slices[longestIdx];
+    const sentenceBreak = textToSplit.search(/[.!?]\s+/);
+    if (sentenceBreak !== -1) {
+      const part1 = textToSplit.slice(0, sentenceBreak + 1).trim();
+      const part2 = textToSplit.slice(sentenceBreak + 1).trim();
+      if (part1 && part2) {
+        slices.splice(longestIdx, 1, part1, part2);
+        continue;
+      }
+    }
+
+    const commaBreak = textToSplit.search(/[,;]\s+/);
+    if (commaBreak !== -1) {
+      const part1 = textToSplit.slice(0, commaBreak + 1).trim();
+      const part2 = textToSplit.slice(commaBreak + 1).trim();
+      if (part1 && part2) {
+        slices.splice(longestIdx, 1, part1, part2);
+        continue;
+      }
+    }
+    break;
+  }
+
+  // If more slices than targetCount, merge shortest adjacent pair
+  while (slices.length > targetCount) {
+    let shortestPairIdx = 0;
+    let minCombinedWords = Infinity;
+    for (let i = 0; i < slices.length - 1; i++) {
+      const w1 = countWords(slices[i]);
+      const w2 = countWords(slices[i + 1]);
+      if (w1 + w2 < minCombinedWords) {
+        minCombinedWords = w1 + w2;
+        shortestPairIdx = i;
+      }
+    }
+    slices.splice(shortestPairIdx, 2, `${slices[shortestPairIdx]} ${slices[shortestPairIdx + 1]}`.trim());
+  }
+
+  return slices;
+}
+
+/**
+ * RECONCILE SCENE DIALOGUE SLICES TO ORIGINAL STORY
+ * Guarantees that:
+ * 1. Each resulting dialogue slice is a 100% verbatim continuous substring of the original user story.
+ * 2. Concatenating all slices in order covers the original story 100% with zero lost characters, words, or clauses.
+ * 3. Prevents any AI paraphrasing, summarization, or text alteration from leaking into voiceover/subtitles.
+ */
+export function reconcileDialogueSlicesToStory(
+  fullStory: string,
+  proposedSlices: string[],
+  targetCount?: number | "auto"
+): string[] {
+  const cleanedStory = fullStory.trim();
+  if (!cleanedStory) return [];
+  if (!proposedSlices || proposedSlices.length === 0) return [cleanedStory];
+
+  const adjustedSlices = adjustProposedSliceCount(proposedSlices, targetCount);
+  if (adjustedSlices.length <= 1) return [cleanedStory];
+
+  const n = adjustedSlices.length;
+  const cutIndices: number[] = [];
+  let currentCursor = 0;
+
+  for (let k = 0; k < n - 1; k++) {
+    const currentSlice = adjustedSlices[k]?.trim() || "";
+    const nextSlice = adjustedSlices[k + 1]?.trim() || "";
+
+    let cutPos = -1;
+
+    // Method A: Search for the first 3-5 words of nextSlice
+    const nextWordsCount = countWords(nextSlice);
+    const wordsToTry = [Math.min(5, nextWordsCount), 4, 3, 2];
+
+    for (const wCount of wordsToTry) {
+      if (wCount <= 0) continue;
+      const rawHead = getFirstNWords(nextSlice, wCount);
+      const cleanHead = stripEnclosingPunctuation(rawHead);
+      const headVariants = rawHead !== cleanHead ? [rawHead, cleanHead] : [rawHead];
+
+      for (const head of headVariants) {
+        if (!head || head.length < 2) continue;
+        const idx = cleanedStory.indexOf(head, currentCursor);
+        if (idx > currentCursor || (currentCursor === 0 && idx === 0 && currentSlice.length === 0)) {
+          cutPos = adjustOpeningQuoteBoundary(cleanedStory, idx, currentCursor);
+          break;
+        }
+      }
+      if (cutPos !== -1) break;
+    }
+
+    // Method B: Search for trailing words of currentSlice
+    if (cutPos === -1) {
+      const currWordsCount = countWords(currentSlice);
+      const tailWordsToTry = [Math.min(4, currWordsCount), 3, 2];
+      for (const wCount of tailWordsToTry) {
+        if (wCount <= 0) continue;
+        const rawTail = getLastNWords(currentSlice, wCount);
+        const cleanTail = stripEnclosingPunctuation(rawTail);
+        const tailVariants = rawTail !== cleanTail ? [rawTail, cleanTail] : [rawTail];
+
+        for (const tail of tailVariants) {
+          if (!tail || tail.length < 2) continue;
+          const idx = cleanedStory.indexOf(tail, currentCursor);
+          if (idx !== -1) {
+            let afterTail = idx + tail.length;
+            while (afterTail < cleanedStory.length && /[.,!?:;'"“”‘’\s]/.test(cleanedStory[afterTail])) {
+              afterTail++;
+            }
+            if (afterTail > currentCursor) {
+              cutPos = adjustOpeningQuoteBoundary(cleanedStory, afterTail, currentCursor);
+              break;
+            }
+          }
+        }
+        if (cutPos !== -1) break;
+      }
+    }
+
+    // Method C: Case-insensitive normalized search
+    if (cutPos === -1) {
+      const normHead = normalizeSimple(getFirstNWords(nextSlice, 3));
+      if (normHead) {
+        const lowerStory = cleanedStory.toLowerCase();
+        const normWords = normHead.split(" ");
+        let searchStart = currentCursor;
+        while (searchStart < cleanedStory.length) {
+          const matchIdx = lowerStory.indexOf(normWords[0], searchStart);
+          if (matchIdx === -1) break;
+          let allMatch = true;
+          let checkPos = matchIdx;
+          for (const w of normWords) {
+            const wIdx = lowerStory.indexOf(w, checkPos);
+            if (wIdx === -1 || wIdx - checkPos > 25) {
+              allMatch = false;
+              break;
+            }
+            checkPos = wIdx + w.length;
+          }
+          if (allMatch && matchIdx > currentCursor) {
+            cutPos = adjustOpeningQuoteBoundary(cleanedStory, matchIdx, currentCursor);
+            break;
+          }
+          searchStart = matchIdx + 1;
+        }
+      }
+    }
+
+    // Method D: Fallback to proportional sentence boundary
+    if (cutPos === -1 || cutPos <= currentCursor || cutPos >= cleanedStory.length) {
+      const remainingLen = cleanedStory.length - currentCursor;
+      const remainingSlices = n - k;
+      const approxLen = Math.floor(remainingLen / remainingSlices);
+      const targetPos = currentCursor + approxLen;
+
+      let bestBreak = -1;
+      let minDistance = Infinity;
+
+      for (let i = currentCursor + 5; i < cleanedStory.length - 5; i++) {
+        if (/[.!?\n]/.test(cleanedStory[i])) {
+          const dist = Math.abs(i - targetPos);
+          if (dist < minDistance) {
+            minDistance = dist;
+            bestBreak = i + 1;
+          }
+        }
+      }
+
+      cutPos = bestBreak !== -1 ? bestBreak : targetPos;
+      cutPos = adjustOpeningQuoteBoundary(cleanedStory, cutPos, currentCursor);
+    }
+
+    cutIndices.push(cutPos);
+    currentCursor = cutPos;
+  }
+
+  // Build verbatim slices directly from cleanedStory
+  const result: string[] = [];
+  let prev = 0;
+  for (let i = 0; i < cutIndices.length; i++) {
+    const end = cutIndices[i];
+    const slice = cleanedStory.slice(prev, end).trim();
+    if (slice) result.push(slice);
+    prev = end;
+  }
+  const lastSlice = cleanedStory.slice(prev).trim();
+  if (lastSlice) result.push(lastSlice);
+
+  return result;
+}
