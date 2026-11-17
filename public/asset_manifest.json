@@ -333,6 +333,16 @@
         "width": 420,
         "height": 385,
         "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_old_apartment_gate",
+        "name": "Cổng sắt chung cư cũ",
+        "semantic_role": "Cổng sắt hoen gỉ khóa xích của khu chung cư cũ nát, khối nhà tập thể u ám phía sau với chuồng cọp lồng sắt, đèn tường chập chờn, nơi nhân vật kiệt sức gục ngã",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 460,
+        "height": 450,
+        "anchor": "bottom-center"
       }
     ]
   },

@@ -500,6 +500,40 @@ export const DEFAULT_NAMED_ENVIRONMENTS: NamedEnvironmentPreset[] = [
       },
     ],
   },
+  {
+    id: "env_old_apartment_gate",
+    name: "Cổng Sắt Chung Cư Cũ & Khối Nhà Hoang Phế",
+    description: "Cánh cổng sắt hoen gỉ khóa xích của khu chung cư cũ u ám, đèn tường lập lòe ánh vàng hổ phách, sương đêm cuộn xoáy và bóng người bí ẩn sau ô cửa sổ.",
+    theme: "urban_night_market",
+    lighting: {
+      sky_preset: "dim_indoor_night",
+      fog_density: 0.72,
+      thunder_flash: false,
+      weather: "haunted_mist",
+    },
+    environment_items: [
+      {
+        asset_id: "structure_old_apartment_gate",
+        slot: "center",
+        scale: 1.0,
+      },
+    ],
+    details: [
+      {
+        id: "detail_crow_gate",
+        asset_id: "detail_black_crow",
+        slot: "air_right",
+        offsetX: -60,
+        offsetY: 20,
+      },
+      {
+        id: "detail_camera_gate",
+        asset_id: "detail_surveillance_camera",
+        slot: "air_left",
+        offsetX: 40,
+      },
+    ],
+  },
 ];
 
 const STORAGE_KEY_ENVIRONMENTS = "limbo_named_environments_v1";

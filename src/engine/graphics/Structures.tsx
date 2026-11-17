@@ -36,6 +36,7 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "market_stall_tent" && <MarketStallTent />}
       {id === "abandoned_subway_station" && <AbandonedSubwayStation />}
       {id === "rusty_train_tracks_tunnel" && <RustyTrainTracksTunnel />}
+      {id === "structure_old_apartment_gate" && <OldApartmentGate />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -1604,6 +1605,446 @@ const RustyTrainTracksTunnel: React.FC = () => {
         <circle cx="12" cy="-5" r="22" fill="url(#blood-moon-glow-radial)" opacity="0.65" />
         {/* Lower Unlit Amber Lens */}
         <circle cx="12" cy="12" r="5" fill="#451A03" stroke="#78350F" strokeWidth="1" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 19. OLD APARTMENT GATE (Cổng Sắt Chung Cư Cũ)
+ * Architecture: Rusty folding iron gate of a decaying Soviet-era / vintage apartment block
+ * Features:
+ * - Looming multi-story apartment block silhouette with "chuồng cọp" rebar cages, water tank & antenna
+ * - Faint flickering yellow window with dark shadowy onlooker
+ * - Weathered cracked concrete pillars with pyramid caps and broken-glass boundary wall
+ * - Heavy decorative wrought-iron arch with swinging rusted sign: "CHUNG CƯ CŨ"
+ * - Massive rusty iron gate bars with sharp spearheads, diagonal braces, heavy padlock & iron chains
+ * - Vintage round wall lamp with flickering amber glow on concrete post
+ * - Cracked ground apron, mud puddles and creeping weeds
+ */
+const OldApartmentGate: React.FC = () => {
+  return (
+    <g className="old-apartment-gate">
+      {/* 1. Background Apartment Block Silhouette (Khối nhà tập thể/chung cư cũ phía sau) */}
+      <g className="apartment-background" opacity="0.95">
+        {/* Main block building shape */}
+        <polygon
+          points="-210,-100 -210,-430 -170,-430 -170,-450 -30,-450 -30,-440 60,-440 60,-465 160,-465 160,-420 210,-420 210,-100"
+          fill="#080B10"
+        />
+        {/* Rooftop Water Tank (Bồn nước inox/bê tông trên nóc) */}
+        <g transform="translate(85, -485)">
+          <rect x="-16" y="0" width="32" height="20" rx="3" fill="#141B26" stroke="#1E293B" strokeWidth="1.5" />
+          <line x1="-12" y1="20" x2="-14" y2="28" stroke="#1E293B" strokeWidth="2" />
+          <line x1="12" y1="20" x2="14" y2="28" stroke="#1E293B" strokeWidth="2" />
+          <line x1="-16" y1="6" x2="16" y2="6" stroke="#0B0F17" strokeWidth="1.5" />
+          <line x1="-16" y1="13" x2="16" y2="13" stroke="#0B0F17" strokeWidth="1.5" />
+        </g>
+        {/* Rooftop TV Antenna Rods & Guy Wires */}
+        <line x1="-120" y1="-450" x2="-120" y2="-495" stroke="#1E293B" strokeWidth="2" />
+        <line x1="-132" y1="-485" x2="-108" y2="-485" stroke="#1E293B" strokeWidth="1.5" />
+        <line x1="-128" y1="-475" x2="-112" y2="-475" stroke="#1E293B" strokeWidth="1.5" />
+        <line x1="-120" y1="-495" x2="-150" y2="-450" stroke="#0F172A" strokeWidth="1" strokeDasharray="2,2" />
+
+        {/* Windows & Balconies Grid on Upper Floors */}
+        {/* Top Floor Windows */}
+        <rect x="-145" y="-420" width="22" height="26" fill="#040608" stroke="#141B26" strokeWidth="1" />
+        <rect x="-85" y="-420" width="22" height="26" fill="#040608" stroke="#141B26" strokeWidth="1" />
+        {/* One mysterious lit window on 3rd floor */}
+        <rect x="0" y="-415" width="24" height="28" fill="#FEF08A" opacity="0.35" className="anim-flicker-ember" />
+        <rect x="0" y="-415" width="24" height="28" fill="none" stroke="#78350F" strokeWidth="1.5" />
+        {/* Shadowy silhouette of person peering down inside window */}
+        <ellipse cx="12" cy="-400" rx="4" ry="5.5" fill="#080B10" />
+        <path d="M 6 -390 Q 12 -395 18 -390 L 20 -387 L 4 -387 Z" fill="#080B10" />
+
+        <rect x="85" y="-410" width="22" height="26" fill="#040608" stroke="#141B26" strokeWidth="1" />
+
+        {/* 2nd Tier Balcony "Chuồng cọp" (Rebar Cage Balcony Extension) */}
+        <g transform="translate(-130, -370)">
+          {/* Protruding cage concrete base */}
+          <rect x="-24" y="0" width="48" height="6" fill="#141B26" />
+          {/* Iron cage frame */}
+          <rect x="-22" y="-32" width="44" height="32" fill="#06090E" stroke="#1E293B" strokeWidth="1.5" />
+          {/* Vertical rebar grilles */}
+          <line x1="-14" y1="-32" x2="-14" y2="0" stroke="#1E293B" strokeWidth="1" />
+          <line x1="-6" y1="-32" x2="-6" y2="0" stroke="#1E293B" strokeWidth="1" />
+          <line x1="2" y1="-32" x2="2" y2="0" stroke="#1E293B" strokeWidth="1" />
+          <line x1="10" y1="-32" x2="10" y2="0" stroke="#1E293B" strokeWidth="1" />
+          <line x1="18" y1="-32" x2="18" y2="0" stroke="#1E293B" strokeWidth="1" />
+          {/* Diagonal corrugated roof sheet */}
+          <line x1="-24" y1="-33" x2="24" y2="-36" stroke="#334155" strokeWidth="2" />
+          {/* Tattered hanging cloth on cage */}
+          <path d="M -8 -8 Q -5 4 -3 -8" stroke="#475569" strokeWidth="1.5" fill="none" />
+        </g>
+
+        {/* Another Chuồng cọp on right side */}
+        <g transform="translate(110, -355)">
+          <rect x="-20" y="0" width="40" height="5" fill="#141B26" />
+          <rect x="-18" y="-30" width="36" height="30" fill="#06090E" stroke="#1E293B" strokeWidth="1.5" />
+          <line x1="-10" y1="-30" x2="-10" y2="0" stroke="#1E293B" strokeWidth="1" />
+          <line x1="-2" y1="-30" x2="-2" y2="0" stroke="#1E293B" strokeWidth="1" />
+          <line x1="6" y1="-30" x2="6" y2="0" stroke="#1E293B" strokeWidth="1" />
+          <line x1="14" y1="-30" x2="14" y2="0" stroke="#1E293B" strokeWidth="1" />
+          {/* Slanted awning */}
+          <line x1="-20" y1="-31" x2="20" y2="-34" stroke="#334155" strokeWidth="2" />
+        </g>
+
+        {/* Tangled overhead electrical bundle (Búi dây điện chằng chịt đặc trưng khu tập thể) */}
+        <path d="M -230 -370 Q -80 -325 0 -330 Q 100 -325 230 -375" fill="none" stroke="#05080E" strokeWidth="3" />
+        <path d="M -230 -360 Q -100 -315 -20 -318 Q 80 -315 230 -362" fill="none" stroke="#090E17" strokeWidth="2" />
+        <path d="M -150 -325 Q -100 -270 -60 -265 Q -20 -270 20 -320" fill="none" stroke="#06090F" strokeWidth="1.5" />
+        {/* Power meter box on building wall */}
+        <rect x="-182" y="-335" width="22" height="32" rx="2" fill="#0C121C" stroke="#1E293B" strokeWidth="1.5" />
+        <circle cx="-171" cy="-325" r="4" fill="#05080E" stroke="#334155" strokeWidth="1" />
+        <circle cx="-171" cy="-325" r="1.5" fill="#EF4444" className="anim-pulse-eerie" />
+      </g>
+
+      {/* 2. Decaying Concrete Pillars & Perimeter Brick Walls (Hai cột trụ & tường bao rêu phong) */}
+      <g className="concrete-pillars-walls">
+        {/* Left Perimeter Wall */}
+        <path
+          d="M -230 0 L -230 -210 L -155 -210 L -155 0 Z"
+          fill="#0D1117"
+          stroke="#161F2E"
+          strokeWidth="1.5"
+        />
+        {/* Broken glass shards & jagged top on left wall */}
+        <path
+          d="M -230 -210 L -225 -218 L -220 -210 L -212 -222 L -205 -210 L -195 -219 L -188 -210 L -180 -223 L -170 -210 L -162 -220 L -155 -210"
+          stroke="#334155"
+          strokeWidth="2"
+          fill="#1E293B"
+        />
+        {/* Wall cracks and peeled plaster */}
+        <path d="M -210 -180 L -195 -150 L -202 -120 L -185 -90" stroke="#06090E" strokeWidth="1.5" fill="none" />
+        <path d="M -175 -160 L -165 -130 L -170 -100" stroke="#06090E" strokeWidth="1" fill="none" />
+
+        {/* Right Perimeter Wall */}
+        <path
+          d="M 155 0 L 155 -210 L 230 -210 L 230 0 Z"
+          fill="#0D1117"
+          stroke="#161F2E"
+          strokeWidth="1.5"
+        />
+        {/* Broken glass shards & rusted barbwire on right wall */}
+        <path
+          d="M 155 -210 L 163 -220 L 170 -210 L 180 -224 L 190 -210 L 198 -219 L 208 -210 L 216 -222 L 225 -210 L 230 -217"
+          stroke="#334155"
+          strokeWidth="2"
+          fill="#1E293B"
+        />
+        <path d="M 185 -190 L 175 -160 L 182 -130 L 170 -85" stroke="#06090E" strokeWidth="1.5" fill="none" />
+
+        {/* Left Massive Concrete Pillar (Trụ cổng bên trái) */}
+        {/* Main Pillar Shaft */}
+        <rect x="-155" y="-310" width="50" height="310" fill="#111722" stroke="#1E293B" strokeWidth="2" />
+        {/* Stepped Pillar Cap (Chóp đỉnh trụ) */}
+        <polygon points="-160,-310 -100,-310 -105,-325 -155,-325" fill="#182232" stroke="#253346" strokeWidth="1.5" />
+        <polygon points="-155,-325 -105,-325 -130,-340" fill="#0F172A" stroke="#1E293B" strokeWidth="1.5" />
+        {/* Pillar base plinth */}
+        <rect x="-160" y="-25" width="60" height="25" fill="#0C1017" stroke="#1A2332" strokeWidth="1.5" />
+        {/* Dark moss / moisture stains on pillar base */}
+        <path d="M -155 0 C -150 -45 -145 -70 -148 -90 L -120 -90 C -122 -60 -115 -30 -110 0 Z" fill="#080E0B" opacity="0.8" />
+        {/* Deep crack on pillar */}
+        <path d="M -135 -290 L -125 -250 L -132 -210 L -122 -160 L -130 -110" stroke="#05070B" strokeWidth="2" fill="none" />
+
+        {/* Right Massive Concrete Pillar (Trụ cổng bên phải) */}
+        {/* Main Pillar Shaft */}
+        <rect x="105" y="-310" width="50" height="310" fill="#111722" stroke="#1E293B" strokeWidth="2" />
+        {/* Stepped Pillar Cap */}
+        <polygon points="100,-310 160,-310 155,-325 105,-325" fill="#182232" stroke="#253346" strokeWidth="1.5" />
+        <polygon points="105,-325 155,-325 130,-340" fill="#0F172A" stroke="#1E293B" strokeWidth="1.5" />
+        {/* Pillar base plinth */}
+        <rect x="100" y="-25" width="60" height="25" fill="#0C1017" stroke="#1A2332" strokeWidth="1.5" />
+        <path d="M 110 0 C 115 -45 120 -65 118 -85 L 148 -85 C 145 -55 152 -30 155 0 Z" fill="#080E0B" opacity="0.8" />
+        <path d="M 130 -280 L 140 -240 L 132 -200 L 142 -150 L 135 -110" stroke="#05070B" strokeWidth="2" fill="none" />
+
+        {/* Vintage Bulkhead Wall Lamp on Left Pillar (Bóng đèn chụp sắt tròn cổ quái) */}
+        <g transform="translate(-130, -255)">
+          {/* Wall bracket pipe */}
+          <path d="M 25 0 L 10 0 L 0 -10" fill="none" stroke="#334155" strokeWidth="3" />
+          {/* Lamp shade / metal hood */}
+          <path d="M -12 -10 Q 0 -16 12 -10 L 10 -4 L -10 -4 Z" fill="#1E293B" stroke="#334155" strokeWidth="1" />
+          {/* Glass bulb cage */}
+          <rect x="-8" y="-4" width="16" height="18" rx="8" fill="#FEF08A" opacity="0.85" className="anim-flicker-ember" />
+          {/* Protective wire cage ribs */}
+          <line x1="0" y1="-4" x2="0" y2="14" stroke="#475569" strokeWidth="1" />
+          <line x1="-8" y1="4" x2="8" y2="4" stroke="#475569" strokeWidth="1" />
+          {/* Warm Amber Glowing Aura */}
+          <circle cx="0" cy="5" r="35" fill="url(#lantern-warm-glow)" opacity="0.6" className="anim-flicker-fast" />
+          <circle cx="0" cy="5" r="70" fill="url(#urban-neon-amber)" opacity="0.25" />
+        </g>
+
+        {/* Rusty Metal Address Plate on Right Pillar (Biển số cư xá cũ gỉ sét) */}
+        <g transform="translate(130, -230) rotate(-4)">
+          <rect x="-22" y="-14" width="44" height="28" rx="2" fill="#3B1C0B" stroke="#78350F" strokeWidth="1.5" />
+          <circle cx="-18" cy="-10" r="1.5" fill="#1E293B" />
+          <circle cx="18" cy="-10" r="1.5" fill="#1E293B" />
+          <circle cx="-18" cy="10" r="1.5" fill="#1E293B" />
+          <circle cx="18" cy="10" r="1.5" fill="#1E293B" />
+          {/* Weathered text */}
+          <text
+            x="0"
+            y="-1"
+            fill="#FDE047"
+            fontSize="8"
+            fontWeight="bold"
+            fontFamily="sans-serif"
+            textAnchor="middle"
+            letterSpacing="1"
+          >
+            CƯ XÁ
+          </text>
+          <text
+            x="0"
+            y="9"
+            fill="#FEF08A"
+            fontSize="10"
+            fontWeight="black"
+            fontFamily="monospace"
+            textAnchor="middle"
+          >
+            47
+          </text>
+          {/* Blood/rust streak dripping from plate */}
+          <path d="M 8 14 Q 9 26 8 36" stroke="#5C1D06" strokeWidth="1.5" fill="none" />
+        </g>
+      </g>
+
+      {/* 3. Wrought-Iron Arch & Suspended Header Plate (Vòm sắt uốn & Biển chữ chung cư) */}
+      <g className="gate-iron-arch">
+        {/* Main Upper Arch Beam */}
+        <path
+          d="M -130 -325 Q 0 -380 130 -325"
+          fill="none"
+          stroke="#0F172A"
+          strokeWidth="6"
+        />
+        {/* Secondary Lower Arch Beam */}
+        <path
+          d="M -125 -315 Q 0 -365 125 -315"
+          fill="none"
+          stroke="#1E293B"
+          strokeWidth="3.5"
+        />
+        {/* Decorative Spiral Scrolls & Curlicues inside arch */}
+        <path
+          d="M -90 -325 Q -75 -350 -55 -342 Q -45 -335 -50 -322"
+          fill="none"
+          stroke="#334155"
+          strokeWidth="2"
+        />
+        <path
+          d="M 90 -325 Q 75 -350 55 -342 Q 45 -335 50 -322"
+          fill="none"
+          stroke="#334155"
+          strokeWidth="2"
+        />
+        <path
+          d="M -30 -340 Q 0 -365 30 -340"
+          fill="none"
+          stroke="#334155"
+          strokeWidth="2"
+        />
+        {/* Top Spire on Center of Arch */}
+        <polygon points="0,-380 -5,-368 5,-368" fill="#334155" />
+        <circle cx="0" cy="-382" r="3" fill="#475569" />
+
+        {/* Suspended Heavy Metal Header Sign (Biển sắt rỉ treo xích) */}
+        <g transform="translate(0, -345)">
+          {/* Left hanging chain */}
+          <line x1="-50" y1="-8" x2="-50" y2="2" stroke="#475569" strokeWidth="2" strokeDasharray="2,2" />
+          {/* Right hanging chain */}
+          <line x1="50" y1="-8" x2="50" y2="2" stroke="#475569" strokeWidth="2" strokeDasharray="2,2" />
+          {/* Sign board plate (slightly crooked by 1 deg) */}
+          <g transform="rotate(1)">
+            <rect x="-65" y="2" width="130" height="24" rx="3" fill="#1C140E" stroke="#5C2607" strokeWidth="2" />
+            <rect x="-62" y="5" width="124" height="18" fill="none" stroke="#78350F" strokeWidth="1" strokeDasharray="6,2" />
+            {/* Rivets in corners */}
+            <circle cx="-60" cy="7" r="1.5" fill="#A16207" />
+            <circle cx="60" cy="7" r="1.5" fill="#A16207" />
+            <circle cx="-60" cy="21" r="1.5" fill="#A16207" />
+            <circle cx="60" cy="21" r="1.5" fill="#A16207" />
+            {/* Stencil Text: CHUNG CƯ CŨ */}
+            <text
+              x="0"
+              y="18"
+              fill="#D97706"
+              fontSize="10"
+              fontWeight="900"
+              fontFamily="sans-serif"
+              textAnchor="middle"
+              letterSpacing="2.5"
+            >
+              CHUNG CƯ CŨ
+            </text>
+            {/* Rust dripping down sign */}
+            <path d="M -20 26 Q -19 32 -21 38" stroke="#78350F" strokeWidth="1.2" fill="none" />
+            <path d="M 32 26 Q 33 34 31 40" stroke="#78350F" strokeWidth="1.2" fill="none" />
+          </g>
+        </g>
+      </g>
+
+      {/* 4. The Massive Rusty Iron Folding Gate (Cánh cổng sắt xếp / chấn song hoen gỉ) */}
+      <g className="rusty-iron-gate">
+        {/* Background dark void between gate bars */}
+        <rect x="-105" y="-270" width="210" height="270" fill="#05070B" opacity="0.6" />
+
+        {/* LEFT GATE LEAF (Cánh cổng trái, từ X = -105 đến X = -5) */}
+        <g className="gate-leaf-left">
+          {/* Main Outer Perimeter Frame */}
+          <rect x="-105" y="-270" width="100" height="270" fill="none" stroke="#0F172A" strokeWidth="6" />
+          <rect x="-104" y="-269" width="98" height="268" fill="none" stroke="#332014" strokeWidth="2" />
+
+          {/* Horizontal cross rails (Thanh dằn ngang) */}
+          <line x1="-105" y1="-268" x2="-5" y2="-268" stroke="#1E293B" strokeWidth="5" />
+          <line x1="-105" y1="-180" x2="-5" y2="-180" stroke="#1E293B" strokeWidth="5" />
+          <line x1="-105" y1="-90" x2="-5" y2="-90" stroke="#1E293B" strokeWidth="5" />
+          <line x1="-105" y1="-4" x2="-5" y2="-4" stroke="#1E293B" strokeWidth="6" />
+
+          {/* Diagonal X-Braces (Hệ thanh giằng chéo chữ X tăng độ u uất) */}
+          {/* Lower section X-brace */}
+          <line x1="-105" y1="-4" x2="-5" y2="-90" stroke="#182234" strokeWidth="3" />
+          <line x1="-5" y1="-4" x2="-105" y2="-90" stroke="#182234" strokeWidth="3" />
+          <circle cx="-55" cy="-47" r="4" fill="#3B1C0B" stroke="#1E293B" strokeWidth="1" />
+
+          {/* Middle section X-brace */}
+          <line x1="-105" y1="-90" x2="-5" y2="-180" stroke="#182234" strokeWidth="3" />
+          <line x1="-5" y1="-90" x2="-105" y2="-180" stroke="#182234" strokeWidth="3" />
+          <circle cx="-55" cy="-135" r="4" fill="#3B1C0B" stroke="#1E293B" strokeWidth="1" />
+
+          {/* Vertical Iron Bars with Spearhead Spikes (Các chấn song đứng) */}
+          {[-93, -80, -67, -55, -42, -29, -16].map((barX) => (
+            <g key={barX}>
+              {/* Vertical Bar */}
+              <line x1={barX} y1="-270" x2={barX} y2="0" stroke="#0F172A" strokeWidth="4" />
+              <line x1={barX} y1="-270" x2={barX} y2="0" stroke="#5C2607" strokeWidth="1.5" />
+              {/* Spearhead Top Tip */}
+              <polygon
+                points={`${barX},-292 ${barX - 5},-270 ${barX + 5},-270`}
+                fill="#1E293B"
+                stroke="#334155"
+                strokeWidth="1"
+              />
+              <circle cx={barX} cy="-270" r="2.5" fill="#78350F" />
+            </g>
+          ))}
+
+          {/* Hinges connecting to Left Pillar */}
+          <rect x="-108" y="-240" width="8" height="18" rx="2" fill="#1C140E" stroke="#78350F" strokeWidth="1" />
+          <rect x="-108" y="-120" width="8" height="18" rx="2" fill="#1C140E" stroke="#78350F" strokeWidth="1" />
+          <rect x="-108" y="-20" width="8" height="18" rx="2" fill="#1C140E" stroke="#78350F" strokeWidth="1" />
+        </g>
+
+        {/* RIGHT GATE LEAF (Cánh cổng phải, từ X = 5 đến X = 105) */}
+        <g className="gate-leaf-right">
+          {/* Main Outer Perimeter Frame */}
+          <rect x="5" y="-270" width="100" height="270" fill="none" stroke="#0F172A" strokeWidth="6" />
+          <rect x="6" y="-269" width="98" height="268" fill="none" stroke="#322014" strokeWidth="2" />
+
+          {/* Horizontal cross rails */}
+          <line x1="5" y1="-268" x2="105" y2="-268" stroke="#1E293B" strokeWidth="5" />
+          <line x1="5" y1="-180" x2="105" y2="-180" stroke="#1E293B" strokeWidth="5" />
+          <line x1="5" y1="-90" x2="105" y2="-90" stroke="#1E293B" strokeWidth="5" />
+          <line x1="5" y1="-4" x2="105" y2="-4" stroke="#1E293B" strokeWidth="6" />
+
+          {/* Diagonal X-Braces */}
+          {/* Lower section X-brace */}
+          <line x1="5" y1="-4" x2="105" y2="-90" stroke="#182234" strokeWidth="3" />
+          <line x1="105" y1="-4" x2="5" y2="-90" stroke="#182234" strokeWidth="3" />
+          <circle cx="55" cy="-47" r="4" fill="#3B1C0B" stroke="#1E293B" strokeWidth="1" />
+
+          {/* Middle section X-brace */}
+          <line x1="5" y1="-90" x2="105" y2="-180" stroke="#182234" strokeWidth="3" />
+          <line x1="105" y1="-90" x2="5" y2="-180" stroke="#182234" strokeWidth="3" />
+          <circle cx="55" cy="-135" r="4" fill="#3B1C0B" stroke="#1E293B" strokeWidth="1" />
+
+          {/* Vertical Iron Bars with Spearhead Spikes */}
+          {[16, 29, 42, 55, 67, 80, 93].map((barX) => (
+            <g key={barX}>
+              <line x1={barX} y1="-270" x2={barX} y2="0" stroke="#0F172A" strokeWidth="4" />
+              <line x1={barX} y1="-270" x2={barX} y2="0" stroke="#5C2607" strokeWidth="1.5" />
+              <polygon
+                points={`${barX},-292 ${barX - 5},-270 ${barX + 5},-270`}
+                fill="#1E293B"
+                stroke="#334155"
+                strokeWidth="1"
+              />
+              <circle cx={barX} cy="-270" r="2.5" fill="#78350F" />
+            </g>
+          ))}
+
+          {/* Hinges connecting to Right Pillar */}
+          <rect x="100" y="-240" width="8" height="18" rx="2" fill="#1C140E" stroke="#78350F" strokeWidth="1" />
+          <rect x="100" y="-120" width="8" height="18" rx="2" fill="#1C140E" stroke="#78350F" strokeWidth="1" />
+          <rect x="100" y="-20" width="8" height="18" rx="2" fill="#1C140E" stroke="#78350F" strokeWidth="1" />
+        </g>
+
+        {/* Central Gap & Heavy Chain Lock (Xích sắt to bản & Ổ khóa gỉ ở trung tâm Y = -135) */}
+        <g className="gate-chain-lock" transform="translate(0, -135)">
+          {/* Iron locking latch bars */}
+          <rect x="-18" y="-6" width="36" height="12" rx="2" fill="#0C121C" stroke="#334155" strokeWidth="1.5" />
+          {/* Looped Heavy Iron Chain wrapped around bars */}
+          <ellipse cx="-4" cy="-2" rx="10" ry="14" fill="none" stroke="#64748B" strokeWidth="4" />
+          <ellipse cx="4" cy="4" rx="10" ry="14" fill="none" stroke="#475569" strokeWidth="3.5" />
+          <ellipse cx="0" cy="8" rx="8" ry="12" fill="none" stroke="#78350F" strokeWidth="3" />
+          {/* Hanging Rusted Brass Padlock (Ổ khóa đồng hoen rỉ) */}
+          <g transform="translate(0, 16)">
+            {/* Shackle */}
+            <path d="M -6 0 L -6 -8 Q 0 -14 6 -8 L 6 0" fill="none" stroke="#64748B" strokeWidth="3" />
+            {/* Lock body */}
+            <rect x="-10" y="0" width="20" height="16" rx="3" fill="#3B1C0B" stroke="#B45309" strokeWidth="1.5" />
+            {/* Keyhole */}
+            <circle cx="0" cy="6" r="2" fill="#000000" />
+            <polygon points="-1,6 1,6 1.5,11 -1.5,11" fill="#000000" />
+          </g>
+        </g>
+      </g>
+
+      {/* 5. Ground Level, Cracked Apron, Murky Puddle & Weeds (Chân cổng tiếp đất tại Y = 0) */}
+      <g className="ground-elements">
+        {/* Concrete ground threshold apron */}
+        <polygon points="-160,0 160,0 150,-10 -150,-10" fill="#080C14" stroke="#161F2E" strokeWidth="1" />
+        {/* Steel roller track rail flush with ground */}
+        <line x1="-110" y1="-2" x2="110" y2="-2" stroke="#475569" strokeWidth="3" />
+        <line x1="-110" y1="-1" x2="110" y2="-1" stroke="#94A3B8" strokeWidth="1" opacity="0.6" />
+
+        {/* Murky Rainwater Puddle on Ground (Vũng nước đọng phản chiếu) */}
+        <ellipse cx="-30" cy="-3" rx="48" ry="8" fill="#04060A" stroke="#1E293B" strokeWidth="1" opacity="0.9" />
+        {/* Reflection of amber lamp in puddle */}
+        <ellipse cx="-45" cy="-3" rx="14" ry="3.5" fill="#F59E0B" opacity="0.28" className="anim-flicker-ember" />
+        {/* Reflection of gate bars */}
+        <line x1="-30" y1="-8" x2="-30" y2="2" stroke="#0F172A" strokeWidth="2" opacity="0.7" />
+        <line x1="-18" y1="-7" x2="-18" y2="3" stroke="#0F172A" strokeWidth="2" opacity="0.7" />
+
+        {/* Clumps of Thorny Weeds / Wild Grass sprouting at base of pillars */}
+        {/* Left weeds */}
+        <path
+          d="M -165 0 C -168 -15 -178 -25 -182 -32 C -178 -20 -170 -10 -160 0 Z"
+          fill="#0A120D"
+        />
+        <path
+          d="M -152 0 C -150 -18 -144 -30 -138 -38 C -144 -22 -148 -10 -148 0 Z"
+          fill="#060C08"
+        />
+        <path
+          d="M -115 0 C -112 -12 -106 -20 -100 -24 C -107 -15 -110 -8 -112 0 Z"
+          fill="#0A120D"
+        />
+        {/* Right weeds */}
+        <path
+          d="M 112 0 C 115 -14 122 -22 128 -28 C 122 -16 118 -8 115 0 Z"
+          fill="#0A120D"
+        />
+        <path
+          d="M 152 0 C 156 -18 165 -28 174 -35 C 166 -20 158 -10 154 0 Z"
+          fill="#060C08"
+        />
+
+        {/* Fallen dry leaves / windblown debris near gate base */}
+        <ellipse cx="-15" cy="-2" rx="4" ry="1.5" fill="#3B1C0B" transform="rotate(-15 -15 -2)" />
+        <ellipse cx="25" cy="-3" rx="5" ry="1.8" fill="#2E1005" transform="rotate(20 25 -3)" />
+        <ellipse cx="70" cy="-2" rx="4" ry="1.4" fill="#3B1C0B" transform="rotate(-30 70 -2)" />
       </g>
     </g>
   );

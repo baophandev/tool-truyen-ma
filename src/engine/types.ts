@@ -37,7 +37,8 @@ export type StructureId =
   | "creepy_bathtub"
   | "market_stall_tent"
   | "abandoned_subway_station"
-  | "rusty_train_tracks_tunnel";
+  | "rusty_train_tracks_tunnel"
+  | "structure_old_apartment_gate";
 
 export type DetailId =
   | "detail_black_crow"

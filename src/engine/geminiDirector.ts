@@ -219,7 +219,7 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
   * "creepy_banyan_tree", "haunted_gallows_tree" -> CHỈ ĐẶT Ở: "far_left" | "far_right"
   * "ancient_tomb", "abandoned_shrine", "creepy_well", "hospital_operating_bed", "hotel_reception_desk", "creepy_elevator_doors", "dining_table_chairs", "bus_interior", "creepy_bathtub" -> CHỈ ĐẶT Ở: "mid_left" | "center" | "mid_right"
   * "dilapidated_hut", "broken_wooden_bridge", "supermarket_shelf_aisle" -> CHỈ ĐẶT Ở: "far_left" | "center" | "far_right"
-  * "scarecrow_of_the_damned", "market_stall_tent", "abandoned_subway_station", "rusty_train_tracks_tunnel" -> Đặt ở mọi ground slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right"
+  * "scarecrow_of_the_damned", "market_stall_tent", "abandoned_subway_station", "rusty_train_tracks_tunnel", "structure_old_apartment_gate" -> Đặt ở mọi ground slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right"
 - Details (Đạo cụ cảnh):
   * "detail_black_crow", "detail_broken_mirror" -> Tất cả 5 ground slots và 3 air slots
   * "detail_will_o_wisp" -> "air_left" | "air_center" | "air_right" | "mid_left" | "center" | "mid_right"
@@ -1316,6 +1316,7 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "market_stall_tent" (Quầy hàng / lều bạt chợ đêm)
    - "abandoned_subway_station" (Cổng ga tàu điện ngầm bỏ hoang)
    - "rusty_train_tracks_tunnel" (Đường ray tàu & đường hầm rỉ sét)
+   - "structure_old_apartment_gate" (Cổng sắt chung cư cũ)
 
 6. ĐẠO CỤ BỐI CẢNH (Details - 11 đạo cụ):
    - "detail_black_crow" (Quạ đen)

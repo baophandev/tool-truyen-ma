@@ -125,6 +125,7 @@ const VALID_STRUCTURES: StructureId[] = [
   "market_stall_tent",
   "abandoned_subway_station",
   "rusty_train_tracks_tunnel",
+  "structure_old_apartment_gate",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -314,6 +315,9 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
   if (Array.isArray(script.environment_items)) {
     script.environment_items.forEach((item: any) => {
       if (!item || typeof item !== "object") return;
+      if (item.asset_id === "old_apartment_gate") {
+        item.asset_id = "structure_old_apartment_gate";
+      }
       if (!VALID_STRUCTURES.includes(item.asset_id)) return;
 
       const structId = item.asset_id as StructureId;

@@ -1734,6 +1734,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="market_stall_tent">Quầy hàng / Lều bạt chợ đêm (market_stall_tent)</option>
                         <option value="abandoned_subway_station">Cổng vào & ga tàu điện ngầm bỏ hoang (abandoned_subway_station)</option>
                         <option value="rusty_train_tracks_tunnel">Đường ray tàu & đường hầm rỉ sét (rusty_train_tracks_tunnel)</option>
+                        <option value="structure_old_apartment_gate">Cổng sắt chung cư cũ (structure_old_apartment_gate)</option>
                       </select>
                     </div>
 

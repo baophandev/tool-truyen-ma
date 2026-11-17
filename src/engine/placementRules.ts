@@ -117,6 +117,11 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ALL_GROUND_SLOT_IDS,
     reason: "Đường hầm và đường ray tàu rỉ sét ẩm mốc có thể đặt tại trung tâm hoặc hai bên khung hình tiếp đất Y=800px tạo chiều sâu hun hút.",
   },
+  structure_old_apartment_gate: {
+    name: "Cổng sắt chung cư cũ",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Cổng sắt chung cư cũ có thể đặt ở trung tâm hoặc các vị trí tiếp đất hai bên (far_left, mid_left, center, mid_right, far_right) làm điểm đến kết thúc hành trình, nơi nhân vật kiệt sức gục ngã hoặc lối vào rùng rợn của khu tập thể cổ quái.",
+  },
 };
 
 export interface DetailRule {

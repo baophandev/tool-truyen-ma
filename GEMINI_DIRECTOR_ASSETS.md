@@ -75,7 +75,7 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"flickering_fluorescent"`: Đèn Tuýp Huỳnh Quang Chập Chờn (Ánh sáng xanh ngọc lạnh lẽo trong nhà, bóng tuýp chập chờn, biển báo EXIT xanh lục phát sáng).
 - `"dim_indoor_night"`: Ánh Vàng Đêm Mờ Ảo (Ánh đèn vàng hổ phách u tịch trong khách sạn / nhà hàng đêm muộn).
 
-### 3.3. 17 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
+### 3.3. 19 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
 
 Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ được đặt tại các Slot được phép** sau:
 
@@ -99,6 +99,7 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `market_stall_tent` | Quầy hàng / Lều bạt chợ đêm | Khung lều bạt chữ A rách mép, bóng đèn tròn vàng ấm đung đưa, quầy gỗ phủ khăn nỉ đỏ bày đồ cổ, bình gốm nứt và hộp gỗ quỷ ám | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `abandoned_subway_station` | Cổng vào & ga tàu điện ngầm bỏ hoang | Lối xuống hầm ga metro hoang phế, bậc thang bê tông nứt nẻ dẫn vào vực thẳm đen ngòm, lan can sắt gỉ, đèn quả cầu chập chờn và biển hiệu SUBWAY vỡ nát | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `rusty_train_tracks_tunnel` | Đường ray tàu & Đường hầm rỉ sét ẩm mốc | Vòm hầm đường sắt ngầm bê tông sâu hun hút, hai thanh ray thép rỉ sét ánh kim, tà vẹt gỗ mục nát, cáp điện lòng thòng, ống nước rỉ giọt và đèn tín hiệu đỏ ma quái | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `structure_old_apartment_gate` | Cổng sắt chung cư cũ | Cổng sắt hoen gỉ khóa xích của khu chung cư cũ nát, khối nhà tập thể u ám phía sau với chuồng cọp lồng sắt, đèn tường chập chờn, nơi nhân vật kiệt sức gục ngã | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 
 ---
 
@@ -898,6 +899,69 @@ Hệ thống cho phép đạo diễn chuyển đổi linh hoạt giữa các c�
   "narrative_note": "Cốt truyện đô thị kinh dị: Hải cầm mẩu giấy ố máu che mưa bước dọc vỉa hè tiến về lối vào trạm ga tàu ngầm bị niêm phong."
 }
 ```
+
+### 9.7. Kịch Bản JSON Mẫu: Hải Kiệt Sức Gục Ngã Trước Cổng Sắt Chung Cư Cũ
+```json
+{
+  "scene_id": "scene_ending_old_apartment_gate",
+  "title": "Hải Kiệt Sức Trước Cổng Chung Cư Cũ",
+  "duration_sec": 6,
+  "theme": "urban_night_market",
+  "lighting": {
+    "sky_preset": "dim_indoor_night",
+    "fog_density": 0.7,
+    "weather": "haunted_mist"
+  },
+  "camera": {
+    "shot": "medium_wide",
+    "target_slot": "center",
+    "shake": "subtle_handheld",
+    "motion": {
+      "type": "push_in",
+      "endZoom": 1.45,
+      "startTimeSec": 0.5,
+      "endTimeSec": 5.5,
+      "easing": "ease_in_out"
+    }
+  },
+  "environment_items": [
+    {
+      "asset_id": "structure_old_apartment_gate",
+      "slot": "center",
+      "offsetX": 0,
+      "offsetY": 0,
+      "scale": 1.0
+    }
+  ],
+  "actors": [
+    {
+      "id": "actor_hai",
+      "base": "male_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_haggard_gaunt",
+      "facialAction": "heavy_panting",
+      "pose": "pose_kneeling",
+      "facing": "right",
+      "slot": "center",
+      "offsetX": -50,
+      "offsetY": 0,
+      "scale": 1.0
+    }
+  ],
+  "details": [
+    {
+      "id": "detail_crow_gate",
+      "asset_id": "detail_black_crow",
+      "slot": "air_right",
+      "offsetX": -80,
+      "offsetY": 40
+    }
+  ],
+  "dialogue": "Sau chuỗi ngày chạy trốn trong vô vọng, Hải lê bước kiệt sức rồi gục ngã trước cánh cổng sắt lạnh lẽo khóa chặt của khu chung cư cũ kỹ nơi cậu từng sống...",
+  "narrative_note": "Cảnh kết thúc bi thảm: Hải gục ngã (pose_kneeling, face_haggard_gaunt, heavy_panting) ngay trước cổng sắt chung cư cũ (structure_old_apartment_gate) tại slot center."
+}
+```
+
 
 
 
