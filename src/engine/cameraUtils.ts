@@ -1,5 +1,6 @@
 import type {
   ActorConfig,
+  CameraKeyframe,
   CameraShakeIntensity,
   CameraShotType,
   DirectorCameraConfig,
@@ -17,6 +18,9 @@ export interface EvaluatedCameraState {
   shot: CameraShotType;
   motionProgress: number;
   isMoving: boolean;
+  // Multi-shot metadata (populated when camera.keyframes has entries)
+  activeShotIndex?: number;
+  totalShots?: number;
   // Parallax transform strings ready to inject into SVG <g>
   worldTransform: string;
   skyTransform: string;
@@ -258,24 +262,37 @@ export function buildLayerTransform(
  */
 export const getCameraTransformMatrix = buildLayerTransform;
 
+interface SingleShotEval {
+  target: Point2D;
+  zoom: number;
+  dutchAngle: number;
+  shot: CameraShotType;
+  shake: CameraShakeIntensity;
+  motionProgress: number;
+  isMoving: boolean;
+}
+
 /**
- * Computes the full evaluated camera state at a given playback timestamp.
+ * Evaluates a single shot config (either a standalone DirectorCameraConfig or one CameraKeyframe)
+ * within the time window [windowStartSec, windowEndSec].
  */
-export function evaluateCameraAtTime(
-  cameraConfig: DirectorCameraConfig | undefined,
-  actors: ActorConfig[] = [],
-  currentTimeSec?: number,
-  durationSec: number = 6
-): EvaluatedCameraState {
-  const shot = cameraConfig?.shot || "wide";
+function evaluateSingleShot(
+  shotConfig: DirectorCameraConfig | CameraKeyframe | undefined,
+  actors: ActorConfig[],
+  currentTimeSec: number | undefined,
+  sceneDurationSec: number,
+  windowStartSec: number,
+  windowEndSec: number,
+  fallbackShake?: CameraShakeIntensity
+): SingleShotEval {
+  const shot = shotConfig?.shot || "wide";
   const preset = CAMERA_SHOT_PRESETS[shot] || CAMERA_SHOT_PRESETS.wide;
 
-  const baseZoom = cameraConfig?.zoom ?? preset.defaultZoom;
-  const baseDutch = cameraConfig?.dutch_angle ?? preset.defaultDutch;
-  const baseTarget = resolveTargetPoint(cameraConfig, actors, currentTimeSec, durationSec);
+  const baseZoom = shotConfig?.zoom ?? preset.defaultZoom;
+  const baseDutch = shotConfig?.dutch_angle ?? preset.defaultDutch;
+  const baseTarget = resolveTargetPoint(shotConfig, actors, currentTimeSec, sceneDurationSec);
 
-  const motion = cameraConfig?.motion;
-  const safeDuration = Math.max(0.5, durationSec);
+  const motion = shotConfig?.motion;
   const currentTime = currentTimeSec ?? 0;
 
   let currentTarget = { ...baseTarget };
@@ -285,9 +302,11 @@ export function evaluateCameraAtTime(
   let isMoving = false;
 
   if (motion && motion.type !== "static") {
-    const startSec = Math.max(0, Math.min(safeDuration, motion.startTimeSec ?? 0));
-    const rawEnd = motion.endTimeSec ?? safeDuration;
-    const endSec = Math.max(startSec, Math.min(safeDuration, rawEnd));
+    const defaultStart = windowStartSec;
+    const defaultEnd = Math.max(windowStartSec, windowEndSec);
+    const startSec = Math.max(0, Math.min(sceneDurationSec, motion.startTimeSec ?? defaultStart));
+    const rawEnd = motion.endTimeSec ?? defaultEnd;
+    const endSec = Math.max(startSec, Math.min(sceneDurationSec, rawEnd));
 
     let rawProgress = 0;
     if (endSec <= startSec) {
@@ -310,7 +329,7 @@ export function evaluateCameraAtTime(
       endZoom = CAMERA_SHOT_PRESETS[motion.endShot]?.defaultZoom;
     }
 
-    let endDutch = motion.endDutchAngle ?? baseDutch;
+    const endDutch = motion.endDutchAngle ?? baseDutch;
 
     switch (motion.type) {
       case "push_in": {
@@ -357,11 +376,119 @@ export function evaluateCameraAtTime(
     }
   }
 
+  return {
+    target: currentTarget,
+    zoom: currentZoom,
+    dutchAngle: currentDutch,
+    shot,
+    shake: shotConfig?.shake ?? fallbackShake ?? "none",
+    motionProgress,
+    isMoving,
+  };
+}
+
+/**
+ * Computes the full evaluated camera state at a given playback timestamp.
+ * Supports both classic single-shot DirectorCameraConfig and Multi-Shot camera.keyframes timelines.
+ */
+export function evaluateCameraAtTime(
+  cameraConfig: DirectorCameraConfig | undefined,
+  actors: ActorConfig[] = [],
+  currentTimeSec?: number,
+  durationSec: number = 6
+): EvaluatedCameraState {
+  const safeDuration = Math.max(0.5, durationSec);
+  const currentTime = currentTimeSec ?? 0;
+
+  let evalState: SingleShotEval;
+  let activeShotIndex: number | undefined;
+  let totalShots: number | undefined;
+
+  const rawKeyframes = cameraConfig?.keyframes;
+  if (rawKeyframes && rawKeyframes.length > 0) {
+    const sorted = [...rawKeyframes].sort((a, b) => a.startTimeSec - b.startTimeSec);
+    totalShots = sorted.length;
+
+    // Locate the active keyframe at currentTime
+    let idx = 0;
+    for (let i = 0; i < sorted.length; i++) {
+      if (currentTime >= sorted[i].startTimeSec) {
+        idx = i;
+      } else {
+        break;
+      }
+    }
+    activeShotIndex = idx;
+
+    const activeKf = sorted[idx];
+    const segStart = Math.max(0, activeKf.startTimeSec);
+    const segEnd = idx < sorted.length - 1 ? Math.max(segStart, sorted[idx + 1].startTimeSec) : safeDuration;
+
+    const currentEval = evaluateSingleShot(
+      activeKf,
+      actors,
+      currentTimeSec,
+      safeDuration,
+      segStart,
+      segEnd,
+      cameraConfig?.shake
+    );
+
+    // Smooth camera transition from previous keyframe when transition === "smooth"
+    if (idx > 0 && activeKf.transition === "smooth") {
+      const transDur = Math.max(0.15, Math.min(activeKf.transitionDurationSec ?? 1.0, Math.max(0.15, segEnd - segStart)));
+      const elapsed = currentTime - segStart;
+
+      if (elapsed >= 0 && elapsed < transDur) {
+        const prevKf = sorted[idx - 1];
+        const prevStart = Math.max(0, prevKf.startTimeSec);
+        const prevEval = evaluateSingleShot(
+          prevKf,
+          actors,
+          segStart,
+          safeDuration,
+          prevStart,
+          segStart,
+          cameraConfig?.shake
+        );
+
+        const t = applyEasing(elapsed / transDur, activeKf.easing ?? "ease_in_out");
+        evalState = {
+          target: {
+            x: prevEval.target.x + (currentEval.target.x - prevEval.target.x) * t,
+            y: prevEval.target.y + (currentEval.target.y - prevEval.target.y) * t,
+          },
+          zoom: prevEval.zoom + (currentEval.zoom - prevEval.zoom) * t,
+          dutchAngle: prevEval.dutchAngle + (currentEval.dutchAngle - prevEval.dutchAngle) * t,
+          shot: t >= 0.5 ? currentEval.shot : prevEval.shot,
+          shake: t >= 0.5 ? currentEval.shake : prevEval.shake,
+          motionProgress: t,
+          isMoving: true,
+        };
+      } else {
+        evalState = currentEval;
+      }
+    } else {
+      evalState = currentEval;
+    }
+  } else {
+    evalState = evaluateSingleShot(
+      cameraConfig,
+      actors,
+      currentTimeSec,
+      safeDuration,
+      0,
+      safeDuration
+    );
+  }
+
   // Clamping focus point within safe cinematic margins
-  currentTarget = clampCameraFocus(currentTarget, currentZoom);
+  const currentTarget = clampCameraFocus(evalState.target, evalState.zoom);
+  const currentZoom = evalState.zoom;
+  const currentDutch = evalState.dutchAngle;
 
   // Camera Shake calculation
-  const shake = generateCameraShake(cameraConfig?.shake, currentTimeSec);
+  const shake = generateCameraShake(evalState.shake, currentTimeSec);
 
   // Parallax layer transforms
   // Parallax factors:
@@ -390,9 +517,11 @@ export function evaluateCameraAtTime(
     dutchAngle: currentDutch,
     shakeOffset: shake.offset,
     shakeAngle: shake.angle,
-    shot,
-    motionProgress,
-    isMoving,
+    shot: evalState.shot,
+    motionProgress: evalState.motionProgress,
+    isMoving: evalState.isMoving,
+    activeShotIndex,
+    totalShots,
     worldTransform,
     skyTransform,
     bgTransform,

@@ -162,7 +162,11 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           </button>
 
           {/* Quick Disable All Shake if any scene has shake */}
-          {scenes.some((s) => s.camera?.shake && s.camera.shake !== "none") && onDisableAllShake && (
+          {scenes.some(
+            (s) =>
+              (s.camera?.shake && s.camera.shake !== "none") ||
+              Boolean(s.camera?.keyframes?.some((kf) => kf.shake && kf.shake !== "none"))
+          ) && onDisableAllShake && (
             <button
               onClick={onDisableAllShake}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-950/70 hover:bg-amber-900/90 text-amber-300 border border-amber-800/60 shadow-lg shadow-amber-950/30 transition-all"

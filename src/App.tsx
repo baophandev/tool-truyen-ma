@@ -133,7 +133,20 @@ export function App() {
     setScenes((prev) =>
       prev.map((sc) => ({
         ...sc,
-        camera: sc.camera ? { ...sc.camera, shake: "none" } : undefined,
+        camera: sc.camera
+          ? {
+              ...sc.camera,
+              shake: "none",
+              ...(sc.camera.keyframes
+                ? {
+                    keyframes: sc.camera.keyframes.map((kf) => ({
+                      ...kf,
+                      shake: "none",
+                    })),
+                  }
+                : {}),
+            }
+          : undefined,
       }))
     );
   };

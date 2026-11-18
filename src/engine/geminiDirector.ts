@@ -97,16 +97,26 @@ export function hasShakeKeywords(text: string | string[]): boolean {
  * enforce camera shake to "none" so scenes don't vibrate unintentionally.
  */
 export function sanitizeSceneShake(scene: DirectorSceneScript, sourceText: string | string[]): DirectorSceneScript {
-  if (scene.camera && scene.camera.shake && scene.camera.shake !== "none") {
-    if (!hasShakeKeywords(sourceText)) {
-      return {
-        ...scene,
-        camera: {
-          ...scene.camera,
-          shake: "none",
-        },
-      };
-    }
+  if (!scene.camera) return scene;
+  const hasTopShake = Boolean(scene.camera.shake && scene.camera.shake !== "none");
+  const hasKfShake = Boolean(
+    scene.camera.keyframes?.some((kf) => kf.shake && kf.shake !== "none")
+  );
+  if ((hasTopShake || hasKfShake) && !hasShakeKeywords(sourceText)) {
+    return {
+      ...scene,
+      camera: {
+        ...scene.camera,
+        ...(hasTopShake ? { shake: "none" } : {}),
+        ...(scene.camera.keyframes
+          ? {
+              keyframes: scene.camera.keyframes.map((kf) =>
+                kf.shake && kf.shake !== "none" ? { ...kf, shake: "none" } : kf
+              ),
+            }
+          : {}),
+      },
+    };
   }
   return scene;
 }
@@ -321,6 +331,19 @@ Mỗi phân cảnh BẮT BUỘC có khối "camera" để điều phối góc nh
   * "endZoom": Hệ số zoom đích (ví dụ 3.2 khi push_in từ medium vào close_up).
   * "startTimeSec", "endTimeSec": Thời gian bắt đầu và kết thúc (ví dụ 0.5 đến duration - 0.5).
   * "easing": "ease_in_out" | "linear" | "ease_in" | "ease_out".
+- "keyframes" (ĐẠO DIỄN ĐA GÓC MÁY TRONG CÙNG 1 PHÂN CẢNH - MULTI-SHOT TIMELINE - RẤT KHUYẾN KHÍCH!):
+  Bạn là đạo diễn điện ảnh thực thụ: ĐỪNG bó buộc 1 cảnh dài chỉ đứng im ở 1 góc máy duy nhất! Hãy tự suy luận theo nhịp hành động, diễn biến tâm lý và độ dài phân cảnh để chọn 1 góc máy (nếu cảnh ngắn ≤ 5s, đơn giản) HOẶC đạo diễn một chuỗi **2 đến 4 góc máy ("camera.keyframes")** trong cùng 1 cảnh (đặc biệt khi cảnh dài ≥ 6s, có nhiều hành động nối tiếp, 2 nhân vật đối mặt, hay có cú twist/hù dọa):
+  * Mỗi phần tử trong "keyframes" gồm:
+    - "startTimeSec": Mốc giây bắt đầu góc máy đó (mốc đầu tiên BẮT BUỘC là 0, các mốc sau tăng dần trong khoảng 0 đến duration_sec - 1).
+    - "transition": "cut" (cắt máy dứt khoát - tạo nhịp dựng phim điện ảnh, cực hợp chuyển sang cận mặt/bóng ma/shot-reverse-shot) | "smooth" (máy quay lướt/zoom mượt từ góc trước sang góc này, kèm "transitionDurationSec": 0.8 - 1.5 và "easing": "ease_in_out").
+    - "shot": Cỡ cảnh cho nhịp này ("extreme_wide" | "wide" | "medium_wide" | "medium" | "close_up" | "extreme_close_up" | "dutch_tilt").
+    - "target_actor_id" hoặc "target_slot": Đổi đối tượng bám theo từng nhịp (vd nhịp 1 toàn cảnh, nhịp 2 cắt sang "actor_1", nhịp 3 cắt sang "actor_2" hoặc cận mặt "actor_1").
+    - "shake": Mặc định "none" (chỉ bật nếu có động đất/sụp đổ/jumpscare).
+    - "motion": (tùy chọn) chuyển động nhẹ ngay trong đoạn góc máy đó (vd "push_in" chậm rãi ở nhịp cuối).
+  * Công thức dựng đa góc máy kinh dị kinh điển để bạn linh hoạt sáng tạo:
+    - Mở bối cảnh → Hành động → Cao trào: 0s: wide → cut sang medium (nhân vật hành động/cầm đồ vật) → cut hoặc smooth sang close_up / dutch_tilt (khuôn mặt kinh hoàng).
+    - Đối mặt (Shot / Reverse-Shot): 0s: medium_wide → cut sang medium vào nạn nhân ("actor_1") → cut sang close_up vào bóng ma ("actor_2") → cut sang extreme_close_up khuôn mặt hoảng loạn của nạn nhân.
+    - Tiết lộ rợn người (Reveal): 0s: close_up vào nhân vật đang căng thẳng → smooth (hoặc cut) ra wide để lộ bóng ma đang đứng ngay sau lưng!
 
 4. QUY ĐỊNH ĐỊNH DẠNG ĐẦU RA:
 - BẮT BUỘC xuất ra CHÍNH XÁC MỘT JSON ARRAY gồm danh sách các cảnh (hoặc 1 JSON object nếu chỉ yêu cầu 1 cảnh duy nhất).
@@ -498,11 +521,13 @@ YÊU CẦU ĐẠO DIỄN BẮT BUỘC:
    - structures & details tuân thủ tuyệt đối quy tắc vị trí neo (Ground Slots vs Air Slots, cây đa/cây gallows chỉ ở far_left/far_right, miếu/mộ/giếng ở giữa...)
    - actors: base, costume, face, pose, facing, slot, continuous offsetX, heldItem, heldHand
    - motion: chuyển động A -> B (nếu nhân vật di chuyển từ vị trí xuất phát tới vị trí đích)
-3. ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH (CINEMATIC CAMERA - BẮT BUỘC SỬ DỤNG):
-   Mỗi cảnh BẮT BUỘC có khối "camera" sinh động theo nhịp điệu kinh dị (TUYỆT ĐỐI KHÔNG để tất cả đều là "wide"):
-   - Cỡ cảnh ("shot"): "wide" (mở màn/bao quát) -> "medium_wide" / "medium" (hành động/tiếp cận) -> "close_up" / "extreme_close_up" (kinh hãi/hé lộ ma quỷ) -> "dutch_tilt" (tà khí/hoảng loạn).
+3. ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH & ĐA GÓC MÁY TRONG 1 CẢNH (CINEMATIC MULTI-SHOT CAMERA - BẮT BUỘC SỬ DỤNG):
+   Mỗi cảnh BẮT BUỘC có khối "camera" sinh động theo nhịp điệu kinh dị (TUYỆT ĐỐI KHÔNG để tất cả đều là "wide" tĩnh):
+   - Bạn tự suy luận đạo diễn xem mỗi cảnh hợp với 1 góc máy duy nhất (cảnh ngắn ≤ 5s) HAY 2–4 góc máy nối tiếp bằng mảng "keyframes" (cảnh dài ≥ 6s, có nhiều diễn biến, 2 nhân vật đối mặt, hay có cao trào/twist).
+   - Cỡ cảnh ("shot"): "extreme_wide" | "wide" | "medium_wide" | "medium" | "close_up" | "extreme_close_up" | "dutch_tilt".
+   - "keyframes": Mảng các mốc chuyển góc máy theo thời gian (startTimeSec: 0 → ...), dùng "transition": "cut" (cắt máy dứt khoát) hoặc "smooth" (lướt mượt) và đổi "target_actor_id" theo từng nhịp hành động.
    - "target_actor_id": Khóa mục tiêu vào ID nhân vật chính (ví dụ "actor_1") để camera bám theo mặt nhân vật khi di chuyển.
-   - "shake": "none" (MẶC ĐỊNH BẮT BUỘC) | "subtle_handheld" | "creepy_tremor" | "heavy_jumpscare". QUY TẮC RUNG LẮC: Mặc định luôn là "none". TUYỆT ĐỐI KHÔNG tự ý thêm hiệu ứng rung lắc vào mọi phân cảnh. CHỈ sử dụng khi người dùng MÔ TẢ RÕ động đất, sụp đổ, nổ tung hoặc jumpscare giật mình. Cảnh đi lại, đứng nhìn, quan sát, trăng rằm, sương mù... BẮT BUỘC để "none".
+   - "shake": "none" (MẶC ĐỊNH BẮT BUỘC) | "subtle_handheld" | "creepy_tremor" | "heavy_jumpscare". QUY TẮC RUNG LẮC: Mặc định luôn là "none". TUYỆT ĐỐI KHÔNG tự ý thêm hiệu ứng rung lắc vào mọi phân cảnh hay keyframe. CHỈ sử dụng khi người dùng MÔ TẢ RÕ động đất, sụp đổ, nổ tung hoặc jumpscare giật mình.
    - "motion": Tùy chọn chuyển động máy ("push_in" zoom cận tăng căng thẳng, "follow_actor" bám theo nhân vật di chuyển).
 4. Mỗi cảnh có tiêu đề (title), thời lượng (duration_sec: 5-8), phụ đề lời thoại rùng rợn (dialogue) và ghi chú đạo diễn (narrative_note).
 5. Đảm bảo nhân vật và trang phục nhất quán giữa các cảnh nếu cùng một nhân vật xuất hiện xuyên suốt.
@@ -512,14 +537,17 @@ Trả về một JSON ARRAY gồm đúng ${effectiveSceneCount} đối tượng 
   {
     "scene_id": "scene_01_...",
     "title": "...",
-    "duration_sec": 6,
+    "duration_sec": 7,
     "theme": "...",
     "lighting": { "sky_preset": "foggy_night", "fog_density": 0.6 },
     "camera": {
-      "shot": "medium_wide",
-      "target_actor_id": "actor_1",
+      "shot": "wide",
       "shake": "none",
-      "motion": { "type": "push_in", "endZoom": 2.2, "startTimeSec": 0.5, "endTimeSec": 5, "easing": "ease_in_out" }
+      "keyframes": [
+        { "startTimeSec": 0, "transition": "cut", "shot": "wide", "shake": "none" },
+        { "startTimeSec": 2.5, "transition": "cut", "shot": "medium", "target_actor_id": "actor_1", "shake": "none" },
+        { "startTimeSec": 5.0, "transition": "smooth", "transitionDurationSec": 1.0, "shot": "close_up", "target_actor_id": "actor_1", "shake": "none" }
+      ]
     },
     "environment_items": [ ... ],
     "actors": [ ... ],
@@ -530,7 +558,7 @@ Trả về một JSON ARRAY gồm đúng ${effectiveSceneCount} đối tượng 
   ...
 ]`;
   } else {
-    userPrompt = `Hãy đạo diễn một chuỗi ${effectiveSceneCount} phân cảnh hoạt hình kinh dị (mỗi cảnh dài 5-7 giây) từ kịch bản sau:
+    userPrompt = `Hãy đạo diễn một chuỗi ${effectiveSceneCount} phân cảnh hoạt hình kinh dị (mỗi cảnh dài 5-8 giây) từ kịch bản sau:
 """
 ${storyPrompt}
 """
@@ -538,12 +566,10 @@ ${storyPrompt}
 Yêu cầu cho chuỗi ${effectiveSceneCount} cảnh:
 1. Các cảnh phải có sự liên kết cốt truyện liền mạch, căng thẳng dồn dập (Cảnh 1 thiết lập bối cảnh, Cảnh 2 phát hiện điều bất thường/chạm trán, Cảnh 3 cao trào rùng rợn/bị rượt đuổi).
 2. Tận dụng tối đa nhân vật, trang phục, khuôn mặt, đồ vật cầm tay (đèn bão, kiếm gỗ đào, nến, bùa...) và chuyển động Điểm A -> Điểm B để câu chuyện sống động.
-3. ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH (CINEMATIC CAMERA - BẮT BUỘC):
+3. ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH & ĐA GÓC MÁY TRONG CÙNG 1 CẢNH (MULTI-SHOT CAMERA - BẮT BUỘC):
    Mỗi cảnh BẮT BUỘC có khối "camera" sinh động theo nhịp điệu kinh dị (TUYỆT ĐỐI KHÔNG để tất cả đều là "wide" tĩnh):
-   - Cảnh 1 (Thiết lập): "shot": "wide" hoặc "extreme_wide", "shake": "none".
-   - Cảnh 2 (Thăm dò / Hành động): "shot": "medium" hoặc "medium_wide" (target_actor_id vào nhân vật, shake: "none").
-   - Cảnh 3 (Cao trào / Jumpscare): "shot": "close_up" hoặc "extreme_close_up" (target_actor_id vào khuôn mặt quỷ/nạn nhân, motion: push_in; CHỈ dùng shake nếu có mô tả động đất, nổ hoặc jumpscare, còn lại để "none").
-   - Cảnh tà khí / dị dạng: "shot": "dutch_tilt" (dutch_angle: -6 đến -10 độ, shake: "none").
+   - Bạn tự suy nghĩ chọn góc máy tối ưu cho từng phân cảnh: có thể dùng 1 góc máy gọn cho cảnh ngắn, HOẶC dùng mảng "keyframes" gồm 2–4 góc máy nối tiếp trong cùng 1 cảnh (ví dụ 0s: wide → cut sang medium vào hành động → cut/smooth sang close_up hoặc dutch_tilt lúc cao trào; hoặc shot/reverse-shot giữa nạn nhân và bóng ma).
+   - "shake": Mặc định luôn là "none" (CHỈ dùng shake nếu có mô tả động đất, nổ hoặc jumpscare).
 4. Mỗi cảnh có tiêu đề (title), thời lượng (duration_sec: 5-8), phụ đề lời thoại rùng rợn (dialogue) và ghi chú đạo diễn (narrative_note).
 5. Tuân thủ 100% quy tắc vị trí neo (Ground Slots cho dáng tiếp đất, Air Slots cho dáng bay; cây đa/cây treo cổ chỉ ở rìa; mộ/giếng/miếu ở giữa...).
 
@@ -552,12 +578,16 @@ Trả về một JSON ARRAY gồm đúng ${effectiveSceneCount} đối tượng 
   {
     "scene_id": "scene_01_...",
     "title": "...",
-    "duration_sec": 6,
+    "duration_sec": 7,
     "theme": "...",
     "lighting": { "sky_preset": "blood_moon", "fog_density": 0.6 },
     "camera": {
       "shot": "wide",
-      "shake": "none"
+      "shake": "none",
+      "keyframes": [
+        { "startTimeSec": 0, "transition": "cut", "shot": "wide", "shake": "none" },
+        { "startTimeSec": 3.5, "transition": "cut", "shot": "close_up", "target_actor_id": "actor_1", "shake": "none", "motion": { "type": "push_in", "endZoom": 3.4 } }
+      ]
     },
     "environment_items": [ ... ],
     "actors": [ ... ],
@@ -689,11 +719,12 @@ ${userInstruction}
 
 Hãy điều chỉnh cảnh trên dựa theo yêu cầu của người dùng, giữ nguyên scene_id hoặc cập nhật hợp lý.
 Đảm bảo tuân thủ 100% quy tắc vị trí neo, theme, structures, actors, handheld items và motion A -> B.
-LƯU Ý VỀ GÓC MÁY (CAMERA): Nếu người dùng yêu cầu thay đổi góc máy (ví dụ cận cảnh, đặc tả, góc nghiêng, rung giật jumpscare, zoom vào đối tượng...), hãy cập nhật hoặc bổ sung khối "camera" chuẩn xác:
+LƯU Ý VỀ GÓC MÁY (CAMERA): Nếu người dùng yêu cầu thay đổi góc máy (ví dụ đa góc máy, cận cảnh, đặc tả, góc nghiêng, rung giật jumpscare, zoom vào đối tượng...), hãy cập nhật hoặc bổ sung khối "camera" chuẩn xác:
 - "shot": "extreme_wide" | "wide" | "medium_wide" | "medium" | "close_up" | "extreme_close_up" | "dutch_tilt"
 - "target_actor_id": khóa vào id nhân vật nếu là góc cận/trung
 - "shake": "none" | "subtle_handheld" | "creepy_tremor" | "heavy_jumpscare"
 - "motion": "push_in" | "pull_out" | "follow_actor"...
+- "keyframes": (tùy chọn, rất khuyến khích cho cảnh dài/nhiều nhịp) mảng các mốc đa góc máy trong cùng 1 cảnh: [{ "startTimeSec": 0, "transition": "cut"|"smooth", "shot": "...", "target_actor_id": "...", "shake": "none" }, ...]
 Trả về CHÍNH XÁC MỘT JSON OBJECT duy nhất:`;
 
   try {
@@ -767,7 +798,7 @@ export async function generateSceneFromDescription(
   const cameraGuidance =
     options.cameraShot && options.cameraShot !== "auto"
       ? `- Cỡ Cảnh Chỉ Định (BẮT BUỘC): Dùng camera.shot = "${options.cameraShot}", gán target_actor_id = "actor_1", shake mặc định là "none" (chỉ bật rung nếu mô tả có động đất, nổ tung hoặc jumpscare giật mình).`
-      : `- Cỡ Cảnh Điện Ảnh: Tự động chọn góc máy kịch tính ("wide", "medium_wide", "medium", "close_up", "extreme_close_up", "dutch_tilt"). Khi quay cận cảnh khuôn mặt, bắt buộc dùng "close_up" có target_actor_id = "actor_1". Shake mặc định là "none" (chỉ dùng "heavy_jumpscare" hoặc "creepy_tremor" khi có động đất, chấn động dữ dội hoặc quỷ dữ vồ jumpscare).`;
+      : `- Cỡ Cảnh & Đa Góc Máy Điện Ảnh (AI TỰ ĐẠO DIỄN): Bạn hãy tự suy luận đạo diễn xem cảnh này nên dùng 1 góc máy gọn hay một chuỗi **2–4 góc máy nối tiếp qua mảng "camera.keyframes"**! Với cảnh dài ≥ 6s, có nhiều diễn biến hành động hoặc từ 2 nhân vật trở lên, RẤT KHUYẾN KHÍCH dùng "keyframes" (ví dụ 0s: wide → cắt sang medium vào hành động → cắt/lướt sang close_up hoặc dutch_tilt vào biểu cảm kinh hoàng). Shake mặc định luôn là "none" (chỉ dùng shake khi mô tả có động đất, chấn động dữ dội hoặc quỷ dữ vồ jumpscare).`;
 
   const userPrompt = `BẠN LÀ CỖ MÁY ĐẠO DIỄN HOẠT HÌNH 2D THEO MÔ TẢ TRỰC TIẾP (DIRECT DESCRIPTION-DRIVEN 2D ENGINE).
 BỐI CẢNH DƯỚI ĐÂY ĐÃ ĐƯỢC NGƯỜI DÙNG CỐ ĐỊNH 100% (BẮT BUỘC GIỮ NGUYÊN BỐI CẢNH NÀY ĐỂ TRÁNH LỆCH CẢNH):
@@ -806,16 +837,21 @@ TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
   "theme": "${environment.theme}",
   "lighting": ${JSON.stringify(environment.lighting)},
   "camera": {
-    "shot": "${options.cameraShot && options.cameraShot !== "auto" ? options.cameraShot : "medium_wide"}",
+    "shot": "${options.cameraShot && options.cameraShot !== "auto" ? options.cameraShot : "wide"}",
     "target_actor_id": "actor_1",
-    "shake": "none",
+    "shake": "none"${options.cameraShot && options.cameraShot !== "auto" ? `,
     "motion": {
       "type": "push_in",
       "endZoom": 2.2,
       "startTimeSec": 0.5,
       "endTimeSec": ${duration - 0.5},
       "easing": "ease_in_out"
-    }
+    }` : `,
+    "keyframes": [
+      { "startTimeSec": 0, "transition": "cut", "shot": "wide", "shake": "none" },
+      { "startTimeSec": ${Math.round(duration * 0.4 * 10) / 10}, "transition": "cut", "shot": "medium", "target_actor_id": "actor_1", "shake": "none" },
+      { "startTimeSec": ${Math.round(duration * 0.72 * 10) / 10}, "transition": "smooth", "transitionDurationSec": 0.9, "shot": "close_up", "target_actor_id": "actor_1", "shake": "none" }
+    ]`}
   },
   "environment_items": ${JSON.stringify(environment.environment_items)},
   "actors": [
@@ -934,7 +970,7 @@ export async function generateFilmFromDescriptions(
     const camReq =
       spec.cameraShot && spec.cameraShot !== "auto"
         ? `- Cỡ Cảnh Chỉ Định (BẮT BUỘC): "${spec.cameraShot}" (khóa target_actor_id vào nhân vật chính)`
-        : `- Cỡ Cảnh: Tự động đạo diễn góc máy điện ảnh kịch tính (wide, medium_wide, medium, close_up, extreme_close_up, dutch_tilt) với shake: "none" (chỉ bật rung khi có động đất/chấn động).`;
+        : `- Cỡ Cảnh (AI Tự Đạo Diễn Đa Góc Máy): Tự suy luận chọn 1 góc máy (nếu cảnh ngắn) HOẶC đạo diễn chuỗi 2–4 góc máy nối tiếp bằng "camera.keyframes" theo đúng diễn biến hành động & lời thoại trong thời lượng ${spec.duration_sec || 6}s (shake mặc định "none").`;
 
     return `[CẢNH ${i + 1}]:
 - Bối Cảnh Cố Định: "${spec.environment.name}" (Theme: "${spec.environment.theme}", Sky: "${spec.environment.lighting.sky_preset}")
@@ -957,11 +993,15 @@ Dưới đây là DÀN DIỄN VIÊN CỐ ĐỊNH CỦA BỘ PHIM:
 ${castSummary}
 - Khi phân cảnh có nhân vật xuất hiện, BẮT BUỘC gán đúng "base" và "costume" tương ứng của diễn viên đó. TUYỆT ĐỐI KHÔNG tự tiện đổi sang trang phục khác giữa các phân cảnh để giữ đúng rắc-co điện ảnh!
 3. Giữ nguyên 100% theme, lighting, environment_items và details của bối cảnh được chỉ định cho mỗi cảnh. Các cảnh có chung bối cảnh BẮT BUỘC PHẢI CÓ BỐI CẢNH Y HỆT NHAU.` : `2. Giữ nguyên 100% theme, lighting, environment_items và details của bối cảnh được chỉ định cho mỗi cảnh. Các cảnh có chung bối cảnh BẮT BUỘC PHẢI CÓ BỐI CẢNH Y HỆT NHAU.`}
-4. ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH (CINEMATIC CAMERA - BẮT BUỘC):
+4. ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH & ĐA GÓC MÁY TRONG 1 CẢNH (AI MULTI-SHOT DIRECTOR - BẮT BUỘC):
    Mỗi cảnh BẮT BUỘC sinh khối "camera" điện ảnh phù hợp (TUYỆT ĐỐI KHÔNG để tất cả đều là "wide" tĩnh):
-   - Nếu cảnh có Cỡ Cảnh Chỉ Định, BẮT BUỘC tuân thủ cỡ cảnh đó.
-   - Nếu tự động, hãy linh hoạt chuyển đổi theo nhịp điệu kinh dị (ví dụ cảnh tiếp cận dùng "medium", cảnh hù dọa/ma quỷ dùng "close_up" có target_actor_id; camera.shake mặc định là "none", CHỈ dùng shake khi có mô tả động đất, sụp đổ, nổ tung hoặc quỷ dữ vồ jumpscare).
-   - Khi dùng "medium", "close_up", "extreme_close_up", "dutch_tilt", BẮT BUỘC điền target_actor_id trỏ vào ID nhân vật chính (ví dụ "actor_1") để camera bám theo!
+   - Nếu cảnh có Cỡ Cảnh Chỉ Định, tuân thủ cỡ cảnh đó.
+   - Nếu là "AI Tự Đạo Diễn Đa Góc Máy" (mặc định): bạn hãy TỰ SUY LUẬN như đạo diễn phim kinh dị để quyết định góc máy phù hợp nhất cho từng diễn biến trong cảnh!
+     * Với cảnh dài (≥ 6s), hoặc cảnh có nhiều hành động/nhiều câu thoại/nhiều nhân vật/cú twist: BẮT BUỘC khai thác mảng "keyframes" gồm **2 đến 4 góc máy nối tiếp** bám sát nhịp lời thoại & hành động từ 0 đến duration_sec!
+     * Dùng "transition": "cut" khi chuyển góc dứt khoát (vd: toàn cảnh → cắt cận mặt, hoặc shot/reverse-shot giữa "actor_1" và "actor_2"), hoặc "transition": "smooth" (transitionDurationSec: 0.8–1.4) khi muốn lia/zoom mượt ma mị.
+     * Mỗi keyframe nên chọn đúng "target_actor_id" tương ứng (vd nhịp 1 toàn cảnh, nhịp 2 trung cảnh "actor_1", nhịp 3 cận cảnh khuôn mặt "actor_1" hoặc bóng ma "actor_2").
+     * "shake" mặc định luôn là "none" (CHỈ dùng shake khi mô tả/lời thoại có động đất, sụp đổ, nổ tung hoặc jumpscare giật mình).
+   - Khi dùng "medium", "close_up", "extreme_close_up", "dutch_tilt", BẮT BUỘC điền target_actor_id trỏ vào ID nhân vật tương ứng (ví dụ "actor_1") để camera bám theo!
 4. QUY ĐỊNH CHO MỖI ACTOR TRONG DANH SÁCH "actors":
    - "id": id duy nhất ví dụ "actor_1", "actor_2"
    - "facing": "left" | "right" (BẮT BUỘC CÓ trên mọi actor).
@@ -983,10 +1023,14 @@ ${castSummary}
     "theme": "...",
     "lighting": { ... },
     "camera": {
-      "shot": "medium_wide",
+      "shot": "wide",
       "target_actor_id": "actor_1",
       "shake": "none",
-      "motion": { "type": "push_in", "endZoom": 2.2, "startTimeSec": 0.5, "endTimeSec": 5, "easing": "ease_in_out" }
+      "keyframes": [
+        { "startTimeSec": 0, "transition": "cut", "shot": "wide", "shake": "none" },
+        { "startTimeSec": 2.5, "transition": "cut", "shot": "medium", "target_actor_id": "actor_1", "shake": "none" },
+        { "startTimeSec": 4.5, "transition": "smooth", "transitionDurationSec": 0.9, "shot": "close_up", "target_actor_id": "actor_1", "shake": "none" }
+      ]
     },
     "environment_items": [ ... ],
     "actors": [
@@ -1043,12 +1087,13 @@ ${castSummary}
       if (spec.title) sc.title = spec.title;
       if (spec.dialogue && spec.dialogue.trim()) sc.dialogue = spec.dialogue.trim();
 
-      // Enforce cameraShot if specified
+      // Enforce explicit manual single cameraShot ONLY when user picked a specific shot instead of "auto"
       if (spec.cameraShot && spec.cameraShot !== "auto") {
         if (!sc.camera || typeof sc.camera !== "object") {
           sc.camera = { shot: spec.cameraShot, target_actor_id: sc.actors?.[0]?.id };
         } else {
           sc.camera.shot = spec.cameraShot;
+          delete sc.camera.keyframes;
           if (!sc.camera.target_actor_id && sc.actors?.[0]?.id) {
             sc.camera.target_actor_id = sc.actors[0].id;
           }
@@ -1058,7 +1103,9 @@ ${castSummary}
       const val = validateDirectorScript(sc);
       if (val.normalized) {
         const spec = sceneSpecs[idx];
-        validScenes.push(sanitizeSceneShake(val.normalized, spec?.actionDescription || ""));
+        validScenes.push(
+          sanitizeSceneShake(val.normalized, [spec?.actionDescription || "", spec?.dialogue || ""])
+        );
       } else {
         validationErrors.push(`Cảnh ${idx + 1}: ${val.errors.join("; ")}`);
       }
@@ -1233,7 +1280,7 @@ export interface AutoFillSceneDraft {
   actionDescription: string;
   dialogue?: string;
   duration_sec: number;
-  cameraShot?: CameraShotType;
+  cameraShot?: CameraShotType | "auto";
 }
 
 export interface MissingAssetItem {
@@ -1566,14 +1613,14 @@ QUY TẮC ĐẠO DIỄN BẮT BUỘC (TUYỆT ĐỐI TUÂN THỦ):
    - Chọn đúng bối cảnh phù hợp trong danh sách. Các cảnh cùng địa điểm BẮT BUỘC dùng chung environmentId để giữ đúng rắc-co cảnh nền.
 
 5. GÓC MÁY ĐIỆN ẢNH (cameraShot):
-   - Chọn góc máy linh hoạt theo nhịp kinh dị: "wide" (toàn cảnh), "medium_wide" (trung toàn), "medium" (tiếp cận), "close_up" (cận cảnh hoảng sợ), "extreme_close_up" (đặc tả ma quỷ), "dutch_tilt" (tà khí chao đảo).
+   - Mặc định đặt "cameraShot": "auto" để AI Đạo diễn ở bước dàn dựng tự do suy luận và bố trí **đa góc máy (camera.keyframes)** linh hoạt cho từng nhịp hành động trong cảnh (chỉ chọn 1 cỡ cảnh cố định nếu cảnh đó thực sự bắt buộc phải khóa duy nhất 1 góc máy từ đầu tới cuối).
 
 TRẢ VỀ CHÍNH XÁC MỘT JSON ARRAY GỒM CÁC ĐỐI TƯỢNG AutoFillSceneDraft (KHÔNG kèm lời giải thích):
 [
   {
     "title": "Cảnh 1: Tiêu đề ngắn gọn phản ánh hành động",
     "environmentId": "id_bối_cảnh",
-    "cameraShot": "wide",
+    "cameraShot": "auto",
     "actionDescription": "Mô tả đạo diễn hoạt hình 2D chi tiết từ 25-50 từ...",
     "dialogue": "Đoạn trích nguyên văn câu chuyện gốc tương ứng với cảnh này..."
   }
@@ -1631,17 +1678,20 @@ TRẢ VỀ CHÍNH XÁC MỘT JSON ARRAY GỒM CÁC ĐỐI TƯỢNG AutoFillScene
       if (!envId || !validEnvIds.has(envId)) {
         envId = fallbackEnvId;
       }
-      const validShot =
-        item.cameraShot && VALID_CAMERA_SHOTS.includes(item.cameraShot)
-          ? item.cameraShot
-          : undefined;
-
       // Tính thời lượng chuẩn xác theo tốc độ đọc voice-over cho đoạn verbatim dialogue này
       const calculatedDuration = estimateVoiceDurationSec(
         dialogueText,
         options.voicePace || "normal_narrative",
         { minDuration: 4.0, maxDuration: 22.0 }
       );
+
+      // Leave cameraShot as "auto" by default so the Film Director AI freely plans multi-shot camera.keyframes per scene
+      const validShot: CameraShotType | "auto" =
+        item.cameraShot === "auto"
+          ? "auto"
+          : item.cameraShot && VALID_CAMERA_SHOTS.includes(item.cameraShot) && calculatedDuration < 5.0
+          ? item.cameraShot
+          : "auto";
 
       let actionDesc = item.actionDescription && typeof item.actionDescription === "string"
         ? item.actionDescription.trim()

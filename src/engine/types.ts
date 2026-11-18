@@ -249,6 +249,8 @@ export type CameraMotionType =
 
 export type CameraShakeIntensity = "none" | "subtle_handheld" | "creepy_tremor" | "heavy_jumpscare";
 
+export type CameraTransitionType = "cut" | "smooth";
+
 export interface CameraMotionConfig {
   type: CameraMotionType;
   endShot?: CameraShotType;
@@ -256,13 +258,29 @@ export interface CameraMotionConfig {
   endPanX?: number;
   endPanY?: number;
   endDutchAngle?: number;
-  startTimeSec?: number;  // Default: 0
-  endTimeSec?: number;    // Default: scene duration
+  startTimeSec?: number;  // Default: 0 (or keyframe startTimeSec)
+  endTimeSec?: number;    // Default: scene duration (or next keyframe startTimeSec)
   easing?: EasingType;    // Default: "ease_in_out"
 }
 
+export interface CameraKeyframe {
+  startTimeSec: number;                 // Mốc thời gian bắt đầu góc máy này (giây, >= 0)
+  transition?: CameraTransitionType;    // "cut" (cắt máy dứt khoát - mặc định) | "smooth" (lướt mượt từ góc trước)
+  transitionDurationSec?: number;       // Thời lượng lướt khi transition === "smooth" (mặc định 1.0s)
+  easing?: EasingType;                  // Easing khi transition === "smooth" (mặc định "ease_in_out")
+  shot: CameraShotType;                 // Cỡ cảnh chuẩn cho nhịp này
+  target_slot?: SlotId;                 // Điểm ngắm theo slot
+  target_actor_id?: string;             // Khóa mục tiêu theo nhân vật (có thể đổi nhân vật giữa các cú cắt)
+  zoom?: number;                        // Hệ số zoom tự do (0.5x - 6.0x, mặc định theo shot)
+  pan_x?: number;                       // Tinh chỉnh tọa độ X (px)
+  pan_y?: number;                       // Tinh chỉnh tọa độ Y (px)
+  dutch_angle?: number;                 // Góc xoay nghiêng (-25 đến 25 độ)
+  shake?: CameraShakeIntensity;         // Rung lắc ống kính riêng cho nhịp này
+  motion?: CameraMotionConfig;          // Chuyển động máy quay cục bộ trong đoạn góc máy này
+}
+
 export interface DirectorCameraConfig {
-  shot?: CameraShotType;              // Cỡ cảnh chuẩn
+  shot?: CameraShotType;              // Cỡ cảnh chuẩn (dùng khi chỉ có 1 góc máy, hoặc làm gốc)
   target_slot?: SlotId;               // Điểm ngắm theo slot
   target_actor_id?: string;           // Khóa mục tiêu theo nhân vật
   zoom?: number;                      // Hệ số zoom tự do (0.8x - 5.0x, default theo shot)
@@ -271,6 +289,7 @@ export interface DirectorCameraConfig {
   dutch_angle?: number;               // Góc xoay nghiêng (-15 đến 15 độ)
   shake?: CameraShakeIntensity;       // Rung lắc ống kính
   motion?: CameraMotionConfig;        // Chuyển động máy quay theo thời gian
+  keyframes?: CameraKeyframe[];       // Đa góc máy theo mốc thời gian trong cùng 1 phân cảnh (AI hoặc người dùng đạo diễn)
 }
 
 export interface DirectorSceneScript {

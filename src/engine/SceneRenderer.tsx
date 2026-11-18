@@ -1249,15 +1249,18 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
           </g>
         )}
 
-        {/* CINEMATIC CAMERA HUD OVERLAY (Visible when Gizmo is on or custom camera is active) */}
-        {(showGizmo || (script.camera && script.camera.shot !== "wide")) && (
+        {/* CINEMATIC CAMERA HUD OVERLAY (Visible when Gizmo is on or custom/multi-shot camera is active) */}
+        {(showGizmo ||
+          (script.camera &&
+            (script.camera.shot !== "wide" ||
+              (script.camera.keyframes && script.camera.keyframes.length > 1)))) && (
           <g id="camera-hud-group" pointerEvents="none">
             {/* Top-Left Lens Status Badge */}
             <g transform="translate(24, 24)">
               <rect
                 x="0"
                 y="0"
-                width="310"
+                width={cameraState.totalShots && cameraState.totalShots > 1 ? "395" : "310"}
                 height="36"
                 rx="6"
                 fill="#060910"
@@ -1281,7 +1284,10 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                 fontFamily="monospace"
                 fontWeight="bold"
               >
-                🎥 {CAMERA_SHOT_PRESETS[cameraState.shot]?.name.split("(")[0].trim().toUpperCase() || "TOÀN CẢNH"} ({cameraState.zoom.toFixed(2)}x{cameraState.dutchAngle !== 0 ? ` | ${cameraState.dutchAngle > 0 ? "+" : ""}${cameraState.dutchAngle.toFixed(1)}°` : ""})
+                🎥 {cameraState.totalShots && cameraState.totalShots > 1
+                  ? `GÓC ${(cameraState.activeShotIndex ?? 0) + 1}/${cameraState.totalShots} • `
+                  : ""}
+                {CAMERA_SHOT_PRESETS[cameraState.shot]?.name.split("(")[0].trim().toUpperCase() || "TOÀN CẢNH"} ({cameraState.zoom.toFixed(2)}x{cameraState.dutchAngle !== 0 ? ` | ${cameraState.dutchAngle > 0 ? "+" : ""}${cameraState.dutchAngle.toFixed(1)}°` : ""})
               </text>
             </g>
 

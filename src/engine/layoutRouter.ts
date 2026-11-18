@@ -20,9 +20,13 @@ import type {
   WeatherEffectId,
   FacialActionId,
   DirectorCameraConfig,
+  CameraKeyframe,
+  CameraMotionConfig,
   CameraShotType,
   CameraMotionType,
   CameraShakeIntensity,
+  CameraTransitionType,
+  EasingType,
 } from "./types";
 import {
   DETAIL_RULES,
@@ -528,11 +532,49 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     ? script.subtitle_anim
     : undefined;
 
-  // 7. Camera Configuration with Self-Healing
+  // 7. Camera Configuration with Self-Healing (supports single-shot & multi-shot keyframes)
+  const sanitizeCameraMotion = (
+    rawMot: any,
+    defaultStartSec: number,
+    defaultEndSec: number
+  ): CameraMotionConfig | undefined => {
+    if (!rawMot || typeof rawMot !== "object" || !VALID_CAMERA_MOTIONS.includes(rawMot.type)) {
+      return undefined;
+    }
+    const easing: EasingType =
+      rawMot.easing === "linear" ||
+      rawMot.easing === "ease_in" ||
+      rawMot.easing === "ease_out" ||
+      rawMot.easing === "ease_in_out"
+        ? rawMot.easing
+        : "ease_in_out";
+    return {
+      type: rawMot.type as CameraMotionType,
+      endShot: VALID_CAMERA_SHOTS.includes(rawMot.endShot) ? rawMot.endShot : undefined,
+      endZoom: typeof rawMot.endZoom === "number" && !isNaN(rawMot.endZoom) ? Math.max(0.5, Math.min(6.0, rawMot.endZoom)) : undefined,
+      endPanX: typeof rawMot.endPanX === "number" && !isNaN(rawMot.endPanX) ? rawMot.endPanX : undefined,
+      endPanY: typeof rawMot.endPanY === "number" && !isNaN(rawMot.endPanY) ? rawMot.endPanY : undefined,
+      endDutchAngle:
+        typeof rawMot.endDutchAngle === "number" && !isNaN(rawMot.endDutchAngle)
+          ? Math.max(-25, Math.min(25, rawMot.endDutchAngle))
+          : undefined,
+      startTimeSec:
+        typeof rawMot.startTimeSec === "number" && !isNaN(rawMot.startTimeSec)
+          ? Math.max(0, Math.min(duration_sec, rawMot.startTimeSec))
+          : defaultStartSec,
+      endTimeSec:
+        typeof rawMot.endTimeSec === "number" && !isNaN(rawMot.endTimeSec)
+          ? Math.max(0, Math.min(duration_sec, rawMot.endTimeSec))
+          : defaultEndSec,
+      easing,
+    };
+  };
+
   let camera: DirectorCameraConfig | undefined = undefined;
   if (script.camera && typeof script.camera === "object") {
     const rawCam = script.camera;
-    const shot = VALID_CAMERA_SHOTS.includes(rawCam.shot) ? rawCam.shot : "wide";
+    const rawShotValid = VALID_CAMERA_SHOTS.includes(rawCam.shot);
+    let shot: CameraShotType = rawShotValid ? rawCam.shot : "wide";
     const target_slot = VALID_SLOTS.includes(rawCam.target_slot) ? rawCam.target_slot : undefined;
     const target_actor_id =
       typeof rawCam.target_actor_id === "string" && rawCam.target_actor_id.trim()
@@ -550,37 +592,117 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
         ? Math.max(-25, Math.min(25, rawCam.dutch_angle))
         : undefined;
     const shake = VALID_CAMERA_SHAKES.includes(rawCam.shake) ? rawCam.shake : undefined;
+    const motion = sanitizeCameraMotion(rawCam.motion, 0, duration_sec);
 
-    let motion = undefined;
-    if (rawCam.motion && typeof rawCam.motion === "object") {
-      const rawMot = rawCam.motion;
-      if (VALID_CAMERA_MOTIONS.includes(rawMot.type)) {
-        motion = {
-          type: rawMot.type as CameraMotionType,
-          endShot: VALID_CAMERA_SHOTS.includes(rawMot.endShot) ? rawMot.endShot : undefined,
-          endZoom: typeof rawMot.endZoom === "number" && !isNaN(rawMot.endZoom) ? rawMot.endZoom : undefined,
-          endPanX: typeof rawMot.endPanX === "number" && !isNaN(rawMot.endPanX) ? rawMot.endPanX : undefined,
-          endPanY: typeof rawMot.endPanY === "number" && !isNaN(rawMot.endPanY) ? rawMot.endPanY : undefined,
-          endDutchAngle:
-            typeof rawMot.endDutchAngle === "number" && !isNaN(rawMot.endDutchAngle)
-              ? rawMot.endDutchAngle
-              : undefined,
-          startTimeSec:
-            typeof rawMot.startTimeSec === "number" && !isNaN(rawMot.startTimeSec)
-              ? Math.max(0, rawMot.startTimeSec)
-              : 0,
-          endTimeSec:
-            typeof rawMot.endTimeSec === "number" && !isNaN(rawMot.endTimeSec)
-              ? Math.max(0, rawMot.endTimeSec)
-              : duration_sec,
-          easing:
-            rawMot.easing === "linear" ||
-            rawMot.easing === "ease_in" ||
-            rawMot.easing === "ease_out" ||
-            rawMot.easing === "ease_in_out"
-              ? rawMot.easing
-              : "ease_in_out",
-        };
+    // Self-heal multi-shot camera keyframes (also gracefully accept `cuts` / `shots` alias from LLM)
+    const rawKfList = Array.isArray(rawCam.keyframes)
+      ? rawCam.keyframes
+      : Array.isArray(rawCam.cuts)
+      ? rawCam.cuts
+      : Array.isArray(rawCam.shots)
+      ? rawCam.shots
+      : null;
+
+    let keyframes: CameraKeyframe[] | undefined = undefined;
+    if (rawKfList && rawKfList.length > 0) {
+      const parsedKfs: CameraKeyframe[] = [];
+      const maxStart = Math.max(0, duration_sec - 0.5);
+
+      rawKfList.forEach((rawKf: any, kIdx: number) => {
+        if (!rawKf || typeof rawKf !== "object") return;
+        const kfShot: CameraShotType = VALID_CAMERA_SHOTS.includes(rawKf.shot) ? rawKf.shot : "wide";
+        const rawTime = Number(rawKf.startTimeSec ?? rawKf.timeSec ?? rawKf.start_sec);
+        const startTimeSec =
+          !isNaN(rawTime)
+            ? Math.round(Math.max(0, Math.min(maxStart, rawTime)) * 10) / 10
+            : Math.round(((kIdx / rawKfList.length) * duration_sec) * 10) / 10;
+
+        const transition: CameraTransitionType =
+          rawKf.transition === "smooth" ? "smooth" : "cut";
+        const rawTransDur = Number(rawKf.transitionDurationSec);
+        const transitionDurationSec =
+          transition === "smooth" && !isNaN(rawTransDur)
+            ? Math.max(0.2, Math.min(3.0, Math.round(rawTransDur * 10) / 10))
+            : transition === "smooth"
+            ? 1.0
+            : undefined;
+        const kfEasing: EasingType | undefined =
+          transition === "smooth"
+            ? rawKf.easing === "linear" ||
+              rawKf.easing === "ease_in" ||
+              rawKf.easing === "ease_out" ||
+              rawKf.easing === "ease_in_out"
+              ? rawKf.easing
+              : "ease_in_out"
+            : undefined;
+
+        const kfTargetSlot = VALID_SLOTS.includes(rawKf.target_slot) ? rawKf.target_slot : undefined;
+        const kfTargetActorId =
+          typeof rawKf.target_actor_id === "string" && rawKf.target_actor_id.trim()
+            ? rawKf.target_actor_id.trim()
+            : undefined;
+        const kfZoom =
+          typeof rawKf.zoom === "number" && !isNaN(rawKf.zoom)
+            ? Math.max(0.5, Math.min(6.0, rawKf.zoom))
+            : undefined;
+        const kfPanX = typeof rawKf.pan_x === "number" && !isNaN(rawKf.pan_x) ? rawKf.pan_x : undefined;
+        const kfPanY = typeof rawKf.pan_y === "number" && !isNaN(rawKf.pan_y) ? rawKf.pan_y : undefined;
+        const kfDutch =
+          typeof rawKf.dutch_angle === "number" && !isNaN(rawKf.dutch_angle)
+            ? Math.max(-25, Math.min(25, rawKf.dutch_angle))
+            : undefined;
+        const kfShake = VALID_CAMERA_SHAKES.includes(rawKf.shake) ? rawKf.shake : undefined;
+
+        parsedKfs.push({
+          startTimeSec,
+          transition,
+          ...(transitionDurationSec !== undefined ? { transitionDurationSec } : {}),
+          ...(kfEasing ? { easing: kfEasing } : {}),
+          shot: kfShot,
+          ...(kfTargetSlot ? { target_slot: kfTargetSlot } : {}),
+          ...(kfTargetActorId ? { target_actor_id: kfTargetActorId } : {}),
+          ...(kfZoom !== undefined ? { zoom: kfZoom } : {}),
+          ...(kfPanX !== undefined ? { pan_x: kfPanX } : {}),
+          ...(kfPanY !== undefined ? { pan_y: kfPanY } : {}),
+          ...(kfDutch !== undefined ? { dutch_angle: kfDutch } : {}),
+          ...(kfShake ? { shake: kfShake } : {}),
+          ...(rawKf.motion ? { motion: rawKf.motion } : {}),
+        });
+      });
+
+      if (parsedKfs.length > 0) {
+        parsedKfs.sort((a, b) => a.startTimeSec - b.startTimeSec);
+
+        // Guarantee keyframe[0] covers t = 0
+        if (parsedKfs[0].startTimeSec > 0.2) {
+          parsedKfs[0].startTimeSec = 0;
+        } else {
+          parsedKfs[0].startTimeSec = 0;
+        }
+
+        // Deduplicate overly close timestamps (< 0.4s apart)
+        const deduped: CameraKeyframe[] = [];
+        for (const kf of parsedKfs) {
+          if (deduped.length === 0 || kf.startTimeSec - deduped[deduped.length - 1].startTimeSec >= 0.4) {
+            deduped.push(kf);
+          }
+        }
+
+        // Sanitize nested motion using each keyframe's actual [segStart, segEnd] window
+        keyframes = deduped.map((kf, idx) => {
+          const segStart = kf.startTimeSec;
+          const segEnd = idx < deduped.length - 1 ? deduped[idx + 1].startTimeSec : duration_sec;
+          const sanitizedMot = kf.motion ? sanitizeCameraMotion(kf.motion, segStart, segEnd) : undefined;
+          return {
+            ...kf,
+            motion: sanitizedMot,
+          };
+        });
+
+        // Keep top-level shot synced with first keyframe if top-level shot was not explicitly given
+        if (!rawShotValid && keyframes.length > 0) {
+          shot = keyframes[0].shot;
+        }
       }
     }
 
@@ -594,6 +716,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       dutch_angle,
       shake,
       motion,
+      ...(keyframes && keyframes.length > 0 ? { keyframes } : {}),
     };
   }
 

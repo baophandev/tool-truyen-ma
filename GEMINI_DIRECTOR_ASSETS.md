@@ -797,7 +797,27 @@ Hệ thống cho phép đạo diễn chuyển đổi linh hoạt giữa các c�
 - `startTimeSec`, `endTimeSec`: Thời điểm bắt đầu và kết thúc chuyển động.
 - `easing`: `"ease_in_out"` | `"linear"` | `"ease_in"` | `"ease_out"`.
 
-### 9.5. Kịch Bản JSON Mẫu Có Góc Máy Cận Cảnh & Rung Chấn
+### 9.5. Đa Góc Máy Trong Cùng 1 Phân Cảnh (`camera.keyframes` - Multi-Shot Timeline)
+Thay vì giữ nguyên 1 góc máy cố định suốt cả phân cảnh dài, AI Director tự suy luận và đạo diễn **chuỗi 2–4 góc máy nối tiếp** ngay trong cùng 1 cảnh qua mảng `camera.keyframes`:
+- `startTimeSec`: Mốc bắt đầu góc máy (giây, phần tử đầu tiên luôn bắt đầu từ `0`).
+- `transition`:
+  - `"cut"` (mặc định): Cắt máy dứt khoát giữa các cỡ cảnh (rất hợp phim kinh dị: toàn cảnh → cắt cận mặt, hoặc shot/reverse-shot giữa nạn nhân và bóng ma).
+  - `"smooth"`: Nội suy lia/zoom mượt mà từ góc trước sang góc này (kèm `transitionDurationSec`: `0.8–1.5`, `easing`: `"ease_in_out"`).
+- `shot`, `target_actor_id`, `target_slot`, `zoom`, `pan_x`, `pan_y`, `dutch_angle`, `shake`, `motion`: Độc lập cho từng nhịp góc máy.
+
+```json
+"camera": {
+  "shot": "wide",
+  "shake": "none",
+  "keyframes": [
+    { "startTimeSec": 0, "transition": "cut", "shot": "wide", "shake": "none" },
+    { "startTimeSec": 3.5, "transition": "cut", "shot": "medium", "target_actor_id": "actor_1", "shake": "none" },
+    { "startTimeSec": 7.0, "transition": "smooth", "transitionDurationSec": 1.0, "shot": "close_up", "target_actor_id": "actor_1", "shake": "none", "motion": { "type": "push_in", "endZoom": 3.3 } }
+  ]
+}
+```
+
+### 9.6. Kịch Bản JSON Mẫu Có Góc Máy Cận Cảnh & Rung Chấn
 ```json
 {
   "scene_id": "scene_close_up_ghost_reveal",

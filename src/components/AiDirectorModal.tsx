@@ -153,7 +153,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         actionDescription:
           "Người nông dân mặc áo tơi sờn rách cầm đèn bão sắt bước từ bên trái sang giữa, run rẩy dừng lại trước bia mộ cổ.",
         duration_sec: 6,
-        cameraShot: "wide",
+        cameraShot: "auto",
       },
       {
         environmentId: env1, // Shared environment 100% same background!
@@ -161,7 +161,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         actionDescription:
           "Một bóng ma quấn vải liệm tử thi hiện hình lơ lửng trên không trung nhìn chằm chằm, người nông dân sợ hãi giơ đèn bão lùi lại.",
         duration_sec: 6,
-        cameraShot: "close_up",
+        cameraShot: "auto",
       },
       {
         environmentId: env2, // Move to next set
@@ -169,7 +169,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         actionDescription:
           "Người nông dân tháo chạy tới trước cửa miếu hoang, pháp sư mặc áo cà sa cầm kiếm gỗ đào và bùa vàng xuất hiện nghênh chiến.",
         duration_sec: 7,
-        cameraShot: "medium_wide",
+        cameraShot: "auto",
       },
     ];
   });
@@ -1361,7 +1361,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                               onChange={(e) => handleUpdateDraft(idx, "cameraShot", e.target.value)}
                               className="bg-transparent text-xs text-purple-200 font-medium focus:outline-none cursor-pointer"
                             >
-                              <option value="auto">🎬 Tự động (AI tối ưu)</option>
+                              <option value="auto">🎬 AI Tự Đạo Diễn Đa Góc Máy (Auto)</option>
                               <option value="wide">🎥 Toàn cảnh (Wide 1.0x)</option>
                               <option value="extreme_wide">🎥 Đại cảnh (Extreme Wide 0.88x)</option>
                               <option value="medium_wide">🎥 Trung toàn (Medium Wide 1.45x)</option>
@@ -1904,7 +1904,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                     onChange={(e) => setSingleSceneCameraShot(e.target.value as any)}
                     className="bg-transparent text-xs text-purple-200 font-medium focus:outline-none cursor-pointer"
                   >
-                    <option value="auto">🎬 Tự động (AI chọn góc máy)</option>
+                    <option value="auto">🎬 AI Tự Đạo Diễn Đa Góc Máy (Auto)</option>
                     <option value="wide">🎥 Toàn cảnh (Wide 1.0x)</option>
                     <option value="extreme_wide">🎥 Đại cảnh (Extreme Wide 0.88x)</option>
                     <option value="medium_wide">🎥 Trung toàn (Medium Wide 1.45x)</option>

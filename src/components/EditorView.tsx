@@ -26,6 +26,8 @@ import type {
   CameraShotType,
   CameraMotionType,
   CameraShakeIntensity,
+  CameraKeyframe,
+  CameraTransitionType,
 } from "../engine/types";
 import { CAMERA_SHOT_PRESETS } from "../engine/cameraUtils";
 import { generateTimedSubtitleCues } from "../engine/subtitleUtils";
@@ -2293,7 +2295,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
               </div>
 
               {/* Reset Camera Button */}
-              {scene.camera && scene.camera.shot !== "wide" && (
+              {scene.camera &&
+                (scene.camera.shot !== "wide" ||
+                  (scene.camera.keyframes && scene.camera.keyframes.length > 0)) && (
                 <button
                   type="button"
                   onClick={() => onChangeScene({ ...scene, camera: undefined })}
@@ -2757,6 +2761,247 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       <option value="ease_out">Nhanh Ban Đầu, Hãm Phanh (Ease Out)</option>
                     </select>
                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* Section 5: Multi-Shot Camera Timeline (AI-Directed or Custom Keyframes) */}
+            <div className="bg-gradient-to-br from-purple-950/30 to-cyan-950/20 border border-purple-800/50 rounded-xl p-4 flex flex-col gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <label className="text-xs font-bold text-purple-200 flex items-center gap-2">
+                    <span>5. Đa Góc Máy Trong 1 Cảnh (Multi-Shot Camera Timeline):</span>
+                    {scene.camera?.keyframes && scene.camera.keyframes.length > 0 && (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-900/70 text-purple-200 border border-purple-700/60">
+                        {scene.camera.keyframes.length} góc máy
+                      </span>
+                    )}
+                  </label>
+                  <p className="text-[11px] text-neutral-400 mt-0.5">
+                    AI Director tự động đạo diễn chuỗi cắt/lướt góc máy theo nhịp diễn biến của cảnh. Bạn cũng có thể bấm từng mốc để xem thử hoặc tinh chỉnh thêm.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = scene.camera || { shot: "wide", shake: "none" };
+                      const existing = current.keyframes ? [...current.keyframes] : [];
+                      if (existing.length === 0) {
+                        const firstKf: CameraKeyframe = {
+                          startTimeSec: 0,
+                          transition: "cut",
+                          shot: current.shot || "wide",
+                          target_actor_id: current.target_actor_id,
+                          target_slot: current.target_slot,
+                          shake: current.shake || "none",
+                        };
+                        const midTime = Math.round((sceneDuration / 2) * 10) / 10;
+                        const secondKf: CameraKeyframe = {
+                          startTimeSec: midTime,
+                          transition: "cut",
+                          shot: "close_up",
+                          target_actor_id: scene.actors?.[0]?.id,
+                          shake: "none",
+                        };
+                        onChangeScene({
+                          ...scene,
+                          camera: { ...current, keyframes: [firstKf, secondKf] },
+                        });
+                        setPreviewTime(midTime + 0.05);
+                      } else {
+                        const sorted = [...existing].sort((a, b) => a.startTimeSec - b.startTimeSec);
+                        const lastTime = sorted[sorted.length - 1].startTimeSec;
+                        const nextTime = Math.min(
+                          Math.max(0.5, Math.round((sceneDuration - 0.5) * 10) / 10),
+                          Math.round(((lastTime + sceneDuration) / 2) * 10) / 10
+                        );
+                        const added: CameraKeyframe = {
+                          startTimeSec: nextTime,
+                          transition: "cut",
+                          shot: "close_up",
+                          target_actor_id: scene.actors?.[0]?.id,
+                          shake: "none",
+                        };
+                        onChangeScene({
+                          ...scene,
+                          camera: {
+                            ...current,
+                            keyframes: [...sorted, added].sort((a, b) => a.startTimeSec - b.startTimeSec),
+                          },
+                        });
+                        setPreviewTime(nextTime + 0.05);
+                      }
+                    }}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-purple-700 hover:bg-purple-600 text-white text-[11px] font-semibold transition-all"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Thêm Góc Máy</span>
+                  </button>
+
+                  {scene.camera?.keyframes && scene.camera.keyframes.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!scene.camera) return;
+                        const { keyframes: _removed, ...rest } = scene.camera;
+                        onChangeScene({ ...scene, camera: rest });
+                      }}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-red-950/70 text-neutral-300 hover:text-red-300 border border-neutral-700 text-[11px] transition-all"
+                      title="Xóa timeline đa góc máy để quay về chế độ 1 góc máy đơn"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      <span>Về 1 Góc Máy</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {scene.camera?.keyframes && scene.camera.keyframes.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {[...scene.camera.keyframes]
+                    .sort((a, b) => a.startTimeSec - b.startTimeSec)
+                    .map((kf, idx, arr) => {
+                      const segEnd = idx < arr.length - 1 ? arr[idx + 1].startTimeSec : sceneDuration;
+                      const isActiveNow =
+                        previewTime !== null &&
+                        previewTime >= kf.startTimeSec &&
+                        previewTime < segEnd;
+
+                      const updateKf = (patch: Partial<CameraKeyframe>) => {
+                        const nextList = arr.map((item, i) =>
+                          i === idx ? { ...item, ...patch } : item
+                        );
+                        nextList.sort((a, b) => a.startTimeSec - b.startTimeSec);
+                        onChangeScene({
+                          ...scene,
+                          camera: {
+                            ...(scene.camera || { shot: nextList[0].shot }),
+                            shot: nextList[0].shot,
+                            keyframes: nextList,
+                          },
+                        });
+                      };
+
+                      return (
+                        <div
+                          key={`cam-kf-${idx}`}
+                          className={`flex flex-wrap items-center gap-2 p-2.5 rounded-lg border transition-all ${
+                            isActiveNow
+                              ? "bg-purple-950/60 border-purple-400/80 shadow-md shadow-purple-950/40"
+                              : "bg-black/60 border-neutral-800 hover:border-neutral-700"
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => setPreviewTime(Math.min(sceneDuration, kf.startTimeSec + 0.05))}
+                            className="px-2 py-1 rounded bg-purple-900/70 hover:bg-purple-800 text-purple-200 font-mono text-[11px] font-bold shrink-0"
+                            title="Bấm để tua màn hình xem góc máy này"
+                          >
+                            #{idx + 1} • {kf.startTimeSec.toFixed(1)}s–{segEnd.toFixed(1)}s
+                          </button>
+
+                          {/* Start time */}
+                          <div className="flex items-center gap-1">
+                            <span className="text-[10px] text-neutral-400">Từ:</span>
+                            <input
+                              type="number"
+                              min={0}
+                              max={Math.max(0, sceneDuration - 0.5)}
+                              step={0.5}
+                              disabled={idx === 0}
+                              value={kf.startTimeSec}
+                              onChange={(e) =>
+                                updateKf({
+                                  startTimeSec: Math.max(0, Math.min(sceneDuration - 0.5, parseFloat(e.target.value) || 0)),
+                                })
+                              }
+                              className="w-14 bg-black border border-neutral-700 disabled:opacity-50 rounded px-1.5 py-1 text-[11px] text-neutral-200 font-mono text-center"
+                            />
+                            <span className="text-[10px] text-neutral-500">s</span>
+                          </div>
+
+                          {/* Shot size */}
+                          <select
+                            value={kf.shot}
+                            onChange={(e) => updateKf({ shot: e.target.value as CameraShotType })}
+                            className="bg-black border border-neutral-700 rounded px-2 py-1 text-[11px] text-cyan-200 font-medium"
+                          >
+                            {(Object.entries(CAMERA_SHOT_PRESETS) as [CameraShotType, typeof CAMERA_SHOT_PRESETS[CameraShotType]][]).map(
+                              ([k, info]) => (
+                                <option key={k} value={k}>
+                                  {info.name.split("(")[0].trim()} ({info.defaultZoom}x)
+                                </option>
+                              )
+                            )}
+                          </select>
+
+                          {/* Target Actor */}
+                          <select
+                            value={kf.target_actor_id || ""}
+                            onChange={(e) =>
+                              updateKf({
+                                target_actor_id: e.target.value || undefined,
+                              })
+                            }
+                            className="bg-black border border-neutral-700 rounded px-2 py-1 text-[11px] text-neutral-200"
+                          >
+                            <option value="">Toàn cảnh / Tâm</option>
+                            {scene.actors.map((a) => (
+                              <option key={a.id} value={a.id}>
+                                Bám: {a.id}
+                              </option>
+                            ))}
+                          </select>
+
+                          {/* Transition (for cuts after #1) */}
+                          {idx > 0 && (
+                            <select
+                              value={kf.transition || "cut"}
+                              onChange={(e) => {
+                                const tr = e.target.value as CameraTransitionType;
+                                updateKf({
+                                  transition: tr,
+                                  transitionDurationSec: tr === "smooth" ? (kf.transitionDurationSec ?? 1.0) : undefined,
+                                });
+                              }}
+                              className="bg-black border border-neutral-700 rounded px-2 py-1 text-[11px] text-amber-300 font-mono"
+                              title="Kiểu chuyển từ góc trước sang góc này"
+                            >
+                              <option value="cut">⚡ Cắt dứt khoát (Cut)</option>
+                              <option value="smooth">🌊 Lướt mượt (Smooth)</option>
+                            </select>
+                          )}
+
+                          {/* Delete cut (keep at least 1) */}
+                          {arr.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const nextList = arr.filter((_, i) => i !== idx);
+                                if (nextList.length > 0) nextList[0].startTimeSec = 0;
+                                onChangeScene({
+                                  ...scene,
+                                  camera: {
+                                    ...(scene.camera || { shot: "wide" }),
+                                    keyframes: nextList.length > 1 ? nextList : undefined,
+                                  },
+                                });
+                              }}
+                              className="ml-auto p-1 rounded text-neutral-500 hover:text-red-400 hover:bg-red-950/50 transition-all"
+                              title="Xóa góc máy này"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+              ) : (
+                <div className="text-[11px] text-neutral-400 bg-black/40 border border-neutral-800/80 rounded-lg px-3 py-2.5">
+                  Cảnh này hiện đang dùng <strong>1 góc máy duy nhất</strong>. Khi tạo phim bằng <strong>AI Đạo Diễn</strong> (chế độ Auto), AI sẽ tự suy luận và đạo diễn 2–4 góc máy cho những cảnh dài/nhiều diễn biến — hoặc bạn có thể bấm <em>"+ Thêm Góc Máy"</em> để tự thêm thủ công.
                 </div>
               )}
             </div>
