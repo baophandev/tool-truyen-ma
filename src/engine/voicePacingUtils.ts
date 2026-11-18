@@ -125,20 +125,25 @@ function extractSentencesWithDelimiters(rawText: string): string[] {
     const lines = para.split(/\n/).map((l) => l.trim()).filter(Boolean);
 
     for (const line of lines) {
-      // Split by sentence terminators (. ! ?) followed by whitespace or end of string,
-      // but avoid splitting numbers or decimals like 3.5 or 03:00
-      const sentenceRegex = /([^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$)/g;
-      const matches = line.match(sentenceRegex);
+      // Losslessly split by sentence terminators (. ! ? …) optionally followed by closing quotes/brackets
+      // when followed by whitespace — preserves closing quotes (`."`), decimals (`3.5`), and abbreviations (`TP.HCM`)
+      const boundaryRegex = /[.!?…]+["”'’)\]»]*\s+/g;
+      let lastIndex = 0;
+      let match: RegExpExecArray | null;
 
-      if (matches && matches.length > 0) {
-        for (const m of matches) {
-          const trimmed = m.trim();
-          if (trimmed.length > 0) {
-            sentences.push(trimmed);
-          }
+      while ((match = boundaryRegex.exec(line)) !== null) {
+        if (match.index === lastIndex) continue;
+        const endIdx = match.index + match[0].length;
+        const part = line.slice(lastIndex, endIdx).trim();
+        if (part.length > 0) {
+          sentences.push(part);
         }
-      } else {
-        sentences.push(line);
+        lastIndex = endIdx;
+      }
+
+      const remainder = line.slice(lastIndex).trim();
+      if (remainder.length > 0) {
+        sentences.push(remainder);
       }
     }
   }
@@ -148,12 +153,30 @@ function extractSentencesWithDelimiters(rawText: string): string[] {
 
 /**
  * Intelligently splits a long sentence (>20 words) into balanced, natural clauses
- * while strictly keeping commas/punctuation attached to the preceding clause.
+ * while strictly keeping commas/punctuation and closing quotes attached to the preceding clause.
  */
 function splitLongSentenceIntoClauses(sentence: string, targetWords = 14): string[] {
-  const clauseMatches = sentence.match(/[^,;:\-–—]+(?:[,;:\-–—]+|\s*$)/g);
-  if (!clauseMatches || clauseMatches.length <= 1) {
-    return [sentence.trim()];
+  const trimmed = sentence.trim();
+  if (!trimmed) return [];
+
+  const clauseMatches: string[] = [];
+  const boundaryRegex = /[,;:\-–—]+["”'’)\]»]*\s+/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = boundaryRegex.exec(trimmed)) !== null) {
+    if (match.index === lastIndex) continue;
+    const endIdx = match.index + match[0].length;
+    const part = trimmed.slice(lastIndex, endIdx).trim();
+    if (part) clauseMatches.push(part);
+    lastIndex = endIdx;
+  }
+
+  const remainder = trimmed.slice(lastIndex).trim();
+  if (remainder) clauseMatches.push(remainder);
+
+  if (clauseMatches.length <= 1) {
+    return [trimmed];
   }
 
   const results: string[] = [];
@@ -394,20 +417,22 @@ function adjustProposedSliceCount(proposedSlices: string[], targetCount?: number
     if (maxWords < 6) break;
 
     const textToSplit = slices[longestIdx];
-    const sentenceBreak = textToSplit.search(/[.!?]\s+/);
-    if (sentenceBreak !== -1) {
-      const part1 = textToSplit.slice(0, sentenceBreak + 1).trim();
-      const part2 = textToSplit.slice(sentenceBreak + 1).trim();
+    const sentenceMatch = textToSplit.match(/[.!?…]+["”'’)\]»]*(?=\s+)/);
+    if (sentenceMatch && sentenceMatch.index !== undefined) {
+      const splitEnd = sentenceMatch.index + sentenceMatch[0].length;
+      const part1 = textToSplit.slice(0, splitEnd).trim();
+      const part2 = textToSplit.slice(splitEnd).trim();
       if (part1 && part2) {
         slices.splice(longestIdx, 1, part1, part2);
         continue;
       }
     }
 
-    const commaBreak = textToSplit.search(/[,;]\s+/);
-    if (commaBreak !== -1) {
-      const part1 = textToSplit.slice(0, commaBreak + 1).trim();
-      const part2 = textToSplit.slice(commaBreak + 1).trim();
+    const commaMatch = textToSplit.match(/[,;]+["”'’)\]»]*(?=\s+)/);
+    if (commaMatch && commaMatch.index !== undefined) {
+      const splitEnd = commaMatch.index + commaMatch[0].length;
+      const part1 = textToSplit.slice(0, splitEnd).trim();
+      const part2 = textToSplit.slice(splitEnd).trim();
       if (part1 && part2) {
         slices.splice(longestIdx, 1, part1, part2);
         continue;

@@ -130,6 +130,62 @@ export interface TimedSubtitleCue {
 }
 
 /**
+ * Losslessly splits text into sentences at sentence-ending punctuation
+ * (optionally followed by closing quotes/brackets) when followed by whitespace.
+ * Never drops text on closing quotes (e.g. `."`), decimals (`3.5`), or abbreviations (`TP.HCM`).
+ */
+function splitSentencesLossless(text: string): string[] {
+  const trimmed = text.trim();
+  if (!trimmed) return [];
+
+  const sentences: string[] = [];
+  const boundaryRegex = /[.!?…]+["”'’)\]»]*\s+/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = boundaryRegex.exec(trimmed)) !== null) {
+    if (match.index === lastIndex) continue;
+    const endIdx = match.index + match[0].length;
+    const part = trimmed.slice(lastIndex, endIdx).trim();
+    if (part) sentences.push(part);
+    lastIndex = endIdx;
+  }
+
+  const remainder = trimmed.slice(lastIndex).trim();
+  if (remainder) sentences.push(remainder);
+
+  return sentences.length > 0 ? sentences : [trimmed];
+}
+
+/**
+ * Losslessly splits a sentence into natural clauses at punctuation marks
+ * (optionally followed by closing quotes/brackets) when followed by whitespace.
+ * Preserves times (`03:00`), leading dialogue dashes (`- ...`), and closing quotes.
+ */
+function splitClausesLossless(sentence: string): string[] {
+  const trimmed = sentence.trim();
+  if (!trimmed) return [];
+
+  const clauses: string[] = [];
+  const boundaryRegex = /[,;:\-–—]+["”'’)\]»]*\s+/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = boundaryRegex.exec(trimmed)) !== null) {
+    if (match.index === lastIndex) continue;
+    const endIdx = match.index + match[0].length;
+    const part = trimmed.slice(lastIndex, endIdx).trim();
+    if (part) clauses.push(part);
+    lastIndex = endIdx;
+  }
+
+  const remainder = trimmed.slice(lastIndex).trim();
+  if (remainder) clauses.push(remainder);
+
+  return clauses.length > 0 ? clauses : [trimmed];
+}
+
+/**
  * Splits a long dialogue paragraph into balanced, bite-sized subtitle lines (typically 7-12 words).
  * Slices cleanly at sentence delimiters, commas, dashes, and conjunctions
  * while strictly preserving 100% of the raw text and punctuation.
@@ -146,9 +202,8 @@ export function splitIntoSubtitleChunks(rawText: string, maxWordsPerChunk = 12):
     return [text];
   }
 
-  // 1. Split into primary sentences
-  const sentenceRegex = /([^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$)/g;
-  const rawSentences = text.match(sentenceRegex) || [text];
+  // 1. Split into primary sentences (100% lossless)
+  const rawSentences = splitSentencesLossless(text);
 
   const preliminaryChunks: string[] = [];
 
@@ -162,9 +217,8 @@ export function splitIntoSubtitleChunks(rawText: string, maxWordsPerChunk = 12):
       continue;
     }
 
-    // Split sentence by punctuation marks: comma, semicolon, dash, ellipses
-    const clauseRegex = /([^,;:\-–—]+(?:[,;:\-–—]+|\s*$))/g;
-    const rawClauses = sTrimmed.match(clauseRegex) || [sTrimmed];
+    // Split sentence by punctuation marks: comma, semicolon, colon, dash (100% lossless)
+    const rawClauses = splitClausesLossless(sTrimmed);
 
     let currentBuffer = "";
 
@@ -189,29 +243,32 @@ export function splitIntoSubtitleChunks(rawText: string, maxWordsPerChunk = 12):
   }
 
   // 2. Further split any chunk that is still too long (> maxWordsPerChunk + 3)
+  const conjunctions = [
+    "để",
+    "mà",
+    "nhưng",
+    "và",
+    "khi",
+    "nơi",
+    "với",
+    "rồi",
+    "cho",
+    "lúc",
+    "song",
+    "tuy",
+    "bởi",
+    "vì",
+  ];
   const refinedChunks: string[] = [];
-  for (const chunk of preliminaryChunks) {
+  const queue = [...preliminaryChunks];
+
+  while (queue.length > 0) {
+    const chunk = queue.shift()!;
     const chunkWords = chunk.split(/\s+/).filter(Boolean);
     if (chunkWords.length <= maxWordsPerChunk + 3) {
       refinedChunks.push(chunk);
     } else {
       const half = Math.ceil(chunkWords.length / 2);
-      const conjunctions = [
-        "để",
-        "mà",
-        "nhưng",
-        "và",
-        "khi",
-        "nơi",
-        "với",
-        "rồi",
-        "cho",
-        "lúc",
-        "song",
-        "tuy",
-        "bởi",
-        "vì",
-      ];
       let splitIdx = half;
       for (let offset = 0; offset <= 3; offset++) {
         const left = half - offset;
@@ -228,7 +285,7 @@ export function splitIntoSubtitleChunks(rawText: string, maxWordsPerChunk = 12):
 
       const p1 = chunkWords.slice(0, splitIdx).join(" ");
       const p2 = chunkWords.slice(splitIdx).join(" ");
-      refinedChunks.push(p1, p2);
+      queue.unshift(p1, p2);
     }
   }
 
@@ -244,7 +301,20 @@ export function splitIntoSubtitleChunks(rawText: string, maxWordsPerChunk = 12):
     }
   }
 
-  return finalChunks.filter(Boolean);
+  const cleanedFinal = finalChunks.filter(Boolean);
+
+  // 4. Lossless integrity safeguard: guarantee 100% of original words/characters are preserved
+  const originalCompact = words.join(" ");
+  const resultCompact = cleanedFinal.join(" ").replace(/\s+/g, " ").trim();
+  if (resultCompact !== originalCompact) {
+    const fallbackChunks: string[] = [];
+    for (let i = 0; i < words.length; i += maxWordsPerChunk) {
+      fallbackChunks.push(words.slice(i, i + maxWordsPerChunk).join(" "));
+    }
+    return fallbackChunks;
+  }
+
+  return cleanedFinal;
 }
 
 /**

@@ -805,11 +805,11 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                     onChange={(e) => handleSaveModel(e.target.value)}
                     className="bg-black border border-neutral-800 rounded-lg px-2.5 py-1.5 text-xs text-neutral-200 font-mono focus:outline-none focus:border-red-600"
                   >
-                    <option value="gemini-2.5-flash">gemini-2.5-flash (Khuyên dùng: Phản hồi tức thì)</option>
-                    <option value="gemini-2.5-pro">gemini-2.5-pro (Suy luận sâu)</option>
-                    <option value="gemini-2.0-flash">gemini-2.0-flash (Tốc độ cao & ổn định)</option>
-                    <option value="gemini-1.5-flash">gemini-1.5-flash (Flash ổn định)</option>
-                    <option value="gemini-1.5-pro">gemini-1.5-pro (Kinh điển)</option>
+                    <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Khuyên dùng: Siêu nhanh & ổn định 100%)</option>
+                    <option value="gemini-flash-lite-latest">gemini-flash-lite-latest (Bản Lite mới nhất)</option>
+                    <option value="gemini-3-flash-preview">gemini-3-flash-preview (Thế hệ 3 Preview)</option>
+                    <option value="gemini-3.8-flash">gemini-3.8-flash (Chất lượng cao nhất - 3.8 Flash)</option>
+                    <option value="gemini-2.5-flash">gemini-2.5-flash (Giới hạn Free 20 lượt/ngày)</option>
                   </select>
                 </div>
               </div>

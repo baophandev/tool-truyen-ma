@@ -34,12 +34,44 @@ export function setStoredApiKey(key: string): void {
   }
 }
 
+/**
+ * Danh sách các model Gemini dự phòng đáng tin cậy (theo thứ tự ưu tiên).
+ * Nếu model được chọn gặp sự cố (429 hết quota, 404 model ngừng hoạt động, 503 quá tải),
+ * hệ thống sẽ tự động chuyển tiếp sang model kế tiếp để đảm bảo không bị gián đoạn.
+ */
+export const HEALTHY_FALLBACK_MODELS = [
+  "gemini-3.5-flash-lite",
+  "gemini-flash-lite-latest",
+  "gemini-3-flash-preview",
+  "gemini-3.1-flash-lite",
+  "gemini-3.8-flash",
+];
+
+export const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite";
+
+export function isDeprecatedModel(model: string): boolean {
+  const lower = (model || "").trim().toLowerCase();
+  return (
+    !lower ||
+    lower.includes("1.5") ||
+    lower.includes("2.0") ||
+    lower === "gemini-2.5-pro"
+  );
+}
+
 export function getStoredModel(): string {
   try {
     const saved = localStorage.getItem(STORAGE_KEY_MODEL);
-    return saved && saved.trim() ? saved.trim() : "gemini-2.5-flash";
+    if (!saved || !saved.trim()) return DEFAULT_GEMINI_MODEL;
+    const trimmed = saved.trim();
+    // Tự động chuyển đổi và ghi đè localStorage nếu gặp model đã bị Google khai tử (404) hoặc model 2.5 cũ
+    if (isDeprecatedModel(trimmed) || trimmed === "gemini-2.5-flash") {
+      localStorage.setItem(STORAGE_KEY_MODEL, DEFAULT_GEMINI_MODEL);
+      return DEFAULT_GEMINI_MODEL;
+    }
+    return trimmed;
   } catch {
-    return "gemini-2.5-flash";
+    return DEFAULT_GEMINI_MODEL;
   }
 }
 
@@ -302,7 +334,10 @@ function formatApiError(res: Response, errBody: string): string {
     const errJson = JSON.parse(errBody);
     if (errJson.error?.message) {
       if (res.status === 503) {
-        return `Máy chủ Gemini đang quá tải tạm thời (HTTP 503: High demand). Hệ thống đã tự động thử lại nhưng máy chủ Google vẫn bận. Vui lòng thử lại sau 30 giây hoặc chọn model khác trong phần Cấu hình.`;
+        return `Máy chủ Gemini đang quá tải tạm thời (HTTP 503: High demand). Hệ thống đã tự động thử lại các model khả dụng nhưng máy chủ Google vẫn bận. Vui lòng thử lại sau 30 giây.`;
+      }
+      if (res.status === 429) {
+        return `Đã vượt quá hạn mức gọi Gemini API (HTTP 429: Quota exceeded). Hệ thống đã cố gắng chuyển qua các model dự phòng nhưng đều chạm trần hạn mức. Vui lòng kiểm tra lại gói cước hoặc đổi API Key.`;
       }
       return `Lỗi Gemini API (${res.status}): ${errJson.error.message}`;
     }
@@ -313,7 +348,8 @@ function formatApiError(res: Response, errBody: string): string {
 }
 
 /**
- * Safe Gemini fetch helper with Exponential Backoff retry and automatic model fallback.
+ * Safe Gemini fetch helper with Exponential Backoff retry and automatic multi-tier model fallback.
+ * Tự động chuyển đổi sang model khác nếu model hiện tại bị 429 (hết quota), 404 (ngừng hỗ trợ), hoặc 503 (quá tải).
  */
 async function callGeminiApiWithRetry(
   apiKey: string,
@@ -321,21 +357,20 @@ async function callGeminiApiWithRetry(
   systemInstructionText: string,
   userPromptText: string,
   generationConfig: any = { responseMimeType: "application/json", temperature: 0.5 },
-  maxRetries: number = 2
+  maxRetries: number = 1
 ): Promise<Response> {
-  const modelsToTry = [model];
-  // Auto-fallback: If primary model is overloaded (503), failover to 2.0-flash or 1.5-flash
-  if (model.includes("2.5") && !modelsToTry.includes("gemini-2.0-flash")) {
-    modelsToTry.push("gemini-2.0-flash");
-  } else if (!modelsToTry.includes("gemini-1.5-flash")) {
-    modelsToTry.push("gemini-1.5-flash");
-  }
+  // Chuỗi model ưu tiên: Lọc bỏ tuyệt đối các model đã bị Google khai tử (1.5, 2.0, 2.5-pro) trước khi gửi request
+  const safeRequestedModel = isDeprecatedModel(model) ? DEFAULT_GEMINI_MODEL : model;
+  const rawModels = [safeRequestedModel, ...HEALTHY_FALLBACK_MODELS];
+  const modelsToTry = Array.from(new Set(rawModels.filter((m) => m && !isDeprecatedModel(m))));
 
   let lastRes: Response | null = null;
 
-  for (const currentModel of modelsToTry) {
+  for (let i = 0; i < modelsToTry.length; i++) {
+    const currentModel = modelsToTry[i];
+    const isLastModel = i === modelsToTry.length - 1;
     let attempt = 0;
-    let delay = 1200;
+    let delay = 1000;
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
 
     while (attempt <= maxRetries) {
@@ -353,27 +388,44 @@ async function callGeminiApiWithRetry(
 
         lastRes = res;
 
-        // If success or normal client error (400, 401, 403, 404), return immediately
+        // Thành công: gắn tag modelUsed và trả về ngay lập tức
         if (res.ok) {
+          (res as any).modelUsed = currentModel;
           return res;
         }
 
-        // Retry only on server load errors: 503 (Overloaded), 429 (Rate limit), 500 (Internal)
-        if (res.status !== 503 && res.status !== 429 && res.status !== 500) {
+        // Nếu model bị 404 (đã đóng) hoặc 429 (hết hạn mức):
+        // KHÔNG chờ vô ích mà nhảy ngay sang model dự phòng kế tiếp!
+        if (res.status === 404 || res.status === 429) {
+          console.warn(`[Gemini Director] Model "${currentModel}" trả về HTTP ${res.status}. Tự động fallback sang model kế tiếp...`);
+          break; // Thoát vòng retry của model này, chuyển sang model kế tiếp trong modelsToTry
+        }
+
+        // Nếu 503 (Google quá tải) hoặc 500: Thử lại 1 lần nhanh nếu còn lượt
+        if (res.status === 503 || res.status === 500) {
+          if (attempt <= maxRetries) {
+            const jitter = Math.random() * 300;
+            await new Promise((resolve) => setTimeout(resolve, delay + jitter));
+            delay *= 1.6;
+            continue;
+          } else {
+            console.warn(`[Gemini Director] Model "${currentModel}" quá tải (503). Chuyển sang model dự phòng kế tiếp...`);
+            break;
+          }
+        }
+
+        // Lỗi client payload/auth (400, 401, 403) thì trả về luôn vì đổi model cũng vô ích
+        if (res.status === 400 || res.status === 401 || res.status === 403) {
           return res;
         }
 
-        if (attempt <= maxRetries) {
-          const jitter = Math.random() * 400;
-          await new Promise((resolve) => setTimeout(resolve, delay + jitter));
-          delay *= 1.8;
-        }
+        break;
       } catch (networkErr) {
-        if (attempt > maxRetries && currentModel === modelsToTry[modelsToTry.length - 1]) {
+        if (isLastModel && attempt > maxRetries) {
           throw networkErr;
         }
         await new Promise((resolve) => setTimeout(resolve, delay));
-        delay *= 1.8;
+        delay *= 1.6;
       }
     }
   }
@@ -408,7 +460,7 @@ export async function generateFilmFromStory(
   } = {}
 ): Promise<GenerateFilmResult> {
   const apiKey = (options.apiKey || getStoredApiKey()).trim();
-  const model = options.model || getStoredModel() || "gemini-2.5-flash";
+  const model = options.model || getStoredModel() || DEFAULT_GEMINI_MODEL;
 
   if (!apiKey) {
     return {
@@ -618,7 +670,7 @@ export async function regenerateSingleScene(
   } = {}
 ): Promise<GenerateSceneResult> {
   const apiKey = (options.apiKey || getStoredApiKey()).trim();
-  const model = options.model || getStoredModel() || "gemini-2.5-flash";
+  const model = options.model || getStoredModel() || DEFAULT_GEMINI_MODEL;
 
   if (!apiKey) {
     return {
@@ -701,7 +753,7 @@ export async function generateSceneFromDescription(
   } = {}
 ): Promise<GenerateSceneResult> {
   const apiKey = (options.apiKey || getStoredApiKey()).trim();
-  const model = options.model || getStoredModel() || "gemini-2.5-flash";
+  const model = options.model || getStoredModel() || DEFAULT_GEMINI_MODEL;
   const duration = options.duration_sec || 6;
   const idx = options.sceneIndex !== undefined ? options.sceneIndex + 1 : 1;
 
@@ -855,7 +907,7 @@ export async function generateFilmFromDescriptions(
   } = {}
 ): Promise<GenerateFilmResult> {
   const apiKey = (options.apiKey || getStoredApiKey()).trim();
-  const model = options.model || getStoredModel() || "gemini-2.5-flash";
+  const model = options.model || getStoredModel() || DEFAULT_GEMINI_MODEL;
 
   if (!apiKey) {
     return {
@@ -1046,7 +1098,7 @@ export async function generateNamedEnvironmentFromPrompt(
   } = {}
 ): Promise<{ success: boolean; environment?: NamedEnvironmentPreset; error?: string }> {
   const apiKey = (options.apiKey || getStoredApiKey()).trim();
-  const model = options.model || getStoredModel() || "gemini-2.5-flash";
+  const model = options.model || getStoredModel() || DEFAULT_GEMINI_MODEL;
 
   if (!apiKey) {
     return {
@@ -1111,7 +1163,7 @@ export async function generateCharacterPresetFromDescription(
   } = {}
 ): Promise<{ success: boolean; character?: NamedCharacterPreset; error?: string }> {
   const apiKey = (options.apiKey || getStoredApiKey()).trim();
-  const model = options.model || getStoredModel() || "gemini-2.5-flash";
+  const model = options.model || getStoredModel() || DEFAULT_GEMINI_MODEL;
 
   if (!apiKey) {
     return {
@@ -1222,7 +1274,7 @@ export async function auditStoryAssets(
   } = {}
 ): Promise<AssetAuditResult> {
   const apiKey = (options.apiKey || getStoredApiKey()).trim();
-  const model = options.model || getStoredModel() || "gemini-2.5-flash";
+  const model = options.model || getStoredModel() || DEFAULT_GEMINI_MODEL;
 
   if (!apiKey) {
     return {
@@ -1422,7 +1474,7 @@ export async function breakdownStoryToSceneDrafts(
   } = {}
 ): Promise<BreakdownStoryResult> {
   const apiKey = (options.apiKey || getStoredApiKey()).trim();
-  const model = options.model || getStoredModel() || "gemini-2.5-flash";
+  const model = options.model || getStoredModel() || DEFAULT_GEMINI_MODEL;
 
   if (!apiKey) {
     return {
