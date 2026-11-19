@@ -363,6 +363,56 @@
         "width": 490,
         "height": 210,
         "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_wooden_coffin",
+        "name": "Cỗ quan tài gỗ đặt trong nhà",
+        "semantic_role": "Cỗ quan tài gỗ truyền thống đặt trên hai đôn gỗ kê cao, nắp vát cạnh chạm khắc chữ Thọ, ánh nến vàng hắt nhẹ lên nắp hòm và dải băng tang trắng rủ mép",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 380,
+        "height": 165,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_bamboo_bed_net",
+        "name": "Giường tre nông thôn giăng mùng ngủ",
+        "semantic_role": "Giường tre nông thôn 4 cọc tre vươn cao treo mùng vải trắng mỏng bán trong suốt rủ quanh giường, bên trong có gối và chiếu cói, hỗ trợ nhìn xuyên thấu nhân vật nằm co ro bên trong",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 370,
+        "height": 290,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_wooden_latch_door",
+        "name": "Cánh cửa gỗ cũ cài then ngang có khe hở chân cửa",
+        "semantic_role": "Khung cửa gỗ ghép từ nhiều tấm ván dọc nứt nẻ lọt ánh sáng xanh đêm lạnh, thanh then cài gỗ ngang tại tầm cao Y=580px, khe hở 15px sát đất cho vệt nước bùn tràn qua",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 260,
+        "height": 400,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_rural_passenger_bus",
+        "name": "Xe đò khách cũ vùng quê",
+        "semantic_role": "Xe khách cổ điển thập niên 90-2000 dạng hộp bo tròn góc, giá chở hàng chằng bạt trên nóc, các ô cửa sổ kính chữ nhật tối màu, đèn pha trước chiếu luồng sáng vàng mờ nhạt",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 540,
+        "height": 270,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_coconut_banana_grove",
+        "name": "Rặng dừa nước và bụi chuối rậm rạp",
+        "semantic_role": "Thân dừa cao vươn nghiêng duyên dáng với tán lá xòe hình lược răng cưa đặc trưng, bên dưới là bụi chuối rậm rạp với các tàu lá bản to rủ xuống xào xạc",
+        "allowed_slots": ["far_left", "far_right"],
+        "layer": "midground",
+        "width": 370,
+        "height": 480,
+        "anchor": "bottom-center"
       }
     ]
   },
@@ -678,6 +728,11 @@
         "desc": "Bị treo thắt cổ lơ lửng, đầu gục bất động, thân đung đưa kẽo kẹt"
       },
       {
+        "id": "pose_lying_down",
+        "type": "ground",
+        "desc": "Tư thế nằm ngửa / nằm co ro trên giường hoặc sàn nhà: toàn bộ cơ thể xoay ngang song song với mặt đất, đầu kê trên gối, hai tay xếp trên ngực/bụng, hỗ trợ offsetY âm (-80px) để đặt khít lên giường tre structure_bamboo_bed_net"
+      },
+      {
         "id": "pose_holding",
         "type": "ground",
         "desc": "Giơ tay cầm đồ vật ra phía trước (soi đèn, giơ bùa, thủ kiếm)"
@@ -780,6 +835,34 @@
       "name": "Gương nhà tắm vỡ nứt vấy máu",
       "semantic_role": "Gương nhà tắm treo tường nứt mạng nhện chằng chịt, dấu bàn tay đẫm máu cào xước",
       "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right", "air_left", "air_center", "air_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_muddy_water_puddle",
+      "name": "Vũng nước ướt sũng lẫn bùn non loang trên nền đất",
+      "semantic_role": "Vệt nước bùn non đục ngầu tràn qua khe cửa bò lan trên sàn đất, bề mặt có các gợn sóng phản chiếu ánh sáng mờ và đốm bùn đặc",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_oil_lamp",
+      "name": "Đèn dầu hột vịt / Đèn dầu cổ để bàn",
+      "semantic_role": "Bầu đèn tròn nhỏ bằng thủy tinh bên dưới, ống khói thủy tinh thon eo, ngọn lửa bấc vàng cam leo lét với quầng sáng tỏa tròn xung quanh",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_vintage_radio",
+      "name": "Đài radio cassette cổ chạy pin",
+      "semantic_role": "Hình chữ nhật ngang nhỏ gọn, có ăng-ten kim loại kéo dài chéo lên trên, hai loa tròn hai bên và dải tần số ở giữa phát sáng yếu ớt",
+      "allowed_slots": ["mid_left", "center", "mid_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_water_hyacinth",
+      "name": "Bụi lục bình dày đặc trôi nổi",
+      "semantic_role": "Cụm lá tròn phình cuống xốp bồng bềnh trên mặt nước, điểm xuyết chùm hoa tím nhạt u ám và rễ ngầm chìm dưới nước",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
       "anchor": "bottom-center"
     }
   ],

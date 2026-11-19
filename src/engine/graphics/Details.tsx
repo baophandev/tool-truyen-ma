@@ -26,6 +26,10 @@ export const DetailRenderer: React.FC<DetailRendererProps> = ({
       {id === "detail_surveillance_camera" && <SurveillanceCamera />}
       {id === "detail_flickering_ceiling_lamp" && <FlickeringCeilingLamp />}
       {id === "detail_broken_mirror" && <BrokenBathroomMirror />}
+      {id === "detail_muddy_water_puddle" && <MuddyWaterPuddle />}
+      {id === "detail_oil_lamp" && <OilLamp />}
+      {id === "detail_vintage_radio" && <VintageRadio />}
+      {id === "detail_water_hyacinth" && <WaterHyacinthClump />}
 
       {showAnchor && (
         <g className="detail-debug-anchor" pointerEvents="none">
@@ -463,6 +467,329 @@ const BrokenBathroomMirror: React.FC = () => {
         {/* Palm blood drips down the mirror bottom */}
         <line x1="4" y1="10" x2="3" y2="28" stroke="#7F1D1D" strokeWidth="1.2" strokeDasharray="4,3" />
         <circle cx="3" cy="30" r="1.3" fill="#DC2626" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 12. MUDDY WATER PUDDLE (Vũng Nước Ướt Sũng Lẫn Bùn Non)
+ * Sinister pool of turbid water and oozing river mud spreading along the ground threshold.
+ * Features dark blue-black liquid sheen, grey reflective fringes, and mud spatter.
+ * Anchored at [bottom-center] (0, 0) at Ground Y = 800px.
+ */
+const MuddyWaterPuddle: React.FC = () => {
+  return (
+    <g className="detail-muddy-water-puddle">
+      {/* 1. Base Dark Ground Shadow & Stained Earth */}
+      <ellipse cx="0" cy="0" rx="105" ry="12" fill="#000000" opacity="0.6" />
+
+      {/* 2. Main Mud & Turbid Water Pool */}
+      <path
+        d="M -98 0 
+           C -108 -6, -88 -14, -55 -16 
+           C -25 -18, 15 -14, 52 -16 
+           C 85 -17, 108 -9, 98 -1 
+           C 88 5, 55 7, 18 6 
+           C -25 5, -88 6, -98 0 Z"
+        fill="#0A0F1D"
+        stroke="#1E293B"
+        strokeWidth="1.5"
+      />
+
+      {/* 3. Concentric Wet Sheen & Mud Ripple Reflections */}
+      <path
+        d="M -75 -2 
+           C -82 -7, -65 -12, -40 -13 
+           C -15 -14, 18 -11, 46 -13 
+           C 72 -14, 86 -7, 78 -1 
+           C 70 4, 42 5, 12 4 
+           C -20 3, -68 4, -75 -2 Z"
+        fill="#0F172A"
+        opacity="0.85"
+      />
+
+      {/* Silver-grey Translucent Edge Reflective Highlighting */}
+      <path
+        d="M -70 -11 C -40 -15, 20 -13, 65 -14"
+        fill="none"
+        stroke="#64748B"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        opacity="0.55"
+      />
+      <path
+        d="M -45 -6 C -10 -9, 35 -8, 55 -6"
+        fill="none"
+        stroke="#94A3B8"
+        strokeWidth="1"
+        strokeLinecap="round"
+        opacity="0.45"
+      />
+
+      {/* 4. Oozing Mud Blobs & Spatter Droplets (Vết bùn non loang lổ) */}
+      <ellipse cx="-82" cy="-4" rx="8" ry="3.5" fill="#07090F" stroke="#334155" strokeWidth="0.8" />
+      <ellipse cx="-52" cy="3" rx="10" ry="4" fill="#07090F" stroke="#334155" strokeWidth="0.8" />
+      <ellipse cx="68" cy="2" rx="7" ry="3" fill="#07090F" stroke="#334155" strokeWidth="0.8" />
+      <circle cx="-95" cy="-8" r="2.2" fill="#0F172A" />
+      <circle cx="86" cy="-8" r="2.5" fill="#0F172A" />
+      <circle cx="98" cy="4" r="1.8" fill="#0F172A" />
+      <circle cx="-18" cy="5" r="2" fill="#334155" opacity="0.7" />
+
+      {/* Eerie cold mist hovering over wet mud */}
+      <ellipse cx="0" cy="-6" rx="65" ry="5" fill="#94A3B8" opacity="0.12" pointerEvents="none" />
+    </g>
+  );
+};
+
+/**
+ * 13. OIL LAMP (Đèn Dầu Hột Vịt / Đèn Dầu Cổ Để Bàn)
+ * Vintage Vietnamese glass hurricane oil lamp ("đèn hột vịt") with glowing amber wick flame.
+ * Anchored at [bottom-center] (0, 0) at Ground Y = 800px (or tabletop via negative offsetY).
+ */
+const OilLamp: React.FC = () => {
+  return (
+    <g className="detail-oil-lamp">
+      {/* 1. Ground Contact Shadow */}
+      <ellipse cx="0" cy="-1.5" rx="18" ry="4" fill="#000000" opacity="0.6" />
+
+      {/* 2. Ambient Warm Amber Glow radiating around the lamp */}
+      <circle cx="0" cy="-44" r="48" fill="#FACC15" opacity="0.22" pointerEvents="none" />
+      <circle cx="0" cy="-44" r="28" fill="#FEF08A" opacity="0.18" pointerEvents="none" />
+
+      {/* 3. Lamp Base & Fuel Reservoir (Đế đèn thiếc & Bầu dầu thủy tinh) */}
+      {/* Flanged tin base foot */}
+      <rect x="-14" y="-5" width="28" height="5" rx="1.5" fill="#141419" stroke="#272733" strokeWidth="1" />
+      <line x1="-12" y1="-2" x2="12" y2="-2" stroke="#374151" strokeWidth="1" />
+
+      {/* Glass Fuel Bowl (Bầu đựng dầu hột vịt tròn phình) */}
+      <ellipse cx="0" cy="-16" rx="15" ry="11" fill="#12141C" stroke="#2F3647" strokeWidth="1.5" />
+      {/* Kerosene liquid level inside bowl */}
+      <ellipse cx="0" cy="-14" rx="12" ry="7" fill="#2E2310" opacity="0.75" />
+      {/* Submerged cotton wick (tim đèn ngâm trong dầu) */}
+      <line x1="0" y1="-26" x2="-3" y2="-10" stroke="#78350F" strokeWidth="2.2" strokeLinecap="round" />
+
+      {/* 4. Brass Burner Collar & Wick Wheel Knob (Họng đèn đồng & Núm vặn bấc) */}
+      <rect x="-7" y="-28" width="14" height="6" rx="1" fill="#78350F" stroke="#B45309" strokeWidth="1" />
+      {/* Wick adjustment thumb-wheel knob on right */}
+      <circle cx="10" cy="-25" r="3.2" fill="#D97706" stroke="#78350F" strokeWidth="0.8" />
+      <line x1="7" y1="-25" x2="10" y2="-25" stroke="#78350F" strokeWidth="1.5" />
+
+      {/* 5. Flickering Teardrop Flame inside Glass (Ngọn lửa bấc leo lét) */}
+      <g className="anim-flicker-ember">
+        {/* Outer Orange Teardrop Flame */}
+        <path
+          d="M 0 -54 
+             C -6 -46, -5 -35, 0 -31 
+             C 5 -35, 6 -46, 0 -54 Z"
+          fill="#F59E0B"
+        />
+        {/* Inner Brilliant Yellow Core */}
+        <path
+          d="M 0 -48 
+             C -3 -42, -2.5 -35, 0 -32 
+             C 2.5 -35, 3 -42, 0 -48 Z"
+          fill="#FEF08A"
+        />
+        {/* Incandescent white center point */}
+        <ellipse cx="0" cy="-34" rx="1.5" ry="2" fill="#FFFFFF" />
+      </g>
+
+      {/* 6. Glass Chimney (Bóng đèn thủy tinh hột vịt thon eo) */}
+      {/* Chimney path: seated at Y = -27, flares out to rx=10 at Y = -42, tapers to neck at Y = -64, flares out at top rim Y = -72 */}
+      <path
+        d="M -7 -27 
+           C -12 -38, -11 -48, -7 -62 
+           C -6 -68, -8 -71, -6 -73 
+           L 6 -73 
+           C 8 -71, 6 -68, 7 -62 
+           C 11 -48, 12 -38, 7 -27 Z"
+        fill="#CBD5E1"
+        fillOpacity="0.08"
+        stroke="#94A3B8"
+        strokeWidth="1.2"
+      />
+      {/* Glass curved highlight reflections */}
+      <path
+        d="M -6 -32 C -9 -40, -9 -48, -5 -58"
+        fill="none"
+        stroke="#F8FAFC"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        opacity="0.65"
+      />
+      <line x1="4" y1="-34" x2="6" y2="-45" stroke="#F8FAFC" strokeWidth="0.8" opacity="0.4" />
+      {/* Scalloped top glass rim */}
+      <line x1="-6" y1="-73" x2="6" y2="-73" stroke="#CBD5E1" strokeWidth="1.5" strokeLinecap="round" />
+    </g>
+  );
+};
+
+/**
+ * 14. VINTAGE CASSETTE RADIO (Đài Radio Cassette Cổ Chạy Pin)
+ * 1980s-1990s vintage portable radio with metallic whip antenna, tuning scale dial, and speakers.
+ * Anchored at [bottom-center] (0, 0) at Ground Y = 800px (or tabletop via negative offsetY).
+ */
+const VintageRadio: React.FC = () => {
+  return (
+    <g className="detail-vintage-radio">
+      {/* 1. Ground Shadow */}
+      <ellipse cx="0" cy="-1.5" rx="44" ry="5.5" fill="#000000" opacity="0.65" />
+
+      {/* 2. Metal Telescopic Whip Antenna (Ăng-ten kim loại vươn chéo) */}
+      <g>
+        <line x1="28" y1="-56" x2="48" y2="-102" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="29" y1="-56" x2="47" y2="-100" stroke="#CBD5E1" strokeWidth="1.2" strokeLinecap="round" />
+        <circle cx="48" cy="-102" r="2.5" fill="#E2E8F0" />
+      </g>
+
+      {/* 3. Folded Carrying Handle on Top (Quai xách gấp) */}
+      <path
+        d="M -26 -56 L -26 -64 L 26 -64 L 26 -56"
+        fill="none"
+        stroke="#1E232E"
+        strokeWidth="3.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M -26 -56 L -26 -64 L 26 -64 L 26 -56"
+        fill="none"
+        stroke="#334155"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+
+      {/* 4. Main Radio Body Chassis (Hộp máy chữ nhật bo góc) */}
+      <rect
+        x="-42"
+        y="-56"
+        width="84"
+        height="54"
+        rx="4"
+        fill="#0D0F14"
+        stroke="#1E2430"
+        strokeWidth="2"
+      />
+      {/* Upper control bevel plate */}
+      <rect x="-38" y="-53" width="76" height="10" rx="1.5" fill="#141822" />
+
+      {/* Knobs on Top Control Panel */}
+      <circle cx="-28" cy="-48" r="3.2" fill="#334155" stroke="#475569" strokeWidth="1" />
+      <circle cx="-16" cy="-48" r="3.2" fill="#334155" stroke="#475569" strokeWidth="1" />
+      {/* Red Power / Battery Status LED indicator */}
+      <circle cx="30" cy="-48" r="2" fill="#EF4444" />
+      <circle cx="30" cy="-48" r="0.8" fill="#FCA5A5" />
+
+      {/* 5. Dual Circular Speaker Grilles (Hai màng loa tròn) */}
+      {/* Left Speaker */}
+      <g>
+        <circle cx="-23" cy="-25" r="14" fill="#07080B" stroke="#252D3D" strokeWidth="1.5" />
+        <circle cx="-23" cy="-25" r="7" fill="#0E121A" />
+        {/* Speaker grille pattern dots */}
+        {[-4, 0, 4].map((dx) =>
+          [-4, 0, 4].map((dy) => (
+            <circle key={`spkL-${dx}-${dy}`} cx={-23 + dx} cy={-25 + dy} r="0.8" fill="#475569" />
+          ))
+        )}
+      </g>
+      {/* Right Speaker */}
+      <g>
+        <circle cx="23" cy="-25" r="14" fill="#07080B" stroke="#252D3D" strokeWidth="1.5" />
+        <circle cx="23" cy="-25" r="7" fill="#0E121A" />
+        {/* Speaker grille pattern dots */}
+        {[-4, 0, 4].map((dx) =>
+          [-4, 0, 4].map((dy) => (
+            <circle key={`spkR-${dx}-${dy}`} cx={23 + dx} cy={-25 + dy} r="0.8" fill="#475569" />
+          ))
+        )}
+      </g>
+
+      {/* 6. Central Tuning Scale / Cassette Bay (Dải tần số sóng radio) */}
+      <rect x="-8" y="-39" width="16" height="32" rx="2" fill="#050709" stroke="#1F2937" strokeWidth="1" />
+      {/* Cassette Tape Spools */}
+      <circle cx="-3" cy="-30" r="2.5" fill="#1E293B" stroke="#334155" strokeWidth="0.8" />
+      <circle cx="3" cy="-30" r="2.5" fill="#1E293B" stroke="#334155" strokeWidth="0.8" />
+      <rect x="-5" y="-23" width="10" height="4" fill="#0B1320" />
+
+      {/* Glowing emerald frequency needle indicator */}
+      <g opacity="0.85">
+        <line x1="-6" y1="-15" x2="6" y2="-15" stroke="#10B981" strokeWidth="1.4" />
+        <rect x="-2" y="-17" width="4" height="4" fill="#34D399" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 15. WATER HYACINTH CLUMP (Bụi Lục Bình Dày Đặc Trôi Nổi)
+ * Dense clump of floating water hyacinth ("bèo tây") with spongy bulbous petioles, fleshy leaves, and violet flowers.
+ * Anchored at [bottom-center] (0, 0) on Ground/Canal surface Y = 800px.
+ */
+const WaterHyacinthClump: React.FC = () => {
+  return (
+    <g className="detail-water-hyacinth anim-sway-subtle">
+      {/* 1. Submerged Feathery Dark Roots under Waterline (Y = 0 to Y = 16) */}
+      <g stroke="#050C08" strokeWidth="1.2" opacity="0.65">
+        <path d="M -35 0 C -42 6, -38 12, -45 18" />
+        <path d="M -20 0 C -22 8, -18 14, -24 20" />
+        <path d="M -5 0 C -6 8, 0 15, -4 22" />
+        <path d="M 12 0 C 15 7, 10 14, 16 21" />
+        <path d="M 30 0 C 28 8, 35 14, 32 19" />
+        <path d="M 45 0 C 48 6, 44 12, 50 17" />
+      </g>
+
+      {/* 2. Water Surface Contact Ripple & Shadow */}
+      <ellipse cx="0" cy="0" rx="65" ry="5.5" fill="#000000" opacity="0.55" />
+      <ellipse cx="0" cy="0" rx="50" ry="3.5" fill="#08140E" opacity="0.4" />
+
+      {/* 3. Spongy Swollen Leaf Stalks (Cuống lá lục bình phình xốp hình bóng tròn) */}
+      {/* Outer base bulbs */}
+      <ellipse cx="-38" cy="-5" rx="14" ry="7" fill="#08140E" stroke="#040906" strokeWidth="1" />
+      <ellipse cx="-16" cy="-6" rx="16" ry="8" fill="#0B1C13" stroke="#050E09" strokeWidth="1" />
+      <ellipse cx="14" cy="-6" rx="17" ry="8.5" fill="#0C1F15" stroke="#050E09" strokeWidth="1" />
+      <ellipse cx="38" cy="-5" rx="14" ry="7" fill="#08140E" stroke="#040906" strokeWidth="1" />
+
+      {/* 4. Glossy Rounded Fan-like Green Leaves (Tàu lá lục bình xanh đậm xếp xòe) */}
+      {/* Left Leaf 1 */}
+      <ellipse cx="-45" cy="-14" rx="16" ry="11" fill="#0F2A1C" stroke="#07170E" strokeWidth="1" transform="rotate(-25, -45, -14)" />
+      <path d="M -45 -14 L -54 -20" stroke="#1A402C" strokeWidth="1.2" />
+
+      {/* Left Leaf 2 */}
+      <ellipse cx="-24" cy="-18" rx="17" ry="12" fill="#133624" stroke="#081C11" strokeWidth="1" transform="rotate(-12, -24, -18)" />
+      <path d="M -24 -18 L -30 -26" stroke="#1D4A32" strokeWidth="1.2" />
+
+      {/* Center Background Leaf */}
+      <ellipse cx="0" cy="-22" rx="18" ry="13" fill="#0E281B" stroke="#06150E" strokeWidth="1" />
+
+      {/* Right Leaf 1 */}
+      <ellipse cx="24" cy="-18" rx="17" ry="12" fill="#133624" stroke="#081C11" strokeWidth="1" transform="rotate(12, 24, -18)" />
+      <path d="M 24 -18 L 30 -26" stroke="#1D4A32" strokeWidth="1.2" />
+
+      {/* Right Leaf 2 */}
+      <ellipse cx="45" cy="-14" rx="16" ry="11" fill="#0F2A1C" stroke="#07170E" strokeWidth="1" transform="rotate(25, 45, -14)" />
+      <path d="M 45 -14 L 54 -20" stroke="#1A402C" strokeWidth="1.2" />
+
+      {/* 5. Flower Spike & Purple Blossoms (Bông hoa lục bình tím nhạt mộng mị) */}
+      <g transform="translate(0, -18)">
+        {/* Flower stem spike */}
+        <line x1="0" y1="0" x2="0" y2="-22" stroke="#18422B" strokeWidth="2.5" strokeLinecap="round" />
+
+        {/* Lower Flower Petals */}
+        <ellipse cx="-6" cy="-14" rx="5" ry="7" fill="#6B21A8" opacity="0.85" transform="rotate(-28, -6, -14)" />
+        <ellipse cx="6" cy="-14" rx="5" ry="7" fill="#6B21A8" opacity="0.85" transform="rotate(28, 6, -14)" />
+        <ellipse cx="0" cy="-10" rx="4.5" ry="6.5" fill="#7E22CE" opacity="0.9" />
+
+        {/* Top Flower Petals */}
+        <ellipse cx="-5" cy="-22" rx="4.5" ry="6.5" fill="#7E22CE" opacity="0.9" transform="rotate(-20, -5, -22)" />
+        <ellipse cx="5" cy="-22" rx="4.5" ry="6.5" fill="#7E22CE" opacity="0.9" transform="rotate(20, 5, -22)" />
+
+        {/* Crown Top Center Petal with distinctive blue-yellow eye spot */}
+        <ellipse cx="0" cy="-27" rx="5.5" ry="8" fill="#9333EA" />
+        <ellipse cx="0" cy="-28" rx="3.5" ry="5" fill="#C084FC" />
+        {/* Blue halo on top petal */}
+        <circle cx="0" cy="-28" r="2.2" fill="#38BDF8" opacity="0.9" />
+        {/* Yellow center eye dot */}
+        <circle cx="0" cy="-28" r="1.1" fill="#FACC15" />
       </g>
     </g>
   );

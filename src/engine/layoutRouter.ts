@@ -132,6 +132,11 @@ const VALID_STRUCTURES: StructureId[] = [
   "structure_old_apartment_gate",
   "structure_wooden_sampan",
   "structure_monkey_bridge",
+  "structure_wooden_coffin",
+  "structure_bamboo_bed_net",
+  "structure_wooden_latch_door",
+  "structure_rural_passenger_bus",
+  "structure_coconut_banana_grove",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -198,6 +203,7 @@ const VALID_POSES: CharacterPoseId[] = [
   "pose_reaching",
   "pose_hanging",
   "pose_holding",
+  "pose_lying_down",
 ];
 const VALID_HELD_ITEMS: HeldItemId[] = [
   "none",
@@ -232,6 +238,10 @@ const VALID_DETAILS: DetailId[] = [
   "detail_surveillance_camera",
   "detail_flickering_ceiling_lamp",
   "detail_broken_mirror",
+  "detail_muddy_water_puddle",
+  "detail_oil_lamp",
+  "detail_vintage_radio",
+  "detail_water_hyacinth",
 ];
 const VALID_FACINGS: FacingDirection[] = ["left", "right"];
 const VALID_SLOTS: SlotId[] = [

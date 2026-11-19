@@ -75,7 +75,7 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"flickering_fluorescent"`: Đèn Tuýp Huỳnh Quang Chập Chờn (Ánh sáng xanh ngọc lạnh lẽo trong nhà, bóng tuýp chập chờn, biển báo EXIT xanh lục phát sáng).
 - `"dim_indoor_night"`: Ánh Vàng Đêm Mờ Ảo (Ánh đèn vàng hổ phách u tịch trong khách sạn / nhà hàng đêm muộn).
 
-### 3.3. 21 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
+### 3.3. 26 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
 
 Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ được đặt tại các Slot được phép** sau:
 
@@ -102,6 +102,11 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `structure_old_apartment_gate` | Cổng sắt chung cư cũ | Cổng sắt hoen gỉ khóa xích của khu chung cư cũ nát, khối nhà tập thể u ám phía sau với chuồng cọp lồng sắt, đèn tường chập chờn, nơi nhân vật kiệt sức gục ngã | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `structure_wooden_sampan` | Xuồng ba lá / Ghe nước miền Tây | Chiếc xuồng ba lá gỗ miền Tây đậu trên con kênh nước nổi âm u, chất đầy bông súng, bông điên điển, gác mái dầm và buộc cọc tre mé kênh, gợi ký ức người mẹ Hai Lụa bơi xuồng trên con kênh mùa nước nổi | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `structure_monkey_bridge` | Cầu khỉ miền Tây | Cây cầu khỉ tre miền Tây chênh vênh với chân tre cắm chữ X buộc dây lạt, thân cầu uốn cong và tay vịn tre một bên bắc ngang con kênh tối giữa bụi dừa nước và lục bình | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `structure_wooden_coffin` | Cỗ quan tài gỗ đặt trong nhà | Tâm điểm đám tang truyền thống bà ngoại; cỗ áo quan gỗ hình lục giác nắp vát cạnh chạm khắc chữ "Thọ" mờ, kê trên hai đôn gỗ cao, ánh nến vàng hắt nhẹ lên nắp hòm và dải băng tang trắng rủ mép | `["mid_left", "center", "mid_right"]` |
+| `structure_bamboo_bed_net` | Giường tre nông thôn giăng mùng ngủ | Giường tre nông thôn 4 cọc tre vươn cao treo mùng vải trắng mỏng bán trong suốt rủ quanh giường, bên trong có chiếu cói và gối mây; mặt giường tại Y=-80px vừa khít với tư thế nằm `pose_lying_down` (offsetY: -80) | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `structure_wooden_latch_door` | Cánh cửa gỗ cũ cài then ngang có khe hở chân cửa | Khung cửa gỗ ghép từ nhiều tấm ván dọc nứt nẻ lọt ánh sáng đêm lạnh, thanh then cài gỗ ngang tại tầm cao Y=580px (offsetY=-220px từ Ground Y=800px), chừa khe hở 15px sát đất cho vệt nước bùn tràn qua | `["mid_left", "center", "mid_right"]` |
+| `structure_rural_passenger_bus` | Xe đò khách cũ vùng quê | Xe khách cổ điển thập niên 90-2000 dạng hộp bo tròn góc, giá chở hàng chằng bạt trên nóc, các ô cửa sổ kính tối màu, đèn pha trước chiếu luồng sáng vàng mờ nhạt | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `structure_coconut_banana_grove` | Rặng dừa nước và bụi chuối rậm rạp | Thân dừa cao vươn nghiêng duyên dáng với tán lá xòe hình lược răng cưa sắc nhọn, bên dưới là bụi chuối xiêm rậm rạp với các tàu lá bản to rách gió và bắp chuối tím sẫm, khung viền đặc trưng Nam Bộ | `["far_left", "far_right"]` |
 
 ---
 
@@ -122,6 +127,10 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `detail_surveillance_camera` | Camera an ninh chớp đỏ | Camera giám sát treo trần chớp đèn đỏ liên tục | `["air_left", "air_center", "air_right"]` (Air only) |
 | `detail_flickering_ceiling_lamp`| Đèn huỳnh quang trần chập chờn | Đèn tuýp huỳnh quang công nghiệp treo lơ lửng trên trần chập chờn phát sáng | `["air_left", "air_center", "air_right"]` (Air only) |
 | `detail_broken_mirror` | Gương nhà tắm vỡ nứt vấy máu | Gương nhà tắm treo tường nứt mạng nhện chằng chịt, dấu bàn tay đẫm máu cào xước | Cả 5 Ground Slots và 3 Air Slots |
+| `detail_muddy_water_puddle` | Vũng nước ướt sũng lẫn bùn non loang trên nền đất | Vệt nước bùn non đục ngầu tràn qua khe cửa bò lan trên sàn đất, ánh phản quang xám bạc và đốm bùn rải rác | Cả 5 Ground Slots (Ground only Y=800px) |
+| `detail_oil_lamp` | Đèn dầu hột vịt / Đèn dầu cổ để bàn | Bầu đèn thủy tinh tròn nhỏ, ống khói thon eo, ngọn lửa bấc vàng cam leo lét với quầng sáng ấm tỏa tròn xung quanh (Ground hoặc bàn với offsetY âm) | Cả 5 Ground Slots |
+| `detail_vintage_radio` | Đài radio cassette cổ chạy pin | Máy radio chữ nhật nhỏ gọn có ăng-ten kim loại chéo cao, hai màng loa tròn và dải đèn tần số xanh lục mờ | `["mid_left", "center", "mid_right"]` (Ground hoặc bàn) |
+| `detail_water_hyacinth` | Bụi lục bình dày đặc trôi nổi | Cụm lá tròn phình cuống xốp bồng bềnh trên mặt nước kênh rạch, chùm hoa tím nhạt u ám và rễ ngầm đen dưới nước | Cả 5 Ground Slots (Ground/Mặt nước Y=800px) |
 
 ---
 
@@ -198,7 +207,7 @@ Giúp nhân vật sống động, không bị đơ cứng như ảnh tĩnh mà l
 | `"terrified_scream"` | Há to đớp khí gào thét | Xương hàm mở rộng tối đa, run rẩy bần bật như đang thét lên không ra tiếng trong ác mộng. |
 | `"talking_jaw"` | Cử động môi nói / thì thào | Môi khép mở tự nhiên chu kỳ 0.6s, mô phỏng nhân vật đang đọc lời thoại hoặc niệm chú. |
 
-### 5.5. 10 Tư Thế Động Tác (Poses) & Quy Định Vùng Đứng Bắt Buộc
+### 5.5. 11 Tư Thế Động Tác (Poses) & Quy Định Vùng Đứng Bắt Buộc
 
 | Pose ID | Tên Tư Thế | Loại Vùng | Quy Định Vị Trí Slot Bắt Buộc | Mô Tả Ngữ Nghĩa & Đặc Điểm Hình Học |
 | :--- | :--- | :--- | :--- | :--- |
@@ -212,6 +221,7 @@ Giúp nhân vật sống động, không bị đơ cứng như ảnh tĩnh mà l
 | `pose_reaching` | Vươn móng vuốt bắt hồn | Ground | Chỉ được đặt ở 5 Ground Slots (Y=800) | Cánh tay dị dạng vươn dài về phía trước chụp bắt con mồi. |
 | `pose_floating` | Bay lơ lửng dập dềnh | Air | **BẮT BUỘC** đặt ở 3 Air Slots (`air_left`, `air_center`, `air_right`) | Oan hồn bay lơ lửng dập dềnh trên không trung. |
 | `pose_hanging` | Bị treo cổ lơ lửng rũ đầu | Air | **BẮT BUỘC** đặt ở 3 Air Slots (`air_left`, `air_center`, `air_right`) | Tử thi bị treo cổ trên cành cây hoặc xà nhà, đầu rũ xuống đung đưa. |
+| `pose_lying_down` | Nằm ngửa / Co ro trên giường | Ground | Cả 5 Ground Slots (Hỗ trợ `offsetY` âm, ví dụ `offsetY: -80` để nằm khớp mặt phẳng giường tre `structure_bamboo_bed_net`) | Toàn bộ cơ thể xoay ngang song song với mặt đất, đầu kê trên gối, hai tay xếp trên ngực/bụng (hoặc cầm quạt mo, đèn, lát gừng), lồng ngực phập phồng nhẹ hoặc run rẩy cứng đờ vì sợ hãi. Rất phù hợp cảnh trốn trong mùng, nằm ngủ nghe tiếng gọi hoặc tử thi bất động bên quan tài. |
 
 ---
 
@@ -298,7 +308,7 @@ export interface DirectorSceneScript {
     weather?: "none" | "heavy_rain" | "storm_thunder" | "blood_rain" | "floating_embers" | "drifting_ash" | "haunted_mist"; // Hiệu ứng thời tiết & hạt khí quyển thuần code
   };
   environment_items: Array<{
-    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub" | "market_stall_tent" | "abandoned_subway_station" | "rusty_train_tracks_tunnel" | "structure_old_apartment_gate" | "structure_wooden_sampan" | "structure_monkey_bridge";
+    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub" | "market_stall_tent" | "abandoned_subway_station" | "rusty_train_tracks_tunnel" | "structure_old_apartment_gate" | "structure_wooden_sampan" | "structure_monkey_bridge" | "structure_wooden_coffin" | "structure_bamboo_bed_net" | "structure_wooden_latch_door" | "structure_rural_passenger_bus" | "structure_coconut_banana_grove";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right";
     offsetX?: number;
     offsetY?: number;
@@ -310,7 +320,7 @@ export interface DirectorSceneScript {
     costume?: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual" | "outfit_traditional_ba_ba";
     face: "face_calm" | "face_scared" | "face_screaming_gasp" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless";
     facialAction?: "none" | "blink_natural" | "blink_nervous" | "darting_eyes" | "crying_tears" | "bleeding_tears" | "creepy_laugh" | "terrified_scream" | "talking_jaw";
-    pose: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging";
+    pose: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging" | "pose_lying_down";
     facing: "left" | "right";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
     offsetX?: number;
@@ -327,12 +337,12 @@ export interface DirectorSceneScript {
       endTimeSec?: number;
       easing?: "linear" | "ease_in_out" | "ease_in" | "ease_out";
       autoFaceTarget?: boolean;
-      movingPose?: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging";
+      movingPose?: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging" | "pose_lying_down";
     };
   }>;
   details?: Array<{
     id: string;
-    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp" | "detail_broken_mirror";
+    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp" | "detail_broken_mirror" | "detail_muddy_water_puddle" | "detail_oil_lamp" | "detail_vintage_radio" | "detail_water_hyacinth";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
     offsetX?: number;
     offsetY?: number;
@@ -1067,6 +1077,104 @@ Thay vì giữ nguyên 1 góc máy cố định suốt cả phân cảnh dài, A
   ],
   "dialogue": "Bà ngoại khom lưng đặt mẹt nải chuối cùng bộ đồ chơi đất nung xuống nền đất hoang, dúi vội lát gừng tươi vào tay Minh để giữ khí... Ngoài mé kênh, bên chiếc xuồng ba lá chất đầy bông súng bông điên điển, bóng người phụ nữ mặc áo bà ba trắng tóc xõa dài vẫn đứng lặng lẽ nhìn theo...",
   "narrative_note": "Tổ hợp asset văn hóa kinh dị Nam Bộ: bà ngoại cầm item_offering_toys (có thể đổi sang item_fresh_ginger ở cảnh trao gừng), Minh cầm item_areca_palm_fan, cầu khỉ tre miền Tây structure_monkey_bridge bắc ngang kênh, bóng cô Hai Lụa mặc outfit_traditional_ba_ba đứng cạnh xuồng ba lá structure_wooden_sampan."
+}
+```
+
+### 9.8. Ví Dụ 8: Minh Nằm Trốn Trong Mùng Tre & Vệt Bùn Tràn Qua Khe Then Cửa Gỗ (Tái Hiện Cảnh Đêm Kinh Hoàng)
+```json
+{
+  "scene_id": "scene_08_bed_net_latch_door_mud",
+  "title": "Nằm Co Ro Trong Mùng Nghe Tiếng Gõ Cửa",
+  "duration_sec": 7.0,
+  "theme": "abandoned_village",
+  "lighting": {
+    "sky_preset": "foggy_night",
+    "fog_density": 0.65,
+    "weather": "haunted_mist"
+  },
+  "camera": {
+    "shot": "medium",
+    "target_slot": "center",
+    "keyframes": [
+      { "startTimeSec": 0.0, "transition": "cut", "shot": "medium_wide", "target_slot": "center" },
+      { "startTimeSec": 3.5, "transition": "smooth", "transitionDurationSec": 1.2, "shot": "close_up", "target_slot": "mid_right", "shake": "creepy_tremor" }
+    ]
+  },
+  "environment_items": [
+    { "asset_id": "structure_bamboo_bed_net", "slot": "mid_left", "scale": 1.0 },
+    { "asset_id": "structure_wooden_latch_door", "slot": "mid_right", "offsetX": 20, "scale": 1.0 }
+  ],
+  "actors": [
+    {
+      "id": "actor_minh_sleeping",
+      "base": "male_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_screaming_gasp",
+      "facialAction": "darting_eyes",
+      "pose": "pose_lying_down",
+      "facing": "right",
+      "slot": "mid_left",
+      "offsetX": 0,
+      "offsetY": -80,
+      "scale": 1.0,
+      "heldItem": "item_fresh_ginger",
+      "heldHand": "right"
+    }
+  ],
+  "details": [
+    { "id": "detail_lamp_side", "asset_id": "detail_oil_lamp", "slot": "mid_left", "offsetX": 135, "offsetY": -75, "scale": 0.9 },
+    { "id": "detail_radio_desk", "asset_id": "detail_vintage_radio", "slot": "mid_left", "offsetX": 165, "offsetY": -75, "scale": 0.85 },
+    { "id": "detail_mud_door", "asset_id": "detail_muddy_water_puddle", "slot": "mid_right", "offsetX": 20, "offsetY": 0, "scale": 1.1 }
+  ],
+  "dialogue": "Minh nằm cứng đờ bên trong tấm mùng tre, hai tay bóp chặt lát gừng tươi, tim đập thình thịch khi nghe tiếng then cài gỗ rung lên bần bật... Phía dưới khe hở chân cửa, một vệt nước đen ngòm lẫn bùn non lạnh ngắt đang từ từ tràn qua nền đất...",
+  "narrative_note": "Tổ hợp asset đắt giá: Minh nằm tư thế pose_lying_down với offsetY: -80 đặt vừa khít mặt giường tre structure_bamboo_bed_net, nhìn xuyên thấu qua lớp mùng mỏng; cánh cửa gỗ cài then structure_wooden_latch_door rung rinh và vệt bùn tràn qua chân cửa detail_muddy_water_puddle; đài radio cassette detail_vintage_radio và đèn dầu detail_oil_lamp."
+}
+```
+
+### 9.9. Ví Dụ 9: Đám Tang Bà Ngoại Bên Cỗ Quan Tài Gỗ & Chuyến Xe Đò Vùng Quê
+```json
+{
+  "scene_id": "scene_09_funeral_coffin_and_bus",
+  "title": "Cỗ Quan Tài Gỗ & Chuyến Xe Đò Rời Bến",
+  "duration_sec": 8.0,
+  "theme": "rural_graveyard",
+  "lighting": {
+    "sky_preset": "stormy_dark",
+    "fog_density": 0.5,
+    "weather": "haunted_mist"
+  },
+  "camera": {
+    "shot": "wide",
+    "target_slot": "center"
+  },
+  "environment_items": [
+    { "asset_id": "structure_rural_passenger_bus", "slot": "far_left", "offsetX": 40, "scale": 0.95 },
+    { "asset_id": "structure_wooden_coffin", "slot": "center", "scale": 1.0 },
+    { "asset_id": "structure_coconut_banana_grove", "slot": "far_right", "scale": 1.0 }
+  ],
+  "actors": [
+    {
+      "id": "actor_minh_mourning",
+      "base": "male_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_scared",
+      "facialAction": "crying_tears",
+      "pose": "pose_standing",
+      "facing": "right",
+      "slot": "mid_left",
+      "offsetX": 20,
+      "scale": 1.0,
+      "heldItem": "item_soul_candle",
+      "heldHand": "right"
+    }
+  ],
+  "details": [
+    { "id": "detail_coffin_lamp", "asset_id": "detail_oil_lamp", "slot": "center", "offsetX": -120, "offsetY": 0, "scale": 1.0 },
+    { "id": "detail_coffin_incense", "asset_id": "detail_incense_bowl", "slot": "center", "offsetX": 120, "offsetY": 0, "scale": 1.0 },
+    { "id": "detail_water_hyacinth_ditch", "asset_id": "detail_water_hyacinth", "slot": "far_right", "offsetX": -80, "offsetY": 0, "scale": 1.0 }
+  ],
+  "dialogue": "Giữa gian nhà quạnh quẽ, cỗ quan tài gỗ khắc chữ Thọ trầm mặc dưới ánh đèn dầu leo lét. Phía ngoài đường lộ ven rặng dừa nước, chiếc xe đò cũ kỹ đã rồ ga chuẩn bị lăn bánh...",
+  "narrative_note": "Tổ hợp asset: cỗ quan tài gỗ structure_wooden_coffin kê trên đôn gỗ có dải băng tang trắng, rặng dừa và bụi chuối structure_coconut_banana_grove, xe đò structure_rural_passenger_bus và bụi lục bình detail_water_hyacinth."
 }
 ```
 

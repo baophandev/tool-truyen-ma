@@ -40,7 +40,12 @@ export type StructureId =
   | "rusty_train_tracks_tunnel"
   | "structure_old_apartment_gate"
   | "structure_wooden_sampan"
-  | "structure_monkey_bridge";
+  | "structure_monkey_bridge"
+  | "structure_wooden_coffin"
+  | "structure_bamboo_bed_net"
+  | "structure_wooden_latch_door"
+  | "structure_rural_passenger_bus"
+  | "structure_coconut_banana_grove";
 
 export type DetailId =
   | "detail_black_crow"
@@ -53,7 +58,11 @@ export type DetailId =
   | "detail_shopping_cart"
   | "detail_surveillance_camera"
   | "detail_flickering_ceiling_lamp"
-  | "detail_broken_mirror";
+  | "detail_broken_mirror"
+  | "detail_muddy_water_puddle"
+  | "detail_oil_lamp"
+  | "detail_vintage_radio"
+  | "detail_water_hyacinth";
 
 export type CharacterBaseId =
   | "male_adult"
@@ -119,7 +128,8 @@ export type CharacterPoseId =
   | "pose_crawling"
   | "pose_reaching"
   | "pose_hanging"
-  | "pose_holding";
+  | "pose_holding"
+  | "pose_lying_down";
 
 export type HeldItemId =
   | "none"

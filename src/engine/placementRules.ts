@@ -132,6 +132,31 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ALL_GROUND_SLOT_IDS,
     reason: "Cầu khỉ tre miền Tây có thể đặt tại mọi vị trí mặt đất/bờ kênh trên trục Ground Y=800px (far_left, mid_left, center, mid_right, far_right) để bắc ngang con kênh rạch u tối giữa bụi dừa nước và lau sậy.",
   },
+  structure_wooden_coffin: {
+    name: "Cỗ quan tài gỗ đặt trong nhà",
+    allowedSlots: ["mid_left", "center", "mid_right"],
+    reason: "Quan tài gỗ là tâm điểm của lễ tang, được đặt trang trọng tại gian giữa hoặc hai bên nhà (mid_left, center, mid_right) tiếp đất Y=800px.",
+  },
+  structure_bamboo_bed_net: {
+    name: "Giường tre nông thôn giăng mùng ngủ",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Giường tre giăng mùng ngủ có thể đặt tại mọi vị trí tiếp đất Y=800px dọc hai bên gian nhà hoặc sát vách.",
+  },
+  structure_wooden_latch_door: {
+    name: "Cánh cửa gỗ cũ cài then ngang có khe hở chân cửa",
+    allowedSlots: ["mid_left", "center", "mid_right"],
+    reason: "Cánh cửa gỗ cài then tạo bối cảnh cận cảnh then chốt của sự căng thẳng, đặt tại khu vực giữa sân khấu (mid_left, center, mid_right).",
+  },
+  structure_rural_passenger_bus: {
+    name: "Xe đò khách cũ vùng quê",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Xe đò khách vùng quê có thể dừng đỗ đón trả khách tại mọi vị trí trên đường lộ tiếp đất Y=800px.",
+  },
+  structure_coconut_banana_grove: {
+    name: "Rặng dừa nước và bụi chuối rậm rạp",
+    allowedSlots: ["far_left", "far_right"],
+    reason: "Rặng dừa nước và bụi chuối cao lớn chỉ được đặt ở hai bìa khung hình (far_left, far_right) để tạo vòm che và khung viền cảnh sông nước Nam Bộ mà không chắn nhân vật trung tâm.",
+  },
 };
 
 export interface DetailRule {
@@ -195,6 +220,26 @@ export const DETAIL_RULES: Record<DetailId, DetailRule> = {
     name: "Gương nhà tắm vỡ nứt vấy máu",
     allowedSlots: ALL_SLOT_IDS,
     reason: "Gương nhà tắm có thể gắn tường trên không hoặc đặt tiếp đất dựa tường.",
+  },
+  detail_muddy_water_puddle: {
+    name: "Vũng nước ướt sũng lẫn bùn non loang trên nền đất",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Vệt nước bùn non tràn qua khe cửa bò lan trên sàn đất bắt buộc phải tiếp đất tại Y=800px.",
+  },
+  detail_oil_lamp: {
+    name: "Đèn dầu hột vịt / Đèn dầu cổ để bàn",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Đèn dầu hột vịt đặt tiếp đất Y=800px hoặc dùng offsetY âm để đặt trên mặt bàn, đôn gỗ cạnh quan tài.",
+  },
+  detail_vintage_radio: {
+    name: "Đài radio cassette cổ chạy pin",
+    allowedSlots: ["mid_left", "center", "mid_right"],
+    reason: "Đài radio cassette cổ đặt tại các vị trí tiếp đất trung tâm (mid_left, center, mid_right) hoặc trên bàn nhỏ.",
+  },
+  detail_water_hyacinth: {
+    name: "Bụi lục bình dày đặc trôi nổi",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Bụi lục bình trôi nổi bồng bềnh trên mặt nước kênh rạch trên trục Ground Y=800px (far_left -> far_right).",
   },
 };
 

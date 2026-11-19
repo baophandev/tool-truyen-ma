@@ -39,6 +39,11 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "structure_old_apartment_gate" && <OldApartmentGate />}
       {id === "structure_wooden_sampan" && <WoodenSampan />}
       {id === "structure_monkey_bridge" && <MonkeyBridge />}
+      {id === "structure_wooden_coffin" && <WoodenCoffin />}
+      {id === "structure_bamboo_bed_net" && <BambooBedNet />}
+      {id === "structure_wooden_latch_door" && <WoodenLatchDoor />}
+      {id === "structure_rural_passenger_bus" && <RuralPassengerBus />}
+      {id === "structure_coconut_banana_grove" && <CoconutBananaGrove />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -2487,6 +2492,857 @@ const MonkeyBridge: React.FC = () => {
       <g opacity="0.36" className="anim-smoke-rise" pointerEvents="none">
         <ellipse cx="-45" cy="-18" rx="62" ry="9" fill="#CBD5E1" opacity="0.2" />
         <ellipse cx="55" cy="-14" rx="58" ry="8" fill="#CBD5E1" opacity="0.18" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 22. TRADITIONAL WOODEN COFFIN (Cỗ Quan Tài Gỗ Truyền Thống)
+ * Vietnamese traditional "Áo quan" with beveled lid and hexagonal profile raised on two wooden pedestals.
+ * Features carved Longevity ("Thọ") crest, candlelight amber sheen, and hanging mourning ribbon.
+ * Anchored at [bottom-center] (0, 0) at Ground Y = 800px.
+ */
+const WoodenCoffin: React.FC = () => {
+  return (
+    <g className="structure-wooden-coffin">
+      {/* 1. Deep Ground Shadow */}
+      <ellipse cx="0" cy="-2" rx="195" ry="11" fill="#000000" opacity="0.75" />
+      <ellipse cx="0" cy="-2" rx="140" ry="7" fill="#000000" opacity="0.5" />
+
+      {/* 2. Two Carved Wooden Pedestals / Trestles (Đôn gỗ kê hòm) */}
+      {/* Left Pedestal */}
+      <g className="pedestal-left">
+        <rect x="-132" y="-36" width="34" height="36" rx="2" fill="#0A0B0E" stroke="#1F212A" strokeWidth="1.5" />
+        <rect x="-140" y="-8" width="50" height="8" rx="1" fill="#07080B" />
+        <rect x="-138" y="-36" width="46" height="6" rx="1" fill="#14161F" />
+        {/* Carved cutout motif */}
+        <path d="M -124 -24 L -115 -12 L -106 -24 Z" fill="#050507" />
+      </g>
+      {/* Right Pedestal */}
+      <g className="pedestal-right">
+        <rect x="98" y="-36" width="34" height="36" rx="2" fill="#0A0B0E" stroke="#1F212A" strokeWidth="1.5" />
+        <rect x="90" y="-8" width="50" height="8" rx="1" fill="#07080B" />
+        <rect x="92" y="-36" width="46" height="6" rx="1" fill="#14161F" />
+        {/* Carved cutout motif */}
+        <path d="M 106 -24 L 115 -12 L 124 -24 Z" fill="#050507" />
+      </g>
+
+      {/* 3. Lower Coffin Body (Thân quan tài gỗ vát đáy) */}
+      {/* Main trapezoid body: Head at left (wider, taller), Foot at right */}
+      <polygon
+        points="-172,-108 162,-108 148,-36 -158,-36"
+        fill="#0D0D12"
+        stroke="#1E1E26"
+        strokeWidth="2.5"
+      />
+      {/* Recessed carved side panel */}
+      <polygon
+        points="-162,-100 152,-100 140,-44 -150,-44"
+        fill="#09090D"
+        stroke="#16161F"
+        strokeWidth="1.2"
+      />
+      {/* Horizontal decorative gold/bronze trim lines */}
+      <line x1="-155" y1="-86" x2="145" y2="-86" stroke="#2A2A38" strokeWidth="1.5" />
+      <line x1="-151" y1="-58" x2="141" y2="-58" stroke="#1E1E28" strokeWidth="1.2" />
+
+      {/* 4. Carved Stylized "Thọ" (Longevity) Medallion on Front Head Board */}
+      <g transform="translate(-110, -72)">
+        {/* Outer Circular Rim */}
+        <circle cx="0" cy="0" r="16" fill="#07070A" stroke="#B45309" strokeWidth="1.4" opacity="0.85" />
+        <circle cx="0" cy="0" r="13" fill="none" stroke="#CA8A04" strokeWidth="0.8" opacity="0.6" strokeDasharray="3,2" />
+        {/* Geometric "Thọ" Character Strokes */}
+        <g stroke="#FACC15" strokeWidth="1.2" strokeLinecap="round" opacity="0.75" fill="none">
+          <line x1="-8" y1="-7" x2="8" y2="-7" />
+          <line x1="0" y1="-10" x2="0" y2="10" />
+          <line x1="-6" y1="-2" x2="6" y2="-2" />
+          <line x1="-8" y1="3" x2="8" y2="3" />
+          <rect x="-5" y="3" width="10" height="5" />
+        </g>
+      </g>
+
+      {/* 5. Coffin Lid (Nắp hòm vát cạnh truyền thống) */}
+      {/* Beveled Upper Lid: High curved crown with faceted slopes */}
+      <path
+        d="M -184 -108 C -182 -146, -110 -165, 0 -165 C 110 -165, 172 -146, 174 -108 Z"
+        fill="#14141B"
+        stroke="#272734"
+        strokeWidth="2.5"
+      />
+      {/* Facet bevel highlight ridge */}
+      <path
+        d="M -170 -148 C -70 -162, 70 -162, 160 -148"
+        fill="none"
+        stroke="#3F3F50"
+        strokeWidth="2"
+      />
+      {/* Candlelight warm yellow amber sheen washing over top lid */}
+      <path
+        d="M -140 -156 C -40 -166, 40 -166, 130 -156 C 80 -150, -80 -150, -140 -156 Z"
+        fill="#FACC15"
+        opacity="0.22"
+      />
+
+      {/* 6. White Mourning Ribbon / Cloth Drape (Dải băng tang trắng rủ mép quan tài) */}
+      <g className="mourning-ribbon">
+        {/* Rosette knot at head corner */}
+        <circle cx="-168" cy="-110" r="6" fill="#F1F5F9" opacity="0.85" />
+        <circle cx="-168" cy="-110" r="3" fill="#94A3B8" />
+        {/* Trailing white cloth streamers falling down */}
+        <path
+          d="M -170 -106 C -178 -80, -165 -60, -172 -38 C -170 -38, -164 -40, -166 -62 C -162 -82, -165 -104, -167 -106 Z"
+          fill="#E2E8F0"
+          opacity="0.85"
+        />
+        <path
+          d="M -166 -106 C -160 -85, -155 -65, -158 -46 C -156 -46, -152 -48, -154 -68 C -152 -86, -162 -104, -164 -106 Z"
+          fill="#CBD5E1"
+          opacity="0.65"
+        />
+      </g>
+
+      {/* 7. Subtle Eerie Altar Incense Smoke rising from Coffin */}
+      <g className="anim-smoke-rise" opacity="0.32" pointerEvents="none">
+        <ellipse cx="-110" cy="-172" rx="35" ry="7" fill="#E2E8F0" opacity="0.18" />
+        <ellipse cx="60" cy="-168" rx="42" ry="8" fill="#CBD5E1" opacity="0.14" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 23. BAMBOO BED WITH MOSQUITO NET (Giường Tre Giăng Mùng)
+ * Traditional rural bamboo bed with 4 corner posts and sheer translucent mosquito netting.
+ * Bed surface positioned at Y = -80px to seamlessly accommodate pose_lying_down (offsetY: -80).
+ * Anchored at [bottom-center] (0, 0) at Ground Y = 800px.
+ */
+const BambooBedNet: React.FC = () => {
+  return (
+    <g className="structure-bamboo-bed-net">
+      {/* 1. Ground Shadow */}
+      <ellipse cx="0" cy="-2" rx="205" ry="11" fill="#000000" opacity="0.65" />
+      <ellipse cx="0" cy="-2" rx="150" ry="6" fill="#000000" opacity="0.4" />
+
+      {/* 2. Rear Mosquito Net Backdrop (Layer behind bed & character) */}
+      <polygon
+        points="-180,-285 170,-285 160,-82 -170,-82"
+        fill="#E2E8F0"
+        fillOpacity="0.08"
+      />
+      {/* Vertical sheer curtain folds on rear wall */}
+      <line x1="-100" y1="-285" x2="-95" y2="-82" stroke="#CBD5E1" strokeWidth="0.8" strokeOpacity="0.15" />
+      <line x1="0" y1="-285" x2="0" y2="-82" stroke="#CBD5E1" strokeWidth="0.8" strokeOpacity="0.15" />
+      <line x1="90" y1="-285" x2="85" y2="-82" stroke="#CBD5E1" strokeWidth="0.8" strokeOpacity="0.15" />
+
+      {/* 3. Rear Bamboo Posts (Cọc mùng tre phía sau) */}
+      {/* Rear Left Post */}
+      <g opacity="0.8">
+        <line x1="-165" y1="0" x2="-165" y2="-285" stroke="#16120E" strokeWidth="5.5" strokeLinecap="round" />
+        <line x1="-165" y1="0" x2="-165" y2="-285" stroke="#3D2B1C" strokeWidth="3" strokeLinecap="round" />
+      </g>
+      {/* Rear Right Post */}
+      <g opacity="0.8">
+        <line x1="155" y1="0" x2="155" y2="-285" stroke="#16120E" strokeWidth="5.5" strokeLinecap="round" />
+        <line x1="155" y1="0" x2="155" y2="-285" stroke="#3D2B1C" strokeWidth="3" strokeLinecap="round" />
+      </g>
+
+      {/* 4. Bed Platform & Mattress Frame (Khung & Giát giường tre Y = -80px) */}
+      {/* Main horizontal bamboo beam supporting mat */}
+      <rect x="-182" y="-85" width="364" height="15" rx="3" fill="#130F0B" stroke="#2B1E13" strokeWidth="1.5" />
+      <line x1="-180" y1="-78" x2="180" y2="-78" stroke="#4A3421" strokeWidth="2" />
+      {/* Bamboo nodes along horizontal beam */}
+      {[-140, -90, -40, 10, 60, 110, 150].map((nx) => (
+        <line key={`node-${nx}`} x1={nx} y1="-85" x2={nx} y2="-70" stroke="#6B4B30" strokeWidth="1.8" />
+      ))}
+
+      {/* Woven Reed Straw Mat on Bed Surface (Chiếu cói rải mặt giường Y = -82px) */}
+      <polygon
+        points="-178,-85 174,-85 168,-77 -172,-77"
+        fill="#26231B"
+        stroke="#453B2B"
+        strokeWidth="1"
+      />
+      {/* Chiếu cói red fabric border binding at edges */}
+      <rect x="-178" y="-84" width="8" height="8" fill="#7F1D1D" opacity="0.85" />
+      <rect x="166" y="-84" width="8" height="8" fill="#7F1D1D" opacity="0.85" />
+
+      {/* Bamboo Rolled Bolster Pillow (Gối tre / gối mây kê đầu bên trái) */}
+      <ellipse cx="-135" cy="-92" rx="20" ry="10" fill="#1E1913" stroke="#4A3927" strokeWidth="1.5" />
+      <ellipse cx="-135" cy="-92" rx="8" ry="4" fill="#0D0A07" />
+
+      {/* 5. Front Bamboo Bed Legs touching ground Y = 0 */}
+      {/* Front Left Leg */}
+      <g>
+        <rect x="-180" y="-80" width="12" height="80" rx="2" fill="#15110D" stroke="#2D1F14" strokeWidth="1.5" />
+        <line x1="-180" y1="-45" x2="-168" y2="-45" stroke="#523924" strokeWidth="1.8" />
+        <line x1="-180" y1="-18" x2="-168" y2="-18" stroke="#523924" strokeWidth="1.8" />
+      </g>
+      {/* Front Right Leg */}
+      <g>
+        <rect x="168" y="-80" width="12" height="80" rx="2" fill="#15110D" stroke="#2D1F14" strokeWidth="1.5" />
+        <line x1="168" y1="-45" x2="180" y2="-45" stroke="#523924" strokeWidth="1.8" />
+        <line x1="168" y1="-18" x2="180" y2="-18" stroke="#523924" strokeWidth="1.8" />
+      </g>
+      {/* Center Bed Leg for heavy stability */}
+      <rect x="-6" y="-76" width="12" height="76" rx="2" fill="#0D0A08" stroke="#22170E" strokeWidth="1.2" />
+
+      {/* 6. Front Tall Bamboo Net Poles (Cọc mùng tre phía trước) */}
+      {/* Front Left Pole */}
+      <g>
+        <line x1="-174" y1="-80" x2="-174" y2="-288" stroke="#16120E" strokeWidth="6" strokeLinecap="round" />
+        <line x1="-174" y1="-80" x2="-174" y2="-288" stroke="#453120" strokeWidth="3" strokeLinecap="round" />
+        {/* Bamboo nodes */}
+        {[-130, -180, -230, -280].map((ny) => (
+          <ellipse key={`poleL-${ny}`} cx="-174" cy={ny} rx="4" ry="1.5" fill="#694C33" />
+        ))}
+      </g>
+      {/* Front Right Pole */}
+      <g>
+        <line x1="174" y1="-80" x2="174" y2="-288" stroke="#16120E" strokeWidth="6" strokeLinecap="round" />
+        <line x1="174" y1="-80" x2="174" y2="-288" stroke="#453120" strokeWidth="3" strokeLinecap="round" />
+        {/* Bamboo nodes */}
+        {[-130, -180, -230, -280].map((ny) => (
+          <ellipse key={`poleR-${ny}`} cx="174" cy={ny} rx="4" ry="1.5" fill="#694C33" />
+        ))}
+      </g>
+
+      {/* Top Horizontal Bamboo Frame (Thanh giằng nóc mùng Y = -288px) */}
+      <rect x="-184" y="-293" width="368" height="7" rx="2" fill="#1A130D" stroke="#3D2918" strokeWidth="1.2" />
+
+      {/* 7. Sheer Translucent Mosquito Net (Mùng vải mỏng rủ phủ quanh giường) */}
+      {/* Top Roof Netting */}
+      <polygon
+        points="-186,-293 184,-293 176,-278 -178,-278"
+        fill="#E2E8F0"
+        fillOpacity="0.22"
+        stroke="#CBD5E1"
+        strokeWidth="1"
+        strokeOpacity="0.3"
+      />
+      {/* Left Net Drape */}
+      <path
+        d="M -184 -288 C -192 -180, -186 -130, -188 -76 L -168 -76 C -166 -130, -172 -180, -172 -288 Z"
+        fill="#E2E8F0"
+        fillOpacity="0.18"
+        stroke="#CBD5E1"
+        strokeWidth="0.8"
+        strokeOpacity="0.3"
+      />
+      {/* Right Net Drape */}
+      <path
+        d="M 184 -288 C 192 -180, 186 -130, 188 -76 L 168 -76 C 166 -130, 172 -180, 172 -288 Z"
+        fill="#E2E8F0"
+        fillOpacity="0.18"
+        stroke="#CBD5E1"
+        strokeWidth="0.8"
+        strokeOpacity="0.3"
+      />
+      {/* Front Sheer Draping Curtain (Vải mùng trước - trong suốt nhìn thấu nhân vật bên trong) */}
+      <polygon
+        points="-174,-285 174,-285 180,-74 -180,-74"
+        fill="#E2E8F0"
+        fillOpacity="0.12"
+      />
+      {/* Organic folds & gathered loops on mosquito net */}
+      <g stroke="#CBD5E1" strokeWidth="0.9" strokeOpacity="0.28" fill="none">
+        <path d="M -174 -285 C -150 -180, -165 -130, -160 -74" />
+        <path d="M -90 -285 C -75 -180, -85 -130, -80 -74" />
+        <path d="M 0 -285 C 10 -180, -5 -130, 5 -74" />
+        <path d="M 90 -285 C 80 -180, 95 -130, 85 -74" />
+        <path d="M 174 -285 C 155 -180, 168 -130, 162 -74" />
+      </g>
+      {/* Corner Tied Ropes (Dây buộc mùng vào cọc) */}
+      <circle cx="-174" cy="-285" r="4" fill="#E2E8F0" opacity="0.8" />
+      <path d="M -174 -285 L -168 -270 M -174 -285 L -178 -268" stroke="#CBD5E1" strokeWidth="1.2" />
+      <circle cx="174" cy="-285" r="4" fill="#E2E8F0" opacity="0.8" />
+      <path d="M 174 -285 L 168 -270 M 174 -285 L 178 -268" stroke="#CBD5E1" strokeWidth="1.2" />
+
+      {/* 8. Cold Night Fog hovering beneath bed */}
+      <ellipse cx="0" cy="-35" rx="130" ry="12" fill="#CBD5E1" opacity="0.08" pointerEvents="none" />
+    </g>
+  );
+};
+
+/**
+ * 24. CLOSE-UP WOODEN LATCH DOOR (Cánh Cửa Gỗ Cũ Cài Then Ngang)
+ * Rustic vertical plank door with horizontal sliding bar latch and 15px threshold clearance gap.
+ * Allows exterior night cold blue light & mud to seep through.
+ * Anchored at [bottom-center] (0, 0) at Ground Y = 800px.
+ */
+const WoodenLatchDoor: React.FC = () => {
+  return (
+    <g className="structure-wooden-latch-door anim-door-shake">
+      {/* 1. Heavy Outer Timber Door Jambs & Lintel (Khung bao cửa gỗ mít cổ) */}
+      {/* Left Jamb */}
+      <rect x="-132" y="-395" width="26" height="395" rx="2" fill="#090A0D" stroke="#1C1E26" strokeWidth="2" />
+      {/* Right Jamb */}
+      <rect x="106" y="-395" width="26" height="395" rx="2" fill="#090A0D" stroke="#1C1E26" strokeWidth="2" />
+      {/* Top Lintel Beam */}
+      <rect x="-144" y="-415" width="288" height="26" rx="3" fill="#0E1015" stroke="#252933" strokeWidth="2" />
+      {/* Wooden Tenon Joints & Wall Brackets */}
+      <rect x="-136" y="-350" width="6" height="18" fill="#374151" />
+      <rect x="130" y="-350" width="6" height="18" fill="#374151" />
+      <rect x="-136" y="-120" width="6" height="18" fill="#374151" />
+      <rect x="130" y="-120" width="6" height="18" fill="#374151" />
+
+      {/* 2. Cold Exterior Night Light Leaking Through Gap Behind Door */}
+      <rect x="-106" y="-388" width="212" height="388" fill="#04060A" />
+
+      {/* 3. 6 Vertical Rough Wooden Door Planks (Ván cửa ghép) */}
+      {[
+        { x: -106, w: 34, id: "p1" },
+        { x: -70, w: 34, id: "p2" },
+        { x: -34, w: 34, id: "p3" },
+        { x: 2, w: 33, id: "p4" },
+        { x: 37, w: 34, id: "p5" },
+        { x: 73, w: 33, id: "p6" },
+      ].map((p, idx) => (
+        <g key={p.id}>
+          {/* Plank Board (Stops at Y = -16px, leaving 16px bottom clearance gap!) */}
+          <rect
+            x={p.x}
+            y="-388"
+            width={p.w}
+            height="372"
+            fill={idx % 2 === 0 ? "#0C0D12" : "#111319"}
+            stroke="#1B1D26"
+            strokeWidth="1.2"
+          />
+          {/* Weathered wood grains & fissures */}
+          <line
+            x1={p.x + p.w * 0.35}
+            y1="-370"
+            x2={p.x + p.w * 0.4}
+            y2="-30"
+            stroke="#08080C"
+            strokeWidth="0.8"
+          />
+          {/* Rusty square nail studs */}
+          <rect x={p.x + p.w / 2 - 2} y="-360" width="4" height="4" fill="#3B2A1E" />
+          <rect x={p.x + p.w / 2 - 2} y="-60" width="4" height="4" fill="#3B2A1E" />
+        </g>
+      ))}
+
+      {/* Vertical Gap Slits between planks leaking cold night blue fog/light */}
+      {[-71, -35, 1, 36, 72].map((gx, idx) => (
+        <line
+          key={`gap-${idx}`}
+          x1={gx}
+          y1="-385"
+          x2={gx}
+          y2="-18"
+          stroke="#38BDF8"
+          strokeWidth="1"
+          opacity="0.38"
+        />
+      ))}
+
+      {/* 4. Bottom Clearance Gap (Khe hở chân cửa 15px sát đất Y = 0) */}
+      {/* Light leakage through bottom clearance */}
+      <rect x="-106" y="-16" width="212" height="16" fill="#1E293B" opacity="0.6" />
+      <line x1="-106" y1="-16" x2="106" y2="-16" stroke="#475569" strokeWidth="1.5" />
+      {/* Cold white/blue fog drifting under the door threshold */}
+      <ellipse cx="0" cy="-4" rx="90" ry="6" fill="#93C5FD" opacity="0.25" />
+
+      {/* 5. Horizontal Slide Wooden Latch Bar (Then cài gỗ ngang tại Y = -220px) */}
+      {/* Relative Y = -220px corresponds to Y = 580px when Ground is Y = 800px (800 - 220 = 580) */}
+      <g className="wooden-latch">
+        {/* Latch Mounting Retaining Brackets (Cối then trái & phải bắt vít vào khung) */}
+        {/* Left bracket on door */}
+        <rect x="-85" y="-238" width="18" height="36" rx="2" fill="#08090C" stroke="#252933" strokeWidth="1.5" />
+        <circle cx="-76" cy="-230" r="2.5" fill="#4B5563" />
+        <circle cx="-76" cy="-210" r="2.5" fill="#4B5563" />
+        {/* Center bracket on door */}
+        <rect x="-8" y="-238" width="18" height="36" rx="2" fill="#08090C" stroke="#252933" strokeWidth="1.5" />
+        <circle cx="1" cy="-230" r="2.5" fill="#4B5563" />
+        <circle cx="1" cy="-210" r="2.5" fill="#4B5563" />
+        {/* Right bracket on door jamb */}
+        <rect x="68" y="-238" width="18" height="36" rx="2" fill="#08090C" stroke="#252933" strokeWidth="1.5" />
+        <circle cx="77" cy="-230" r="2.5" fill="#4B5563" />
+        <circle cx="77" cy="-210" r="2.5" fill="#4B5563" />
+
+        {/* Heavy Carved Horizontal Wooden Slide Bar (Thanh then cài ngang) */}
+        <rect
+          x="-126"
+          y="-232"
+          width="248"
+          height="24"
+          rx="3"
+          fill="#1C150E"
+          stroke="#3D2E20"
+          strokeWidth="2"
+        />
+        {/* Wood grain highlight along top edge of latch */}
+        <line x1="-124" y1="-230" x2="120" y2="-230" stroke="#5E4733" strokeWidth="1.8" />
+        {/* Safety Wedge Pin (Chốt nêm then) */}
+        <polygon points="-58,-244 -52,-244 -54,-208 -56,-208" fill="#451A03" stroke="#78350F" strokeWidth="1" />
+        {/* Hanging security hemp cord */}
+        <path d="M -55 -208 C -58 -185, -48 -175, -52 -155" fill="none" stroke="#78350F" strokeWidth="1.2" strokeDasharray="3,2" />
+      </g>
+
+      {/* 6. Old Cast Iron Door Pull Ring (Khuyên sắt kéo cửa cổ) */}
+      <g transform="translate(68, -165)">
+        <circle cx="0" cy="0" r="8" fill="#111319" stroke="#374151" strokeWidth="2" />
+        <circle cx="0" cy="14" r="14" fill="none" stroke="#475569" strokeWidth="3.5" />
+        <ellipse cx="0" cy="22" rx="3" ry="1.5" fill="#94A3B8" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 25. RURAL PASSENGER BUS (Xe Đò Quê Miền Tây)
+ * Vintage 1990s rural passenger bus exterior side profile.
+ * Features rounded retro bodywork, roof luggage rack piled with cargo, and warm headlights.
+ * Anchored at [bottom-center] (0, 0) at Ground Y = 800px.
+ */
+const RuralPassengerBus: React.FC = () => {
+  return (
+    <g className="structure-rural-passenger-bus">
+      {/* 1. Ground Contact Shadow */}
+      <ellipse cx="10" cy="-2" rx="275" ry="12" fill="#000000" opacity="0.75" />
+      <ellipse cx="10" cy="-2" rx="220" ry="7" fill="#000000" opacity="0.5" />
+
+      {/* 2. Headlight Beam (Luồng ánh sáng vàng mờ chiếu sáng mặt đường phía trước) */}
+      <polygon
+        points="268,-92 530,-155 560,0 268,-65"
+        fill="#FDE047"
+        opacity="0.22"
+      />
+      {/* Secondary softer outer light scatter */}
+      <polygon
+        points="268,-92 545,-180 580,0 268,-50"
+        fill="#FEF08A"
+        opacity="0.1"
+      />
+
+      {/* 3. Main Retro Bus Chassis & Body Silhouette */}
+      {/* Main Hull Shape (Length: 520px, Height: 230px, facing Right) */}
+      <path
+        d="M -250 -45 
+           L -250 -185 
+           C -250 -215, -230 -228, -190 -230 
+           L 180 -230 
+           C 220 -228, 255 -205, 265 -160 
+           L 272 -105 
+           C 274 -90, 270 -60, 265 -45 
+           L 260 -45 
+           C 255 -45, 230 -45, 222 -45 
+           C 222 -75, 150 -75, 150 -45 
+           L -125 -45 
+           C -125 -75, -200 -75, -200 -45 
+           Z"
+        fill="#0D0F14"
+        stroke="#1F2430"
+        strokeWidth="2.5"
+      />
+
+      {/* Retro Lower Body Trim Band / Two-Tone Stripe */}
+      <path
+        d="M -248 -80 L 268 -80 L 265 -52 C 255 -52, 230 -52, 222 -52 C 222 -75, 150 -75, 150 -52 L -125 -52 C -125 -75, -200 -75, -200 -52 L -248 -52 Z"
+        fill="#1A202C"
+        stroke="#2D3748"
+        strokeWidth="1"
+      />
+      {/* Vintage decorative red accent pinstripe */}
+      <line x1="-248" y1="-80" x2="268" y2="-80" stroke="#7F1D1D" strokeWidth="2.5" />
+
+      {/* 4. Roof Luggage Rack (Giá để hàng trên nóc xe chở đầy thùng bọc bạt) */}
+      {/* Steel pipe rack frame */}
+      <rect x="-225" y="-242" width="405" height="12" fill="none" stroke="#374151" strokeWidth="2.5" rx="2" />
+      <line x1="-220" y1="-230" x2="-220" y2="-242" stroke="#374151" strokeWidth="2" />
+      <line x1="-120" y1="-230" x2="-120" y2="-242" stroke="#374151" strokeWidth="2" />
+      <line x1="-20" y1="-230" x2="-20" y2="-242" stroke="#374151" strokeWidth="2" />
+      <line x1="80" y1="-230" x2="80" y2="-242" stroke="#374151" strokeWidth="2" />
+      <line x1="180" y1="-230" x2="180" y2="-242" stroke="#374151" strokeWidth="2" />
+      {/* Bulging luggage cargo & tarpaulin bundles on roof */}
+      <path
+        d="M -215 -242 
+           C -210 -265, -170 -270, -150 -255 
+           C -130 -272, -80 -275, -60 -250 
+           C -40 -270, 20 -272, 45 -252 
+           C 65 -268, 120 -265, 140 -248 
+           C 155 -258, 175 -252, 175 -242 Z"
+        fill="#07080B"
+        stroke="#1F2937"
+        strokeWidth="2"
+      />
+      {/* Cargo tie-down ropes (Dây thừng chằng hàng) */}
+      <g stroke="#D97706" strokeWidth="1.2" opacity="0.6">
+        <line x1="-190" y1="-242" x2="-155" y2="-265" />
+        <line x1="-140" y1="-242" x2="-100" y2="-270" />
+        <line x1="-50" y1="-242" x2="-10" y2="-268" />
+        <line x1="50" y1="-242" x2="90" y2="-262" />
+        <line x1="130" y1="-242" x2="165" y2="-252" />
+      </g>
+
+      {/* 5. Passenger Windows & Doors */}
+      {/* Front Curved Windshield Glass */}
+      <path
+        d="M 215 -215 C 238 -208, 252 -185, 258 -150 L 222 -150 L 208 -215 Z"
+        fill="#0B1320"
+        stroke="#334155"
+        strokeWidth="1.8"
+      />
+      {/* Windshield wiper */}
+      <line x1="225" y1="-150" x2="242" y2="-180" stroke="#475569" strokeWidth="2" />
+
+      {/* Row of 4 Side Passenger Windows */}
+      {[
+        { x: -115, w: 50, id: "w1" },
+        { x: -50, w: 50, id: "w2" },
+        { x: 15, w: 50, id: "w3" },
+        { x: 80, w: 50, id: "w4" },
+      ].map((w) => (
+        <g key={w.id}>
+          {/* Window Frame */}
+          <rect
+            x={w.x}
+            y="-210"
+            width={w.w}
+            height="70"
+            rx="5"
+            fill="#09101C"
+            stroke="#1F2937"
+            strokeWidth="2"
+          />
+          {/* Subtle Seat Headrest silhouette inside bus */}
+          <ellipse cx={w.x + 18} cy="-165" rx="9" ry="12" fill="#05070A" />
+          <ellipse cx={w.x + 36} cy="-165" rx="9" ry="12" fill="#05070A" />
+          {/* Cold night window glass reflection diagonal slash */}
+          <path
+            d={`M ${w.x + 8} -145 L ${w.x + 32} -205`}
+            stroke="#475569"
+            strokeWidth="1"
+            opacity="0.45"
+          />
+        </g>
+      ))}
+
+      {/* Rear Passenger Window */}
+      <rect x="-238" y="-208" width="55" height="68" rx="5" fill="#09101C" stroke="#1F2937" strokeWidth="2" />
+      <path d="M -230 -145 L -205 -202" stroke="#475569" strokeWidth="1" opacity="0.45" />
+
+      {/* Passenger Boarding Door (Cửa lên xuống dạng gấp) at Front */}
+      <g transform="translate(142, -210)">
+        <rect x="0" y="0" width="55" height="158" rx="2" fill="#0A0D13" stroke="#252D3D" strokeWidth="2" />
+        <line x1="27" y1="0" x2="27" y2="158" stroke="#1F2937" strokeWidth="2" />
+        {/* Door Glass Panes */}
+        <rect x="4" y="8" width="19" height="65" rx="2" fill="#0B1320" stroke="#334155" strokeWidth="1" />
+        <rect x="31" y="8" width="19" height="65" rx="2" fill="#0B1320" stroke="#334155" strokeWidth="1" />
+        <rect x="4" y="85" width="19" height="55" rx="2" fill="#0B1320" stroke="#334155" strokeWidth="1" />
+        <rect x="31" y="85" width="19" height="55" rx="2" fill="#0B1320" stroke="#334155" strokeWidth="1" />
+        <circle cx="23" cy="80" r="2.5" fill="#E2E8F0" />
+      </g>
+
+      {/* Destination Sign Box above Windshield */}
+      <rect x="185" y="-228" width="52" height="14" rx="2" fill="#05070A" stroke="#475569" strokeWidth="1" />
+      <text x="211" y="-218" fill="#FACC15" fontSize="6.5" fontFamily="monospace" textAnchor="middle" opacity="0.8">
+        XE ĐÒ
+      </text>
+
+      {/* 6. Heavy Rubber Bus Wheels (Bánh xe đôi sau và bánh trước) */}
+      {/* Front Wheel at (186, -36) */}
+      <g className="wheel-front">
+        <circle cx="186" cy="-36" r="36" fill="#060709" stroke="#1F2937" strokeWidth="2" />
+        <circle cx="186" cy="-36" r="22" fill="#1A202C" stroke="#2D3748" strokeWidth="2" />
+        <circle cx="186" cy="-36" r="10" fill="#0F172A" />
+        {/* Lug nuts */}
+        {[0, 60, 120, 180, 240, 300].map((deg) => (
+          <circle
+            key={`nutF-${deg}`}
+            cx={186 + 15 * Math.cos((deg * Math.PI) / 180)}
+            cy={-36 + 15 * Math.sin((deg * Math.PI) / 180)}
+            r="2"
+            fill="#64748B"
+          />
+        ))}
+      </g>
+      {/* Rear Dual Wheels at (-162, -36) */}
+      <g className="wheel-rear">
+        <circle cx="-162" cy="-36" r="36" fill="#060709" stroke="#1F2937" strokeWidth="2" />
+        <circle cx="-162" cy="-36" r="22" fill="#1A202C" stroke="#2D3748" strokeWidth="2" />
+        <circle cx="-162" cy="-36" r="10" fill="#0F172A" />
+        {/* Lug nuts */}
+        {[0, 60, 120, 180, 240, 300].map((deg) => (
+          <circle
+            key={`nutR-${deg}`}
+            cx={-162 + 15 * Math.cos((deg * Math.PI) / 180)}
+            cy={-36 + 15 * Math.sin((deg * Math.PI) / 180)}
+            r="2"
+            fill="#64748B"
+          />
+        ))}
+      </g>
+
+      {/* 7. Front Headlights & Bumpers */}
+      {/* Chrome Bumper */}
+      <rect x="258" y="-62" width="18" height="15" rx="3" fill="#334155" stroke="#64748B" strokeWidth="1" />
+      <rect x="-256" y="-62" width="14" height="14" rx="2" fill="#1E293B" />
+      {/* Round Front Headlight */}
+      <g>
+        <circle cx="268" cy="-88" r="9" fill="#FACC15" stroke="#FDE047" strokeWidth="1.5" />
+        <circle cx="268" cy="-88" r="5" fill="#FEF08A" />
+        <ellipse cx="270" cy="-90" rx="2" ry="1.2" fill="#FFFFFF" />
+      </g>
+      {/* Orange Turn Signal */}
+      <circle cx="267" cy="-105" r="4.5" fill="#EA580C" stroke="#F97316" strokeWidth="1" />
+
+      {/* Rear Tail Light */}
+      <rect x="-252" y="-95" width="4" height="18" rx="1" fill="#DC2626" opacity="0.9" />
+
+      {/* Side Exhaust Pipe puffing faint road smoke */}
+      <ellipse cx="-230" cy="-32" rx="4" ry="2.5" fill="#374151" />
+      <g className="anim-smoke-rise" opacity="0.25" pointerEvents="none">
+        <circle cx="-252" cy="-30" r="10" fill="#4B5563" />
+        <circle cx="-275" cy="-28" r="16" fill="#374151" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 26. COCONUT & BANANA GROVE (Rặng Dừa Nước & Bụi Chuối Rậm Rạp)
+ * Authentic Mekong Delta waterway vegetation for framing rural scenes.
+ * Features a leaning coconut palm with comb-serrated fronds and wild banana clump with large drooping ragged leaves.
+ * Anchored at [bottom-center] (0, 0) at Ground Y = 800px.
+ */
+const CoconutBananaGrove: React.FC = () => {
+  return (
+    <g className="structure-coconut-banana-grove">
+      {/* 1. Ground Shadow & Root Base */}
+      <ellipse cx="0" cy="-2" rx="175" ry="10" fill="#000000" opacity="0.75" />
+      <ellipse cx="-40" cy="-2" rx="120" ry="7" fill="#000000" opacity="0.5" />
+
+      {/* 2. Leaning Coconut Palm Trunk (Thân cây dừa vươn nghiêng duyên dáng) */}
+      {/* Sweeps from base (-45, 0) curving up to (35, -420) */}
+      <path
+        d="M -56 0 
+           C -58 -90, -42 -180, -18 -260 
+           C 2 -330, 22 -380, 28 -425 
+           L 44 -425 
+           C 36 -380, 18 -330, -2 -260 
+           C -26 -180, -40 -90, -38 0 Z"
+        fill="#0B0E12"
+        stroke="#1E232B"
+        strokeWidth="1.5"
+      />
+      {/* Ringed bark ridges along trunk */}
+      {[-50, -110, -170, -230, -290, -345, -395].map((ry, idx) => (
+        <line
+          key={`bark-${idx}`}
+          x1={-45 + idx * 11}
+          y1={ry}
+          x2={-32 + idx * 11}
+          y2={ry - 2}
+          stroke="#2A323D"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+      ))}
+
+      {/* 3. Coconut Crown & Fruits at (36, -425) */}
+      <g transform="translate(36, -425)">
+        {/* Cluster of coconuts under the frond base */}
+        <circle cx="-12" cy="10" r="9" fill="#06080A" stroke="#171D24" strokeWidth="1.2" />
+        <circle cx="2" cy="14" r="8.5" fill="#080B0E" stroke="#171D24" strokeWidth="1.2" />
+        <circle cx="14" cy="9" r="8" fill="#06080A" stroke="#171D24" strokeWidth="1.2" />
+
+        {/* 7 Arching Pinnate Fronds with Serrated Comb Leaflets */}
+        {/* Frond 1: Arching Left-Down */}
+        <g>
+          <path d="M 0 0 C -60 -40, -140 -20, -180 40" fill="none" stroke="#0B0E12" strokeWidth="4" />
+          <path
+            d="M 0 0 
+               C -40 -35, -110 -25, -175 35 
+               C -155 15, -100 -40, -40 -45 Z"
+            fill="#0E1217"
+            stroke="#171D24"
+            strokeWidth="1"
+          />
+          {/* Serrated comb leaflets */}
+          {[-40, -80, -120, -155].map((lx, i) => (
+            <line
+              key={`f1-${i}`}
+              x1={lx}
+              y1={-30 + i * 14}
+              x2={lx - 16}
+              y2={-10 + i * 16}
+              stroke="#090B0E"
+              strokeWidth="2"
+            />
+          ))}
+        </g>
+
+        {/* Frond 2: High Arching Left */}
+        <g>
+          <path d="M 0 0 C -50 -70, -120 -80, -165 -30" fill="none" stroke="#0B0E12" strokeWidth="4" />
+          <path
+            d="M 0 0 
+               C -45 -65, -110 -75, -160 -30 
+               C -130 -85, -60 -80, 0 0 Z"
+            fill="#090B0E"
+          />
+          {[-35, -75, -115, -145].map((lx, i) => (
+            <line
+              key={`f2-${i}`}
+              x1={lx}
+              y1={-60 + i * 7}
+              x2={lx - 12}
+              y2={-40 + i * 8}
+              stroke="#131920"
+              strokeWidth="1.8"
+            />
+          ))}
+        </g>
+
+        {/* Frond 3: Soaring Center Upright */}
+        <g>
+          <path d="M 0 0 C -15 -90, 0 -130, 25 -145" fill="none" stroke="#0B0E12" strokeWidth="3.5" />
+          <path
+            d="M 0 0 
+               C -12 -80, 0 -125, 25 -145 
+               C 10 -115, 12 -70, 0 0 Z"
+            fill="#0E1318"
+          />
+        </g>
+
+        {/* Frond 4: Arching High Right */}
+        <g>
+          <path d="M 0 0 C 45 -70, 115 -75, 160 -25" fill="none" stroke="#0B0E12" strokeWidth="4" />
+          <path
+            d="M 0 0 
+               C 40 -65, 105 -70, 155 -25 
+               C 125 -80, 55 -75, 0 0 Z"
+            fill="#090B0E"
+          />
+          {[35, 75, 115, 145].map((rx, i) => (
+            <line
+              key={`f4-${i}`}
+              x1={rx}
+              y1={-60 + i * 7}
+              x2={rx + 12}
+              y2={-40 + i * 8}
+              stroke="#131920"
+              strokeWidth="1.8"
+            />
+          ))}
+        </g>
+
+        {/* Frond 5: Arching Right-Down */}
+        <g>
+          <path d="M 0 0 C 60 -40, 140 -20, 185 45" fill="none" stroke="#0B0E12" strokeWidth="4" />
+          <path
+            d="M 0 0 
+               C 40 -35, 110 -25, 180 40 
+               C 160 15, 105 -40, 45 -45 Z"
+            fill="#0E1217"
+            stroke="#171D24"
+            strokeWidth="1"
+          />
+          {[40, 80, 120, 160].map((rx, i) => (
+            <line
+              key={`f5-${i}`}
+              x1={rx}
+              y1={-30 + i * 14}
+              x2={rx + 16}
+              y2={-10 + i * 16}
+              stroke="#090B0E"
+              strokeWidth="2"
+            />
+          ))}
+        </g>
+
+        {/* Frond 6: Drooping Low Left */}
+        <path d="M 0 0 C -30 20, -75 40, -110 75" fill="none" stroke="#080A0D" strokeWidth="3" />
+        {/* Frond 7: Drooping Low Right */}
+        <path d="M 0 0 C 30 20, 75 40, 115 75" fill="none" stroke="#080A0D" strokeWidth="3" />
+      </g>
+
+      {/* 4. Wild Banana Grove at Base (Bụi chuối xiêm rậm rạp che chân dừa) */}
+      {/* Left Banana Stem */}
+      <path d="M -125 0 C -122 -60, -112 -120, -100 -160 L -86 -160 C -98 -120, -108 -60, -108 0 Z" fill="#0A0E0C" />
+      {/* Center Large Banana Stem */}
+      <path d="M -30 0 C -25 -70, -15 -140, 0 -190 L 16 -190 C 2 -140, -8 -70, -12 0 Z" fill="#080C0A" />
+      {/* Right Banana Stem */}
+      <path d="M 60 0 C 62 -55, 68 -110, 80 -150 L 92 -150 C 82 -110, 75 -55, 74 0 Z" fill="#0A0E0C" />
+
+      {/* Massive Broad Drooping Ragged Banana Leaves (Tàu lá chuối to bản rách răng cưa) */}
+      {/* Leaf 1: Arching Left with Wind Tears */}
+      <path
+        d="M -100 -160 
+           C -140 -195, -195 -180, -225 -130 
+           C -205 -125, -190 -140, -170 -135 
+           C -155 -120, -145 -145, -125 -145 
+           C -105 -150, -102 -155, -100 -160 Z"
+        fill="#0A120E"
+        stroke="#14211A"
+        strokeWidth="1.2"
+      />
+      <line x1="-100" y1="-160" x2="-220" y2="-130" stroke="#192A21" strokeWidth="2" />
+
+      {/* Leaf 2: High Arching Up-Right */}
+      <path
+        d="M 0 -190 
+           C 30 -245, 90 -255, 145 -220 
+           C 125 -210, 110 -225, 90 -215 
+           C 70 -205, 55 -220, 35 -210 
+           C 15 -200, 5 -195, 0 -190 Z"
+        fill="#070D0A"
+        stroke="#111B15"
+        strokeWidth="1.2"
+      />
+      <line x1="0" y1="-190" x2="140" y2="-220" stroke="#17261E" strokeWidth="2.2" />
+
+      {/* Leaf 3: Drooping Far Right */}
+      <path
+        d="M 80 -150 
+           C 120 -185, 175 -170, 205 -115 
+           C 185 -110, 170 -125, 150 -120 
+           C 135 -105, 120 -130, 100 -130 
+           Z"
+        fill="#0A120E"
+        stroke="#14211A"
+        strokeWidth="1.2"
+      />
+      <line x1="80" y1="-150" x2="200" y2="-115" stroke="#192A21" strokeWidth="2" />
+
+      {/* Leaf 4: Foreground Drooping Center Leaf */}
+      <path
+        d="M -10 -140 
+           C -40 -120, -70 -70, -85 -10 
+           C -75 -15, -60 -40, -45 -50 
+           C -30 -60, -15 -100, -10 -140 Z"
+        fill="#0D1712"
+        stroke="#1B2E24"
+        strokeWidth="1.2"
+      />
+
+      {/* Purple Banana Heart / Blossom (Bắp chuối đỏ tím treo lủng lẳng) */}
+      <g transform="translate(18, -135)">
+        {/* Curved stem */}
+        <path d="M 0 0 C 5 25, 15 35, 18 55" fill="none" stroke="#14211A" strokeWidth="3" />
+        {/* Pendant teardrop blossom */}
+        <path
+          d="M 18 55 
+             C 10 65, 8 85, 18 100 
+             C 28 85, 26 65, 18 55 Z"
+          fill="#4A0404"
+          stroke="#7F1D1D"
+          strokeWidth="1.2"
+        />
+        <line x1="18" y1="58" x2="18" y2="95" stroke="#991B1B" strokeWidth="1" opacity="0.6" />
+      </g>
+
+      {/* 5. Young Banana Shoots (Cây chuối tơ) & Wild Swamp Grass at Base */}
+      <path d="M -75 0 L -80 -45 L -72 -45 Z" fill="#0D1611" />
+      <path d="M 45 0 L 52 -55 L 58 -55 Z" fill="#0D1611" />
+      <g stroke="#09110D" strokeWidth="2" strokeLinecap="round">
+        <line x1="-140" y1="0" x2="-148" y2="-25" />
+        <line x1="-132" y1="0" x2="-135" y2="-32" />
+        <line x1="110" y1="0" x2="116" y2="-30" />
+        <line x1="125" y1="0" x2="135" y2="-22" />
       </g>
     </g>
   );

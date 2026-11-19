@@ -1117,6 +1117,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="pose_crawling">Bò trườn rạp sàn góc ngang (pose_crawling)</option>
                         <option value="pose_reaching">Vươn tay bắt hồn (pose_reaching)</option>
                         <option value="pose_hanging">Bị treo lơ lửng rũ đầu (pose_hanging)</option>
+                        <option value="pose_lying_down">Nằm ngửa / Co ro trên giường (pose_lying_down)</option>
                       </select>
                     </div>
 
@@ -1616,6 +1617,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                                       <option value="pose_reaching">Vươn vuốt tiến tới (pose_reaching)</option>
                                       <option value="pose_shivering">Run rẩy tiến bước (pose_shivering)</option>
                                       <option value="pose_standing">Trượt giữ nguyên dáng (pose_standing)</option>
+                                      <option value="pose_lying_down">Nằm ngửa / Nằm cứng đờ (pose_lying_down)</option>
                                     </>
                                   )}
                                 </select>
@@ -1740,6 +1742,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="structure_old_apartment_gate">Cổng sắt chung cư cũ (structure_old_apartment_gate)</option>
                         <option value="structure_wooden_sampan">Xuồng ba lá / Ghe nước miền Tây (structure_wooden_sampan)</option>
                         <option value="structure_monkey_bridge">Cầu khỉ miền Tây (structure_monkey_bridge)</option>
+                        <option value="structure_wooden_coffin">Cỗ quan tài gỗ đặt trong nhà (structure_wooden_coffin)</option>
+                        <option value="structure_bamboo_bed_net">Giường tre nông thôn giăng mùng ngủ (structure_bamboo_bed_net)</option>
+                        <option value="structure_wooden_latch_door">Cánh cửa gỗ cũ cài then ngang (structure_wooden_latch_door)</option>
+                        <option value="structure_rural_passenger_bus">Xe đò khách cũ vùng quê (structure_rural_passenger_bus)</option>
+                        <option value="structure_coconut_banana_grove">Rặng dừa nước và bụi chuối (structure_coconut_banana_grove)</option>
                       </select>
                     </div>
 

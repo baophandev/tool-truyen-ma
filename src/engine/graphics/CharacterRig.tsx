@@ -83,6 +83,12 @@ function resolveHandSockets(
       right: { x: 86, y: -6, rot: 15 },
     };
   }
+  if (pose === "pose_lying_down") {
+    return {
+      left: { x: -6, y: -22, rot: 0 },
+      right: { x: 16, y: -22, rot: 0 },
+    };
+  }
   if (pose === "pose_reaching") {
     return {
       left: { x: -18, y: -115, rot: 0 },
@@ -318,6 +324,28 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
   if (pose === "pose_crawling") {
     return (
       <CrawlingSideRig
+        id={id}
+        base={base}
+        costume={activeCostume}
+        face={face}
+        facialAction={facialAction}
+        scale={finalScale}
+        flip={flip}
+        opacity={opacity}
+        heldItem={heldItem}
+        heldHand={heldHand}
+        showSockets={showSockets}
+        palette={palette}
+        appearance={appearance}
+        handSockets={handSockets}
+      />
+    );
+  }
+
+  // LYING DOWN HORIZONTAL PROFILE OVERRIDE (Dùng cho Minh / Bà ngoại nằm trên giường tre hoặc sàn nhà)
+  if (pose === "pose_lying_down") {
+    return (
+      <LyingDownSideRig
         id={id}
         base={base}
         costume={activeCostume}
@@ -2496,6 +2524,325 @@ const CrawlingSideRig: React.FC<CrawlingSideRigProps> = ({
           <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4" fill="#A855F7" />
           <circle cx={handSockets.right.x} cy={handSockets.right.y} r="5" fill="#22D3EE" />
           <text x={handSockets.right.x + 8} y={handSockets.right.y} fill="#67E8F9" fontSize="9" fontFamily="monospace">HandR</text>
+        </g>
+      )}
+    </g>
+  );
+};
+
+/**
+ * =========================================================
+ * LYING DOWN HORIZONTAL 2D RIG (TƯ THẾ NẰM NGỬA / CO RO TRÊN GIƯỜNG / SÀN NHÀ)
+ * Horizontal profile view for sleeping, hiding in mosquito nets, or rigid corpse state.
+ * Accommodates negative offsetY (e.g. offsetY: -80 on structure_bamboo_bed_net).
+ * =========================================================
+ */
+interface LyingDownSideRigProps {
+  id?: string;
+  base: CharacterBaseId;
+  costume: CostumeId;
+  face: CharacterFaceId;
+  facialAction?: FacialActionId;
+  scale: number;
+  flip: number;
+  opacity: number;
+  heldItem?: HeldItemId;
+  heldHand?: HeldHand;
+  showSockets?: boolean;
+  palette: CostumePalette;
+  appearance: BaseAppearance;
+  handSockets: { left: HandSocketPoint; right: HandSocketPoint };
+}
+
+const LyingDownSideRig: React.FC<LyingDownSideRigProps> = ({
+  id,
+  base,
+  costume,
+  face,
+  facialAction,
+  scale,
+  flip,
+  opacity,
+  heldItem = "none",
+  heldHand = "right",
+  showSockets = false,
+  palette,
+  appearance,
+  handSockets,
+}) => {
+  const isGhost = base === "ghost_wraith";
+  const isDemon = base === "demon_shadow";
+  const isChild = base === "creepy_child";
+  const isElder = base === "elder_hunched";
+  const isSkeletal = base === "skeletal_emaciated";
+  const isHeadless = face === "face_headless";
+
+  const sleeveColor = costume === "outfit_child_pajamas" ? appearance.skin : palette.sleeve;
+  const handColor = appearance.skin;
+  const activeSocket = heldHand === "left" ? handSockets.left : handSockets.right;
+
+  // Head center rested horizontally on pillow
+  const headPos = { x: -58, y: -24 };
+
+  return (
+    <g
+      id={id ? `actor-${id}` : undefined}
+      transform={`scale(${flip * scale}, ${scale})`}
+      opacity={isGhost ? Math.min(opacity, 0.88) : opacity}
+      className="character-rig rig-lying-down"
+    >
+      {/* 1. SURFACE CONTACT SHADOW UNDER BODY */}
+      <ellipse cx="20" cy="-2" rx="105" ry="6" fill="#000000" opacity="0.45" />
+      <ellipse cx="-45" cy="-2" rx="40" ry="4" fill="#000000" opacity="0.35" />
+
+      {/* Ghost aura glow */}
+      {isGhost && (
+        <ellipse
+          cx="15"
+          cy="-20"
+          rx="105"
+          ry="35"
+          fill="url(#ghost-aura-grad)"
+          opacity="0.35"
+          className="anim-pulse-slow"
+        />
+      )}
+
+      {/* Demon dark smoky shadow aura */}
+      {isDemon && (
+        <g opacity="0.35" filter="url(#ghost-blur)">
+          <ellipse cx="15" cy="-20" rx="110" ry="32" fill="#000000" />
+        </g>
+      )}
+
+      {/* 2. RUSTIC PILLOW / BOLSTER UNDER HEAD */}
+      <ellipse cx="-60" cy="-12" rx="20" ry="9" fill="#15120D" stroke="#362619" strokeWidth="1.2" />
+      <ellipse cx="-60" cy="-12" rx="10" ry="4" fill="#0A0806" />
+
+      {/* 3. REAR LEG (Left Leg - resting along mattress) */}
+      <g className="lie-back-leg" opacity="0.88">
+        {/* Rear Thigh from Hip (20, -14) to Knee (62, -10) */}
+        <path
+          d="M 18 -18 L 62 -13 L 60 -5 L 18 -9 Z"
+          fill={palette.pantsSecondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        {/* Rear Shin from Knee (62, -10) to Ankle (98, -6) */}
+        <path
+          d="M 60 -13 L 98 -9 L 96 -3 L 60 -5 Z"
+          fill={palette.pantsSecondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        {/* Rear Foot relaxed slightly pointing up */}
+        <polygon points="98,-9 108,-14 110,-9 96,-3" fill="#11131A" />
+      </g>
+
+      {/* 4. REAR ARM (Left Arm - resting along side/stomach) */}
+      <g className="lie-back-arm" opacity="0.9">
+        {/* Upper Arm from Shoulder (-34, -20) to Elbow (-12, -16) */}
+        <path
+          d="M -34 -22 L -10 -18 L -12 -12 L -34 -15 Z"
+          fill={palette.secondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        {/* Forearm from Elbow to Hand near stomach (-8, -22) */}
+        <path
+          d="M -10 -18 L -6 -23 L -4 -19 L -10 -14 Z"
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        <ellipse cx={handSockets.left.x} cy={handSockets.left.y} rx="5" ry="3.5" fill={handColor} />
+      </g>
+
+      {/* 5. MAIN TORSO & ABDOMEN (Horizontal chest rising gently with breath) */}
+      <g className="lie-torso">
+        {/* Base Torso Shape: Shoulders (-38, -24) to Hips (22, -16) */}
+        <path
+          d="M -38 -24 
+             C -25 -30, -5 -29, 20 -20 
+             L 22 -6 
+             C -5 -5, -25 -6, -38 -10 Z"
+          fill={palette.primary}
+          stroke={appearance.outline}
+          strokeWidth="1.2"
+        />
+
+        {/* Costume Details for Lying Down */}
+        {costume === "outfit_traditional_ba_ba" && (
+          <g>
+            {/* White Ba Ba shirt center button placket along chest */}
+            <path d="M -34 -23 L 14 -16" stroke={palette.trim} strokeWidth="1.2" strokeDasharray="3,3" />
+            {/* Small fabric pocket on front hem */}
+            <rect x="-4" y="-14" width="7" height="6" rx="1" fill={palette.secondary} stroke={palette.trim} strokeWidth="0.8" />
+          </g>
+        )}
+
+        {costume === "outfit_modern_casual" && (
+          <g>
+            {/* Hoodie / Jacket collar & zipper */}
+            <line x1="-36" y1="-23" x2="16" y2="-17" stroke="#334155" strokeWidth="1.5" />
+            <circle cx="-32" cy="-21" r="1.5" fill="#E2E8F0" />
+          </g>
+        )}
+
+        {costume === "outfit_flowing_ao_dai" && (
+          <g>
+            {/* Silk flap pooling gracefully along the body */}
+            <path
+              d="M -34 -23 C -10 -31, 20 -25, 45 -14 L 35 -6 C 15 -14, -10 -15, -34 -12 Z"
+              fill={palette.primary}
+              opacity="0.9"
+            />
+          </g>
+        )}
+
+        {costume === "outfit_patient_gown" && (
+          <line x1="-28" y1="-24" x2="12" y2="-17" stroke={palette.secondary} strokeWidth="1.8" />
+        )}
+
+        {/* Skeletal Emaciated Rib Lines */}
+        {isSkeletal && (
+          <g opacity="0.6">
+            <line x1="-22" y1="-25" x2="-22" y2="-10" stroke={appearance.outline} strokeWidth="1.5" />
+            <line x1="-10" y1="-26" x2="-10" y2="-9" stroke={appearance.outline} strokeWidth="1.5" />
+            <line x1="2" y1="-24" x2="2" y2="-8" stroke={appearance.outline} strokeWidth="1.5" />
+          </g>
+        )}
+      </g>
+
+      {/* 6. FRONT LEG (Right Leg - resting horizontally on top) */}
+      <g className="lie-front-leg">
+        {/* Front Thigh from Hip (20, -18) to Knee (65, -14) */}
+        <path
+          d="M 18 -20 L 66 -16 L 64 -8 L 18 -11 Z"
+          fill={palette.pantsPrimary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        {/* Front Shin from Knee (65, -14) to Ankle (102, -10) */}
+        <path
+          d="M 64 -16 L 102 -11 L 100 -5 L 64 -8 Z"
+          fill={palette.pantsPrimary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        {/* Front Foot pointing relaxed upward */}
+        <polygon points="102,-11 112,-16 114,-11 100,-5" fill="#181512" />
+        {costume === "outfit_modern_casual" && (
+          <line x1="102" y1="-10" x2="112" y2="-14" stroke={palette.accent} strokeWidth="1.6" strokeLinecap="round" />
+        )}
+      </g>
+
+      {/* 7. FRONT ARM (Right Arm - resting folded across chest) */}
+      <g className="lie-front-arm">
+        {/* Upper Arm from Shoulder (-30, -24) to Elbow (-6, -18) */}
+        <path
+          d="M -30 -24 L -6 -20 L -8 -13 L -30 -16 Z"
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        {/* Forearm from Elbow (-6, -20) across chest to Hand (14, -22) */}
+        <path
+          d="M -6 -20 L 14 -24 L 16 -19 L -6 -15 Z"
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        {/* Hand resting on chest */}
+        <ellipse cx={handSockets.right.x} cy={handSockets.right.y} rx="5.5" ry="3.8" fill={handColor} />
+
+        {/* Attached handheld item if holding something while resting */}
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+
+      {/* 8. NECK, HEAD & FACE (Resting horizontally at X = -58, Y = -24) */}
+      {isHeadless ? (
+        <g transform="translate(-48, -20)">
+          <ellipse cx="0" cy="0" rx="6" ry="8" fill="#7F1D1D" />
+          <path d="M 0 0 C -6 4, -12 6, -18 8" stroke="#DC2626" strokeWidth="2" fill="none" />
+        </g>
+      ) : (
+        <g className="lie-head-group" transform={`translate(${headPos.x}, ${headPos.y})`}>
+          {/* Neck connecting torso to head */}
+          <path
+            d="M 16 2 L 6 0 L 8 10 L 18 12 Z"
+            fill={appearance.skinShadow}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+
+          {/* Hair splaying out onto pillow/mattress */}
+          {base === "female_adult" && (
+            <g className="lie-female-hair">
+              {/* Long dark hair splayed backwards onto pillow */}
+              <path
+                d="M 10 4 C -6 2, -24 -4, -32 -8 C -26 8, -12 18, 5 18 Z"
+                fill={appearance.hair}
+              />
+              <path
+                d="M 12 -8 C -2 -14, -18 -18, -28 -16 C -20 -8, -8 0, 8 2 Z"
+                fill={appearance.hair}
+              />
+            </g>
+          )}
+
+          {base === "male_adult" && (
+            <path
+              d="M 12 -4 C 4 -16, -10 -18, -20 -10 C -16 -2, -8 4, 6 6 Z"
+              fill={appearance.hair}
+            />
+          )}
+
+          {base === "creepy_child" && (
+            <path
+              d="M 10 -2 C 2 -14, -8 -16, -18 -8 C -14 0, -6 4, 6 4 Z"
+              fill={appearance.hair}
+            />
+          )}
+
+          {/* Head ellipse */}
+          <ellipse
+            cx="0"
+            cy="0"
+            rx={isChild ? "18" : isElder ? "17" : "19"}
+            ry={isChild ? "17" : isElder ? "18" : "18"}
+            fill={appearance.skin}
+            stroke={appearance.outline}
+            strokeWidth="1.5"
+          />
+
+          {/* Wrinkles for elder */}
+          {isElder && (
+            <g stroke="#3A2E24" strokeWidth="0.9" fill="none" opacity="0.65">
+              <path d="M -8 -6 C -4 -4, 4 -4, 8 -6" />
+              <path d="M -6 6 C -2 8, 4 8, 8 6" />
+            </g>
+          )}
+
+          {/* Face Expression Rig */}
+          <FaceRig face={face} facialAction={facialAction} />
+        </g>
+      )}
+
+      {/* 9. DEBUG SOCKETS & GIZMO OVERLAY */}
+      {showSockets && (
+        <g className="rig-debug-gizmo" pointerEvents="none">
+          <circle cx="0" cy="0" r="5" fill="#10B981" />
+          <text x="10" y="-8" fill="#10B981" fontSize="10" fontFamily="monospace">Ground [0,0]</text>
+          <circle cx="20" cy="-18" r="4" fill="#3B82F6" />
+          <text x="24" y="-22" fill="#3B82F6" fontSize="9" fontFamily="monospace">Hip</text>
+          <circle cx="-30" cy="-24" r="4" fill="#F59E0B" />
+          <text x="-32" y="-30" fill="#F59E0B" fontSize="9" fontFamily="monospace">Shoulder</text>
+          <circle cx={headPos.x} cy={headPos.y} r="5" fill="#EF4444" />
+          <text x={headPos.x - 24} y={headPos.y - 10} fill="#EF4444" fontSize="9" fontFamily="monospace">Head</text>
+          <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4" fill="#A855F7" />
+          <circle cx={handSockets.right.x} cy={handSockets.right.y} r="5" fill="#22D3EE" />
+          <text x={handSockets.right.x + 6} y={handSockets.right.y - 4} fill="#67E8F9" fontSize="9" fontFamily="monospace">HandR</text>
         </g>
       )}
     </g>
