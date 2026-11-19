@@ -157,6 +157,16 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ["far_left", "far_right"],
     reason: "Rặng dừa nước và bụi chuối cao lớn chỉ được đặt ở hai bìa khung hình (far_left, far_right) để tạo vòm che và khung viền cảnh sông nước Nam Bộ mà không chắn nhân vật trung tâm.",
   },
+  structure_wooden_chair: {
+    name: "Ghế gỗ tựa",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Ghế gỗ tựa gia đình có thể đặt tại mọi vị trí mặt đất (far_left -> far_right), tương tác vừa khít với nhân vật ngồi (pose_sitting, pose_sitting_twisted_legs) tại mặt ghế Y=-72px.",
+  },
+  structure_wooden_bed: {
+    name: "Giường ngủ gỗ",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Giường ngủ gỗ gia đình có thể đặt tại mọi vị trí mặt đất (far_left -> far_right), tương tác hoàn hảo với nhân vật nằm (pose_lying_down với offsetY: -80) hoặc ngồi ở mép giường.",
+  },
 };
 
 export interface DetailRule {
@@ -247,6 +257,10 @@ const AIR_POSES: CharacterPoseId[] = ["pose_floating", "pose_hanging"];
 
 export function isAirPose(pose: CharacterPoseId): boolean {
   return AIR_POSES.includes(pose);
+}
+
+export function supportsVerticalOffset(pose: CharacterPoseId): boolean {
+  return isAirPose(pose) || pose === "pose_lying_down" || pose === "pose_sitting";
 }
 
 export function getAllowedSlotsForActor(actor: Pick<ActorConfig, "base" | "pose">): {

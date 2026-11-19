@@ -45,7 +45,9 @@ export type StructureId =
   | "structure_bamboo_bed_net"
   | "structure_wooden_latch_door"
   | "structure_rural_passenger_bus"
-  | "structure_coconut_banana_grove";
+  | "structure_coconut_banana_grove"
+  | "structure_wooden_chair"
+  | "structure_wooden_bed";
 
 export type DetailId =
   | "detail_black_crow"
@@ -171,6 +173,7 @@ export interface EnvironmentItemConfig {
   offsetX?: number; // Optional fine-tuning in px
   offsetY?: number; // Optional fine-tuning in px
   scale?: number;   // Optional scaling factor
+  facing?: FacingDirection; // Optional horizontal facing direction ("left" | "right")
 }
 
 export interface DetailItemConfig {

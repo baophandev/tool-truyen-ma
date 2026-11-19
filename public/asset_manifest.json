@@ -413,6 +413,26 @@
         "width": 370,
         "height": 480,
         "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_wooden_chair",
+        "name": "Ghế gỗ tựa",
+        "semantic_role": "Chiếc ghế gỗ tựa gia đình mộc mạc trang nhã, lưng tựa nan cao vút từ Y=-72px lên Y=-198px, tay vịn gỗ thanh lịch; tương tác vừa khít 100% với tư thế ngồi pose_sitting và pose_sitting_twisted_legs tại mặt ghế Y=-72px, chân chạm đất phẳng phiu; hỗ trợ xoay hướng facing: left | right",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 140,
+        "height": 220,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_wooden_bed",
+        "name": "Giường ngủ gỗ",
+        "semantic_role": "Chiếc giường đôi gỗ gia đình ấm áp, vách đầu giường gỗ thanh lịch cao Y=-195px có gối nằm kê đầu tại X=-65px, mặt nệm chiếu phẳng phiu tại Y=-80px và chăn gấp gọn gàng; tương tác hoàn hảo với tư thế nằm pose_lying_down (offsetY: -80) hoặc tư thế ngồi pose_sitting ở mép giường",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 320,
+        "height": 235,
+        "anchor": "bottom-center"
       }
     ]
   },

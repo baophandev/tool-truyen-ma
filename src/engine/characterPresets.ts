@@ -3,8 +3,9 @@ import type {
   NamedCharacterPreset,
 } from "./types";
 import { getDefaultCostumeForBase } from "./layoutRouter";
+import { setProjectIsolated } from "./environmentPresets";
 
-export const STORAGE_KEY_CHARACTERS = "limbo_named_characters";
+export const STORAGE_KEY_CHARACTERS = "limbo_project_characters_v2";
 
 export const DEFAULT_NAMED_CHARACTERS: NamedCharacterPreset[] = [
   {
@@ -116,33 +117,55 @@ export const DEFAULT_NAMED_CHARACTERS: NamedCharacterPreset[] = [
     defaultHeldHand: "right",
     scale: 1.25,
   },
+  {
+    id: "char_western_grandmother",
+    name: "Bà Ngoại Miền Tây (Lưng Còng Áo Bà Ba)",
+    description: "Cụ bà gần 80 tuổi hiền từ, lưng còng xuống, tóc bạc phơ búi gọn, mặc áo bà ba sẫm màu, tay cầm lát gừng tươi giữ khí.",
+    base: "elder_hunched",
+    costume: "outfit_traditional_ba_ba",
+    face: "face_old_wrinkled",
+    defaultHeldItem: "item_fresh_ginger",
+    defaultHeldHand: "right",
+    scale: 0.85,
+  },
+  {
+    id: "char_hai_lua_ghost",
+    name: "Vong Hồn Cô Hai Lụa (Áo Bà Ba Trắng)",
+    description: "Oan hồn người mẹ nghèo miền Tây đi tìm con trong đêm mùa nước nổi, mặc áo bà ba trắng ướt sũng bùn non, tóc xõa dài rũ rượi bên mé kênh.",
+    base: "female_adult",
+    costume: "outfit_traditional_ba_ba",
+    face: "face_weeping_ghost",
+    defaultHeldItem: "none",
+    scale: 1.0,
+  },
 ];
 
 /**
- * Load named characters from localStorage or defaults
+ * Load named characters from localStorage.
+ * Brand new projects start with 0 characters (empty []) so they are not polluted with unrelated presets.
  */
 export function loadStoredNamedCharacters(): NamedCharacterPreset[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_CHARACTERS);
     if (!raw) {
-      return DEFAULT_NAMED_CHARACTERS;
+      return [];
     }
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      // Auto-merge missing official defaults
-      const existingIds = new Set(parsed.map((c: any) => c.id));
-      const merged = [...parsed];
-      for (const def of DEFAULT_NAMED_CHARACTERS) {
-        if (!existingIds.has(def.id)) {
-          merged.push(def);
-        }
-      }
-      return merged;
+    if (Array.isArray(parsed)) {
+      return parsed;
     }
-    return DEFAULT_NAMED_CHARACTERS;
+    return [];
   } catch {
-    return DEFAULT_NAMED_CHARACTERS;
+    return [];
   }
+}
+
+/**
+ * Explicitly loads the official demo characters library (12 diễn viên demo) ONLY when requested
+ */
+export function loadDemoNamedCharacters(): NamedCharacterPreset[] {
+  saveStoredNamedCharacters(DEFAULT_NAMED_CHARACTERS);
+  return DEFAULT_NAMED_CHARACTERS;
 }
 
 /**
@@ -154,6 +177,14 @@ export function saveStoredNamedCharacters(chars: NamedCharacterPreset[]): void {
   } catch {
     // Ignore storage quota errors
   }
+}
+
+/**
+ * Sets project-scoped isolated characters (clears out pollution from other projects)
+ */
+export function setProjectNamedCharacters(chars: NamedCharacterPreset[]): void {
+  setProjectIsolated(true);
+  saveStoredNamedCharacters(chars);
 }
 
 /**
@@ -184,15 +215,16 @@ export function deleteNamedCharacter(id: string): NamedCharacterPreset[] {
 }
 
 /**
- * Reset stored named characters back to defaults (used when starting a clean new film)
+ * Reset stored named characters back to empty state (used when starting a clean new film)
  */
 export function resetStoredNamedCharacters(): NamedCharacterPreset[] {
   try {
     localStorage.removeItem(STORAGE_KEY_CHARACTERS);
+    setProjectIsolated(true);
   } catch {
     // Ignore storage errors
   }
-  return DEFAULT_NAMED_CHARACTERS;
+  return [];
 }
 
 /**

@@ -601,6 +601,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                   <StructureRenderer
                     id={item.asset_id}
                     scale={item.scale || 1}
+                    facing={item.facing}
                     showAnchor={showGizmo || isSelected || isBeingDragged}
                   />
 

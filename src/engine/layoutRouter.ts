@@ -34,6 +34,7 @@ import {
   getAllowedSlotsForActor,
   findNearestAllowedSlot,
   isAirPose,
+  supportsVerticalOffset,
   isSlotAllowed,
 } from "./placementRules";
 
@@ -137,6 +138,8 @@ const VALID_STRUCTURES: StructureId[] = [
   "structure_wooden_latch_door",
   "structure_rural_passenger_bus",
   "structure_coconut_banana_grove",
+  "structure_wooden_chair",
+  "structure_wooden_bed",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -344,6 +347,12 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       if (item.asset_id === "monkey_bridge") {
         item.asset_id = "structure_monkey_bridge";
       }
+      if (item.asset_id === "wooden_chair" || item.asset_id === "chair") {
+        item.asset_id = "structure_wooden_chair";
+      }
+      if (item.asset_id === "wooden_bed" || item.asset_id === "bed") {
+        item.asset_id = "structure_wooden_bed";
+      }
       if (!VALID_STRUCTURES.includes(item.asset_id)) return;
 
       const structId = item.asset_id as StructureId;
@@ -359,6 +368,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
         offsetX: Number(item.offsetX) || 0,
         offsetY: Number(item.offsetY) || 0,
         scale: Number(item.scale) || 1,
+        ...(item.facing === "left" || item.facing === "right" ? { facing: item.facing } : {}),
       });
     });
   }
@@ -393,7 +403,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     }
 
     const offsetX = Number(actor.offsetX) || 0;
-    const offsetY = isAirPose(pose) ? (Number(actor.offsetY) || 0) : 0;
+    const offsetY = supportsVerticalOffset(pose) ? (Number(actor.offsetY) || 0) : 0;
     const scale = Number(actor.scale) || 1;
     const opacity = actor.opacity !== undefined ? Math.min(1, Math.max(0, Number(actor.opacity))) : 1;
 
@@ -434,7 +444,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
         : duration_sec;
 
       const targetOffsetX = Number(rawMotion.targetOffsetX) || 0;
-      const targetOffsetY = isAirPose(pose) ? (Number(rawMotion.targetOffsetY) || 0) : 0;
+      const targetOffsetY = supportsVerticalOffset(pose) ? (Number(rawMotion.targetOffsetY) || 0) : 0;
 
       motion = {
         targetSlot,

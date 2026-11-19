@@ -245,7 +245,7 @@ export function App() {
 
   const handleResetProject = () => {
     const confirmReset = window.confirm(
-      "Bạn có chắc muốn làm mới toàn bộ dự án để làm phim mới?\n\n- Toàn bộ các cảnh hiện tại sẽ được xóa và đặt lại về 1 cảnh mẫu mặc định sạch sẽ.\n- Thư viện bối cảnh và dàn diễn viên dùng lại (rắc-co) sẽ được làm mới về mặc định ban đầu."
+      "Bạn có chắc muốn làm mới toàn bộ dự án để làm phim mới?\n\n- Toàn bộ các cảnh hiện tại sẽ được xóa và đặt lại về 1 cảnh mẫu ban đầu.\n- Thư viện bối cảnh và dàn diễn viên khóa rắc-co sẽ được dọn sạch hoàn toàn (0 diễn viên, 0 bối cảnh) để dự án mới không bị ô nhiễm chéo."
     );
     if (!confirmReset) return;
 

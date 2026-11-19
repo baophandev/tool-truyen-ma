@@ -1,22 +1,25 @@
 import React from "react";
-import type { StructureId } from "../types";
+import type { StructureId, FacingDirection } from "../types";
 import { COLOR_PALETTE } from "../constants";
 
 interface StructureProps {
   id: StructureId;
   scale?: number;
+  facing?: FacingDirection;
   showAnchor?: boolean;
 }
 
 export const StructureRenderer: React.FC<StructureProps> = ({
   id,
   scale = 1,
+  facing = "right",
   showAnchor = false,
 }) => {
+  const flip = facing === "left" ? -1 : 1;
   return (
     <g
       className={`structure-${id}`}
-      transform={`scale(${scale})`}
+      transform={`scale(${flip * scale}, ${scale})`}
     >
       {id === "creepy_banyan_tree" && <CreepyBanyanTree />}
       {id === "ancient_tomb" && <AncientTomb />}
@@ -44,6 +47,8 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "structure_wooden_latch_door" && <WoodenLatchDoor />}
       {id === "structure_rural_passenger_bus" && <RuralPassengerBus />}
       {id === "structure_coconut_banana_grove" && <CoconutBananaGrove />}
+      {id === "structure_wooden_chair" && <WoodenChair />}
+      {id === "structure_wooden_bed" && <WoodenBed />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -3343,6 +3348,227 @@ const CoconutBananaGrove: React.FC = () => {
         <line x1="-132" y1="0" x2="-135" y2="-32" />
         <line x1="110" y1="0" x2="116" y2="-30" />
         <line x1="125" y1="0" x2="135" y2="-22" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 27. WOODEN CHAIR (Ghế Gỗ Tựa Gia Đình)
+ * Classic home wooden armchair with elegant spindled backrest, curved crest rail, and turned legs.
+ * Clean, rustic, everyday design without horror elements.
+ * Seat surface positioned at Y = -72px, perfectly accommodating pose_sitting and pose_sitting_twisted_legs.
+ * Anchored at [bottom-center] (0, 0) at Ground Line Y = 800px.
+ */
+const WoodenChair: React.FC = () => {
+  return (
+    <g className="structure-wooden-chair">
+      {/* 1. Floor Shadow */}
+      <ellipse cx="6" cy="-2" rx="42" ry="5.5" fill="#000000" opacity="0.5" />
+      <ellipse cx="6" cy="-2" rx="58" ry="8" fill="#000000" opacity="0.2" />
+
+      {/* 2. Rear Legs (Chân sau vươn từ sàn lên đỉnh tựa lưng) */}
+      <g opacity="0.95">
+        <line x1="-24" y1="-68" x2="-26" y2="0" stroke="#16120F" strokeWidth="6" strokeLinecap="round" />
+        <line x1="-24" y1="-68" x2="-26" y2="0" stroke="#3D2E24" strokeWidth="2.2" strokeLinecap="round" />
+      </g>
+      {/* Far Rear Leg */}
+      <g opacity="0.75">
+        <line x1="-15" y1="-68" x2="-16" y2="0" stroke="#0F0C0A" strokeWidth="5" strokeLinecap="round" />
+        <line x1="-15" y1="-68" x2="-16" y2="0" stroke="#2B2018" strokeWidth="1.8" strokeLinecap="round" />
+      </g>
+
+      {/* 3. Lower Wooden Stretchers / Rungs (Thanh giằng chân ghế vững chãi) */}
+      <line x1="-25" y1="-20" x2="33" y2="-20" stroke="#221A14" strokeWidth="3.5" />
+      <line x1="-25" y1="-20" x2="33" y2="-20" stroke="#453326" strokeWidth="1.5" />
+      <line x1="-24" y1="-10" x2="31" y2="-10" stroke="#1B140F" strokeWidth="2.8" />
+
+      {/* 4. Front Legs (Chân trước) */}
+      {/* Far Front Leg */}
+      <g opacity="0.8">
+        <line x1="22" y1="-68" x2="23" y2="0" stroke="#120E0B" strokeWidth="5" strokeLinecap="round" />
+        <line x1="22" y1="-68" x2="23" y2="0" stroke="#36281E" strokeWidth="1.8" strokeLinecap="round" />
+      </g>
+      {/* Near Front Leg - tiện tròn tinh tế */}
+      <g>
+        <line x1="33" y1="-68" x2="34" y2="0" stroke="#18130F" strokeWidth="6" strokeLinecap="round" />
+        <line x1="33" y1="-68" x2="34" y2="0" stroke="#4A3729" strokeWidth="2.2" strokeLinecap="round" />
+        <ellipse cx="33.5" cy="-48" rx="4.5" ry="2" fill="#5E4634" />
+        <ellipse cx="33.8" cy="-14" rx="4.5" ry="2" fill="#5E4634" />
+      </g>
+
+      {/* 5. Chair Seat (Mặt ngồi ván gỗ Y = -72px vừa khít đùi nhân vật ngồi) */}
+      <polygon
+        points="-28,-73 38,-73 34,-63 -24,-63"
+        fill="#211A14"
+        stroke="#382B20"
+        strokeWidth="1.4"
+      />
+      {/* Beveled wooden edge highlight */}
+      <line x1="-27" y1="-73" x2="37" y2="-73" stroke="#5E4735" strokeWidth="2" />
+      <line x1="-26" y1="-71" x2="36" y2="-71" stroke="#33251A" strokeWidth="1" />
+
+      {/* 6. Spindled High Backrest (Tựa lưng nan gỗ cao từ Y = -72px lên Y = -198px) */}
+      {/* Upright Back Post */}
+      <g>
+        <line x1="-24" y1="-72" x2="-25" y2="-198" stroke="#18130F" strokeWidth="5.5" strokeLinecap="round" />
+        <line x1="-24" y1="-72" x2="-25" y2="-198" stroke="#473426" strokeWidth="2.2" strokeLinecap="round" />
+        <circle cx="-25" cy="-201" r="3.5" fill="#3D2B1E" stroke="#5A402D" strokeWidth="1" />
+      </g>
+
+      {/* Spindles (3 nan tựa lưng dọc) */}
+      {[-18, -10, -2].map((spX, idx) => (
+        <g key={`chair-spindle-${idx}`}>
+          <line x1={spX} y1="-72" x2={spX - 0.8} y2="-192" stroke="#1C1510" strokeWidth="3.2" />
+          <line x1={spX} y1="-72" x2={spX - 0.8} y2="-192" stroke="#4E3929" strokeWidth="1.2" />
+          <ellipse cx={spX - 0.4} cy="-135" rx="2.4" ry="1.8" fill="#614733" />
+        </g>
+      ))}
+
+      {/* Curved Crest Rail (Thanh đỉnh tựa lưng uốn cong nhã nhặn) */}
+      <path
+        d="M -29 -196 
+           C -18 -206, 0 -206, 10 -196 
+           L 8 -188 
+           C -1 -197, -17 -197, -27 -188 
+           Z"
+        fill="#221A13"
+        stroke="#453325"
+        strokeWidth="1.5"
+      />
+
+      {/* 7. Curved Wooden Armrest (Tay vịn gỗ gia đình) */}
+      <path
+        d="M -24 -115 C -10 -120, 14 -118, 27 -105"
+        fill="none"
+        stroke="#1A140F"
+        strokeWidth="4.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M -24 -115 C -10 -120, 14 -118, 27 -105"
+        fill="none"
+        stroke="#523C2B"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <circle cx="27" cy="-105" r="3.8" fill="#332419" stroke="#5E4532" strokeWidth="1" />
+      {/* Armrest vertical support post down to seat */}
+      <line x1="25" y1="-103" x2="25" y2="-72" stroke="#1D1611" strokeWidth="3.5" />
+      <line x1="25" y1="-103" x2="25" y2="-72" stroke="#4A3627" strokeWidth="1.6" />
+    </g>
+  );
+};
+
+/**
+ * 28. WOODEN BED (Giường Ngủ Gỗ Gia Đình)
+ * Traditional home wooden bed with clean sturdy headboard, neat sleeping mat,
+ * comfortable bolster pillow, and warm folded quilt.
+ * Standard domestic bedroom furniture without horror elements.
+ * Bed sleeping surface positioned at Y = -80px to perfectly accommodate pose_lying_down (offsetY: -80)
+ * and pose_sitting (seated at bed edge).
+ * Anchored at [bottom-center] (0, 0) at Ground Line Y = 800px.
+ */
+const WoodenBed: React.FC = () => {
+  return (
+    <g className="structure-wooden-bed">
+      {/* 1. Natural Ground Shadow */}
+      <ellipse cx="0" cy="-2" rx="155" ry="9" fill="#000000" opacity="0.5" />
+      <ellipse cx="0" cy="-2" rx="175" ry="14" fill="#000000" opacity="0.2" />
+
+      {/* 2. Headboard Panel & Posts (Thành đầu giường bên trái X = -135px, cao Y = -195px) */}
+      {/* Headboard Corner Post */}
+      <g>
+        <rect x="-142" y="-195" width="15" height="195" rx="2" fill="#17120D" stroke="#312419" strokeWidth="1.6" />
+        <line x1="-134.5" y1="-193" x2="-134.5" y2="0" stroke="#4D3828" strokeWidth="2.2" />
+        <circle cx="-134.5" cy="-201" r="5" fill="#2E2016" stroke="#523B2A" strokeWidth="1.2" />
+        <circle cx="-134.5" cy="-206" r="2" fill="#694C35" />
+      </g>
+
+      {/* Headboard Solid Wood Paneling */}
+      <polygon
+        points="-138,-80 -82,-80 -82,-185 -138,-190"
+        fill="#1C1611"
+        stroke="#36281D"
+        strokeWidth="1.5"
+      />
+      {/* Headboard Top Cap Rail */}
+      <rect x="-140" y="-193" width="60" height="9" rx="2" fill="#281F17" stroke="#4A3728" strokeWidth="1.2" />
+      {/* Vertical Wood Plank Lines */}
+      <line x1="-122" y1="-188" x2="-122" y2="-80" stroke="#3D2D1F" strokeWidth="1.4" />
+      <line x1="-106" y1="-186" x2="-106" y2="-80" stroke="#3D2D1F" strokeWidth="1.4" />
+      <line x1="-92" y1="-184" x2="-92" y2="-80" stroke="#3D2D1F" strokeWidth="1.4" />
+
+      {/* 3. Footboard Panel & Post (Thành đuôi giường bên phải X = +135px, cao Y = -125px) */}
+      {/* Footboard Corner Post */}
+      <g>
+        <rect x="127" y="-125" width="14" height="125" rx="2" fill="#17120D" stroke="#312419" strokeWidth="1.6" />
+        <line x1="134" y1="-123" x2="134" y2="0" stroke="#4D3828" strokeWidth="2.2" />
+        <circle cx="134" cy="-130" r="4.5" fill="#2E2016" stroke="#523B2A" strokeWidth="1.2" />
+      </g>
+      {/* Footboard Wood Board */}
+      <polygon
+        points="86,-80 130,-80 130,-115 86,-115"
+        fill="#1C1611"
+        stroke="#36281D"
+        strokeWidth="1.5"
+      />
+      <rect x="84" y="-118" width="48" height="7" rx="1.5" fill="#281F17" stroke="#4A3728" strokeWidth="1.2" />
+
+      {/* 4. Heavy Horizontal Bed Frame Rail (Xà dầm đỡ mặt giường Y = -80px) */}
+      <rect x="-140" y="-83" width="280" height="15" rx="2" fill="#1A140F" stroke="#36271C" strokeWidth="1.6" />
+      <line x1="-138" y1="-76" x2="138" y2="-76" stroke="#523C2B" strokeWidth="2" />
+      {/* Wooden joint pegs */}
+      {[-100, -50, 0, 50, 100].map((px) => (
+        <circle key={`bed-peg-${px}`} cx={px} cy="-76" r="2" fill="#6E4F39" />
+      ))}
+
+      {/* 5. Front Bed Legs touching ground Y = 0 */}
+      {/* Left Front Leg */}
+      <g>
+        <rect x="-138" y="-76" width="14" height="76" rx="2" fill="#16110D" stroke="#2D2016" strokeWidth="1.5" />
+        <line x1="-131" y1="-76" x2="-131" y2="0" stroke="#453222" strokeWidth="2" />
+        <ellipse cx="-131" cy="-38" rx="5.5" ry="2" fill="#583F2B" />
+      </g>
+      {/* Right Front Leg */}
+      <g>
+        <rect x="124" y="-76" width="14" height="76" rx="2" fill="#16110D" stroke="#2D2016" strokeWidth="1.5" />
+        <line x1="131" y1="-76" x2="131" y2="0" stroke="#453222" strokeWidth="2" />
+        <ellipse cx="131" cy="-38" rx="5.5" ry="2" fill="#583F2B" />
+      </g>
+      {/* Center Stability Leg */}
+      <rect x="-6" y="-72" width="12" height="72" rx="2" fill="#100C09" stroke="#261A12" strokeWidth="1.2" />
+
+      {/* 6. Sleeping Surface & Woven Mat (Mặt nệm / chiếu nằm phẳng phiu Y = -80px) */}
+      <polygon
+        points="-134,-83 130,-83 126,-72 -130,-72"
+        fill="#2A221A"
+        stroke="#483B2D"
+        strokeWidth="1.2"
+      />
+      <line x1="-132" y1="-83" x2="128" y2="-83" stroke="#69553E" strokeWidth="1.8" />
+      {/* Neat fabric border at mat edges */}
+      <rect x="-133" y="-83" width="8" height="8" fill="#5A3A28" opacity="0.8" />
+      <rect x="120" y="-83" width="8" height="8" fill="#5A3A28" opacity="0.8" />
+
+      {/* Comfortable Bolster Pillow (Gối kê đầu bên trái X = -65, Y = -88) */}
+      <ellipse cx="-65" cy="-88" rx="23" ry="9.5" fill="#24201B" stroke="#4C4135" strokeWidth="1.5" />
+      <ellipse cx="-65" cy="-88" rx="12" ry="4.5" fill="#14110E" />
+
+      {/* 7. Folded Home Quilt / Blanket (Chăn đắp gia đình gấp gọn gàng phẳng phiu) */}
+      <g>
+        {/* Main folded quilt draped over lower portion */}
+        <polygon
+          points="20,-83 120,-83 118,-52 24,-52"
+          fill="#2C3540"
+          stroke="#424F5E"
+          strokeWidth="1.4"
+        />
+        {/* Fold crease highlight */}
+        <line x1="22" y1="-70" x2="119" y2="-70" stroke="#546578" strokeWidth="1.2" />
+        <line x1="24" y1="-52" x2="118" y2="-52" stroke="#546578" strokeWidth="1.5" />
+        {/* Quilt hem band */}
+        <rect x="20" y="-83" width="8" height="31" fill="#3D4B5C" opacity="0.75" />
       </g>
     </g>
   );

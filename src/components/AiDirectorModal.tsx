@@ -10,6 +10,7 @@ import {
   generateSceneFromDescription,
   generateNamedEnvironmentFromPrompt,
   generateCharacterPresetFromDescription,
+  generateProjectRaccordFromBreakdown,
   breakdownStoryToSceneDrafts,
   auditStoryAssets,
   SAMPLE_HORROR_PROMPTS,
@@ -20,6 +21,7 @@ import {
   type SceneDescriptionSpec,
   type AssetAuditResult,
   type MissingAssetItem,
+  type ProjectRaccordResult,
 } from "../engine/geminiDirector";
 import {
   VOICE_PACE_PRESETS,
@@ -30,19 +32,24 @@ import {
 } from "../engine/voicePacingUtils";
 import {
   loadStoredNamedEnvironments,
+  loadDemoNamedEnvironments,
   resetStoredNamedEnvironments,
   addOrUpdateNamedEnvironment,
   deleteNamedEnvironment,
   applyEnvironmentToScene,
   extractEnvironmentFromScene,
+  setProjectNamedEnvironments,
+  isProjectIsolated,
 } from "../engine/environmentPresets";
 import {
   loadStoredNamedCharacters,
+  loadDemoNamedCharacters,
   resetStoredNamedCharacters,
   addOrUpdateNamedCharacter,
   deleteNamedCharacter,
   extractCharacterFromActor,
   applyCharacterToActor,
+  setProjectNamedCharacters,
 } from "../engine/characterPresets";
 import {
   Sparkles,
@@ -72,9 +79,11 @@ import {
   Users,
   UserPlus,
   UserCheck,
+  Clapperboard,
 } from "lucide-react";
 
 export type AiModalMode =
+  | "pre_production"
   | "description_film"
   | "environments_manager"
   | "characters_manager"
@@ -118,13 +127,13 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
   // Map legacy mode names if passed
   const normalizeInitialMode = (
     m: AiModalMode
-  ): "description_film" | "environments_manager" | "characters_manager" | "re_direct_scene" => {
+  ): "pre_production" | "description_film" | "environments_manager" | "characters_manager" | "re_direct_scene" => {
     if (m === "full_film" || m === "append_scene") return "description_film";
     return m;
   };
 
   const [mode, setMode] = useState<
-    "description_film" | "environments_manager" | "characters_manager" | "re_direct_scene"
+    "pre_production" | "description_film" | "environments_manager" | "characters_manager" | "re_direct_scene"
   >(() => normalizeInitialMode(initialMode));
   const [apiKey, setApiKey] = useState<string>(getStoredApiKey);
   const [showKey, setShowKey] = useState<boolean>(false);
@@ -220,12 +229,19 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
   const [generatedScenes, setGeneratedScenes] = useState<DirectorSceneScript[] | null>(null);
   const [generatedSingleScene, setGeneratedSingleScene] = useState<DirectorSceneScript[] | null>(null);
 
+  // Pre-production Breakdown state
+  const [breakdownInput, setBreakdownInput] = useState<string>("");
+  const [isAnalyzingBreakdown, setIsAnalyzingBreakdown] = useState<boolean>(false);
+  const [projectRaccordResult, setProjectRaccordResult] = useState<ProjectRaccordResult | null>(null);
+  const [preProdNotice, setPreProdNotice] = useState<string | null>(null);
+
   // Sync mode whenever modal opens
   useEffect(() => {
     if (isOpen) {
       setMode(normalizeInitialMode(initialMode));
       setErrorMessage(null);
       setNamedEnvironments(loadStoredNamedEnvironments());
+      setNamedCharacters(loadStoredNamedCharacters());
     }
   }, [isOpen, initialMode]);
 
@@ -459,6 +475,100 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     }
   };
 
+  // Helper to paste breakdown text from clipboard
+  const handlePasteBreakdownFromClipboard = async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        const text = await navigator.clipboard.readText();
+        if (text && text.trim()) {
+          setBreakdownInput(text.trim());
+          setErrorMessage(null);
+        }
+      }
+    } catch {
+      // Ignore clipboard read errors
+    }
+  };
+
+  // Handle analyzing pre-production breakdown
+  const handleAnalyzeBreakdown = async () => {
+    if (!breakdownInput.trim()) {
+      setErrorMessage("Vui lòng dán nội dung bảng bóc tách kịch bản.");
+      return;
+    }
+
+    setIsAnalyzingBreakdown(true);
+    setErrorMessage(null);
+    setPreProdNotice(null);
+
+    try {
+      const result = await generateProjectRaccordFromBreakdown(breakdownInput, {
+        apiKey,
+        model,
+      });
+
+      if (!result.success) {
+        setErrorMessage(result.error || "Không thể phân tích bảng bóc tách.");
+      } else {
+        setProjectRaccordResult(result);
+      }
+    } catch (err: any) {
+      setErrorMessage(`Lỗi phân tích bảng bóc tách: ${err.message}`);
+    } finally {
+      setIsAnalyzingBreakdown(false);
+    }
+  };
+
+  // Apply clean project raccord (isolated project mode)
+  const handleApplyCleanProjectRaccord = () => {
+    if (!projectRaccordResult) return;
+    const chars = projectRaccordResult.characters || [];
+    const envs = projectRaccordResult.environments || [];
+
+    if (chars.length === 0 && envs.length === 0) return;
+
+    if (envs.length > 0) {
+      setProjectNamedEnvironments(envs);
+      setNamedEnvironments(envs);
+    }
+    if (chars.length > 0) {
+      setProjectNamedCharacters(chars);
+      setNamedCharacters(chars);
+    }
+
+    setPreProdNotice(
+      `🎉 Đã thiết lập thành công Dự Án Mới! Đã lưu ${chars.length} diễn viên và ${envs.length} bối cảnh chuẩn văn hóa (${projectRaccordResult.culturalTheme}). Toàn bộ bối cảnh không liên quan đã được dọn sạch!`
+    );
+
+    // Switch to description_film after 1.5s
+    setTimeout(() => {
+      setMode("description_film");
+    }, 1500);
+  };
+
+  // Append to existing library
+  const handleAppendToExistingLibrary = () => {
+    if (!projectRaccordResult) return;
+    const chars = projectRaccordResult.characters || [];
+    const envs = projectRaccordResult.environments || [];
+
+    let updatedEnvs = [...namedEnvironments];
+    for (const env of envs) {
+      updatedEnvs = addOrUpdateNamedEnvironment(env);
+    }
+    setNamedEnvironments(updatedEnvs);
+
+    let updatedChars = [...namedCharacters];
+    for (const char of chars) {
+      updatedChars = addOrUpdateNamedCharacter(char);
+    }
+    setNamedCharacters(updatedChars);
+
+    setPreProdNotice(
+      `✅ Đã bổ sung ${chars.length} diễn viên và ${envs.length} bối cảnh vào thư viện hiện có!`
+    );
+  };
+
   // Reset assistant state to start a clean new film
   const handleResetAssistant = () => {
     const confirmReset = window.confirm(
@@ -487,6 +597,19 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         duration_sec: 6,
       },
     ]);
+  };
+
+  // Explicitly load demo catalog if user wants to explore generic presets
+  const handleLoadDemoCatalog = () => {
+    const confirmLoad = window.confirm(
+      "Nạp bộ thư viện mẫu demo (12 diễn viên và 17 bối cảnh)?\n\nLưu ý: Bộ mẫu này chứa nhiều thể loại khác nhau (bệnh viện, xe buýt, siêu thị...). Nếu bạn đang làm dự án riêng, nên dùng Tab '0. Tiền Kỳ Rắc-co' để AI tạo rắc-co chuẩn hơn."
+    );
+    if (!confirmLoad) return;
+
+    const chars = loadDemoNamedCharacters();
+    const envs = loadDemoNamedEnvironments();
+    setNamedCharacters(chars);
+    setNamedEnvironments(envs);
   };
 
   // Generate Film from Description Specs
@@ -893,7 +1016,23 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
           </div>
 
           {/* MODE TABS SWITCHER */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 p-1 bg-neutral-950/80 rounded-xl border border-neutral-800">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 p-1 bg-neutral-950/80 rounded-xl border border-neutral-800">
+            {/* TAB 0: TIỀN KỲ & RẮC-CO */}
+            <button
+              onClick={() => {
+                setMode("pre_production");
+                setErrorMessage(null);
+              }}
+              className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg text-xs font-semibold transition-all ${
+                mode === "pre_production"
+                  ? "bg-gradient-to-r from-amber-600 via-red-600 to-purple-800 text-white shadow-md shadow-amber-950/50"
+                  : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-850"
+              }`}
+            >
+              <Clapperboard className="w-4 h-4 text-amber-300" />
+              <span>0. Tiền Kỳ Rắc-co</span>
+            </button>
+
             {/* TAB 1 */}
             <button
               onClick={() => {
@@ -901,14 +1040,14 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                 setErrorMessage(null);
                 setGeneratedScenes(null);
               }}
-              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg text-xs font-semibold transition-all ${
                 mode === "description_film"
                   ? "bg-gradient-to-r from-red-700 to-purple-800 text-white shadow-md shadow-red-950/50"
                   : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-850"
               }`}
             >
               <Wand2 className="w-4 h-4 text-amber-300" />
-              <span>1. Trợ Thủ Kịch Bản ({sceneCount} Cảnh)</span>
+              <span>1. Trợ Thủ Kịch Bản</span>
             </button>
 
             {/* TAB 2 */}
@@ -917,14 +1056,14 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                 setMode("characters_manager");
                 setErrorMessage(null);
               }}
-              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg text-xs font-semibold transition-all ${
                 mode === "characters_manager"
                   ? "bg-gradient-to-r from-red-700 to-purple-800 text-white shadow-md shadow-red-950/50"
                   : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-850"
               }`}
             >
               <Users className="w-4 h-4 text-purple-400" />
-              <span>2. Diễn Viên Rắc-co ({namedCharacters.length})</span>
+              <span>2. Diễn Viên ({namedCharacters.length})</span>
             </button>
 
             {/* TAB 3 */}
@@ -933,14 +1072,14 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                 setMode("environments_manager");
                 setErrorMessage(null);
               }}
-              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg text-xs font-semibold transition-all ${
                 mode === "environments_manager"
                   ? "bg-gradient-to-r from-red-700 to-purple-800 text-white shadow-md shadow-red-950/50"
                   : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-850"
               }`}
             >
               <Compass className="w-4 h-4 text-cyan-400" />
-              <span>3. Bối Cảnh Dùng Lại ({namedEnvironments.length})</span>
+              <span>3. Bối Cảnh ({namedEnvironments.length})</span>
             </button>
 
             {/* TAB 4 */}
@@ -950,7 +1089,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                 setErrorMessage(null);
                 setGeneratedSingleScene(null);
               }}
-              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg text-xs font-semibold transition-all ${
                 mode === "re_direct_scene"
                   ? "bg-gradient-to-r from-red-700 to-purple-800 text-white shadow-md shadow-red-950/50"
                   : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-850"
@@ -960,6 +1099,266 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
               <span>4. AI Sửa Cảnh {currentSceneIndex + 1}</span>
             </button>
           </div>
+
+          {/* TAB 0: PRE-PRODUCTION BREAKDOWN & RACCORD GENERATOR */}
+          {mode === "pre_production" && (
+            <div className="flex flex-col gap-4">
+              <div className="bg-gradient-to-b from-amber-950/40 via-neutral-950 to-neutral-950 border border-amber-800/50 rounded-2xl p-5 flex flex-col gap-4 shadow-xl shadow-amber-950/20">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 bg-amber-600/20 border border-amber-500/40 rounded-xl">
+                      <Clapperboard className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-amber-200 flex items-center gap-2">
+                        BÓC TÁCH TIỀN KỲ & LẮP GHÉP RẮC-CO BẰNG AI
+                        <span className="text-[10px] font-normal px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          Khuyên Dùng Trước Khi Dựng Phim
+                        </span>
+                        {isProjectIsolated() && (
+                          <span className="text-[10px] font-normal px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            🔒 Đang Khóa Rắc-co Độc Lập
+                          </span>
+                        )}
+                      </h3>
+                      <p className="text-[11px] text-neutral-400 mt-0.5">
+                        Dán bảng mô tả thực thể (Bối cảnh, Nhân vật, Trang phục, Đạo cụ). AI sẽ tự động phân tích và lắp ghép các Component SVG thành Dàn Diễn Viên & Bối Cảnh riêng biệt, giúp phim luôn giữ đúng bối cảnh và tránh xung đột với các dự án khác.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handlePasteBreakdownFromClipboard}
+                      className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 hover:border-amber-500/50 text-xs text-neutral-300 font-medium hover:bg-neutral-800 transition-all"
+                      title="Dán nhanh nội dung bảng bóc tách từ Clipboard"
+                    >
+                      <Copy className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Dán Từ Clipboard</span>
+                    </button>
+                    {breakdownInput && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setBreakdownInput("");
+                          setProjectRaccordResult(null);
+                          setPreProdNotice(null);
+                        }}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-red-500/50 text-xs text-neutral-400 hover:text-red-300 font-medium hover:bg-neutral-800 transition-all"
+                        title="Xóa trắng khung nhập"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Xóa</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* TEXTAREA FOR SCRIPT BREAKDOWN */}
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-semibold text-neutral-300">
+                      Nội dung Bảng Bóc Tách Thực Thể:
+                    </span>
+                    <span className="text-neutral-500 font-mono text-[11px]">
+                      {countWords(breakdownInput)} từ
+                    </span>
+                  </div>
+                  <textarea
+                    rows={8}
+                    value={breakdownInput}
+                    onChange={(e) => setBreakdownInput(e.target.value)}
+                    placeholder="Dán nội dung bảng bóc tách vào đây... (Ví dụ: Danh sách nhân vật, ngoại hình, trang phục, danh sách bối cảnh thôn quê/đô thị, đạo cụ cầm tay...)"
+                    className="w-full bg-black/80 border border-neutral-800 rounded-xl p-3.5 text-xs text-neutral-200 font-mono focus:outline-none focus:border-amber-500 resize-y leading-relaxed"
+                  />
+                </div>
+
+                {/* ACTION BUTTON */}
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-[11px] text-neutral-400 italic">
+                    AI sẽ chỉ dùng các Asset SVG hợp lệ trong GEMINI_DIRECTOR_ASSETS.md để lắp ghép.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleAnalyzeBreakdown}
+                    disabled={isAnalyzingBreakdown || !breakdownInput.trim()}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 via-red-600 to-purple-700 hover:from-amber-500 hover:to-purple-600 text-white font-semibold text-xs shadow-lg shadow-amber-950/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  >
+                    {isAnalyzingBreakdown ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
+                        <span>AI Đang Phân Tích & Lắp Ghép Rắc-co...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 text-amber-300" />
+                        <span>🤖 AI Phân Tích & Ghép Rắc-co</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* SUCCESS / NOTICE BANNER */}
+              {preProdNotice && (
+                <div className="p-3.5 bg-emerald-950/60 border border-emerald-600/60 rounded-xl text-xs text-emerald-200 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span>{preProdNotice}</span>
+                  </div>
+                  <button
+                    onClick={() => setMode("description_film")}
+                    className="text-xs font-bold underline text-emerald-300 hover:text-white"
+                  >
+                    Chuyển Sang Dựng Phim Ngay →
+                  </button>
+                </div>
+              )}
+
+              {/* GENERATED RACCORD PREVIEW PANEL */}
+              {projectRaccordResult && (
+                <div className="bg-neutral-900/90 border border-neutral-800 rounded-2xl p-5 flex flex-col gap-5">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-800 pb-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-neutral-200 uppercase tracking-wider">
+                          KẾT QUẢ LẮP GHÉP RẮC-CO TIỀN KỲ
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[11px] font-medium font-mono">
+                          {projectRaccordResult.culturalTheme}
+                        </span>
+                      </div>
+                      <p className="text-xs text-neutral-400 mt-1">
+                        {projectRaccordResult.summary}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleApplyCleanProjectRaccord}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-bold text-xs shadow-lg shadow-emerald-950/50 transition-all"
+                      >
+                        <Check className="w-4 h-4" />
+                        <span>✨ Áp Dụng Làm Dự Án Mới (Khuyên dùng)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleAppendToExistingLibrary}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-xs text-neutral-300 font-medium transition-all"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Thêm Vào Kho Hiện Có</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* SECTION 1: CAST (DIỄN VIÊN) */}
+                  <div className="flex flex-col gap-2.5">
+                    <h4 className="text-xs font-bold text-purple-300 flex items-center gap-2">
+                      <Users className="w-4 h-4 text-purple-400" />
+                      DÀN DIỄN VIÊN ĐỀ XUẤT ({projectRaccordResult.characters?.length || 0})
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {(projectRaccordResult.characters || []).map((char, cIdx) => (
+                        <div
+                          key={char.id || cIdx}
+                          className="bg-black/60 border border-purple-900/40 rounded-xl p-3 flex flex-col gap-2"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-neutral-200">
+                              {char.name}
+                            </span>
+                            <span className="text-[10px] font-mono text-purple-400 bg-purple-950/60 px-2 py-0.5 rounded border border-purple-800/40">
+                              {char.id}
+                            </span>
+                          </div>
+                          {char.description && (
+                            <p className="text-[11px] text-neutral-400 line-clamp-2">
+                              {char.description}
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-1.5 pt-1 text-[10px]">
+                            <span className="bg-neutral-800 text-neutral-300 px-2 py-0.5 rounded">
+                              Thân: <b className="text-neutral-100">{char.base}</b>
+                            </span>
+                            <span className="bg-neutral-800 text-neutral-300 px-2 py-0.5 rounded">
+                              Đồ: <b className="text-neutral-100">{char.costume}</b>
+                            </span>
+                            {char.face && (
+                              <span className="bg-neutral-800 text-neutral-300 px-2 py-0.5 rounded">
+                                Mặt: <b className="text-neutral-100">{char.face}</b>
+                              </span>
+                            )}
+                            {char.defaultHeldItem && char.defaultHeldItem !== "none" && (
+                              <span className="bg-amber-950/60 text-amber-300 border border-amber-800/40 px-2 py-0.5 rounded">
+                                Cầm: <b>{char.defaultHeldItem}</b>
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* SECTION 2: ENVIRONMENTS (BỐI CẢNH) */}
+                  <div className="flex flex-col gap-2.5 pt-2 border-t border-neutral-800/60">
+                    <h4 className="text-xs font-bold text-cyan-300 flex items-center gap-2">
+                      <Compass className="w-4 h-4 text-cyan-400" />
+                      DÀN BỐI CẢNH DÙNG LẠI ĐỀ XUẤT ({projectRaccordResult.environments?.length || 0})
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {(projectRaccordResult.environments || []).map((env, eIdx) => (
+                        <div
+                          key={env.id || eIdx}
+                          className="bg-black/60 border border-cyan-900/40 rounded-xl p-3 flex flex-col gap-2"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-neutral-200">
+                              {env.name}
+                            </span>
+                            <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">
+                              {env.id}
+                            </span>
+                          </div>
+                          {env.description && (
+                            <p className="text-[11px] text-neutral-400 line-clamp-2">
+                              {env.description}
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-1.5 pt-1 text-[10px]">
+                            <span className="bg-neutral-800 text-cyan-300 px-2 py-0.5 rounded">
+                              Theme: <b>{env.theme}</b>
+                            </span>
+                            <span className="bg-neutral-800 text-neutral-300 px-2 py-0.5 rounded">
+                              Sky: <b>{env.lighting?.sky_preset || "foggy_night"}</b>
+                            </span>
+                            {env.environment_items?.map((item, iIdx) => (
+                              <span
+                                key={iIdx}
+                                className="bg-neutral-850 text-amber-200/90 border border-neutral-750 px-2 py-0.5 rounded font-mono"
+                              >
+                                🏗️ {item.asset_id} [{item.slot}]
+                              </span>
+                            ))}
+                            {env.details?.map((detail, dIdx) => (
+                              <span
+                                key={dIdx}
+                                className="bg-neutral-850 text-purple-200/90 border border-neutral-750 px-2 py-0.5 rounded font-mono"
+                              >
+                                🕯️ {detail.asset_id}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* TAB 1: DESCRIPTION-DRIVEN MULTI-SCENE GENERATOR WITH AI STORY ASSISTANT */}
           {mode === "description_film" && (
@@ -1679,23 +2078,53 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                   <span className="text-xs font-bold text-neutral-300">
                     Danh Sách Bối Cảnh Chung Đang Có Trong Thư Viện ({namedEnvironments.length}):
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (window.confirm("Khôi phục toàn bộ thư viện bối cảnh về danh sách mặc định gốc của Limbo Engine (bao gồm Phòng tắm, Xe bus, Bệnh viện, v.v.)?")) {
-                        const fresh = resetStoredNamedEnvironments();
-                        setNamedEnvironments(fresh);
-                      }
-                    }}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-amber-300 border border-neutral-700 text-[11px] transition-all font-medium"
-                    title="Khôi phục lại danh sách bối cảnh mặc định chuẩn của Engine"
-                  >
-                    <RotateCcw className="w-3 h-3" />
-                    <span>Khôi phục bối cảnh mặc định</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {namedEnvironments.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm("Xóa toàn bộ bối cảnh trong dự án này để bắt đầu danh sách bối cảnh mới hoàn toàn?")) {
+                            const fresh = resetStoredNamedEnvironments();
+                            setNamedEnvironments(fresh);
+                          }
+                        }}
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-800/50 text-[11px] transition-all font-medium"
+                        title="Xóa toàn bộ bối cảnh trong dự án"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Xóa sạch</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleLoadDemoCatalog}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-amber-300 border border-neutral-700 text-[11px] transition-all font-medium"
+                      title="Nạp bộ 17 bối cảnh mẫu demo"
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span>Nạp mẫu demo</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1">
+                {namedEnvironments.length === 0 ? (
+                  <div className="p-8 text-center bg-black/40 border border-neutral-800 rounded-2xl flex flex-col items-center gap-2.5">
+                    <Compass className="w-8 h-8 text-neutral-600" />
+                    <span className="text-xs font-bold text-neutral-300">Dự án mới chưa có bối cảnh nào (0 Bối Cảnh)</span>
+                    <p className="text-[11px] text-neutral-500 max-w-md m-0">
+                      Dự án mới hoàn toàn sạch, không bị lẫn bối cảnh của dự án khác. Hãy sang Tab <b>"0. Tiền Kỳ Rắc-co"</b> để AI tự động bóc tách kịch bản của bạn và lắp ghép bối cảnh chuẩn, hoặc bấm nút nạp mẫu demo bên dưới nếu muốn thử nghiệm.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleLoadDemoCatalog}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-cyan-300 border border-cyan-800/50 text-xs font-semibold transition-all mt-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Nạp 17 Bối Cảnh Mẫu Demo</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1">
                   {namedEnvironments.map((env) => (
                     <div
                       key={env.id}
@@ -1753,6 +2182,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                     </div>
                   ))}
                 </div>
+              )}
               </div>
             </div>
           )}
@@ -1869,23 +2299,53 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                   <span className="text-xs font-bold text-neutral-300">
                     Dàn Diễn Viên Khóa Rắc-co Trong Thư Viện ({namedCharacters.length}):
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (window.confirm("Khôi phục danh sách dàn diễn viên về mặc định chuẩn của Limbo Engine?")) {
-                        const fresh = resetStoredNamedCharacters();
-                        setNamedCharacters(fresh);
-                      }
-                    }}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-purple-300 border border-neutral-700 text-[11px] transition-all font-medium"
-                    title="Khôi phục lại danh sách dàn diễn viên mặc định"
-                  >
-                    <RotateCcw className="w-3 h-3" />
-                    <span>Khôi phục diễn viên mặc định</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {namedCharacters.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm("Xóa toàn bộ diễn viên trong dự án này để bắt đầu dàn nhân vật mới hoàn toàn?")) {
+                            const fresh = resetStoredNamedCharacters();
+                            setNamedCharacters(fresh);
+                          }
+                        }}
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-800/50 text-[11px] transition-all font-medium"
+                        title="Xóa toàn bộ diễn viên trong dự án"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Xóa sạch</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleLoadDemoCatalog}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-purple-300 border border-neutral-700 text-[11px] transition-all font-medium"
+                      title="Nạp bộ 12 diễn viên mẫu demo"
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span>Nạp mẫu demo</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1">
+                {namedCharacters.length === 0 ? (
+                  <div className="p-8 text-center bg-black/40 border border-neutral-800 rounded-2xl flex flex-col items-center gap-2.5">
+                    <Users className="w-8 h-8 text-neutral-600" />
+                    <span className="text-xs font-bold text-neutral-300">Dự án mới chưa có diễn viên nào (0 Diễn Viên)</span>
+                    <p className="text-[11px] text-neutral-500 max-w-md m-0">
+                      Dự án mới hoàn toàn sạch, không bị lẫn nhân vật của dự án khác. Hãy sang Tab <b>"0. Tiền Kỳ Rắc-co"</b> để AI tự động bóc tách kịch bản của bạn và tạo nhân vật, hoặc bấm nút nạp mẫu demo bên dưới nếu muốn thử nghiệm.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleLoadDemoCatalog}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-purple-300 border border-purple-800/50 text-xs font-semibold transition-all mt-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Nạp 12 Diễn Viên Mẫu Demo</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1">
                   {namedCharacters.map((char) => (
                     <div
                       key={char.id}
@@ -1946,6 +2406,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                     </div>
                   ))}
                 </div>
+              )}
               </div>
             </div>
           )}

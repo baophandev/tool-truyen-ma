@@ -56,6 +56,7 @@ import {
   getAllowedSlotsForStructure,
   getSlotType,
   isAirPose,
+  supportsVerticalOffset,
   isSlotAllowed,
   supportsContinuousGroundPlacement,
 } from "../engine/placementRules";
@@ -245,7 +246,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
             updatedMotion.targetOffsetX = 0;
             updatedMotion.targetOffsetY = 0;
           }
-          if (!isAirPose(merged.pose) && updatedMotion.targetOffsetY) {
+          if (!supportsVerticalOffset(merged.pose) && updatedMotion.targetOffsetY) {
             updatedMotion.targetOffsetY = 0;
           }
           if (
@@ -257,7 +258,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
           merged.motion = updatedMotion;
         }
       }
-      if (!isAirPose(merged.pose) && merged.offsetY) {
+      if (!supportsVerticalOffset(merged.pose) && merged.offsetY) {
         merged.offsetY = 0;
       }
       return merged;
@@ -944,12 +945,18 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       defaultValue=""
                       className="bg-black border border-purple-700/60 rounded-lg px-2.5 py-1 text-xs text-purple-200 focus:outline-none"
                     >
-                      <option value="" disabled>-- Chọn diễn viên mẫu để gán đồng bộ --</option>
-                      {loadStoredNamedCharacters().map((char) => (
-                        <option key={char.id} value={char.id}>
-                          👤 {char.name} ({char.base} | {char.costume})
-                        </option>
-                      ))}
+                      {loadStoredNamedCharacters().length === 0 ? (
+                        <option value="" disabled>-- Chưa có diễn viên rắc-co (Tạo trong AI Director) --</option>
+                      ) : (
+                        <>
+                          <option value="" disabled>-- Chọn diễn viên mẫu để gán đồng bộ --</option>
+                          {loadStoredNamedCharacters().map((char) => (
+                            <option key={char.id} value={char.id}>
+                              👤 {char.name} ({char.base} | {char.costume})
+                            </option>
+                          ))}
+                        </>
+                      )}
                     </select>
                   </div>
                   <button
@@ -1298,22 +1305,22 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       })()}
                     </div>
 
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-1.5">
                       <div className="flex justify-between text-xs text-neutral-300">
-                        <span>Tinh chỉnh Y (Offset):</span>
+                        <span>Tinh chỉnh Y (Độ cao / Offset):</span>
                         <span className="font-mono text-emerald-400">
-                          {isAirPose(selectedActor.pose)
+                          {supportsVerticalOffset(selectedActor.pose)
                             ? `${selectedActor.offsetY || 0}px`
                             : "Khóa Y=800px (Tiếp đất)"}
                         </span>
                       </div>
                       <input
                         type="range"
-                        min="-160"
-                        max="180"
+                        min={isAirPose(selectedActor.pose) ? -160 : -140}
+                        max={isAirPose(selectedActor.pose) ? 180 : 40}
                         step="5"
-                        disabled={!isAirPose(selectedActor.pose)}
-                        value={isAirPose(selectedActor.pose) ? selectedActor.offsetY || 0 : 0}
+                        disabled={!supportsVerticalOffset(selectedActor.pose)}
+                        value={supportsVerticalOffset(selectedActor.pose) ? selectedActor.offsetY || 0 : 0}
                         onChange={(e) =>
                           updateActor(selectedActor.id, {
                             offsetY: parseInt(e.target.value, 10),
@@ -1321,6 +1328,58 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         }
                         className="w-full accent-red-600 disabled:opacity-40 disabled:cursor-not-allowed"
                       />
+                      {selectedActor.pose === "pose_lying_down" && (
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            type="button"
+                            onClick={() => updateActor(selectedActor.id, { offsetY: -80 })}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
+                              (selectedActor.offsetY ?? 0) === -80
+                                ? "bg-red-800/90 text-white border-red-500 shadow"
+                                : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+                            }`}
+                          >
+                            🛏️ Đặt Lên Giường (Y=-80px)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => updateActor(selectedActor.id, { offsetY: 0 })}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
+                              (selectedActor.offsetY ?? 0) === 0
+                                ? "bg-red-800/90 text-white border-red-500 shadow"
+                                : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+                            }`}
+                          >
+                            🩸 Nằm Trên Sàn (Y=0px)
+                          </button>
+                        </div>
+                      )}
+                      {selectedActor.pose === "pose_sitting" && (
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            type="button"
+                            onClick={() => updateActor(selectedActor.id, { offsetY: 0 })}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
+                              (selectedActor.offsetY ?? 0) === 0
+                                ? "bg-red-800/90 text-white border-red-500 shadow"
+                                : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+                            }`}
+                          >
+                            🪑 Ngồi Ghế / Sàn (Y=0px)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => updateActor(selectedActor.id, { offsetY: -80 })}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
+                              (selectedActor.offsetY ?? 0) === -80
+                                ? "bg-red-800/90 text-white border-red-500 shadow"
+                                : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+                            }`}
+                          >
+                            🛏️ Ngồi Mép Giường (Y=-80px)
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex flex-col gap-1">
@@ -1500,7 +1559,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                                 value={Math.round(pointBCoords.x)}
                                 onChange={(e) => {
                                   const targetX = parseInt(e.target.value, 10);
-                                  const targetY = isAirPose(selectedActor.pose)
+                                  const targetY = supportsVerticalOffset(selectedActor.pose)
                                     ? pointBCoords.y
                                     : GROUND_Y;
                                   const assigned = coordsToSlotAssignment(
@@ -1512,25 +1571,25 @@ export const EditorView: React.FC<EditorViewProps> = ({
                                     selectedActor.id,
                                     assigned.slot,
                                     assigned.offsetX,
-                                    isAirPose(selectedActor.pose) ? assigned.offsetY : 0
+                                    supportsVerticalOffset(selectedActor.pose) ? assigned.offsetY : 0
                                   );
                                 }}
                                 className="w-full accent-cyan-400"
                               />
                             </div>
 
-                            {isAirPose(selectedActor.pose) && (
+                            {supportsVerticalOffset(selectedActor.pose) && (
                               <div className="flex flex-col gap-1">
                                 <div className="flex justify-between text-xs text-neutral-300">
-                                  <span>Độ cao Y Đích B (Air Offset):</span>
+                                  <span>Độ cao Y Đích B (Offset):</span>
                                   <span className="font-mono text-cyan-300">
                                     {motion.targetOffsetY || 0}px
                                   </span>
                                 </div>
                                 <input
                                   type="range"
-                                  min="-160"
-                                  max="180"
+                                  min={isAirPose(selectedActor.pose) ? -160 : -140}
+                                  max={isAirPose(selectedActor.pose) ? 180 : 40}
                                   step="5"
                                   value={motion.targetOffsetY || 0}
                                   onChange={(e) =>
@@ -1747,6 +1806,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="structure_wooden_latch_door">Cánh cửa gỗ cũ cài then ngang (structure_wooden_latch_door)</option>
                         <option value="structure_rural_passenger_bus">Xe đò khách cũ vùng quê (structure_rural_passenger_bus)</option>
                         <option value="structure_coconut_banana_grove">Rặng dừa nước và bụi chuối (structure_coconut_banana_grove)</option>
+                        <option value="structure_wooden_chair">Ghế gỗ tựa (structure_wooden_chair)</option>
+                        <option value="structure_wooden_bed">Giường ngủ gỗ (structure_wooden_bed)</option>
                       </select>
                     </div>
 
@@ -1807,6 +1868,36 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         }
                         className="w-full accent-red-600"
                       />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-neutral-300">
+                        Hướng Quay (Facing):
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => updateStructure(selectedStructureIdx, { facing: "left" })}
+                          className={`py-2 px-3 rounded-lg text-xs font-semibold border transition-all ${
+                            selectedStructure.facing === "left"
+                              ? "bg-red-700 border-red-500 text-white shadow-md shadow-red-950/40"
+                              : "bg-neutral-900 border-neutral-800 text-neutral-300 hover:bg-neutral-800"
+                          }`}
+                        >
+                          ⇦ Quay Trái (left)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => updateStructure(selectedStructureIdx, { facing: "right" })}
+                          className={`py-2 px-3 rounded-lg text-xs font-semibold border transition-all ${
+                            (selectedStructure.facing || "right") === "right"
+                              ? "bg-red-700 border-red-500 text-white shadow-md shadow-red-950/40"
+                              : "bg-neutral-900 border-neutral-800 text-neutral-300 hover:bg-neutral-800"
+                          }`}
+                        >
+                          ⇨ Quay Phải (right)
+                        </button>
+                      </div>
                     </div>
 
                     <div className="flex flex-col gap-1">
@@ -2138,12 +2229,18 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     defaultValue=""
                     className="flex-1 bg-black border border-amber-700/80 rounded-lg p-2 text-xs text-amber-200 font-semibold focus:outline-none focus:border-amber-400"
                   >
-                    <option value="" disabled>-- Chọn bối cảnh mẫu để khóa khung cảnh --</option>
-                    {loadStoredNamedEnvironments().map((env) => (
-                      <option key={env.id} value={env.id}>
-                        📍 {env.name} ({env.theme} | {env.lighting.sky_preset})
-                      </option>
-                    ))}
+                    {loadStoredNamedEnvironments().length === 0 ? (
+                      <option value="" disabled>-- Chưa có bối cảnh rắc-co (Tạo trong AI Director) --</option>
+                    ) : (
+                      <>
+                        <option value="" disabled>-- Chọn bối cảnh mẫu để khóa khung cảnh --</option>
+                        {loadStoredNamedEnvironments().map((env) => (
+                          <option key={env.id} value={env.id}>
+                            📍 {env.name} ({env.theme} | {env.lighting.sky_preset})
+                          </option>
+                        ))}
+                      </>
+                    )}
                   </select>
                 </div>
               </div>

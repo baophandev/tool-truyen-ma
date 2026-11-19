@@ -534,53 +534,144 @@ export const DEFAULT_NAMED_ENVIRONMENTS: NamedEnvironmentPreset[] = [
       },
     ],
   },
+  {
+    id: "env_western_canal_dock",
+    name: "Bến Sông & Cầu Khỉ Ven Kênh",
+    description: "Khúc sông ven kênh miền Tây mùa nước nổi u tịch, cây cầu khỉ tre bắc ngang dòng nước chảy xiết, chiếc xuồng ba lá chất đầy bông súng bông điên điển nép bên mé bờ và đốm ma trơi xanh lập lòe trong sương đêm.",
+    theme: "cursed_swamp",
+    lighting: {
+      sky_preset: "foggy_night",
+      fog_density: 0.75,
+      thunder_flash: false,
+    },
+    environment_items: [
+      {
+        asset_id: "structure_monkey_bridge",
+        slot: "center",
+        scale: 0.95,
+      },
+      {
+        asset_id: "structure_wooden_sampan",
+        slot: "far_right",
+        offsetX: -30,
+        scale: 1.0,
+      },
+    ],
+    details: [
+      {
+        id: "detail_wisp_canal_1",
+        asset_id: "detail_will_o_wisp",
+        slot: "air_left",
+      },
+      {
+        id: "detail_crow_canal_1",
+        asset_id: "detail_black_crow",
+        slot: "air_right",
+      },
+    ],
+  },
+  {
+    id: "env_rural_thatched_house",
+    name: "Căn Nhà Lá Miền Tây Đêm Tối",
+    description: "Căn nhà lá lợp ngói máng cũ của bà ngoại nép mình trong đêm oi bức, lều tranh xiêu vẹo ánh đèn dầu đỏ leo lét và bát hương tàn nghi ngút khói lạnh.",
+    theme: "abandoned_village",
+    lighting: {
+      sky_preset: "stormy_dark",
+      fog_density: 0.65,
+      thunder_flash: false,
+    },
+    environment_items: [
+      {
+        asset_id: "dilapidated_hut",
+        slot: "center",
+        scale: 1.0,
+      },
+    ],
+    details: [
+      {
+        id: "detail_lantern_hut",
+        asset_id: "detail_blood_lantern",
+        slot: "mid_left",
+        offsetX: -20,
+      },
+      {
+        id: "detail_incense_hut",
+        asset_id: "detail_incense_bowl",
+        slot: "mid_right",
+        offsetX: 30,
+      },
+    ],
+  },
 ];
 
+export const STORAGE_KEY_ISOLATED = "limbo_project_isolated";
 const STORAGE_KEY_ENVIRONMENTS = "limbo_named_environments_v1";
 
 /**
- * Hard-resets named environments stored in localStorage back to original clean defaults
+ * Checks if the current project is isolated to clean custom raccord sets (no auto-merging unrelated defaults)
+ */
+export function isProjectIsolated(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEY_ISOLATED) === "true";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Sets project isolation flag
+ */
+export function setProjectIsolated(isolated: boolean): void {
+  try {
+    if (isolated) {
+      localStorage.setItem(STORAGE_KEY_ISOLATED, "true");
+    } else {
+      localStorage.removeItem(STORAGE_KEY_ISOLATED);
+    }
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+/**
+ * Hard-resets named environments stored in localStorage back to empty state for a new clean project
  */
 export function resetStoredNamedEnvironments(): NamedEnvironmentPreset[] {
   try {
     localStorage.removeItem(STORAGE_KEY_ENVIRONMENTS);
+    setProjectIsolated(true);
   } catch {
     // Ignore storage errors
   }
-  return DEFAULT_NAMED_ENVIRONMENTS;
+  return [];
 }
 
 /**
- * Load named environments from localStorage or defaults
+ * Load named environments from localStorage.
+ * Brand new projects start with 0 environments (empty []) so they are not polluted with unrelated presets.
  */
 export function loadStoredNamedEnvironments(): NamedEnvironmentPreset[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_ENVIRONMENTS);
     if (!raw) {
-      return DEFAULT_NAMED_ENVIRONMENTS;
+      return [];
     }
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      // Auto-merge missing official presets and upgrade outdated themes (e.g., bus interior from modern_indoor to vehicle_interior)
-      const existingIds = new Set(parsed.map((e: any) => e.id));
-      const merged = parsed.map((item: any) => {
-        const official = DEFAULT_NAMED_ENVIRONMENTS.find((d) => d.id === item.id);
-        if (official && official.id === "env_midnight_bus" && item.theme !== "vehicle_interior") {
-          return official;
-        }
-        return item;
-      });
-      for (const def of DEFAULT_NAMED_ENVIRONMENTS) {
-        if (!existingIds.has(def.id)) {
-          merged.push(def);
-        }
-      }
-      return merged;
+    if (Array.isArray(parsed)) {
+      return parsed;
     }
-    return DEFAULT_NAMED_ENVIRONMENTS;
+    return [];
   } catch {
-    return DEFAULT_NAMED_ENVIRONMENTS;
+    return [];
   }
+}
+
+/**
+ * Explicitly loads the official demo environments library (17 bối cảnh demo) ONLY when requested
+ */
+export function loadDemoNamedEnvironments(): NamedEnvironmentPreset[] {
+  saveStoredNamedEnvironments(DEFAULT_NAMED_ENVIRONMENTS);
+  return DEFAULT_NAMED_ENVIRONMENTS;
 }
 
 /**
@@ -592,6 +683,14 @@ export function saveStoredNamedEnvironments(envs: NamedEnvironmentPreset[]): voi
   } catch {
     // Ignore storage quota errors
   }
+}
+
+/**
+ * Sets project-scoped isolated environments (clears out pollution from other projects)
+ */
+export function setProjectNamedEnvironments(envs: NamedEnvironmentPreset[]): void {
+  setProjectIsolated(true);
+  saveStoredNamedEnvironments(envs);
 }
 
 /**

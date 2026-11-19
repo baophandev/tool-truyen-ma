@@ -107,6 +107,8 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `structure_wooden_latch_door` | Cánh cửa gỗ cũ cài then ngang có khe hở chân cửa | Khung cửa gỗ ghép từ nhiều tấm ván dọc nứt nẻ lọt ánh sáng đêm lạnh, thanh then cài gỗ ngang tại tầm cao Y=580px (offsetY=-220px từ Ground Y=800px), chừa khe hở 15px sát đất cho vệt nước bùn tràn qua | `["mid_left", "center", "mid_right"]` |
 | `structure_rural_passenger_bus` | Xe đò khách cũ vùng quê | Xe khách cổ điển thập niên 90-2000 dạng hộp bo tròn góc, giá chở hàng chằng bạt trên nóc, các ô cửa sổ kính tối màu, đèn pha trước chiếu luồng sáng vàng mờ nhạt | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `structure_coconut_banana_grove` | Rặng dừa nước và bụi chuối rậm rạp | Thân dừa cao vươn nghiêng duyên dáng với tán lá xòe hình lược răng cưa sắc nhọn, bên dưới là bụi chuối xiêm rậm rạp với các tàu lá bản to rách gió và bắp chuối tím sẫm, khung viền đặc trưng Nam Bộ | `["far_left", "far_right"]` |
+| `structure_wooden_chair` | Ghế gỗ tựa | Chiếc ghế gỗ tựa gia đình mộc mạc trang nhã, lưng tựa nan cao vút từ Y=-72px lên Y=-198px tại X=-20px, tay vịn gỗ thanh lịch; **tương tác vừa khít 100% với tư thế ngồi `pose_sitting` và `pose_sitting_twisted_legs`** (đùi gập ngang trên mặt ghế Y=-72px, cẳng chân buông xuống sàn, bàn chân tiếp đất tại Y=0px). Hỗ trợ `facing: "left" | "right"` để xoay ghế đón nhân vật ngồi từ mọi hướng | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `structure_wooden_bed` | Giường ngủ gỗ | Chiếc giường đôi gỗ gia đình ấm áp, vách đầu giường gỗ thanh lịch cao Y=-195px có gối nằm kê đầu tại X=-65px, mặt nệm chiếu phẳng phiu tại Y=-80px và chăn gấp gọn gàng; **tương tác hoàn hảo với tư thế nằm `pose_lying_down` (kèm `offsetY: -80`) hoặc tư thế ngồi `pose_sitting` ở mép giường** | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 
 ---
 
@@ -308,11 +310,12 @@ export interface DirectorSceneScript {
     weather?: "none" | "heavy_rain" | "storm_thunder" | "blood_rain" | "floating_embers" | "drifting_ash" | "haunted_mist"; // Hiệu ứng thời tiết & hạt khí quyển thuần code
   };
   environment_items: Array<{
-    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub" | "market_stall_tent" | "abandoned_subway_station" | "rusty_train_tracks_tunnel" | "structure_old_apartment_gate" | "structure_wooden_sampan" | "structure_monkey_bridge" | "structure_wooden_coffin" | "structure_bamboo_bed_net" | "structure_wooden_latch_door" | "structure_rural_passenger_bus" | "structure_coconut_banana_grove";
+    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub" | "market_stall_tent" | "abandoned_subway_station" | "rusty_train_tracks_tunnel" | "structure_old_apartment_gate" | "structure_wooden_sampan" | "structure_monkey_bridge" | "structure_wooden_coffin" | "structure_bamboo_bed_net" | "structure_wooden_latch_door" | "structure_rural_passenger_bus" | "structure_coconut_banana_grove" | "structure_wooden_chair" | "structure_wooden_bed";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right";
     offsetX?: number;
     offsetY?: number;
     scale?: number;
+    facing?: "left" | "right";
   }>;
   actors: Array<{
     id: string;
@@ -1175,6 +1178,79 @@ Thay vì giữ nguyên 1 góc máy cố định suốt cả phân cảnh dài, A
   ],
   "dialogue": "Giữa gian nhà quạnh quẽ, cỗ quan tài gỗ khắc chữ Thọ trầm mặc dưới ánh đèn dầu leo lét. Phía ngoài đường lộ ven rặng dừa nước, chiếc xe đò cũ kỹ đã rồ ga chuẩn bị lăn bánh...",
   "narrative_note": "Tổ hợp asset: cỗ quan tài gỗ structure_wooden_coffin kê trên đôn gỗ có dải băng tang trắng, rặng dừa và bụi chuối structure_coconut_banana_grove, xe đò structure_rural_passenger_bus và bụi lục bình detail_water_hyacinth."
+}
+```
+
+### Cấu Trúc JSON Mẫu 10: Gian Phòng Ngủ Cổ U Ám - Ghế Gỗ & Giường Gỗ Tương Tác Khung Nhân Vật (Ngồi & Nằm Khớp Khít)
+
+```json
+{
+  "scene_id": "scene_10_creepy_bedroom_chair_bed",
+  "theme": "abandoned_village",
+  "duration_sec": 7.0,
+  "lighting": {
+    "sky_preset": "dim_indoor_night",
+    "fog_density": 0.45,
+    "ambient_tint": "#1E1B18",
+    "thunder_flash": false,
+    "weather": "haunted_mist"
+  },
+  "camera": {
+    "shot": "medium_wide",
+    "target_slot": "center",
+    "shake": "subtle_handheld",
+    "motion": {
+      "type": "push_in",
+      "endShot": "medium",
+      "startTimeSec": 0,
+      "endTimeSec": 7.0,
+      "easing": "ease_in_out"
+    }
+  },
+  "environment_items": [
+    { "asset_id": "structure_wooden_bed", "slot": "mid_left", "scale": 1.0 },
+    { "asset_id": "structure_wooden_chair", "slot": "mid_right", "scale": 1.0, "facing": "left" }
+  ],
+  "actors": [
+    {
+      "id": "actor_sleeping_corpse",
+      "base": "female_adult",
+      "costume": "outfit_shredded_burial",
+      "face": "face_pale_corpse",
+      "pose": "pose_lying_down",
+      "facing": "right",
+      "slot": "mid_left",
+      "offsetX": 0,
+      "offsetY": -80,
+      "scale": 1.0,
+      "opacity": 0.95,
+      "heldItem": "item_fresh_ginger",
+      "heldHand": "right"
+    },
+    {
+      "id": "actor_seated_watcher",
+      "base": "elder_hunched",
+      "costume": "outfit_traditional_ba_ba",
+      "face": "face_creepy_smile",
+      "facialAction": "talking_jaw",
+      "pose": "pose_sitting",
+      "facing": "left",
+      "slot": "mid_right",
+      "offsetX": 0,
+      "offsetY": 0,
+      "scale": 1.0,
+      "opacity": 1.0,
+      "heldItem": "item_soul_candle",
+      "heldHand": "right"
+    }
+  ],
+  "details": [
+    { "id": "detail_oil_lamp_bedside", "asset_id": "detail_oil_lamp", "slot": "mid_left", "offsetX": 130, "offsetY": 0, "scale": 1.0 },
+    { "id": "detail_incense_chair", "asset_id": "detail_incense_bowl", "slot": "mid_right", "offsetX": -60, "offsetY": 0, "scale": 0.9 },
+    { "id": "detail_hanging_talisman_room", "asset_id": "detail_hanging_talisman", "slot": "air_center", "offsetX": 0, "offsetY": 0, "scale": 1.0 }
+  ],
+  "dialogue": "Người phụ nữ nằm nghỉ ngơi trên chiếc giường gỗ quen thuộc trong gian phòng yên tĩnh. Ở góc đối diện, người thân ngồi trò chuyện trên chiếc ghế tựa gỗ bên ánh đèn leo lét...",
+  "narrative_note": "Tổ hợp tương tác hoàn hảo: structure_wooden_bed kết hợp nhân vật nằm pose_lying_down (offsetY: -80 đặt vừa khít mặt nệm giường) và structure_wooden_chair quay mặt sang trái (facing: 'left') kết hợp nhân vật ngồi pose_sitting (đùi gập trên mặt ghế Y=-72px, chân chạm đất phẳng phiu)."
 }
 ```
 

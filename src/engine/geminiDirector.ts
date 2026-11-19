@@ -261,7 +261,7 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
   * "creepy_banyan_tree", "haunted_gallows_tree" -> CHỈ ĐẶT Ở: "far_left" | "far_right"
   * "ancient_tomb", "abandoned_shrine", "creepy_well", "hospital_operating_bed", "hotel_reception_desk", "creepy_elevator_doors", "dining_table_chairs", "bus_interior", "creepy_bathtub" -> CHỈ ĐẶT Ở: "mid_left" | "center" | "mid_right"
   * "dilapidated_hut", "broken_wooden_bridge", "supermarket_shelf_aisle" -> CHỈ ĐẶT Ở: "far_left" | "center" | "far_right"
-  * "scarecrow_of_the_damned", "market_stall_tent", "abandoned_subway_station", "rusty_train_tracks_tunnel", "structure_old_apartment_gate", "structure_wooden_sampan", "structure_monkey_bridge" -> Đặt ở mọi ground slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right"
+  * "scarecrow_of_the_damned", "market_stall_tent", "abandoned_subway_station", "rusty_train_tracks_tunnel", "structure_old_apartment_gate", "structure_wooden_sampan", "structure_monkey_bridge", "structure_wooden_coffin", "structure_bamboo_bed_net", "structure_wooden_latch_door", "structure_rural_passenger_bus", "structure_wooden_chair", "structure_wooden_bed" -> Đặt ở mọi ground slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right"
 - Details (Đạo cụ cảnh):
   * "detail_black_crow", "detail_broken_mirror" -> Tất cả 5 ground slots và 3 air slots
   * "detail_will_o_wisp" -> "air_left" | "air_center" | "air_right" | "mid_left" | "center" | "mid_right"
@@ -1302,6 +1302,240 @@ export interface AssetAuditResult {
   rawText?: string;
 }
 
+export interface ProjectRaccordResult {
+  success: boolean;
+  culturalTheme?: string;
+  summary?: string;
+  characters?: NamedCharacterPreset[];
+  environments?: NamedEnvironmentPreset[];
+  error?: string;
+  rawText?: string;
+}
+
+/**
+ * AI PRODUCTION ASSISTANT:
+ * Analyzes a pre-production breakdown document (Bảng bóc tách thực thể kịch bản)
+ * and automatically assembles (ghép) dedicated NamedCharacterPresets and NamedEnvironmentPresets
+ * strictly conforming to cultural/epoch consistency and valid engine assets.
+ */
+export async function generateProjectRaccordFromBreakdown(
+  breakdownText: string,
+  options: {
+    apiKey?: string;
+    model?: string;
+  } = {}
+): Promise<ProjectRaccordResult> {
+  const apiKey = (options.apiKey || getStoredApiKey()).trim();
+  const model = options.model || getStoredModel() || DEFAULT_GEMINI_MODEL;
+
+  if (!apiKey) {
+    return {
+      success: false,
+      error: "Chưa có Gemini API Key. Vui lòng cấu hình API Key để tiếp tục.",
+    };
+  }
+
+  const rawCleaned = breakdownText.trim();
+  if (!rawCleaned) {
+    return {
+      success: false,
+      error: "Vui lòng nhập nội dung bảng bóc tách thực thể kịch bản.",
+    };
+  }
+
+  const userPrompt = `BẠN LÀ GIÁM ĐỐC NGHỆ THUẬT & THIẾT KẾ BỐI CẢNH (PRODUCTION DESIGNER & CASTING DIRECTOR) CHO PHIM HOẠT HÌNH 2D LIMBO ENGINE.
+Người dùng cung cấp một BẢNG BÓC TÁCH THỰC THỂ TIỀN KỲ (SCRIPT BREAKDOWN) cho một dự án phim hoạt hình kinh dị bóng đen:
+
+"""
+${rawCleaned}
+"""
+
+KHO TÀI NGUYÊN HOẠT HÌNH 2D SẴN CÓ TRONG HỆ THỐNG (CHỈ ĐƯỢC CHỌN TỪ ĐÂY ĐỂ LẮP GHÉP, KHÔNG TỰ BỊA ID MỚI):
+
+1. KHUNG NHÂN VẬT (Bases - 9 loại):
+   - "male_adult" (Nam thanh niên, sinh viên, người lữ khách gầy)
+   - "female_adult" (Nữ thanh niên, phụ nữ thôn quê, bóng ma tóc dài)
+   - "elder_hunched" (Bà lão / Cụ già lưng còng 0.85x, tóc búi)
+   - "brute_hulking" (Đồ tể / Hộ pháp lực lưỡng 1.2x)
+   - "skeletal_emaciated" (Kẻ gầy trơ xương / Ngạ quỷ 1.05x)
+   - "ghost_wraith" (Bóng ma oan hồn bay lơ lửng, không chân)
+   - "creepy_child" (Đứa trẻ ma / Trẻ em nhỏ bé 0.65x)
+   - "jiangshi_corpse" (Cương thi)
+   - "demon_shadow" (Quỷ bóng đen 1.25x sừng cong)
+
+2. TRANG PHỤC (Costumes - 12 bộ):
+   - "outfit_traditional_ba_ba" (Áo bà ba truyền thống Nam Bộ & quần lụa đen) -> RẤT QUAN TRỌNG CHO BỐI CẢNH ĐỒNG QUÊ / MIỀN TÂY!
+   - "outfit_tattered_tunic" (Áo tơi sờn rách người nghèo nông thôn)
+   - "outfit_flowing_ao_dai" (Áo dài cổ truyền tà rách)
+   - "outfit_shrouded_cloak" (Áo choàng trùm đầu Reaper)
+   - "outfit_mandarin_court" (Quan phục triều đình)
+   - "outfit_monk_cassock" (Áo cà sa pháp sư trừ tà)
+   - "outfit_shredded_burial" (Vải liệm tử thi)
+   - "outfit_ancient_armor" (Giáp tướng cổ vỡ nát)
+   - "outfit_child_pajamas" (Yếm hoa trẻ thơ / quần áo trẻ em đơn sơ)
+   - "outfit_modern_casual" (Đồ hoodie / áo thun thường nhật)
+   - "outfit_doctor_coat" (Áo blouse bác sĩ - CHỈ DÙNG CHO ĐÔ THỊ HIỆN ĐẠI)
+   - "outfit_patient_gown" (Áo bệnh nhân sọc xanh - CHỈ DÙNG CHO ĐÔ THỊ HIỆN ĐẠI)
+
+3. BIỂU CẢM KHUÔN MẶT (Faces - 14 mặt):
+   - "face_calm", "face_scared", "face_creepy_smile", "face_bleeding_eyes", "face_old_wrinkled", "face_rage_furious", "face_pale_corpse", "face_weeping_ghost", "face_sewn_mouth", "face_haggard_gaunt", "face_faceless", "face_glowing_hollow", "face_talisman_covered", "face_headless"
+
+4. ĐỒ VẬT CẦM TAY (Held Items - 17 món):
+   - "none"
+   - "item_areca_palm_fan" (quạt mo cau phe phẩy khi oi nóng)
+   - "item_fresh_ginger" (lát gừng tươi giữ khí trừ tà)
+   - "item_offering_toys" (nải chuối & đồ chơi đất nung cúng cô hồn)
+   - "item_storm_lantern" (đèn bão sắt / đèn dầu)
+   - "item_paper_lantern" (lồng đèn giấy)
+   - "item_soul_candle" (nến triệu hồn)
+   - "item_peach_wood_sword" (kiếm gỗ đào)
+   - "item_yellow_talisman" (lá bùa vàng)
+   - "item_rusty_sickle" (lưỡi liềm rỉ sét)
+   - "item_ritual_bell" (chuông đồng Tam Thanh)
+   - "item_tattered_doll" (búp bê vải rách)
+   - "item_tattered_umbrella" (ô rách)
+   - "item_flashlight" (đèn pin hiện đại)
+   - "item_scalpel" (dao mổ phẫu thuật)
+   - "item_smartphone" (điện thoại phát sáng)
+   - "item_severed_head" (thủ cấp đứt lìa)
+   - "item_mysterious_note" (mẩu giấy bí ẩn vương máu)
+
+5. CÔNG TRÌNH BỐI CẢNH (Structures - 28 công trình):
+   - Bối cảnh Đồng Quê / Cổ Phong / Gian Nhà Cổ / Miền Tây:
+     * "structure_wooden_chair" (Ghế gỗ tựa gia đình - tương tác ngồi vừa khít pose_sitting, pose_sitting_twisted_legs) -> mọi ground slot
+     * "structure_wooden_bed" (Giường ngủ gỗ gia đình - tương tác nằm vừa khít pose_lying_down kèm offsetY: -80, hoặc ngồi mép giường) -> mọi ground slot
+     * "structure_bamboo_bed_net" (Giường tre nông thôn giăng mùng) -> mọi ground slot
+     * "structure_wooden_coffin" (Cỗ quan tài gỗ trong nhà) -> mid_left | center | mid_right
+     * "structure_wooden_latch_door" (Cửa gỗ cũ cài then ngang) -> mid_left | center | mid_right
+     * "structure_rural_passenger_bus" (Xe đò khách cũ vùng quê) -> mọi ground slot
+     * "structure_coconut_banana_grove" (Rặng dừa nước & bụi chuối) -> far_left | far_right
+     * "structure_monkey_bridge" (Cầu khỉ tre miền Tây chênh vênh) -> mọi ground slot
+     * "structure_wooden_sampan" (Xuồng ba lá / ghe nước miền Tây chở bông súng) -> mọi ground slot
+     * "dilapidated_hut" (Căn lều tranh / vách nứa xiêu vẹo) -> far_left | center | far_right
+     * "creepy_banyan_tree" (Cây đa cổ thụ) -> far_left | far_right
+     * "ancient_tomb" (Mộ cổ bia đá) -> mid_left | center | mid_right
+     * "abandoned_shrine" (Miếu hoang cô hồn) -> mid_left | center | mid_right
+     * "broken_wooden_bridge" (Cầu gỗ gãy nhịp) -> far_left | center | far_right
+     * "creepy_well" (Giếng cạn oan hồn) -> mid_left | center | mid_right
+     * "scarecrow_of_the_damned" (Bù nhìn quỷ ám) -> mọi ground slot
+   - Bối cảnh Đô Thị / Hiện Đại (CHỈ DÙNG KHI CỐT TRUYỆN THUỘC THỂ LOẠI ĐÔ THỊ HIỆN ĐẠI):
+     * "hospital_operating_bed", "hotel_reception_desk", "supermarket_shelf_aisle", "creepy_elevator_doors", "dining_table_chairs", "bus_interior", "creepy_bathtub", "market_stall_tent", "abandoned_subway_station", "rusty_train_tracks_tunnel", "structure_old_apartment_gate"
+
+6. ĐẠO CỤ BỐI CẢNH (Details - 11 đạo cụ):
+   - "detail_black_crow" (Quạ đen)
+   - "detail_will_o_wisp" (Đốm ma trơi xanh lân tinh)
+   - "detail_blood_lantern" (Lồng đèn máu / ngọn đèn dầu)
+   - "detail_incense_bowl" (Bát hương tàn / khói nhang cuộn)
+   - "detail_skull_pile" (Đống sọ người)
+   - "detail_hanging_talisman" (Dây bùa treo)
+   - "detail_iv_drip_stand" (Cột truyền dịch - hiện đại)
+   - "detail_shopping_cart" (Xe đẩy siêu thị - hiện đại)
+   - "detail_surveillance_camera" (Camera an ninh - hiện đại)
+   - "detail_flickering_ceiling_lamp" (Đèn huỳnh quang trần - hiện đại)
+   - "detail_broken_mirror" (Gương vỡ nứt vấy máu)
+
+7. THEMES & SKY PRESETS:
+   - Themes: "abandoned_village" (Làng quê bỏ hoang), "cursed_swamp" (Đầm lầy / ven kênh sông nước), "rural_graveyard" (Bãi tha ma cổ), "modern_indoor" (Trong nhà hiện đại), "vehicle_interior" (Khoang xe), "urban_night_market" (Chợ đêm đô thị)
+   - Sky: "foggy_night" (Sương mù lạnh buốt), "stormy_dark" (Bão đêm / Đêm oi ả ngột ngạt), "blood_moon" (Trăng máu), "eclipse_abyss" (Nhật thực lửa xanh)
+
+QUY TẮC LẮP GHÉP BẮT BUỘC (TUYỆT ĐỐI TUÂN THỦ):
+1. NHẬN DIỆN THỜI ĐẠI & KHÔNG GIAN BỐI CẢNH (CULTURAL & EPOCH FILTER):
+   - Đọc kỹ bảng bóc tách để nhận diện đúng thể loại & thời đại kịch bản:
+     * Ví dụ: "Đồng quê / Dân gian Việt Nam", "Đô thị / Bệnh viện hiện đại", "Khách sạn / Chung cư u ám", "Chuyến xe đêm / Ga tàu ngầm", "Cổ phong / Cương thi miếu hoang"...
+   - NGUYÊN TẮC NHẤT QUÁN THỜI ĐẠI & KHÔNG GIAN (CHỐNG LỆCH NGỮ CẢNH):
+     * Nếu kịch bản là ĐỒNG QUÊ / DÂN GIAN VIỆT NAM (nhà lá, bến sông, ruộng đồng, miếu cổ...): Tuyệt đối CẤM chọn các công trình / trang phục / đạo cụ hiện đại (như hospital_operating_bed, creepy_elevator_doors, supermarket_shelf_aisle, outfit_doctor_coat, outfit_patient_gown, detail_surveillance_camera, detail_iv_drip_stand). Bắt buộc chọn asset phù hợp nông thôn (cầu khỉ, xuồng ba lá, lều tranh, áo bà ba, áo tơi, quạt mo, gừng tươi...).
+     * Nếu kịch bản là ĐÔ THỊ / HIỆN ĐẠI (Bệnh viện, khách sạn, siêu thị, chung cư, xe buýt...): Bắt buộc dùng đúng asset hiện đại (hospital_operating_bed, hotel_reception_desk, creepy_elevator_doors, supermarket_shelf_aisle, bus_interior, creepy_bathtub, outfit_modern_casual, outfit_doctor_coat, outfit_patient_gown, item_flashlight, item_smartphone...). CẤM chọn bừa xuồng ba lá, cầu khỉ, hay quan phục phong kiến.
+     * Nếu kịch bản là CỔ TRANG / PHONG KIẾN / CƯƠNG THI: Bắt buộc chọn quan phục (outfit_mandarin_court), áo cà sa (outfit_monk_cassock), miếu hoang, mộ cổ, kiếm gỗ đào, bùa vàng...
+2. LẮP GHÉP DÀN DIỄN VIÊN (characters - từ 2 đến 6 diễn viên):
+   - Trích xuất toàn bộ các nhân vật xuất hiện trong bảng bóc tách của người dùng.
+   - Đặt "id" duy nhất (vd: "char_proj_...").
+   - Gán đúng "name", "description", "base", "costume", "face", "defaultHeldItem", "defaultHeldHand", "scale" theo đúng mô tả của người dùng.
+3. LẮP GHÉP DÀN BỐI CẢNH DÙNG LẠI (environments - từ 2 đến 5 bối cảnh):
+   - Trích xuất các địa điểm chính trong kịch bản mà người dùng đã mô tả.
+   - Đặt "id" duy nhất (vd: "env_proj_...").
+   - Gán đúng "name", "description", "theme", "lighting" (sky_preset, fog_density, thunder_flash, weather).
+   - "environment_items": mảng 1-3 công trình với slot neo hợp lệ.
+   - "details": mảng 1-3 đạo cụ cảnh đặt đúng slot.
+
+TRẢ VỀ CHÍNH XÁC MỘT ĐỐI TƯỢNG JSON DUY NHẤT:
+{
+  "culturalTheme": "Chủ đề văn hóa & không gian kịch bản (vd: 'Đồng quê dân gian Việt Nam' hoặc 'Đô thị hiện đại')",
+  "summary": "Tóm tắt ngắn gọn các nhân vật và bối cảnh đã phân tích và lắp ghép thành công...",
+  "characters": [
+    {
+      "id": "char_proj_example",
+      "name": "Tên nhân vật",
+      "description": "Vai trò, đặc điểm...",
+      "base": "male_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_calm",
+      "defaultHeldItem": "item_flashlight",
+      "defaultHeldHand": "right",
+      "scale": 1.0
+    }
+  ],
+  "environments": [
+    {
+      "id": "env_proj_example",
+      "name": "Tên bối cảnh",
+      "description": "Mô tả không gian...",
+      "theme": "modern_indoor",
+      "lighting": { "sky_preset": "flickering_fluorescent", "fog_density": 0.6, "thunder_flash": false },
+      "environment_items": [
+        { "asset_id": "hospital_operating_bed", "slot": "center", "scale": 1.0 }
+      ],
+      "details": [
+        { "id": "detail_lamp_1", "asset_id": "detail_flickering_ceiling_lamp", "slot": "air_center" }
+      ]
+    }
+  ]
+}`;
+
+  try {
+    const res = await callGeminiApiWithRetry(
+      apiKey,
+      model,
+      GEMINI_DIRECTOR_SYSTEM_INSTRUCTION,
+      userPrompt,
+      { responseMimeType: "application/json", temperature: 0.3 }
+    );
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      return { success: false, error: formatApiError(res, errBody) };
+    }
+
+    const data = await res.json();
+    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+    const parsed = JSON.parse(rawText);
+
+    const characters: NamedCharacterPreset[] = Array.isArray(parsed.characters) ? parsed.characters : [];
+    const environments: NamedEnvironmentPreset[] = Array.isArray(parsed.environments) ? parsed.environments : [];
+
+    if (characters.length === 0 && environments.length === 0) {
+      return {
+        success: false,
+        error: "Không thể trích xuất nhân vật hoặc bối cảnh từ bảng bóc tách.",
+        rawText,
+      };
+    }
+
+    return {
+      success: true,
+      culturalTheme: parsed.culturalTheme || "Kinh dị dân gian",
+      summary: parsed.summary || `Đã lắp ghép thành công ${characters.length} nhân vật và ${environments.length} bối cảnh chuẩn.`,
+      characters,
+      environments,
+      rawText,
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      error: `Lỗi phân tích bảng bóc tách: ${err.message}`,
+    };
+  }
+}
+
 export interface BreakdownStoryResult {
   success: boolean;
   drafts?: AutoFillSceneDraft[];
@@ -1423,6 +1657,13 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "structure_old_apartment_gate" (Cổng sắt chung cư cũ)
    - "structure_wooden_sampan" (Xuồng ba lá / ghe nước miền Tây)
    - "structure_monkey_bridge" (Cầu khỉ tre miền Tây)
+   - "structure_wooden_coffin" (Cỗ quan tài gỗ trong nhà)
+   - "structure_bamboo_bed_net" (Giường tre nông thôn giăng mùng)
+   - "structure_wooden_latch_door" (Cánh cửa gỗ cài then ngang)
+   - "structure_rural_passenger_bus" (Xe đò khách cũ vùng quê)
+   - "structure_coconut_banana_grove" (Rặng dừa nước & bụi chuối)
+   - "structure_wooden_chair" (Ghế gỗ tựa gia đình - ngồi vừa khít)
+   - "structure_wooden_bed" (Giường ngủ gỗ gia đình - nằm vừa khít)
 
 6. ĐẠO CỤ BỐI CẢNH (Details - 11 đạo cụ):
    - "detail_black_crow" (Quạ đen)
@@ -1442,7 +1683,15 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - Sky: blood_moon, foggy_night, stormy_dark, eclipse_abyss, flickering_fluorescent, dim_indoor_night
 
 YÊU CẦU KIỂM TRA ĐỐI CHIẾU:
-- Phân tích xem trong cốt truyện có chi tiết nào mà hệ thống CHƯA CÓ asset phù hợp không.
+1. KIỂM TRA TÍNH TƯƠNG THÍCH THỜI ĐẠI & VĂN HÓA (EPOCH & CULTURAL CONSISTENCY - BẮT BUỘC):
+   - Đánh giá bối cảnh cốt truyện (ví dụ: Đồng quê Việt Nam / Dân gian Nam Bộ vs. Đô thị hiện đại).
+   - NẾU CỐT TRUYỆN LÀ ĐỒNG QUÊ / DÂN GIAN (nhà lá, bãi tha ma, ruộng đồng, bờ kênh, then cài, người bệnh ở thôn quê...):
+     * TUYỆT ĐỐI KHÔNG ĐƯỢC gán các asset đô thị/hiện đại (như 'hospital_operating_bed', 'creepy_elevator_doors', 'supermarket_shelf_aisle', 'outfit_doctor_coat', 'outfit_patient_gown', 'detail_iv_drip_stand', 'detail_surveillance_camera') làm asset thay thế!
+     * Không được coi 'giường mổ bệnh viện hiện đại' là đáp ứng cho 'giường tre / chõng tre / giường người bệnh ở quê'.
+     * Nếu câu chuyện cần giường tre / chõng tre nông thôn hoặc cánh cửa gỗ then cài nhà lá mà hệ thống chưa có, BẮT BUỘC BÁO THIẾU ASSET (isSufficient = false) để người dùng nắm được, hoặc nhắc nhở cảnh báo.
+2. PHÂN BIỆT RÕ RÀNG HÀNH ĐỘNG TRỰC TIẾP TRƯỚC ỐNG KÍNH (ON-SCREEN) VS. LỜI KỂ NỘI TÂM (OFF-SCREEN / BACKSTORY):
+   - Những chi tiết chỉ nằm trong suy nghĩ, ký ức hay lời thuyết minh nền (ví dụ: nhân vật đứng nép bên cửa nhà lá nhớ về người bệnh ở đầu xóm) thì KHÔNG bắt buộc bối cảnh phân cảnh phải dựng phòng bệnh. Bối cảnh phải bám theo địa điểm thực tế nhân vật đang đứng hành động.
+3. Phân tích xem trong cốt truyện có chi tiết nào mà hệ thống CHƯA CÓ asset phù hợp không.
 - Ví dụ nếu truyện có "cung tên", "súng săn", "chó săn", "ngựa ma", "rìu đốn củi", "thuyền gỗ", "mặt nạ quỷ", v.v. -> đây là các asset mà hệ thống chưa có.
 - Nếu phát hiện thiếu asset:
   * "isSufficient": false
@@ -1452,7 +1701,7 @@ YÊU CẦU KIỂM TRA ĐỐI CHIẾU:
     - "name": Tên tiếng Việt của thực thể thiếu (vd: "Cung tên gỗ", "Chó săn ma")
     - "suggestedId": ID kỹ thuật đề xuất theo chuẩn hệ thống (vd: "item_wooden_bow", "beast_hunting_dog")
     - "reason": Lý do tại sao cốt truyện cần asset này
-    - "replacementAvailable": Gợi ý asset có sẵn gần nhất trong kho có thể tạm thời thay thế (vd: "Có thể tạm dùng 'item_rusty_sickle'")
+    - "replacementAvailable": Gợi ý asset có sẵn gần nhất trong kho có thể tạm thời thay thế (CHỈ gợi ý asset cùng thời đại/văn hóa, KHÔNG gợi ý asset hiện đại cho truyện dân gian!)
 - Nếu toàn bộ thực thể trong câu chuyện đều đã có thể đáp ứng trọn vẹn bằng các asset trên:
   * "isSufficient": true
   * "missingAssets": []
