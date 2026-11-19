@@ -75,7 +75,7 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"flickering_fluorescent"`: Đèn Tuýp Huỳnh Quang Chập Chờn (Ánh sáng xanh ngọc lạnh lẽo trong nhà, bóng tuýp chập chờn, biển báo EXIT xanh lục phát sáng).
 - `"dim_indoor_night"`: Ánh Vàng Đêm Mờ Ảo (Ánh đèn vàng hổ phách u tịch trong khách sạn / nhà hàng đêm muộn).
 
-### 3.3. 26 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
+### 3.3. 28 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
 
 Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ được đặt tại các Slot được phép** sau:
 
@@ -109,6 +109,8 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `structure_coconut_banana_grove` | Rặng dừa nước và bụi chuối rậm rạp | Thân dừa cao vươn nghiêng duyên dáng với tán lá xòe hình lược răng cưa sắc nhọn, bên dưới là bụi chuối xiêm rậm rạp với các tàu lá bản to rách gió và bắp chuối tím sẫm, khung viền đặc trưng Nam Bộ | `["far_left", "far_right"]` |
 | `structure_wooden_chair` | Ghế gỗ tựa | Chiếc ghế gỗ tựa gia đình mộc mạc trang nhã, lưng tựa nan cao vút từ Y=-72px lên Y=-198px tại X=-20px, tay vịn gỗ thanh lịch; **tương tác vừa khít 100% với tư thế ngồi `pose_sitting` và `pose_sitting_twisted_legs`** (đùi gập ngang trên mặt ghế Y=-72px, cẳng chân buông xuống sàn, bàn chân tiếp đất tại Y=0px). Hỗ trợ `facing: "left" | "right"` để xoay ghế đón nhân vật ngồi từ mọi hướng | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `structure_wooden_bed` | Giường ngủ gỗ | Chiếc giường đôi gỗ gia đình ấm áp, vách đầu giường gỗ thanh lịch cao Y=-195px có gối nằm kê đầu tại X=-65px, mặt nệm chiếu phẳng phiu tại Y=-80px và chăn gấp gọn gàng; **tương tác hoàn hảo với tư thế nằm `pose_lying_down` (kèm `offsetY: -80`) hoặc tư thế ngồi `pose_sitting` ở mép giường** | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `structure_small_wooden_table` | Bàn gỗ nhỏ nông thôn | Bàn gỗ nhỏ mộc mạc đặt đèn dầu hột vịt và radio cassette cổ, gốc neo `[bottom-center]` tiếp đất Y=800px, mặt bàn cao Y=-75px (**tương thích hoàn hảo với đạo cụ `detail_oil_lamp`, `detail_vintage_radio` đặt trên bàn kèm `offsetY: -75`**) | `["mid_left", "center", "mid_right"]` |
+| `structure_wooden_window` | Cửa sổ gỗ ván lùa/chống nông thôn | Khung cửa sổ ván gỗ hai cánh khép hờ chừa khe dọc ở giữa hắt ánh sương lạnh mờ ảo ra ngoài màn đêm, có các thanh song cửa dọc; neo theo trục sàn Y=800px nhưng khung cửa sổ treo ở tầm cao Y=-260px đến Y=-120px (**tương ứng tầm mắt người nằm trên giường tre nhìn ra**) | `["far_left", "mid_left", "mid_right", "far_right"]` |
 
 ---
 
@@ -162,7 +164,7 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
 - `"jiangshi_corpse"`: Cương thi áo quan (xác chết nhảy búp, mũ quan phong kiến, tay duỗi thẳng phía trước).
 - `"demon_shadow"`: Quỷ bóng đen dị hình (vóc dáng to lớn 1.25x, sừng cong nhọn hoắt, móng vuốt, hào quang khói đen).
 
-### 5.2. 12 Bộ Sưu Tập Trang Phục (Costumes)
+### 5.2. 13 Bộ Sưu Tập Trang Phục (Costumes)
 - `"outfit_tattered_tunic"`: Áo tơi / Áo nông phu nâu đất sờn rách, thắt lưng dây gai.
 - `"outfit_flowing_ao_dai"`: Áo dài cổ truyền tà rách ma mị phất phơ trong gió.
 - `"outfit_shrouded_cloak"`: Áo choàng trùm đầu tăm tối (Reaper / Kẻ hành hương tà giáo).
@@ -175,6 +177,7 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
 - `"outfit_patient_gown"`: Bộ quần áo bệnh nhân sọc xanh nhạt rộng thùng thình, buộc dây sau gáy, vạt áo lấm lem rách rưới.
 - `"outfit_modern_casual"`: Áo khoác hoodie hiện đại màu xám đen có khóa kéo, dây rút, quần jean ôm và giày thể thao đế trắng.
 - `"outfit_traditional_ba_ba"`: Áo bà ba trắng truyền thống Nam Bộ cổ tròn không bâu, hàng nút dọc giữa ngực, hai túi vuông nhỏ, vạt xẻ tà hông phối quần lụa đen ống rộng. Rất phù hợp cho tạo hình bóng người phụ nữ mặc áo bà ba trắng, tóc xõa dài đứng nhìn theo xe đò ở mé kênh.
+- `"outfit_funeral_white"`: Trang phục tang lễ trắng xô gai truyền thống & dải khăn tang trắng quấn ngang trán có hai vạt rủ sau gáy, quần lụa đen. Dành riêng cho các cảnh đám tang thôn quê, chịu tang gia đình hoặc nhân vật thức dậy đối diện cái chết (Cảnh 7).
 
 ### 5.3. 15 Biểu Cảm Khuôn Mặt & Đặc Điểm Phần Đầu (Faces - Gắn tại Head Socket)
 - `"face_calm"`: Mặt bình thường, mắt đen nhỏ vô hồn, lạnh lẽo.
@@ -237,7 +240,7 @@ Nhân vật có thể cầm đồ vật trên tay thông qua Hand Socket. Vật 
   - `"right"`: Tay trước (mặc định - tay chính quay về phía người xem).
   - `"left"`: Tay sau.
 
-### 6.2. Danh Mục 18 Đồ Vật Cầm Tay Thuần SVG:
+### 6.2. Danh Mục 19 Đồ Vật Cầm Tay Thuần SVG:
 1. `"none"`: Hai tay trống không.
 2. `"item_storm_lantern"`: Đèn bão sắt cổ phát sáng vàng ấm soi rọi màn sương (tỏa quầng sáng ấm xung quanh).
 3. `"item_paper_lantern"`: Đèn lồng giấy đỏ cầm tay cán trúc, tỏa ánh đỏ ma mị kèm tua rua.
@@ -256,6 +259,7 @@ Nhân vật có thể cầm đồ vật trên tay thông qua Hand Socket. Vật 
 16. `"item_offering_toys"`: Nải chuối và bộ đồ chơi đất nung cúng cô hồn. Mẹt tre lót tàu lá chuối đựng nải chuối chín vàng xanh, nồi đất - chén đất - con giống đất nung nhỏ cùng nén nhang cháy đỏ lập lòe tỏa khói mỏng. Phù hợp cảnh bà ngoại mang đồ cúng ra nền đất hoang cho oan hồn cô Hai Lụa.
 17. `"item_areca_palm_fan"`: Quạt mo cau miền quê. Chiếc quạt bẹ mo cau khô sạm gân dọc đặc trưng, tự đung đưa phe phẩy nhẹ theo chuyển động tay. Phù hợp cảnh nhân vật cầm quạt mo phe phẩy trằn trọc trong đêm hè oi bức.
 18. `"item_fresh_ginger"`: Lát gừng tươi giữ khí. Nhánh và lát gừng vàng tươi tỏa quầng sáng ấm áp nhẹ nhàng, biểu trưng cho mẹo dân gian ngậm hoặc cầm lát gừng tươi để "giữ khí" chống lại tà khí ban đêm.
+19. `"item_oil_lamp"`: Đèn dầu hột vịt cầm tay. Đèn dầu thủy tinh hột vịt thon eo nhỏ gọn cầm tại Hand Socket [0, 0] (bàn tay cầm vào đế/cổ đèn), ngọn lửa bấc vàng cam leo lét với quầng sáng ấm tỏa tròn soi tỏ bóng đêm. Rất phù hợp khi nhân vật vùng dậy soi quanh giường tre hoặc cầm đèn dầu rọi tìm dấu vết trong đêm tối.
 
 ---
 
@@ -310,7 +314,7 @@ export interface DirectorSceneScript {
     weather?: "none" | "heavy_rain" | "storm_thunder" | "blood_rain" | "floating_embers" | "drifting_ash" | "haunted_mist"; // Hiệu ứng thời tiết & hạt khí quyển thuần code
   };
   environment_items: Array<{
-    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub" | "market_stall_tent" | "abandoned_subway_station" | "rusty_train_tracks_tunnel" | "structure_old_apartment_gate" | "structure_wooden_sampan" | "structure_monkey_bridge" | "structure_wooden_coffin" | "structure_bamboo_bed_net" | "structure_wooden_latch_door" | "structure_rural_passenger_bus" | "structure_coconut_banana_grove" | "structure_wooden_chair" | "structure_wooden_bed";
+    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub" | "market_stall_tent" | "abandoned_subway_station" | "rusty_train_tracks_tunnel" | "structure_old_apartment_gate" | "structure_wooden_sampan" | "structure_monkey_bridge" | "structure_wooden_coffin" | "structure_bamboo_bed_net" | "structure_wooden_latch_door" | "structure_rural_passenger_bus" | "structure_coconut_banana_grove" | "structure_wooden_chair" | "structure_wooden_bed" | "structure_small_wooden_table" | "structure_wooden_window";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right";
     offsetX?: number;
     offsetY?: number;
@@ -320,7 +324,7 @@ export interface DirectorSceneScript {
   actors: Array<{
     id: string;
     base: "male_adult" | "female_adult" | "elder_hunched" | "brute_hulking" | "skeletal_emaciated" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow";
-    costume?: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual" | "outfit_traditional_ba_ba";
+    costume?: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual" | "outfit_traditional_ba_ba" | "outfit_funeral_white";
     face: "face_calm" | "face_scared" | "face_screaming_gasp" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless";
     facialAction?: "none" | "blink_natural" | "blink_nervous" | "darting_eyes" | "crying_tears" | "bleeding_tears" | "creepy_laugh" | "terrified_scream" | "talking_jaw";
     pose: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging" | "pose_lying_down";
@@ -330,7 +334,7 @@ export interface DirectorSceneScript {
     offsetY?: number;
     scale?: number;
     opacity?: number;
-    heldItem?: "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger";
+    heldItem?: "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger" | "item_oil_lamp";
     heldHand?: "right" | "left";
     motion?: {
       targetSlot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
@@ -1251,6 +1255,107 @@ Thay vì giữ nguyên 1 góc máy cố định suốt cả phân cảnh dài, A
   ],
   "dialogue": "Người phụ nữ nằm nghỉ ngơi trên chiếc giường gỗ quen thuộc trong gian phòng yên tĩnh. Ở góc đối diện, người thân ngồi trò chuyện trên chiếc ghế tựa gỗ bên ánh đèn leo lét...",
   "narrative_note": "Tổ hợp tương tác hoàn hảo: structure_wooden_bed kết hợp nhân vật nằm pose_lying_down (offsetY: -80 đặt vừa khít mặt nệm giường) và structure_wooden_chair quay mặt sang trái (facing: 'left') kết hợp nhân vật ngồi pose_sitting (đùi gập trên mặt ghế Y=-72px, chân chạm đất phẳng phiu)."
+}
+```
+
+### 10.6. Mẫu Kịch Bản 6: Đêm Kinh Hoàng Gian Nhà Lá - Cửa Sổ Gỗ Khép Hờ, Bàn Nhỏ & Đèn Dầu Hột Vịt (Scene 2, 4 & 7)
+
+```json
+{
+  "scene_id": "scene_rural_night_mystery",
+  "title": "Bóng Đen Ngoài Cửa Sổ & Ánh Đèn Dầu Giữa Đêm",
+  "duration_sec": 7,
+  "theme": "abandoned_village",
+  "camera": {
+    "shot": "medium_shot",
+    "angle": "eye_level",
+    "movement": "pan_right",
+    "shake": false,
+    "flash": false
+  },
+  "lighting": {
+    "sky_preset": "dim_indoor_night",
+    "ambient_tint": "rgba(10, 8, 14, 0.45)",
+    "fog_density": 0.28,
+    "weather": "haunted_mist"
+  },
+  "environment_items": [
+    {
+      "asset_id": "structure_bamboo_bed_net",
+      "slot": "mid_left",
+      "offsetX": 0,
+      "offsetY": 0,
+      "scale": 1.0
+    },
+    {
+      "asset_id": "structure_wooden_window",
+      "slot": "far_left",
+      "offsetX": -30,
+      "offsetY": 0,
+      "scale": 1.0
+    },
+    {
+      "asset_id": "structure_small_wooden_table",
+      "slot": "center",
+      "offsetX": 40,
+      "offsetY": 0,
+      "scale": 1.0
+    }
+  ],
+  "actors": [
+    {
+      "id": "actor_minh",
+      "base": "male_adult",
+      "costume": "outfit_funeral_white",
+      "face": "face_scared",
+      "facialAction": "darting_eyes",
+      "pose": "pose_holding",
+      "facing": "left",
+      "slot": "mid_left",
+      "offsetX": 70,
+      "offsetY": 0,
+      "scale": 1.0,
+      "opacity": 1.0,
+      "heldItem": "item_oil_lamp",
+      "heldHand": "right"
+    },
+    {
+      "id": "actor_ghost_outside",
+      "base": "ghost_wraith",
+      "costume": "outfit_flowing_ao_dai",
+      "face": "face_faceless",
+      "facialAction": "none",
+      "pose": "pose_floating",
+      "facing": "right",
+      "slot": "air_left",
+      "offsetX": -120,
+      "offsetY": 40,
+      "scale": 0.85,
+      "opacity": 0.65,
+      "heldItem": "none",
+      "heldHand": "right"
+    }
+  ],
+  "details": [
+    {
+      "id": "detail_lamp_on_table",
+      "asset_id": "detail_oil_lamp",
+      "slot": "center",
+      "offsetX": 10,
+      "offsetY": -75,
+      "scale": 0.95
+    },
+    {
+      "id": "detail_radio_on_table",
+      "asset_id": "detail_vintage_radio",
+      "slot": "center",
+      "offsetX": 65,
+      "offsetY": -75,
+      "scale": 0.9
+    }
+  ],
+  "dialogue": "Minh cầm chặt cây đèn dầu hột vịt nhỏ trong tay, run rẩy nhìn về phía khe cửa sổ gỗ khép hờ. Bên ngoài màn sương lạnh buốt, một bóng hình ma quái đang lặng lẽ dòm vào...",
+  "narrative_note": "Tổ hợp visual chuẩn xác: structure_wooden_window tại vách trái với ánh sương lạnh lọt qua khe cửa; structure_small_wooden_table tại center làm bệ đỡ cho detail_oil_lamp và detail_vintage_radio ở tọa độ offsetY: -75 vừa khít mặt bàn; diễn viên Minh cầm item_oil_lamp tỏa quầng sáng vàng ấm soi rọi đối diện bóng ma ghost_wraith."
 }
 ```
 

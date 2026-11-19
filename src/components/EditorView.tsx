@@ -1034,6 +1034,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="outfit_patient_gown">Áo bệnh nhân sọc xanh lấm lem (outfit_patient_gown)</option>
                         <option value="outfit_modern_casual">Áo hoodie / Đồ hiện đại thường nhật (outfit_modern_casual)</option>
                         <option value="outfit_traditional_ba_ba">Áo bà ba trắng truyền thống & quần lụa đen (outfit_traditional_ba_ba)</option>
+                        <option value="outfit_funeral_white">Áo tang trắng xô gai & dải khăn tang (outfit_funeral_white)</option>
                       </select>
                     </div>
 
@@ -1808,6 +1809,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="structure_coconut_banana_grove">Rặng dừa nước và bụi chuối (structure_coconut_banana_grove)</option>
                         <option value="structure_wooden_chair">Ghế gỗ tựa (structure_wooden_chair)</option>
                         <option value="structure_wooden_bed">Giường ngủ gỗ (structure_wooden_bed)</option>
+                        <option value="structure_small_wooden_table">Bàn gỗ nhỏ nông thôn (structure_small_wooden_table)</option>
+                        <option value="structure_wooden_window">Cửa sổ gỗ ván lùa/chống nông thôn (structure_wooden_window)</option>
                       </select>
                     </div>
 

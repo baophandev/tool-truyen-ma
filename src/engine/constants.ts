@@ -338,4 +338,14 @@ export const COSTUME_PALETTES: Record<CostumeId, CostumePalette> = {
     sleeve: "#DDE2E8",
     sleeveShadow: "#B4BECB",
   },
+  outfit_funeral_white: {
+    primary: "#E2E8F0",
+    secondary: "#CBD5E1",
+    accent: "#F8FAFC",
+    trim: "#94A3B8",
+    pantsPrimary: "#14161D",
+    pantsSecondary: "#0C0E14",
+    sleeve: "#E2E8F0",
+    sleeveShadow: "#94A3B8",
+  },
 };

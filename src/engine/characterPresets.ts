@@ -138,6 +138,17 @@ export const DEFAULT_NAMED_CHARACTERS: NamedCharacterPreset[] = [
     defaultHeldItem: "none",
     scale: 1.0,
   },
+  {
+    id: "char_minh_mourning",
+    name: "Minh (Áo Tang Trắng & Đèn Dầu Hột Vịt)",
+    description: "Chàng trai trẻ thức dậy trong gian nhà tang vắng vẻ, chít khăn tang trắng trên đầu, tay run rẩy cầm đèn dầu hột vịt soi tỏ bóng đêm.",
+    base: "male_adult",
+    costume: "outfit_funeral_white",
+    face: "face_scared",
+    defaultHeldItem: "item_oil_lamp",
+    defaultHeldHand: "right",
+    scale: 1.0,
+  },
 ];
 
 /**

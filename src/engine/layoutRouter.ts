@@ -140,6 +140,8 @@ const VALID_STRUCTURES: StructureId[] = [
   "structure_coconut_banana_grove",
   "structure_wooden_chair",
   "structure_wooden_bed",
+  "structure_small_wooden_table",
+  "structure_wooden_window",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -165,6 +167,7 @@ const VALID_COSTUMES: CostumeId[] = [
   "outfit_patient_gown",
   "outfit_modern_casual",
   "outfit_traditional_ba_ba",
+  "outfit_funeral_white",
 ];
 const VALID_FACES: CharacterFaceId[] = [
   "face_calm",
@@ -227,6 +230,7 @@ const VALID_HELD_ITEMS: HeldItemId[] = [
   "item_offering_toys",
   "item_areca_palm_fan",
   "item_fresh_ginger",
+  "item_oil_lamp",
 ];
 const VALID_HELD_HANDS: HeldHand[] = ["right", "left"];
 const VALID_DETAILS: DetailId[] = [
@@ -353,6 +357,12 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       if (item.asset_id === "wooden_bed" || item.asset_id === "bed") {
         item.asset_id = "structure_wooden_bed";
       }
+      if (item.asset_id === "small_wooden_table" || item.asset_id === "wooden_table" || item.asset_id === "table") {
+        item.asset_id = "structure_small_wooden_table";
+      }
+      if (item.asset_id === "wooden_window" || item.asset_id === "window" || item.asset_id === "country_window") {
+        item.asset_id = "structure_wooden_window";
+      }
       if (!VALID_STRUCTURES.includes(item.asset_id)) return;
 
       const structId = item.asset_id as StructureId;
@@ -382,8 +392,12 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
 
     const id = actor.id && typeof actor.id === "string" ? actor.id.trim() : `actor_${idx + 1}`;
     const base: CharacterBaseId = VALID_BASES.includes(actor.base) ? actor.base : "male_adult";
-    const costume: CostumeId = VALID_COSTUMES.includes(actor.costume)
-      ? actor.costume
+    let rawCostume = actor.costume;
+    if (rawCostume === "funeral_white" || rawCostume === "mourning_white" || rawCostume === "white_mourning") {
+      rawCostume = "outfit_funeral_white";
+    }
+    const costume: CostumeId = VALID_COSTUMES.includes(rawCostume)
+      ? rawCostume
       : getDefaultCostumeForBase(base);
     const face: CharacterFaceId = VALID_FACES.includes(actor.face) ? actor.face : "face_calm";
     const facialAction: FacialActionId | undefined = VALID_FACIAL_ACTIONS.includes(actor.facialAction)
@@ -407,7 +421,11 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     const scale = Number(actor.scale) || 1;
     const opacity = actor.opacity !== undefined ? Math.min(1, Math.max(0, Number(actor.opacity))) : 1;
 
-    const heldItem: HeldItemId = VALID_HELD_ITEMS.includes(actor.heldItem) ? actor.heldItem : "none";
+    let rawHeldItem = actor.heldItem;
+    if (rawHeldItem === "oil_lamp" || rawHeldItem === "handheld_oil_lamp" || rawHeldItem === "item_handheld_oil_lamp") {
+      rawHeldItem = "item_oil_lamp";
+    }
+    const heldItem: HeldItemId = VALID_HELD_ITEMS.includes(rawHeldItem) ? rawHeldItem : "none";
     const heldHand: HeldHand = VALID_HELD_HANDS.includes(actor.heldHand) ? actor.heldHand : "right";
 
     // Motion healing: drop motion if null, false, empty object, or invalid

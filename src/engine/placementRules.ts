@@ -167,6 +167,16 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ALL_GROUND_SLOT_IDS,
     reason: "Giường ngủ gỗ gia đình có thể đặt tại mọi vị trí mặt đất (far_left -> far_right), tương tác hoàn hảo với nhân vật nằm (pose_lying_down với offsetY: -80) hoặc ngồi ở mép giường.",
   },
+  structure_small_wooden_table: {
+    name: "Bàn gỗ nhỏ nông thôn",
+    allowedSlots: ["mid_left", "center", "mid_right"],
+    reason: "Bàn gỗ nhỏ nông thôn đặt đèn dầu và radio, neo [bottom-center] tiếp đất Y=800px với mặt bàn cao Y=-75px tại các slot trung tâm (mid_left, center, mid_right).",
+  },
+  structure_wooden_window: {
+    name: "Cửa sổ gỗ ván lùa/chống nông thôn",
+    allowedSlots: ["far_left", "mid_left", "mid_right", "far_right"],
+    reason: "Cửa sổ gỗ ván nông thôn neo trên trục sàn Y=800px nhưng khung cửa treo tầm cao Y=-260px đến Y=-120px, đặt dọc các vách phòng bên trái hoặc bên phải (far_left, mid_left, mid_right, far_right).",
+  },
 };
 
 export interface DetailRule {

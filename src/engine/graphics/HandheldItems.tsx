@@ -27,6 +27,7 @@ export const HELD_ITEM_CATALOG: HeldItemMeta[] = [
   { id: "item_offering_toys", name: "Nải chuối & đồ chơi đất nung cúng cô hồn", desc: "Mẹt lá chuối đựng nải chuối cùng bộ đồ chơi đất nung nhỏ và nén hương cúng cô hồn" },
   { id: "item_areca_palm_fan", name: "Quạt mo cau", desc: "Chiếc quạt mo cau quê nhà khô sạm, phe phẩy trong đêm hè oi bức" },
   { id: "item_fresh_ginger", name: "Lát gừng tươi", desc: "Lát gừng vàng tươi tỏa hơi ấm giữ khí chống lại tà khí ban đêm" },
+  { id: "item_oil_lamp", name: "Đèn dầu hột vịt cầm tay", desc: "Đèn dầu hột vịt thủy tinh thon eo cầm tay, ngọn lửa vàng cam leo lét soi tỏ bóng đêm" },
 ];
 
 interface HandheldItemRendererProps {
@@ -666,6 +667,83 @@ function renderHeldItemSvg(itemId: Exclude<HeldItemId, "none">) {
               <circle cx="1.2" cy="1.8" r="0.5" fill="#CA8A04" />
             </g>
           </g>
+        </g>
+      );
+
+    case "item_oil_lamp":
+      return (
+        <g className="held-oil-lamp">
+          {/* 1. Atmospheric Warm Amber Radial Glow radiating around the flame */}
+          <circle cx="0" cy="-28" r="46" fill="#D4AF37" opacity="0.3" pointerEvents="none" />
+          <circle cx="0" cy="-28" r="26" fill="#FACC15" opacity="0.24" pointerEvents="none" />
+
+          {/* 2. Metal Base & Finger Loop Handle held in palm [0, 0] */}
+          {/* Tin base foot resting in/below palm */}
+          <rect x="-9" y="1" width="18" height="5" rx="1.5" fill="#141419" stroke="#272733" strokeWidth="1" />
+          <line x1="-7" y1="3" x2="7" y2="3" stroke="#374151" strokeWidth="0.8" />
+          {/* Wire loop finger handle on the side for holding */}
+          <path
+            d="M 8 -4 C 15 -4, 15 4, 7 4"
+            fill="none"
+            stroke="#1E293B"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+
+          {/* 3. Glass Fuel Bowl (Bầu dầu hột vịt tròn phình) */}
+          <ellipse cx="0" cy="-7" rx="11" ry="8.5" fill="#12141C" stroke="#2F3647" strokeWidth="1.2" />
+          {/* Kerosene oil fuel level inside glass */}
+          <ellipse cx="0" cy="-6" rx="9" ry="5.5" fill="#2E2310" opacity="0.8" />
+          {/* Submerged cotton wick */}
+          <line x1="0" y1="-14" x2="-2" y2="-4" stroke="#78350F" strokeWidth="1.8" strokeLinecap="round" />
+
+          {/* 4. Brass Burner Collar & Adjustment Knob */}
+          <rect x="-5" y="-17" width="10" height="4.5" rx="0.8" fill="#78350F" stroke="#B45309" strokeWidth="0.8" />
+          <circle cx="7" cy="-15" r="2.2" fill="#D97706" stroke="#78350F" strokeWidth="0.6" />
+          <line x1="5" y1="-15" x2="7" y2="-15" stroke="#78350F" strokeWidth="1.2" />
+
+          {/* 5. Flickering Teardrop Wick Flame (Ngọn lửa bấc giọt nước leo lét) */}
+          <g className="anim-flicker-ember">
+            {/* Outer golden-orange flame */}
+            <path
+              d="M 0 -36 
+                 C -4.5 -30, -4 -21, 0 -18 
+                 C 4 -21, 4.5 -30, 0 -36 Z"
+              fill="#F59E0B"
+            />
+            {/* Inner brilliant yellow core */}
+            <path
+              d="M 0 -32 
+                 C -2.2 -27, -2 -21, 0 -19 
+                 C 2 -21, 2.2 -27, 0 -32 Z"
+              fill="#FEF08A"
+            />
+            {/* Incandescent white core center */}
+            <ellipse cx="0" cy="-21" rx="1" ry="1.5" fill="#FFFFFF" />
+          </g>
+
+          {/* 6. Glass Chimney (Bóng đèn thủy tinh hột vịt thon eo) */}
+          <path
+            d="M -5 -16 
+               C -9 -25, -8 -33, -5 -42 
+               C -4 -46, -6 -48, -4 -50 
+               L 4 -50 
+               C 6 -48, 4 -46, 5 -42 
+               C 8 -33, 9 -25, 5 -16 Z"
+            fill="#CBD5E1"
+            fillOpacity="0.14"
+            stroke="#94A3B8"
+            strokeWidth="1.1"
+          />
+          {/* Curved white specular reflection */}
+          <path
+            d="M -4 -20 C -6 -26, -6 -32, -3 -39"
+            fill="none"
+            stroke="#FFFFFF"
+            strokeWidth="1"
+            strokeLinecap="round"
+            opacity="0.65"
+          />
         </g>
       );
   }

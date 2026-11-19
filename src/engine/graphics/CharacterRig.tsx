@@ -661,6 +661,33 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
             </g>
           )}
 
+          {/* White Funeral Mourning Headband (Khăn tang trắng quấn ngang trán có 2 vạt rủ) */}
+          {activeCostume === "outfit_funeral_white" && (
+            <g className="rig-funeral-headband">
+              <path
+                d="M -23 -8 Q 0 -12 23 -8 L 22 -2 Q 0 -6 -22 -2 Z"
+                fill="#F8FAFC"
+                stroke="#94A3B8"
+                strokeWidth="1"
+              />
+              <ellipse cx="-18" cy="-5" rx="3.5" ry="3" fill="#E2E8F0" stroke="#94A3B8" strokeWidth="0.8" />
+              <path
+                d="M -18 -4 Q -28 14 -22 36 L -17 35 Q -23 15 -15 -4 Z"
+                fill="#F8FAFC"
+                stroke="#CBD5E1"
+                strokeWidth="0.8"
+                opacity="0.95"
+              />
+              <path
+                d="M -19 -3 Q -32 20 -28 44 L -23 43 Q -27 21 -16 -3 Z"
+                fill="#E2E8F0"
+                stroke="#94A3B8"
+                strokeWidth="0.8"
+                opacity="0.9"
+              />
+            </g>
+          )}
+
           <FaceRig face={face} facialAction={facialAction} />
         </g>
       )}
@@ -935,6 +962,30 @@ const TorsoOutfit: React.FC<{
         </g>
       );
 
+    case "outfit_funeral_white":
+      return (
+        <g className="costume-funeral-white-torso">
+          {/* Loose White Coarse Funeral Mourning Tunic (Áo tang trắng xô gai truyền thống) */}
+          <path
+            d="M -22 -188 C -21 -155, -18 -125, -20 -88 L 20 -88 C 18 -125, 21 -155, 22 -188 Z"
+            fill={palette.primary}
+            stroke={palette.trim}
+            strokeWidth="1.2"
+          />
+          {/* Deep V-neck coarse mourning collar */}
+          <path d="M -9 -188 L 0 -168 L 9 -188 Z" fill={appearance.skinShadow} stroke={palette.trim} strokeWidth="1" />
+          {/* Rough hemp cord tied across waist */}
+          <path d="M -18 -122 Q 0 -118 18 -122" fill="none" stroke="#A8A29E" strokeWidth="2.2" />
+          <path d="M -3 -122 Q -5 -105 -2 -94" fill="none" stroke="#A8A29E" strokeWidth="1.8" />
+          <path d="M 1 -122 Q 4 -102 2 -92" fill="none" stroke="#A8A29E" strokeWidth="1.8" />
+          {/* Frayed raw hem at bottom */}
+          <line x1="-20" y1="-88" x2="20" y2="-88" stroke={palette.trim} strokeWidth="1.2" strokeDasharray="3,2" />
+          {/* Vertical fabric fold shadows */}
+          <path d="M -10 -165 Q -8 -135 -11 -95" fill="none" stroke={palette.secondary} strokeWidth="1.3" opacity="0.65" />
+          <path d="M 10 -165 Q 8 -135 11 -95" fill="none" stroke={palette.secondary} strokeWidth="1.3" opacity="0.65" />
+        </g>
+      );
+
     case "outfit_tattered_tunic":
     default:
       return (
@@ -1079,7 +1130,7 @@ const LowerBodyOutfit: React.FC<{
         {costume === "outfit_flowing_ao_dai" && (
           <path d="M -16 -90 C -22 -75, -28 -60, -26 -40 L -12 -40 C -10 -60, -8 -75, -6 -90 Z" fill={palette.primary} opacity="0.9" />
         )}
-        {costume === "outfit_traditional_ba_ba" && (
+        {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
           <path d="M -18 -90 C -22 -78, -22 -68, -14 -64 L 6 -64 C 12 -68, 14 -78, 12 -90 Z" fill={palette.primary} stroke={appearance.outline} strokeWidth="0.9" />
         )}
       </g>
@@ -1341,8 +1392,8 @@ const LowerBodyOutfit: React.FC<{
     );
   }
 
-  // 10. Traditional Southern Vietnamese White Áo Bà Ba (Hip-length side-slit white hem over wide black silk trousers)
-  if (costume === "outfit_traditional_ba_ba") {
+  // 10. Traditional White Áo Bà Ba & Funeral Mourning Costume (Hem over wide black trousers)
+  if (costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") {
     if (isSitting) {
       return (
         <g className="ba-ba-seated">
@@ -2343,7 +2394,7 @@ const CrawlingSideRig: React.FC<CrawlingSideRigProps> = ({
           </g>
         )}
 
-        {costume === "outfit_traditional_ba_ba" && (
+        {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
           <g>
             {/* Soft white hip-length Áo Bà Ba hem draping over arched back */}
             <path
@@ -2503,6 +2554,14 @@ const CrawlingSideRig: React.FC<CrawlingSideRigProps> = ({
               d="M -18 -2 C -22 -18, -4 -22, 2 -22 C 14 -22, 20 -16, 18 -2 C 12 -12, 4 -12, 0 -10 C -6 -12, -12 -10, -18 -2 Z"
               fill={appearance.hair}
             />
+          )}
+
+          {/* White Funeral Mourning Headband when lying down */}
+          {costume === "outfit_funeral_white" && (
+            <g className="lie-funeral-headband">
+              <path d="M -16 -4 Q 0 -7 16 -4 L 15 2 Q 0 -1 -15 2 Z" fill="#F8FAFC" stroke="#94A3B8" strokeWidth="0.8" />
+              <path d="M -15 -2 Q -24 6 -20 18 L -17 17 Q -20 7 -13 -2 Z" fill="#F8FAFC" stroke="#CBD5E1" strokeWidth="0.8" opacity="0.9" />
+            </g>
           )}
 
           {/* Face Expression Rig */}
@@ -2672,7 +2731,7 @@ const LyingDownSideRig: React.FC<LyingDownSideRigProps> = ({
         />
 
         {/* Costume Details for Lying Down */}
-        {costume === "outfit_traditional_ba_ba" && (
+        {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
           <g>
             {/* White Ba Ba shirt center button placket along chest */}
             <path d="M -34 -23 L 14 -16" stroke={palette.trim} strokeWidth="1.2" strokeDasharray="3,3" />
@@ -2821,6 +2880,14 @@ const LyingDownSideRig: React.FC<LyingDownSideRigProps> = ({
             <g stroke="#3A2E24" strokeWidth="0.9" fill="none" opacity="0.65">
               <path d="M -8 -6 C -4 -4, 4 -4, 8 -6" />
               <path d="M -6 6 C -2 8, 4 8, 8 6" />
+            </g>
+          )}
+
+          {/* White Funeral Mourning Headband when lying down */}
+          {costume === "outfit_funeral_white" && (
+            <g className="lie-funeral-headband">
+              <path d="M -16 -4 Q 0 -7 16 -4 L 15 2 Q 0 -1 -15 2 Z" fill="#F8FAFC" stroke="#94A3B8" strokeWidth="0.8" />
+              <path d="M -15 -2 Q -24 6 -20 18 L -17 17 Q -20 7 -13 -2 Z" fill="#F8FAFC" stroke="#CBD5E1" strokeWidth="0.8" opacity="0.9" />
             </g>
           )}
 

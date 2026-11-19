@@ -433,6 +433,26 @@
         "width": 320,
         "height": 235,
         "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_small_wooden_table",
+        "name": "Bàn gỗ nhỏ nông thôn",
+        "semantic_role": "Bàn gỗ nhỏ mộc mạc đặt đèn dầu hột vịt và radio cassette cổ, gốc neo [bottom-center] tiếp đất Y=800px, mặt bàn cao Y=-75px khớp với đạo cụ đặt trên bàn",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 140,
+        "height": 75,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_wooden_window",
+        "name": "Cửa sổ gỗ ván lùa/chống nông thôn",
+        "semantic_role": "Khung cửa sổ ván gỗ hai cánh khép hờ chừa khe dọc ở giữa hắt ánh sương lạnh mờ ảo ra ngoài màn đêm, có các thanh song cửa dọc; neo theo trục sàn Y=800px nhưng khung cửa sổ treo ở tầm cao Y=-260px đến Y=-120px",
+        "allowed_slots": ["far_left", "mid_left", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 130,
+        "height": 260,
+        "anchor": "bottom-center"
       }
     ]
   },
@@ -575,6 +595,11 @@
         "id": "outfit_traditional_ba_ba",
         "name": "Áo bà ba trắng truyền thống",
         "desc": "Bộ áo bà ba trắng cổ tròn không bâu, hàng nút dọc giữa ngực, hai túi vuông nhỏ, vạt xẻ tà hông phối quần lụa đen ống rộng Nam Bộ, tạo hình bóng người phụ nữ ma mị ở mé kênh"
+      },
+      {
+        "id": "outfit_funeral_white",
+        "name": "Trang phục tang lễ trắng xô gai & dải khăn tang",
+        "desc": "Áo tang trắng xô gai truyền thống thắt dây lưng gai, quần lụa đen và dải khăn tang trắng quấn ngang trán có hai vạt rủ sau gáy"
       }
     ],
     "faces": [
@@ -776,7 +801,8 @@
       { "id": "item_mysterious_note", "name": "Mẩu giấy bí ẩn vương máu" },
       { "id": "item_offering_toys", "name": "Nải chuối và đồ chơi đất nung cúng cô hồn" },
       { "id": "item_areca_palm_fan", "name": "Quạt mo cau" },
-      { "id": "item_fresh_ginger", "name": "Lát gừng tươi" }
+      { "id": "item_fresh_ginger", "name": "Lát gừng tươi" },
+      { "id": "item_oil_lamp", "name": "Đèn dầu hột vịt cầm tay" }
     ]
   },
   "details": [

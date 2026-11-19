@@ -47,7 +47,9 @@ export type StructureId =
   | "structure_rural_passenger_bus"
   | "structure_coconut_banana_grove"
   | "structure_wooden_chair"
-  | "structure_wooden_bed";
+  | "structure_wooden_bed"
+  | "structure_small_wooden_table"
+  | "structure_wooden_window";
 
 export type DetailId =
   | "detail_black_crow"
@@ -89,7 +91,8 @@ export type CostumeId =
   | "outfit_doctor_coat"        // Áo blouse bác sĩ / Y tá bệnh viện hiện đại
   | "outfit_patient_gown"       // Áo bệnh nhân sọc xanh lấm lem
   | "outfit_modern_casual"      // Trang phục thường ngày hiện đại (Hoodie / Áo khoác)
-  | "outfit_traditional_ba_ba"; // Áo bà ba trắng truyền thống Nam Bộ & quần lụa đen
+  | "outfit_traditional_ba_ba"  // Áo bà ba trắng truyền thống Nam Bộ & quần lụa đen
+  | "outfit_funeral_white";     // Trang phục tang lễ trắng xô gai & dải khăn tang trắng quấn đầu
 
 export type CharacterFaceId =
   | "face_calm"
@@ -151,7 +154,8 @@ export type HeldItemId =
   | "item_mysterious_note"    // Mẩu giấy / lá thư bí ẩn vương máu mang thông điệp kinh hoàng
   | "item_offering_toys"      // Nải chuối & đồ chơi đất nung cúng cô hồn trên tàu lá chuối
   | "item_areca_palm_fan"     // Quạt mo cau miền quê phe phẩy đêm hè oi bức
-  | "item_fresh_ginger";      // Lát gừng tươi giữ khí chống tà khí ban đêm
+  | "item_fresh_ginger"       // Lát gừng tươi giữ khí chống tà khí ban đêm
+  | "item_oil_lamp";          // Đèn dầu hột vịt cầm tay soi bóng đêm
 
 export type HeldHand = "right" | "left";
 

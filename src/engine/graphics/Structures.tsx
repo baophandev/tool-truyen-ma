@@ -49,6 +49,8 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "structure_coconut_banana_grove" && <CoconutBananaGrove />}
       {id === "structure_wooden_chair" && <WoodenChair />}
       {id === "structure_wooden_bed" && <WoodenBed />}
+      {id === "structure_small_wooden_table" && <SmallWoodenTable />}
+      {id === "structure_wooden_window" && <WoodenCountryWindow />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -3570,6 +3572,158 @@ const WoodenBed: React.FC = () => {
         {/* Quilt hem band */}
         <rect x="20" y="-83" width="8" height="31" fill="#3D4B5C" opacity="0.75" />
       </g>
+    </g>
+  );
+};
+
+/**
+ * 28. SMALL WOODEN TABLE (Bàn Gỗ Nhỏ Nông Thôn)
+ * Rustic rural wooden table where oil lamps and vintage radios rest.
+ * Anchored at [bottom-center] [0, 0] at Ground Y = 800px.
+ * Tabletop surface sits at Y = -75px (aligns with detail_oil_lamp / detail_vintage_radio offsetY: -75).
+ */
+const SmallWoodenTable: React.FC = () => {
+  return (
+    <g className="structure-small-wooden-table">
+      {/* 1. Ground Contact Shadow */}
+      <ellipse cx="0" cy="0" rx="72" ry="5.5" fill="#000000" opacity="0.65" />
+
+      {/* 2. Rear Legs & Rear Crossbar (Chân bàn sau & thanh giằng sau tối màu tạo chiều sâu) */}
+      {/* Rear Left Leg */}
+      <polygon points="-52,-63 -46,-63 -51,0 -57,0" fill="#08080B" stroke="#16161D" strokeWidth="0.8" />
+      {/* Rear Right Leg */}
+      <polygon points="46,-63 52,-63 57,0 51,0" fill="#08080B" stroke="#16161D" strokeWidth="0.8" />
+      {/* Rear Crossbar */}
+      <rect x="-48" y="-36" width="96" height="5" fill="#060608" stroke="#14141A" strokeWidth="0.6" />
+
+      {/* 3. Under-Table Apron Rail (Thành dầm đỡ mặt bàn trước) */}
+      <rect x="-63" y="-63" width="126" height="10" rx="1" fill="#0B0B0E" stroke="#1F1F24" strokeWidth="0.8" />
+      {/* Wooden joinery dowel pegs */}
+      <circle cx="-56" cy="-58" r="1.5" fill="#3F3F46" />
+      <circle cx="56" cy="-58" r="1.5" fill="#3F3F46" />
+      <line x1="-60" y1="-54" x2="60" y2="-54" stroke="#1A1A22" strokeWidth="0.8" />
+
+      {/* 4. Lower Front Stretcher (Thanh giằng ngang liên kết chân trước Y = -24px) */}
+      <rect x="-60" y="-24" width="120" height="6" rx="1.5" fill="#0D0D11" stroke="#27272A" strokeWidth="0.8" />
+      <line x1="-58" y1="-21" x2="58" y2="-21" stroke="#3F3F46" strokeWidth="0.8" />
+
+      {/* 5. Front Legs (Hai chân trước choãi nhẹ, góc bo thanh mảnh) */}
+      {/* Front Left Leg */}
+      <g>
+        <polygon points="-64,-63 -56,-63 -61,0 -69,0" fill="#0E0E12" stroke="#27272A" strokeWidth="1" />
+        <line x1="-68" y1="0" x2="-63" y2="-63" stroke="#3F3F46" strokeWidth="1" />
+      </g>
+      {/* Front Right Leg */}
+      <g>
+        <polygon points="56,-63 64,-63 69,0 61,0" fill="#0E0E12" stroke="#27272A" strokeWidth="1" />
+        <line x1="68" y1="0" x2="63" y2="-63" stroke="#3F3F46" strokeWidth="1" />
+      </g>
+
+      {/* 6. Solid Wooden Tabletop (Mặt bàn gỗ ngang dày 12px, y = -75px đến -63px) */}
+      <rect x="-70" y="-75" width="140" height="12" rx="2" fill="#0E0E12" stroke="#1F1F24" strokeWidth="1" />
+      {/* Upper surface highlight line catches dim room light */}
+      <line x1="-69" y1="-74.5" x2="69" y2="-74.5" stroke="#27272A" strokeWidth="1.6" strokeLinecap="round" />
+      {/* Subtle wood grain texture */}
+      <line x1="-65" y1="-71" x2="65" y2="-71" stroke="#3F3F46" strokeWidth="0.7" opacity="0.6" strokeDasharray="18,10,32,8" />
+      {/* End-grain chamfer bevels */}
+      <line x1="-70" y1="-75" x2="-67" y2="-63" stroke="#33333D" strokeWidth="0.8" />
+      <line x1="70" y1="-75" x2="67" y2="-63" stroke="#33333D" strokeWidth="0.8" />
+    </g>
+  );
+};
+
+/**
+ * 29. WOODEN COUNTRY WINDOW (Cửa Sổ Gỗ Ván Lùa/Chống Nông Thôn)
+ * Rustic rural wooden window ajar with cold mist / moonlight peering through the vertical slit.
+ * Anchored at [bottom-center] at Ground Y = 800px; window frame suspended at Y = -260px to -120px
+ * (directly at eye level of character lying down on bamboo bed).
+ */
+const WoodenCountryWindow: React.FC = () => {
+  return (
+    <g className="structure-wooden-window">
+      {/* 1. Wall Stud Timber Posts & Siding extending down to floor */}
+      <line x1="-60" y1="-120" x2="-60" y2="0" stroke="#09090C" strokeWidth="5" />
+      <line x1="60" y1="-120" x2="60" y2="0" stroke="#09090C" strokeWidth="5" />
+      {/* Horizontal wicker/wood wall slats below window */}
+      {[-100, -75, -50, -25].map((wy) => (
+        <line
+          key={`wall-slat-${wy}`}
+          x1="-62"
+          y1={wy}
+          x2="62"
+          y2={wy}
+          stroke="#07070A"
+          strokeWidth="1.5"
+          opacity="0.5"
+        />
+      ))}
+      {/* Base contact shadow on floor */}
+      <ellipse cx="0" cy="0" rx="68" ry="4" fill="#000000" opacity="0.5" />
+
+      {/* 2. Main Window Framing (Width: 130px, Height: 140px, Y = -260px to -120px) */}
+      {/* Window Opening Cavity Void */}
+      <rect x="-53" y="-256" width="106" height="132" fill="#040406" />
+
+      {/* Eerie Cold Moonlight / Sương Lạnh Peering Through Opening */}
+      <rect x="-53" y="-256" width="106" height="132" fill="#64748B" opacity="0.22" />
+      <ellipse cx="0" cy="-190" rx="46" ry="56" fill="#94A3B8" opacity="0.14" />
+
+      {/* 3. Vertical Wooden Security Window Bars (Song cửa gỗ dọc nông thôn) */}
+      {[-34, -17, 0, 17, 34].map((bx) => (
+        <g key={`window-bar-${bx}`}>
+          <line x1={bx} y1="-256" x2={bx} y2="-124" stroke="#0B0B0E" strokeWidth="3" />
+          <line x1={bx - 0.7} y1="-256" x2={bx - 0.7} y2="-124" stroke="#1E1E26" strokeWidth="0.8" />
+        </g>
+      ))}
+
+      {/* 4. Rustic Wooden Window Shutter Panels (Hai cánh cửa ván khép hờ chừa khe dọc ở giữa) */}
+      {/* Left Shutter Leaf (Cánh ván bên trái) */}
+      <g>
+        <polygon points="-53,-255 -8,-255 -11,-125 -53,-125" fill="#0A0A0C" stroke="#1C1C24" strokeWidth="1.2" />
+        {/* Vertical plank joints */}
+        <line x1="-38" y1="-255" x2="-38" y2="-125" stroke="#181820" strokeWidth="1" />
+        <line x1="-24" y1="-255" x2="-24" y2="-125" stroke="#181820" strokeWidth="1" />
+        {/* Diagonal Z-brace structural batten */}
+        <line x1="-50" y1="-245" x2="-14" y2="-135" stroke="#16161D" strokeWidth="2.6" />
+        {/* Shutter inner rim moonlight edge highlight */}
+        <line x1="-8" y1="-255" x2="-11" y2="-125" stroke="#334155" strokeWidth="1.2" />
+      </g>
+
+      {/* Right Shutter Leaf (Cánh ván bên phải, khép chừa khe hở 16px ở giữa) */}
+      <g>
+        <polygon points="8,-255 53,-255 53,-125 11,-125" fill="#0A0A0C" stroke="#1C1C24" strokeWidth="1.2" />
+        {/* Vertical plank joints */}
+        <line x1="24" y1="-255" x2="24" y2="-125" stroke="#181820" strokeWidth="1" />
+        <line x1="38" y1="-255" x2="38" y2="-125" stroke="#181820" strokeWidth="1" />
+        {/* Diagonal Z-brace structural batten */}
+        <line x1="50" y1="-245" x2="14" y2="-135" stroke="#16161D" strokeWidth="2.6" />
+        {/* Shutter inner rim moonlight edge highlight */}
+        <line x1="8" y1="-255" x2="11" y2="-125" stroke="#334155" strokeWidth="1.2" />
+      </g>
+
+      {/* 5. Center Vertical Slit Moonlight Ray (Khe dọc hắt ánh sương lạnh & bóng ma lấp ló) */}
+      <g>
+        <rect x="-7" y="-255" width="14" height="130" fill="#64748B" opacity="0.32" />
+        <rect x="-3" y="-255" width="6" height="130" fill="#94A3B8" opacity="0.25" />
+      </g>
+
+      {/* 6. Heavy Exterior Framing (Khung xà dầm gỗ bao quanh) */}
+      {/* Top Lintel Beam (Xà ngang trên) */}
+      <rect x="-75" y="-268" width="150" height="12" rx="2" fill="#0E0E12" stroke="#27272A" strokeWidth="1" />
+      <line x1="-73" y1="-267" x2="73" y2="-267" stroke="#3F3F46" strokeWidth="1" />
+      {/* Bottom Window Sill (Bậu cửa sổ dày dặn bắt sáng) */}
+      <rect x="-76" y="-124" width="152" height="14" rx="2" fill="#0E0E12" stroke="#27272A" strokeWidth="1.2" />
+      <line x1="-74" y1="-123" x2="74" y2="-123" stroke="#3F3F46" strokeWidth="1.2" />
+      {/* Left & Right Jambs */}
+      <rect x="-65" y="-260" width="12" height="140" fill="#0A0A0C" stroke="#1F1F24" strokeWidth="0.8" />
+      <rect x="53" y="-260" width="12" height="140" fill="#0A0A0C" stroke="#1F1F24" strokeWidth="0.8" />
+
+      {/* 7. Window Latch Bar / Wooden Lock Prop (Then gỗ cài ngang) */}
+      <line x1="-42" y1="-185" x2="42" y2="-185" stroke="#060608" strokeWidth="4" />
+      <rect x="-8" y="-190" width="16" height="10" rx="1" fill="#141419" stroke="#27272A" strokeWidth="0.8" />
+
+      {/* 8. Soft Cold Mist hovering just under sill */}
+      <ellipse cx="0" cy="-118" rx="38" ry="6" fill="#64748B" opacity="0.18" pointerEvents="none" />
     </g>
   );
 };
