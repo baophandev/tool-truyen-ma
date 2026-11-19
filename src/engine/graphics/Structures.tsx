@@ -37,6 +37,8 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "abandoned_subway_station" && <AbandonedSubwayStation />}
       {id === "rusty_train_tracks_tunnel" && <RustyTrainTracksTunnel />}
       {id === "structure_old_apartment_gate" && <OldApartmentGate />}
+      {id === "structure_wooden_sampan" && <WoodenSampan />}
+      {id === "structure_monkey_bridge" && <MonkeyBridge />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -2045,6 +2047,446 @@ const OldApartmentGate: React.FC = () => {
         <ellipse cx="-15" cy="-2" rx="4" ry="1.5" fill="#3B1C0B" transform="rotate(-15 -15 -2)" />
         <ellipse cx="25" cy="-3" rx="5" ry="1.8" fill="#2E1005" transform="rotate(20 25 -3)" />
         <ellipse cx="70" cy="-2" rx="4" ry="1.4" fill="#3B1C0B" transform="rotate(-30 70 -2)" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 20. MEKONG DELTA WOODEN SAMPAN (Xuồng ba lá / Ghe nước miền Tây)
+ * Ground / Waterline anchor: [0, 0] at bottom-center (Y=800px)
+ * Semantic Role: Ký ức về người mẹ Hai Lụa bơi xuồng hái bông súng, bông điên điển trên con kênh nước nổi.
+ */
+const WoodenSampan: React.FC = () => {
+  return (
+    <g className="structure-wooden-sampan">
+      {/* 1. Dark Haunted Canal Water Surface & Ripples along Ground Y = 0 */}
+      <g className="canal-water-base">
+        <ellipse cx="0" cy="2" rx="228" ry="14" fill="#061017" opacity="0.88" />
+        <ellipse cx="0" cy="0" rx="200" ry="9" fill="#0A1B24" opacity="0.82" />
+        {/* Moonlit eerie water ripple streaks */}
+        <path d="M -215 2 Q -140 -3 -70 2 Q 0 7 80 1 Q 150 -4 218 2" fill="none" stroke="#1E3A4C" strokeWidth="2" opacity="0.7" />
+        <path d="M -185 8 Q -100 4 -20 9 Q 70 13 175 7" fill="none" stroke="#334155" strokeWidth="1.3" opacity="0.55" />
+        <path d="M -150 -5 Q -60 -9 35 -5 Q 110 -2 175 -6" fill="none" stroke="#164E63" strokeWidth="1.2" opacity="0.5" />
+        {/* Dark hull water reflection */}
+        <path
+          d="M -155 1 C -110 12, 110 12, 155 1 Z"
+          fill="#02060A"
+          opacity="0.72"
+        />
+      </g>
+
+      {/* 2. Wooden Mooring Bamboo Stake on Left Bank (Cọc tre cắm mé kênh buộc dây mũi xuồng) */}
+      <g transform="translate(-195, 0)">
+        <path d="M -6 2 L -4 -108 L 4 -108 L 6 2 Z" fill="#18120D" stroke="#292018" strokeWidth="1.2" />
+        <line x1="-5" y1="-34" x2="5" y2="-34" stroke="#3F2E21" strokeWidth="2" />
+        <line x1="-4.5" y1="-70" x2="4.5" y2="-70" stroke="#3F2E21" strokeWidth="2" />
+        {/* Mooring rope tied from stake to upturned sampan bow */}
+        <path
+          d="M 3 -64 Q 16 -46 30 -52"
+          fill="none"
+          stroke="#785332"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+        <ellipse cx="0" cy="-64" rx="6" ry="2.5" fill="none" stroke="#785332" strokeWidth="2" />
+      </g>
+
+      {/* 3. Tall Canal Reeds & Wild Water Grass behind stern/bow (Lau sậy & cỏ lác mé kênh) */}
+      <g className="canal-reeds" opacity="0.88">
+        <path d="M -180 0 Q -195 -45 -212 -85" fill="none" stroke="#0C1712" strokeWidth="3" />
+        <path d="M -172 0 Q -180 -55 -170 -102" fill="none" stroke="#112119" strokeWidth="2.6" />
+        <path d="M 182 0 Q 198 -48 214 -92" fill="none" stroke="#0C1712" strokeWidth="3" />
+        <path d="M 172 0 Q 186 -60 180 -108" fill="none" stroke="#112119" strokeWidth="2.5" />
+        {/* Reed cattail tufts */}
+        <ellipse cx="-170" cy="-98" rx="3" ry="10" fill="#1C1917" />
+        <ellipse cx="180" cy="-104" rx="3" ry="10" fill="#1C1917" />
+      </g>
+
+      {/* 4. Main Wooden Sampan Hull (Thân xuồng ba lá gỗ miền Tây, nhẹ nhàng dập dềnh) */}
+      <g className="sampan-hull anim-sway-subtle">
+        {/* Interior Hollow Back Wall & Wooden Thwarts (Khoang trong & ván ngồi ngang) */}
+        <path
+          d="M -165 -54 C -130 -44, 130 -44, 165 -54 L 145 -28 L -145 -28 Z"
+          fill="#0C0907"
+          stroke="#261C15"
+          strokeWidth="1.2"
+        />
+        {/* Wooden Cross-Benches (Băng ngồi xuồng) */}
+        <rect x="-112" y="-48" width="24" height="6" rx="1" fill="#2A1E15" stroke="#140E0A" strokeWidth="1" />
+        <rect x="-14" y="-46" width="28" height="6" rx="1" fill="#2A1E15" stroke="#140E0A" strokeWidth="1" />
+        <rect x="88" y="-48" width="24" height="6" rx="1" fill="#2A1E15" stroke="#140E0A" strokeWidth="1" />
+
+        {/* Harvested Bông Súng (Water Lilies) & Bông Điên Điển piled inside the sampan */}
+        <g className="harvested-flowers">
+          {/* Bông súng stalks & crimson-pink/pale buds on left-center */}
+          <path d="M -92 -42 Q -70 -64 -48 -56" fill="none" stroke="#1E3A24" strokeWidth="2.4" />
+          <path d="M -86 -40 Q -62 -72 -35 -60" fill="none" stroke="#2D4F33" strokeWidth="2.2" />
+          <path d="M -78 -38 Q -52 -68 -24 -52" fill="none" stroke="#1E3A24" strokeWidth="2" />
+          {/* Water lily blossoms (Bông súng tím hồng / đỏ trầm ma mị) */}
+          <g transform="translate(-48, -58) rotate(18)">
+            <path d="M 0 0 C -5 -8, -2 -15, 0 -18 C 2 -15, 5 -8, 0 0 Z" fill="#BE123C" stroke="#4C0519" strokeWidth="0.8" />
+            <path d="M 0 0 C -8 -5, -7 -12, -3 -15 C -2 -10, -1 -4, 0 0 Z" fill="#9F1239" />
+            <path d="M 0 0 C 8 -5, 7 -12, 3 -15 C 2 -10, 1 -4, 0 0 Z" fill="#E11D48" opacity="0.85" />
+          </g>
+          <g transform="translate(-34, -62) rotate(-14)">
+            <path d="M 0 0 C -4 -7, -2 -13, 0 -16 C 2 -13, 4 -7, 0 0 Z" fill="#E2E8F0" stroke="#475569" strokeWidth="0.7" opacity="0.9" />
+            <path d="M 0 0 C -7 -4, -6 -10, -2 -13 C -1 -8, 0 -3, 0 0 Z" fill="#BE123C" opacity="0.8" />
+          </g>
+          <g transform="translate(-62, -55) rotate(-32)">
+            <path d="M 0 0 C -4 -7, -1 -12, 0 -14 C 1 -12, 4 -7, 0 0 Z" fill="#9F1239" />
+          </g>
+
+          {/* Bông điên điển (Golden-yellow Mekong sesbania blossom clusters) piled in woven basket / mid-hull */}
+          <g transform="translate(26, -45)">
+            {/* Shallow bamboo basket rim */}
+            <path d="M -26 6 Q 0 14 26 6 L 22 -4 Q 0 2 -22 -4 Z" fill="#4A321F" stroke="#1C120A" strokeWidth="1.2" />
+            {/* Clusters of golden-yellow bông điên điển */}
+            <g fill="#CA8A04" stroke="#713F12" strokeWidth="0.6">
+              <circle cx="-14" cy="-6" r="4.5" />
+              <circle cx="-7" cy="-10" r="5" fill="#EAB308" />
+              <circle cx="2" cy="-12" r="5.2" fill="#FACC15" />
+              <circle cx="11" cy="-9" r="4.8" fill="#EAB308" />
+              <circle cx="17" cy="-5" r="4" />
+              <circle cx="-2" cy="-6" r="4.2" fill="#FDE047" />
+              <circle cx="8" cy="-5" r="4" fill="#CA8A04" />
+            </g>
+            {/* Delicate dark green sesbania leaves */}
+            <path d="M -20 -4 Q -28 -12 -32 -10" fill="none" stroke="#1E3A1E" strokeWidth="2" />
+            <path d="M 20 -4 Q 28 -13 33 -10" fill="none" stroke="#1E3A1E" strokeWidth="2" />
+          </g>
+        </g>
+
+        {/* Outer Curved 3-Plank Wooden Hull (Mạn xuồng ba lá mũi nhọn cong vút) */}
+        <path
+          d="M -182 -60 C -152 -24, -124 -4, -95 0 L 95 0 C 124 -4, 152 -24, 182 -60 C 145 -44, 100 -38, 0 -38 C -100 -38, -145 -44, -182 -60 Z"
+          fill="#15100D"
+          stroke="#2E221A"
+          strokeWidth="1.8"
+        />
+        {/* Upper gunwale highlight plank */}
+        <path
+          d="M -182 -60 C -145 -44, -100 -38, 0 -38 C 100 -38, 145 -44, 182 -60 L 175 -51 C 140 -36, 98 -31, 0 -31 C -98 -31, -140 -36, -175 -51 Z"
+          fill="#261C15"
+        />
+        {/* Characteristic Three-Plank Horizontal Seam Lines (Đường ghép 3 lá ván) */}
+        <path
+          d="M -166 -43 C -128 -28, -90 -22, 0 -22 C 90 -22, 128 -28, 166 -43"
+          fill="none"
+          stroke="#3D2D22"
+          strokeWidth="1.4"
+          opacity="0.85"
+        />
+        <path
+          d="M -140 -24 C -105 -13, -70 -10, 0 -10 C 70 -10, 105 -13, 140 -24"
+          fill="none"
+          stroke="#0A0705"
+          strokeWidth="1.6"
+        />
+        {/* Vertical wooden rib bolts / weathered plank joints */}
+        {[-105, -55, 0, 55, 105].map((rx) => (
+          <line key={rx} x1={rx} y1="-37" x2={rx * 0.88} y2="-3" stroke="#0B0806" strokeWidth="1.2" opacity="0.7" />
+        ))}
+        {/* Pointed Bow & Stern End-Caps (Mũi xuồng & lái xuồng) */}
+        <polygon points="-182,-60 -190,-65 -174,-52" fill="#3B2B1F" />
+        <polygon points="182,-60 190,-65 174,-52" fill="#3B2B1F" />
+
+        {/* Wooden Oar / Paddle (Mái dầm / Cây chèo gác xiên qua mạn xuồng) */}
+        <g className="sampan-oar">
+          <line x1="65" y1="-64" x2="148" y2="-10" stroke="#3D2B1F" strokeWidth="4.2" strokeLinecap="round" />
+          <line x1="65" y1="-64" x2="148" y2="-10" stroke="#5C4026" strokeWidth="1.4" strokeLinecap="round" opacity="0.7" />
+          {/* Flat paddle blade dipping into canal water */}
+          <path
+            d="M 142 -15 L 176 4 C 180 7, 174 14, 166 11 L 136 -8 Z"
+            fill="#261A12"
+            stroke="#4A3525"
+            strokeWidth="1.1"
+          />
+          {/* Tiny water splash ring around paddle blade */}
+          <ellipse cx="164" cy="7" rx="18" ry="3.5" fill="none" stroke="#38BDF8" strokeWidth="1" opacity="0.35" />
+        </g>
+      </g>
+
+      {/* 5. Floating Lily Pads & Wild Water Lily on Foreground Canal Water */}
+      <g className="canal-lily-pads">
+        <ellipse cx="-115" cy="7" rx="16" ry="4" fill="#14291A" stroke="#09150C" strokeWidth="1" />
+        <ellipse cx="105" cy="9" rx="18" ry="4.5" fill="#14291A" stroke="#09150C" strokeWidth="1" />
+        <ellipse cx="128" cy="4" rx="11" ry="3" fill="#1A3321" />
+        {/* Single eerie wild water lily blooming on the water */}
+        <g transform="translate(-115, 5)">
+          <path d="M 0 0 C -3 -6, -1 -10, 0 -12 C 1 -10, 3 -6, 0 0 Z" fill="#E11D48" opacity="0.85" />
+          <path d="M 0 0 C -6 -3, -5 -7, -2 -9 Z" fill="#9F1239" />
+          <path d="M 0 0 C 6 -3, 5 -7, 2 -9 Z" fill="#9F1239" />
+        </g>
+      </g>
+
+      {/* 6. Faint Drifting River Mist over Sampan */}
+      <g opacity="0.38" className="anim-smoke-rise" pointerEvents="none">
+        <ellipse cx="-55" cy="-16" rx="52" ry="8" fill="#CBD5E1" opacity="0.22" />
+        <ellipse cx="60" cy="-12" rx="58" ry="9" fill="#CBD5E1" opacity="0.18" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 21. MEKONG DELTA BAMBOO MONKEY BRIDGE (Cầu khỉ miền Tây)
+ * Ground / Canal anchor: [0, 0] at bottom-center (Y=800px)
+ * Semantic Role: Cây cầu khỉ tre chênh vênh đặc trưng sông nước Nam Bộ bắc qua con kênh tối giữa bụi dừa nước và lục bình.
+ */
+const MonkeyBridge: React.FC = () => {
+  const xStilts = [
+    { x: -150, crossY: -66, topY: -144, leftFoot: -176, rightFoot: -124 },
+    { x: -55, crossY: -108, topY: -188, leftFoot: -82, rightFoot: -28 },
+    { x: 55, crossY: -108, topY: -188, leftFoot: 28, rightFoot: 82 },
+    { x: 150, crossY: -66, topY: -144, leftFoot: 124, rightFoot: 176 },
+  ];
+
+  return (
+    <g className="structure-monkey-bridge">
+      {/* 1. Dark Haunted Canal Water Surface & Muddy Banks along Y = 0 */}
+      <g className="monkey-bridge-canal">
+        {/* Canal water bed */}
+        <ellipse cx="0" cy="1" rx="235" ry="13" fill="#061017" opacity="0.9" />
+        <ellipse cx="0" cy="0" rx="185" ry="8" fill="#0A1B24" opacity="0.85" />
+        {/* Moonlit eerie ripples under bridge arch */}
+        <path d="M -165 2 Q -95 -3 -25 2 Q 45 7 155 1" fill="none" stroke="#1E3A4C" strokeWidth="1.8" opacity="0.7" />
+        <path d="M -135 8 Q -55 4 20 9 Q 95 12 145 7" fill="none" stroke="#334155" strokeWidth="1.2" opacity="0.55" />
+        <path d="M -110 -4 Q -30 -8 45 -4 Q 100 -1 135 -5" fill="none" stroke="#164E63" strokeWidth="1.1" opacity="0.5" />
+
+        {/* Left & Right Muddy Canal Banks (Bờ đất sình hai đầu cầu) */}
+        <path
+          d="M -245 4 C -225 -18, -195 -24, -158 -12 C -144 -7, -138 0, -135 4 Z"
+          fill={COLOR_PALETTE.silhouette_primary}
+        />
+        <path
+          d="M 245 4 C 225 -18, 195 -24, 158 -12 C 144 -7, 138 0, 135 4 Z"
+          fill={COLOR_PALETTE.silhouette_primary}
+        />
+      </g>
+
+      {/* 2. Silhouetted Nipa Palm Fronds & Canal Reeds at Both Banks (Bụi dừa nước & lau sậy mé kênh) */}
+      <g className="canal-nipa-palms" opacity="0.92">
+        {/* Left nipa palm fronds */}
+        <path d="M -218 -10 Q -238 -58 -252 -96" fill="none" stroke="#0B1510" strokeWidth="3.5" strokeLinecap="round" />
+        <path d="M -214 -12 Q -218 -64 -202 -106" fill="none" stroke="#112119" strokeWidth="3" strokeLinecap="round" />
+        <path d="M -210 -10 Q -194 -52 -176 -84" fill="none" stroke="#0D1912" strokeWidth="2.4" strokeLinecap="round" />
+        {/* Frond leaflets on left */}
+        <path d="M -234 -48 L -246 -56 M -242 -70 L -256 -76 M -214 -56 L -226 -64 M -210 -78 L -196 -86" stroke="#0F1F16" strokeWidth="2" />
+
+        {/* Right nipa palm fronds */}
+        <path d="M 218 -10 Q 238 -58 252 -96" fill="none" stroke="#0B1510" strokeWidth="3.5" strokeLinecap="round" />
+        <path d="M 214 -12 Q 218 -64 202 -106" fill="none" stroke="#112119" strokeWidth="3" strokeLinecap="round" />
+        <path d="M 210 -10 Q 194 -52 176 -84" fill="none" stroke="#0D1912" strokeWidth="2.4" strokeLinecap="round" />
+        {/* Frond leaflets on right */}
+        <path d="M 234 -48 L 246 -56 M 242 -70 L 256 -76 M 214 -56 L 226 -64 M 210 -78 L 196 -86" stroke="#0F1F16" strokeWidth="2" />
+      </g>
+
+      {/* 3. Back Handrail Upright Bamboo Posts & Curved Single-Side Bamboo Handrail (Tay vịn tre một bên) */}
+      <g className="monkey-bridge-handrail">
+        {/* Upright bamboo handrail posts anchored down into the canal bed */}
+        <line x1="-208" y1="-12" x2="-208" y2="-98" stroke="#1B1610" strokeWidth="4.2" strokeLinecap="round" />
+        <line x1="208" y1="-12" x2="208" y2="-98" stroke="#1B1610" strokeWidth="4.2" strokeLinecap="round" />
+
+        {xStilts.map((st, idx) => (
+          <g key={`post-${idx}`}>
+            {/* Tall upright rear bamboo handrail post */}
+            <line
+              x1={st.x}
+              y1="2"
+              x2={st.x}
+              y2={st.topY - 8}
+              stroke="#1C1711"
+              strokeWidth="4.6"
+              strokeLinecap="round"
+            />
+            <line
+              x1={st.x}
+              y1="2"
+              x2={st.x}
+              y2={st.topY - 8}
+              stroke="#3B2E20"
+              strokeWidth="1.4"
+              opacity="0.7"
+            />
+            {/* Bamboo node joints on upright post */}
+            <line x1={st.x - 3} y1={st.crossY - 26} x2={st.x + 3} y2={st.crossY - 26} stroke="#5C442B" strokeWidth="1.5" />
+            <line x1={st.x - 3} y1={st.topY + 12} x2={st.x + 3} y2={st.topY + 12} stroke="#5C442B" strokeWidth="1.5" />
+          </g>
+        ))}
+
+        {/* Curved slender bamboo handrail pole (Tay vịn tre uốn cong chênh vênh) */}
+        <path
+          d="M -216 -92 C -152 -148, -68 -190, 0 -195 C 68 -190, 152 -148, 216 -92"
+          fill="none"
+          stroke="#1D1710"
+          strokeWidth="6.2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M -216 -92 C -152 -148, -68 -190, 0 -195 C 68 -190, 152 -148, 216 -92"
+          fill="none"
+          stroke="#4A3928"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          opacity="0.85"
+        />
+
+        {/* Rattan lashing knots binding handrail to upright posts */}
+        {xStilts.map((st, idx) => (
+          <g key={`rail-knot-${idx}`} transform={`translate(${st.x}, ${st.topY})`}>
+            <path d="M -4 -3 L 4 3 M -4 3 L 4 -3" stroke="#785332" strokeWidth="2.2" strokeLinecap="round" />
+          </g>
+        ))}
+        {/* Weathered fluttering cloth tie / dried leaf tuft on center handrail post */}
+        <g transform="translate(-55, -186)" className="anim-sway-subtle">
+          <path d="M 0 0 Q -6 12 -3 24 Q 2 14 3 0 Z" fill="#7F1D1D" opacity="0.78" />
+        </g>
+      </g>
+
+      {/* 4. Iconic Crossed Bamboo X-Stilts (Chân cầu tre cắm chữ X chéo) */}
+      <g className="monkey-bridge-x-stilts">
+        {xStilts.map((st, idx) => (
+          <g key={`stilt-${idx}`}>
+            {/* Subtle dark water reflection below waterline */}
+            <line x1={st.leftFoot} y1="0" x2={st.leftFoot - 4} y2="10" stroke="#04090D" strokeWidth="4" opacity="0.65" />
+            <line x1={st.rightFoot} y1="0" x2={st.rightFoot + 4} y2="10" stroke="#04090D" strokeWidth="4" opacity="0.65" />
+
+            {/* Diagonal bamboo leg 1 (bottom-left to upper-right) */}
+            <line
+              x1={st.leftFoot}
+              y1="2"
+              x2={st.x + 14}
+              y2={st.crossY - 14}
+              stroke="#14110D"
+              strokeWidth="5.8"
+              strokeLinecap="round"
+            />
+            <line
+              x1={st.leftFoot}
+              y1="2"
+              x2={st.x + 14}
+              y2={st.crossY - 14}
+              stroke="#382B1E"
+              strokeWidth="1.6"
+              opacity="0.75"
+            />
+
+            {/* Diagonal bamboo leg 2 (bottom-right to upper-left) */}
+            <line
+              x1={st.rightFoot}
+              y1="2"
+              x2={st.x - 14}
+              y2={st.crossY - 14}
+              stroke="#1A1510"
+              strokeWidth="5.8"
+              strokeLinecap="round"
+            />
+            <line
+              x1={st.rightFoot}
+              y1="2"
+              x2={st.x - 14}
+              y2={st.crossY - 14}
+              stroke="#463626"
+              strokeWidth="1.6"
+              opacity="0.78"
+            />
+
+            {/* Horizontal underwater/low cross brace for realism */}
+            <line
+              x1={st.leftFoot + 8}
+              y1={st.crossY * 0.35}
+              x2={st.rightFoot - 8}
+              y2={st.crossY * 0.35}
+              stroke="#241B13"
+              strokeWidth="2.8"
+            />
+
+            {/* Rattan rope lashing at X intersection (Dây lạt buộc chéo chân cầu) */}
+            <g transform={`translate(${st.x}, ${st.crossY})`}>
+              <ellipse cx="0" cy="0" rx="6.5" ry="5" fill="#4A321F" stroke="#1C120A" strokeWidth="1" />
+              <path d="M -5 -4 L 5 4 M -5 4 L 5 -4" stroke="#8C6239" strokeWidth="1.8" strokeLinecap="round" />
+            </g>
+          </g>
+        ))}
+      </g>
+
+      {/* 5. Slender Arched Bamboo Walkway Beams (Thân cầu tre / cau ghép đôi uốn cong qua kênh) */}
+      <g className="monkey-bridge-walkway">
+        {/* Lower shadow bamboo trunk */}
+        <path
+          d="M -230 -14 C -152 -74, -68 -108, 0 -112 C 68 -108, 152 -74, 230 -14"
+          fill="none"
+          stroke="#120E0A"
+          strokeWidth="10"
+          strokeLinecap="round"
+        />
+        {/* Upper main bamboo / areca walkway trunk */}
+        <path
+          d="M -232 -18 C -154 -80, -68 -114, 0 -118 C 68 -114, 154 -80, 232 -18"
+          fill="none"
+          stroke="#2E2318"
+          strokeWidth="8.5"
+          strokeLinecap="round"
+        />
+        {/* Weathered bamboo top edge highlight */}
+        <path
+          d="M -230 -20 C -152 -82, -68 -116, 0 -120 C 68 -116, 152 -82, 230 -20"
+          fill="none"
+          stroke="#5C452F"
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity="0.85"
+        />
+
+        {/* Bamboo ring nodes & rattan bindings along the walkway arch */}
+        {[
+          { x: -185, y: -50, rot: -32 },
+          { x: -120, y: -88, rot: -24 },
+          { x: -55, y: -112, rot: -12 },
+          { x: 0, y: -118, rot: 0 },
+          { x: 55, y: -112, rot: 12 },
+          { x: 120, y: -88, rot: 24 },
+          { x: 185, y: -50, rot: 32 },
+        ].map((node, idx) => (
+          <line
+            key={`node-${idx}`}
+            x1={node.x}
+            y1={node.y - 5}
+            x2={node.x}
+            y2={node.y + 5}
+            stroke="#785332"
+            strokeWidth="2"
+            transform={`rotate(${node.rot}, ${node.x}, ${node.y})`}
+          />
+        ))}
+
+        {/* Small wooden ramp cleats at both ends */}
+        <rect x="-228" y="-20" width="16" height="5" rx="1" fill="#2A1E14" transform="rotate(-28, -220, -18)" />
+        <rect x="212" y="-20" width="16" height="5" rx="1" fill="#2A1E14" transform="rotate(28, 220, -18)" />
+      </g>
+
+      {/* 6. Floating Water Hyacinth Clusters (Bèo lục bình trôi lững lờ dưới chân cầu) */}
+      <g className="canal-water-hyacinth">
+        <g transform="translate(-85, 5)">
+          <ellipse cx="0" cy="0" rx="16" ry="4" fill="#132919" stroke="#08140B" strokeWidth="0.9" />
+          <ellipse cx="-8" cy="-3" rx="6" ry="3.5" fill="#1D3D24" />
+          <ellipse cx="6" cy="-2.5" rx="7" ry="3" fill="#1A3620" />
+          {/* Tiny muted purple hyacinth blossom */}
+          <ellipse cx="0" cy="-7" rx="2.4" ry="4" fill="#7E22CE" opacity="0.75" />
+        </g>
+        <g transform="translate(75, 6)">
+          <ellipse cx="0" cy="0" rx="18" ry="4.5" fill="#132919" stroke="#08140B" strokeWidth="0.9" />
+          <ellipse cx="-6" cy="-3" rx="7" ry="3.5" fill="#1D3D24" />
+          <ellipse cx="8" cy="-2" rx="6" ry="3" fill="#1A3620" />
+          <ellipse cx="-4" cy="-7.5" rx="2.2" ry="3.8" fill="#9333EA" opacity="0.7" />
+        </g>
+      </g>
+
+      {/* 7. Eerie Drifting Canal Mist under Bridge */}
+      <g opacity="0.36" className="anim-smoke-rise" pointerEvents="none">
+        <ellipse cx="-45" cy="-18" rx="62" ry="9" fill="#CBD5E1" opacity="0.2" />
+        <ellipse cx="55" cy="-14" rx="58" ry="8" fill="#CBD5E1" opacity="0.18" />
       </g>
     </g>
   );

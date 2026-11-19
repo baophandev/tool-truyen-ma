@@ -24,6 +24,9 @@ export const HELD_ITEM_CATALOG: HeldItemMeta[] = [
   { id: "item_smartphone", name: "Điện thoại di động phát sáng", desc: "Màn hình smartphone xanh lạnh ma mị soi tỏ bóng đêm" },
   { id: "item_severed_head", name: "Thủ cấp đứt lìa vương máu", desc: "Đầu người bị chém đứt túm tóc xách tay, mắt trợn trừng, máu rỉ giọt" },
   { id: "item_mysterious_note", name: "Mẩu giấy bí ẩn vương máu", desc: "Mẩu giấy / lá thư cũ nát viết thông điệp rùng rợn trên tay" },
+  { id: "item_offering_toys", name: "Nải chuối & đồ chơi đất nung cúng cô hồn", desc: "Mẹt lá chuối đựng nải chuối cùng bộ đồ chơi đất nung nhỏ và nén hương cúng cô hồn" },
+  { id: "item_areca_palm_fan", name: "Quạt mo cau", desc: "Chiếc quạt mo cau quê nhà khô sạm, phe phẩy trong đêm hè oi bức" },
+  { id: "item_fresh_ginger", name: "Lát gừng tươi", desc: "Lát gừng vàng tươi tỏa hơi ấm giữ khí chống lại tà khí ban đêm" },
 ];
 
 interface HandheldItemRendererProps {
@@ -489,6 +492,180 @@ function renderHeldItemSvg(itemId: Exclude<HeldItemId, "none">) {
           {/* Dripping blood drop from corner of note */}
           <path d="M 6 31 Q 6 37 6 39" stroke="#DC2626" strokeWidth="1" strokeLinecap="round" />
           <circle cx="6" cy="39" r="1.2" fill="#DC2626" className="anim-pulse-eerie" />
+        </g>
+      );
+
+    case "item_offering_toys":
+      return (
+        <g className="held-offering-toys">
+          {/* Faint spiritual eerie mist aura around offering tray */}
+          <ellipse cx="14" cy="-12" rx="34" ry="24" fill="url(#candle-eerie-glow)" opacity="0.32" pointerEvents="none" />
+
+          {/* Woven bamboo tray (Mẹt tre) held in palm at [0, 0] */}
+          <ellipse cx="14" cy="1" rx="26" ry="7" fill="#5C4026" stroke="#1C140C" strokeWidth="1.4" />
+          <ellipse cx="14" cy="0" rx="23" ry="5.5" fill="#785332" stroke="#3F2A17" strokeWidth="0.9" />
+          {/* Dark banana leaf lining (Tàu lá chuối) */}
+          <path
+            d="M -10 -1 C -2 -6, 26 -7, 38 -1 C 28 5, 0 5, -10 -1 Z"
+            fill="#1E3A1E"
+            stroke="#0F1F0F"
+            strokeWidth="1"
+          />
+          <line x1="-8" y1="-1" x2="36" y2="-1" stroke="#365314" strokeWidth="0.8" opacity="0.7" />
+
+          {/* Hand of bananas (Nải chuối cúng cô hồn) on left/center of tray */}
+          <g transform="translate(2, -4)">
+            {/* Dark curved stem crown */}
+            <path d="M -8 -10 Q -2 -14 5 -11 L 4 -7 Q -2 -9 -7 -6 Z" fill="#292524" stroke="#0C0A09" strokeWidth="0.9" />
+            {/* 4 distinct curved bananas */}
+            <path
+              d="M -8 -8 C -15 -3, -14 3, -7 4 C -9 0, -9 -4, -5 -7 Z"
+              fill="#A16207"
+              stroke="#422006"
+              strokeWidth="0.9"
+            />
+            <path
+              d="M -5 -9 C -10 -2, -8 4, -1 5 C -4 0, -4 -5, -1 -8 Z"
+              fill="#CA8A04"
+              stroke="#422006"
+              strokeWidth="0.9"
+            />
+            <path
+              d="M -1 -9 C -4 -2, -1 4, 5 4 C 1 0, 1 -5, 2 -8 Z"
+              fill="#EAB308"
+              stroke="#713F12"
+              strokeWidth="0.9"
+            />
+            <path
+              d="M 2 -8 C 2 -2, 6 3, 11 2 C 7 -1, 5 -5, 5 -8 Z"
+              fill="#65A30D"
+              stroke="#365314"
+              strokeWidth="0.9"
+            />
+            {/* Dark banana tips */}
+            <circle cx="-7" cy="4" r="0.9" fill="#1C1917" />
+            <circle cx="-1" cy="5" r="0.9" fill="#1C1917" />
+            <circle cx="5" cy="4" r="0.9" fill="#1C1917" />
+            <circle cx="11" cy="2" r="0.9" fill="#1C1917" />
+          </g>
+
+          {/* Miniature terracotta clay toys (Bộ đồ chơi đất nung: nồi đất, chén nhỏ, con giống) */}
+          <g transform="translate(22, -3)">
+            {/* Tiny clay cooking pot (Nồi đất nung nhỏ) */}
+            <ellipse cx="-2" cy="0" rx="5.5" ry="4.5" fill="#9A3412" stroke="#431407" strokeWidth="1" />
+            <ellipse cx="-2" cy="-3.5" rx="4" ry="1.4" fill="#7C2D12" stroke="#431407" strokeWidth="0.8" />
+            {/* Tiny clay lid knob */}
+            <path d="M -5 -4 Q -2 -7.5 1 -4 Z" fill="#C2410C" stroke="#431407" strokeWidth="0.8" />
+            <circle cx="-2" cy="-6.5" r="1.1" fill="#EA580C" />
+
+            {/* Tiny clay bowl (Chén đất nhỏ) */}
+            <path d="M 5 1 Q 9 5 13 1 L 12 -1 L 6 -1 Z" fill="#B45309" stroke="#451A03" strokeWidth="0.9" />
+            <ellipse cx="9" cy="-1" rx="3.2" ry="1.1" fill="#78350F" />
+
+            {/* Tiny clay figurine / animal toy (Con giống đất nung nhỏ) */}
+            <g transform="translate(8, -6)">
+              <ellipse cx="0" cy="0" rx="3" ry="2.2" fill="#C2410C" stroke="#431407" strokeWidth="0.8" />
+              <circle cx="-2.2" cy="-2.2" r="1.7" fill="#EA580C" stroke="#431407" strokeWidth="0.7" />
+              <line x1="-1.5" y1="2" x2="-1.5" y2="4" stroke="#431407" strokeWidth="1" />
+              <line x1="1.5" y1="2" x2="1.5" y2="4" stroke="#431407" strokeWidth="1" />
+            </g>
+          </g>
+
+          {/* Tiny lit incense sticks stuck into offering (Nén nhang cúng cô hồn lập lòe) */}
+          <g transform="translate(13, -6)">
+            <line x1="0" y1="2" x2="-3" y2="-18" stroke="#78350F" strokeWidth="1.2" />
+            <line x1="2" y1="2" x2="2" y2="-20" stroke="#78350F" strokeWidth="1.2" />
+            {/* Glowing red embers */}
+            <circle cx="-3" cy="-18" r="1.5" fill="#DC2626" className="anim-flicker-ember" />
+            <circle cx="2" cy="-20" r="1.6" fill="#EF4444" className="anim-flicker-ember" />
+            {/* Rising faint spirit smoke */}
+            <path
+              d="M -3 -20 Q -7 -28 -2 -36 M 2 -22 Q 6 -31 1 -40"
+              fill="none"
+              stroke="#CBD5E1"
+              strokeWidth="1"
+              opacity="0.55"
+              className="anim-smoke-rise"
+            />
+          </g>
+        </g>
+      );
+
+    case "item_areca_palm_fan":
+      return (
+        <g className="held-areca-palm-fan anim-sway-subtle" transform="rotate(-24)">
+          {/* Tapered palm sheath handle gripped at palm socket [0, 0] */}
+          <path
+            d="M -3 12 L -4 -6 L 4 -6 L 3 12 C 2 15, -2 15, -3 12 Z"
+            fill="#5C3D24"
+            stroke="#1C1108"
+            strokeWidth="1.2"
+          />
+          {/* Bamboo twine binding around neck of fan */}
+          <line x1="-4.5" y1="-4" x2="4.5" y2="-4" stroke="#D4AF37" strokeWidth="1.6" />
+          <line x1="-4.5" y1="-1" x2="4.5" y2="-1" stroke="#92400E" strokeWidth="1.4" />
+
+          {/* Wide organic spade / teardrop dried areca palm sheath blade (Lá mo cau) */}
+          <path
+            d="M -4 -6 C -24 -12, -32 -32, -26 -50 C -20 -64, -8 -68, 0 -72 C 8 -68, 20 -64, 26 -50 C 32 -32, 24 -12, 4 -6 Z"
+            fill="#8C6239"
+            stroke="#2D1B0E"
+            strokeWidth="1.5"
+          />
+          {/* Inner lighter dried sheath surface */}
+          <path
+            d="M -2.5 -9 C -19 -14, -26 -31, -21 -47 C -16 -59, -6 -63, 0 -66 C 6 -63, 16 -59, 21 -47 C 26 -31, 19 -14, 2.5 -9 Z"
+            fill="#B8926A"
+            opacity="0.72"
+          />
+
+          {/* Natural fibrous vertical veins of areca palm sheath */}
+          <g stroke="#5C3D24" strokeWidth="1" opacity="0.65" fill="none">
+            <path d="M 0 -7 L 0 -68" strokeWidth="1.3" />
+            <path d="M -2 -8 C -10 -22, -12 -42, -9 -62" />
+            <path d="M 2 -8 C 10 -22, 12 -42, 9 -62" />
+            <path d="M -3 -8 C -17 -20, -20 -38, -17 -55" />
+            <path d="M 3 -8 C 17 -20, 20 -38, 17 -55" />
+          </g>
+
+          {/* Subtle weathered spots & worn rim edge */}
+          <ellipse cx="-10" cy="-38" rx="4" ry="7" fill="#5C3D24" opacity="0.28" transform="rotate(-12, -10, -38)" />
+          <ellipse cx="12" cy="-28" rx="3.5" ry="6" fill="#452C1A" opacity="0.25" transform="rotate(15, 12, -28)" />
+          <path d="M -24 -45 L -20 -43 L -25 -40" fill="none" stroke="#2D1B0E" strokeWidth="1.1" />
+        </g>
+      );
+
+    case "item_fresh_ginger":
+      return (
+        <g className="held-fresh-ginger">
+          {/* Warm protective aura ("giữ khí" chống tà khí ban đêm) */}
+          <circle cx="4" cy="-4" r="24" fill="url(#lantern-warm-glow)" opacity="0.42" pointerEvents="none" />
+
+          {/* Small gnarly fresh ginger root knob held between fingers at [0, 0] */}
+          <g transform="translate(2, -2) rotate(-18)">
+            {/* Back ginger rhizome lobe */}
+            <path
+              d="M -7 2 C -10 -4, -6 -10, 0 -9 C 4 -14, 11 -13, 12 -7 C 16 -4, 14 4, 8 6 C 3 8, -4 7, -7 2 Z"
+              fill="#A16207"
+              stroke="#422006"
+              strokeWidth="1.2"
+            />
+            {/* Earthy ginger skin rings */}
+            <path d="M -5 -2 Q 0 -4 5 -1" fill="none" stroke="#713F12" strokeWidth="0.9" opacity="0.8" />
+            <path d="M 1 -7 Q 6 -9 10 -6" fill="none" stroke="#713F12" strokeWidth="0.9" opacity="0.8" />
+
+            {/* Freshly cut bright golden-yellow ginger slice in foreground */}
+            <g transform="translate(6, -2) rotate(14)">
+              <ellipse cx="0" cy="0" rx="8.5" ry="6.5" fill="#92400E" stroke="#451A03" strokeWidth="1.1" />
+              <ellipse cx="0" cy="0" rx="7" ry="5.2" fill="#FACC15" />
+              <ellipse cx="-0.5" cy="-0.4" rx="5" ry="3.5" fill="#FEF08A" opacity="0.85" />
+              {/* Fibrous ginger ring & subtle speckles */}
+              <ellipse cx="0" cy="0" rx="3.4" ry="2.2" fill="none" stroke="#CA8A04" strokeWidth="0.7" strokeDasharray="2,1.5" />
+              <circle cx="-2.5" cy="1" r="0.6" fill="#A16207" />
+              <circle cx="2.8" cy="-1.2" r="0.6" fill="#A16207" />
+              <circle cx="1.2" cy="1.8" r="0.5" fill="#CA8A04" />
+            </g>
+          </g>
         </g>
       );
   }

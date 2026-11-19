@@ -878,6 +878,35 @@ const TorsoOutfit: React.FC<{
         </g>
       );
 
+    case "outfit_traditional_ba_ba":
+      return (
+        <g className="costume-traditional-ba-ba-torso">
+          {/* Classic Southern Vietnamese White Áo Bà Ba (Collarless round neck, softly waisted tunic) */}
+          <path
+            d="M -20 -188 C -19 -155, -16 -125, -18 -90 L 18 -90 C 16 -125, 19 -155, 20 -188 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="1.2"
+          />
+          {/* Collarless round neckline (Cổ tròn không bâu đặc trưng áo bà ba) */}
+          <path d="M -8 -188 Q 0 -177 8 -188 Z" fill={appearance.skinShadow} stroke={palette.trim} strokeWidth="1" />
+          {/* Raglan sleeve shoulder seams */}
+          <line x1="-8" y1="-186" x2="-19" y2="-165" stroke={palette.secondary} strokeWidth="1.3" />
+          <line x1="8" y1="-186" x2="19" y2="-165" stroke={palette.secondary} strokeWidth="1.3" />
+          {/* Center-front vertical button placket (Hàng nút dọc chính giữa) */}
+          <line x1="0" y1="-179" x2="0" y2="-90" stroke={palette.trim} strokeWidth="1.2" />
+          {[-170, -154, -138, -122, -106].map((by) => (
+            <circle key={by} cx="0" cy={by} r="1.7" fill={palette.accent} stroke={palette.secondary} strokeWidth="0.6" />
+          ))}
+          {/* Two signature front square patch pockets near waist */}
+          <rect x="-14" y="-114" width="9" height="10" rx="1.5" fill={palette.secondary} stroke={palette.trim} strokeWidth="0.9" />
+          <rect x="5" y="-114" width="9" height="10" rx="1.5" fill={palette.secondary} stroke={palette.trim} strokeWidth="0.9" />
+          {/* Soft eerie damp mist fold shadows */}
+          <path d="M -12 -162 Q -10 -138 -12 -118" fill="none" stroke={palette.secondary} strokeWidth="1.2" opacity="0.7" />
+          <path d="M 12 -162 Q 10 -138 12 -118" fill="none" stroke={palette.secondary} strokeWidth="1.2" opacity="0.7" />
+        </g>
+      );
+
     case "outfit_tattered_tunic":
     default:
       return (
@@ -1021,6 +1050,9 @@ const LowerBodyOutfit: React.FC<{
         )}
         {costume === "outfit_flowing_ao_dai" && (
           <path d="M -16 -90 C -22 -75, -28 -60, -26 -40 L -12 -40 C -10 -60, -8 -75, -6 -90 Z" fill={palette.primary} opacity="0.9" />
+        )}
+        {costume === "outfit_traditional_ba_ba" && (
+          <path d="M -18 -90 C -22 -78, -22 -68, -14 -64 L 6 -64 C 12 -68, 14 -78, 12 -90 Z" fill={palette.primary} stroke={appearance.outline} strokeWidth="0.9" />
         )}
       </g>
     );
@@ -1277,6 +1309,76 @@ const LowerBodyOutfit: React.FC<{
         <line x1="-19" y1="-2" x2="-5" y2="-2" stroke={palette.accent} strokeWidth="2" strokeLinecap="round" />
         <ellipse cx="12" cy="-5" rx="8" ry="4" fill={palette.secondary} />
         <line x1="5" y1="-2" x2="19" y2="-2" stroke={palette.accent} strokeWidth="2" strokeLinecap="round" />
+      </g>
+    );
+  }
+
+  // 10. Traditional Southern Vietnamese White Áo Bà Ba (Hip-length side-slit white hem over wide black silk trousers)
+  if (costume === "outfit_traditional_ba_ba") {
+    if (isSitting) {
+      return (
+        <g className="ba-ba-seated">
+          {/* Wide-leg black silk trousers (Quần lãnh Mỹ A đen) bent at knees */}
+          <path d="M -8 -90 L 32 -78 L 32 -64 L -8 -76 Z" fill={palette.pantsSecondary} />
+          <path d="M 20 -76 L 32 -78 L 33 0 L 20 0 Z" fill={palette.pantsSecondary} />
+          <path d="M -12 -88 L 38 -74 L 38 -56 L -12 -72 Z" fill={palette.pantsPrimary} stroke={appearance.outline} strokeWidth="0.9" />
+          <path d="M 24 -70 L 38 -72 L 39 0 L 24 0 Z" fill={palette.pantsPrimary} stroke={appearance.outline} strokeWidth="0.9" />
+          <ellipse cx="42" cy="-2" rx="8" ry="3.2" fill={appearance.skinShadow} />
+          {/* Hip-length white Áo Bà Ba rounded hem draping over lap */}
+          <path
+            d="M -18 -90 C -4 -86, 12 -82, 22 -74 C 24 -64, 16 -58, 6 -60 L -14 -66 C -18 -72, -18 -82, -18 -90 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          <line x1="-2" y1="-87" x2="10" y2="-61" stroke={palette.trim} strokeWidth="1.1" />
+        </g>
+      );
+    }
+    return (
+      <g className={isWalking ? "anim-skirt-walk" : isShivering ? "anim-leg-tremble" : ""}>
+        {/* Wide-leg flowing black silk trousers (Quần lụa đen ống rộng) */}
+        <path
+          d={
+            isWalking
+              ? "M -15 -90 L -26 -42 L -34 -3 L -18 -3 L -12 -44 L -3 -90 Z"
+              : "M -15 -90 L -20 -42 L -21 -3 L -5 -3 L -4 -44 L -2 -90 Z"
+          }
+          fill={palette.pantsPrimary}
+          stroke={appearance.outline}
+          strokeWidth="0.9"
+        />
+        <path
+          d={
+            isWalking
+              ? "M 3 -90 L 16 -42 L 28 -3 L 12 -3 L 6 -44 L -2 -90 Z"
+              : "M 2 -90 L 4 -44 L 5 -3 L 21 -3 L 20 -42 L 15 -90 Z"
+          }
+          fill={palette.pantsSecondary}
+          stroke={appearance.outline}
+          strokeWidth="0.9"
+        />
+        {/* Bare feet / simple traditional sandals peeking beneath wide black hems */}
+        <ellipse cx={isWalking ? "-26" : "-13"} cy="-2" rx="6.5" ry="2.8" fill={appearance.skinShadow} />
+        <ellipse cx={isWalking ? "20" : "13"} cy="-2" rx="6.5" ry="2.8" fill={appearance.skinShadow} />
+
+        {/* Hip-length white Áo Bà Ba rounded hem with center placket & side slits */}
+        <path
+          d="M -18 -90 L -21 -67 C -21 -61, -15 -58, -9 -58 L -1 -58 L -1 -90 Z"
+          fill={palette.primary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        <path
+          d="M 1 -90 L 1 -58 L 9 -58 C 15 -58, 21 -61, 21 -67 L 18 -90 Z"
+          fill={palette.primary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        {/* Side slit accent & subtle button */}
+        <line x1="0" y1="-90" x2="0" y2="-59" stroke={palette.trim} strokeWidth="1.2" />
+        <circle cx="0" cy="-78" r="1.6" fill={palette.accent} />
+        <circle cx="0" cy="-66" r="1.5" fill={palette.accent} />
       </g>
     );
   }
@@ -2210,6 +2312,19 @@ const CrawlingSideRig: React.FC<CrawlingSideRigProps> = ({
               opacity="0.9"
             />
             <polygon points="-85,0 -78,-5 -72,0 -66,-6 -60,0" fill={palette.secondary} />
+          </g>
+        )}
+
+        {costume === "outfit_traditional_ba_ba" && (
+          <g>
+            {/* Soft white hip-length Áo Bà Ba hem draping over arched back */}
+            <path
+              d="M 22 -44 C 4 -52, -22 -48, -44 -28 C -46 -22, -40 -18, -32 -20 L 16 -32 Z"
+              fill={palette.primary}
+              stroke={appearance.outline}
+              strokeWidth="0.9"
+            />
+            <rect x="-12" y="-44" width="8" height="8" rx="1.2" fill={palette.secondary} stroke={palette.trim} strokeWidth="0.8" />
           </g>
         )}
 

@@ -122,6 +122,16 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ALL_GROUND_SLOT_IDS,
     reason: "Cổng sắt chung cư cũ có thể đặt ở trung tâm hoặc các vị trí tiếp đất hai bên (far_left, mid_left, center, mid_right, far_right) làm điểm đến kết thúc hành trình, nơi nhân vật kiệt sức gục ngã hoặc lối vào rùng rợn của khu tập thể cổ quái.",
   },
+  structure_wooden_sampan: {
+    name: "Xuồng ba lá / Ghe nước miền Tây",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Xuồng ba lá gỗ miền Tây có thể đặt tại mọi vị trí mặt nước/bờ kênh trên trục Ground Y=800px (far_left, mid_left, center, mid_right, far_right) cho các cảnh sông nước, ký ức hái bông súng bông điên điển hoặc bến đò ma mị.",
+  },
+  structure_monkey_bridge: {
+    name: "Cầu khỉ miền Tây",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Cầu khỉ tre miền Tây có thể đặt tại mọi vị trí mặt đất/bờ kênh trên trục Ground Y=800px (far_left, mid_left, center, mid_right, far_right) để bắc ngang con kênh rạch u tối giữa bụi dừa nước và lau sậy.",
+  },
 };
 
 export interface DetailRule {

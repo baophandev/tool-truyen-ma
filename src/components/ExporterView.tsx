@@ -126,7 +126,7 @@ Hệ thống đồ họa 2D thuần code có các tài nguyên và tọa độ c
 - Khung hình: 1920x1080 (16:9), Ground Y = 800px.
 - Themes: "rural_graveyard" | "abandoned_village" | "cursed_swamp"
 - Sky presets: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss"
-- Structures: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree"
+- Structures: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "structure_wooden_sampan" | "structure_monkey_bridge"
 - Details (Props): "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman"
 - Ground Slots (Y=800): "far_left" (250), "mid_left" (600), "center" (960), "mid_right" (1320), "far_right" (1670)
 - Air Slots: "air_left" (400, 350), "air_center" (960, 280), "air_right" (1520, 350)
@@ -137,12 +137,12 @@ Hệ thống đồ họa 2D thuần code có các tài nguyên và tọa độ c
   * "detail_incense_bowl" -> mid_left | center | mid_right; "detail_skull_pile" -> 5 Ground Slots; "detail_hanging_talisman" -> 3 Air Slots; "detail_blood_lantern" -> Ground hoặc air_left | air_right
   * Nhân vật "pose_floating" | "pose_hanging" -> Air Slots; các tư thế khác -> Ground Slots (Y=800)
 - Actor Bases: "male_adult" | "female_adult" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow"
-- Actor Costumes: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas"
+- Actor Costumes: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual" | "outfit_traditional_ba_ba"
 - Actor Faces: "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless"
 - Actor Poses: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging" | "pose_holding"
 - Actor Facing: "left" | "right"
 - Actor Handheld Items (Gắn vào Hand Socket):
-  "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head"
+  "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger"
   "heldHand": "right" | "left" (mặc định "right")
 - Actor Motion (Tùy chọn di chuyển từ Điểm A -> Điểm B trong cảnh):
   "motion": { "targetSlot": SlotId, "targetOffsetX": number, "targetOffsetY": number, "startTimeSec": number, "endTimeSec": number, "easing": "linear"|"ease_in_out"|"ease_in"|"ease_out", "autoFaceTarget": true, "movingPose": CharacterPoseId }

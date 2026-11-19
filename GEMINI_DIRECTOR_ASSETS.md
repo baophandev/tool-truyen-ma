@@ -75,7 +75,7 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"flickering_fluorescent"`: Đèn Tuýp Huỳnh Quang Chập Chờn (Ánh sáng xanh ngọc lạnh lẽo trong nhà, bóng tuýp chập chờn, biển báo EXIT xanh lục phát sáng).
 - `"dim_indoor_night"`: Ánh Vàng Đêm Mờ Ảo (Ánh đèn vàng hổ phách u tịch trong khách sạn / nhà hàng đêm muộn).
 
-### 3.3. 19 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
+### 3.3. 21 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
 
 Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ được đặt tại các Slot được phép** sau:
 
@@ -100,6 +100,8 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `abandoned_subway_station` | Cổng vào & ga tàu điện ngầm bỏ hoang | Lối xuống hầm ga metro hoang phế, bậc thang bê tông nứt nẻ dẫn vào vực thẳm đen ngòm, lan can sắt gỉ, đèn quả cầu chập chờn và biển hiệu SUBWAY vỡ nát | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `rusty_train_tracks_tunnel` | Đường ray tàu & Đường hầm rỉ sét ẩm mốc | Vòm hầm đường sắt ngầm bê tông sâu hun hút, hai thanh ray thép rỉ sét ánh kim, tà vẹt gỗ mục nát, cáp điện lòng thòng, ống nước rỉ giọt và đèn tín hiệu đỏ ma quái | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `structure_old_apartment_gate` | Cổng sắt chung cư cũ | Cổng sắt hoen gỉ khóa xích của khu chung cư cũ nát, khối nhà tập thể u ám phía sau với chuồng cọp lồng sắt, đèn tường chập chờn, nơi nhân vật kiệt sức gục ngã | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `structure_wooden_sampan` | Xuồng ba lá / Ghe nước miền Tây | Chiếc xuồng ba lá gỗ miền Tây đậu trên con kênh nước nổi âm u, chất đầy bông súng, bông điên điển, gác mái dầm và buộc cọc tre mé kênh, gợi ký ức người mẹ Hai Lụa bơi xuồng trên con kênh mùa nước nổi | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `structure_monkey_bridge` | Cầu khỉ miền Tây | Cây cầu khỉ tre miền Tây chênh vênh với chân tre cắm chữ X buộc dây lạt, thân cầu uốn cong và tay vịn tre một bên bắc ngang con kênh tối giữa bụi dừa nước và lục bình | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 
 ---
 
@@ -149,7 +151,7 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
 - `"jiangshi_corpse"`: Cương thi áo quan (xác chết nhảy búp, mũ quan phong kiến, tay duỗi thẳng phía trước).
 - `"demon_shadow"`: Quỷ bóng đen dị hình (vóc dáng to lớn 1.25x, sừng cong nhọn hoắt, móng vuốt, hào quang khói đen).
 
-### 5.2. 11 Bộ Sưu Tập Trang Phục (Costumes)
+### 5.2. 12 Bộ Sưu Tập Trang Phục (Costumes)
 - `"outfit_tattered_tunic"`: Áo tơi / Áo nông phu nâu đất sờn rách, thắt lưng dây gai.
 - `"outfit_flowing_ao_dai"`: Áo dài cổ truyền tà rách ma mị phất phơ trong gió.
 - `"outfit_shrouded_cloak"`: Áo choàng trùm đầu tăm tối (Reaper / Kẻ hành hương tà giáo).
@@ -161,6 +163,7 @@ Mỗi nhân vật được định nghĩa trong mảng `actors` gồm 8 thành p
 - `"outfit_doctor_coat"`: Áo blouse bác sĩ phẫu thuật vạt dài loang lổ vết máu, ống nghe stethoscope và quần scrub tối màu.
 - `"outfit_patient_gown"`: Bộ quần áo bệnh nhân sọc xanh nhạt rộng thùng thình, buộc dây sau gáy, vạt áo lấm lem rách rưới.
 - `"outfit_modern_casual"`: Áo khoác hoodie hiện đại màu xám đen có khóa kéo, dây rút, quần jean ôm và giày thể thao đế trắng.
+- `"outfit_traditional_ba_ba"`: Áo bà ba trắng truyền thống Nam Bộ cổ tròn không bâu, hàng nút dọc giữa ngực, hai túi vuông nhỏ, vạt xẻ tà hông phối quần lụa đen ống rộng. Rất phù hợp cho tạo hình bóng người phụ nữ mặc áo bà ba trắng, tóc xõa dài đứng nhìn theo xe đò ở mé kênh.
 
 ### 5.3. 15 Biểu Cảm Khuôn Mặt & Đặc Điểm Phần Đầu (Faces - Gắn tại Head Socket)
 - `"face_calm"`: Mặt bình thường, mắt đen nhỏ vô hồn, lạnh lẽo.
@@ -222,7 +225,7 @@ Nhân vật có thể cầm đồ vật trên tay thông qua Hand Socket. Vật 
   - `"right"`: Tay trước (mặc định - tay chính quay về phía người xem).
   - `"left"`: Tay sau.
 
-### 6.2. Danh Mục 15 Đồ Vật Cầm Tay Thuần SVG:
+### 6.2. Danh Mục 18 Đồ Vật Cầm Tay Thuần SVG:
 1. `"none"`: Hai tay trống không.
 2. `"item_storm_lantern"`: Đèn bão sắt cổ phát sáng vàng ấm soi rọi màn sương (tỏa quầng sáng ấm xung quanh).
 3. `"item_paper_lantern"`: Đèn lồng giấy đỏ cầm tay cán trúc, tỏa ánh đỏ ma mị kèm tua rua.
@@ -238,6 +241,9 @@ Nhân vật có thể cầm đồ vật trên tay thông qua Hand Socket. Vật 
 13. `"item_smartphone"`: Điện thoại di động thông minh hiện đại, màn hình phát ánh sáng xanh lạnh ma mị soi tỏ bóng đêm và quầng sáng hình nón.
 14. `"item_severed_head"`: Thủ cấp đứt lìa vương máu rỉ giọt. Bàn tay túm chặt lọn tóc xách lủng lẳng đầu người bị chém đứt, mắt trợn trừng vô hồn, vệt máu đen rỉ từ hốc mắt và cuống cổ rỉ giọt máu rơi xuống đất. Rất phù hợp kết hợp cùng `face_headless` (ma không đầu tự xách đầu mình) hoặc kẻ sát nhân/chiến tướng xách thủ cấp kẻ thù.
 15. `"item_mysterious_note"`: Mẩu giấy / Lá thư bí ẩn gấp mép vương vệt máu mang thông điệp rùng rợn. Tờ giấy ố vàng nhăn nhúm, các nếp gấp 3D, mép rách răng cưa, vệt máu ngón tay cào xước, dòng chữ viết tay nghuệch ngoạc bằng máu và con dấu sáp đỏ niêm phong. Rất phù hợp cho nhân vật tìm thấy manh mối, di thư tuyệt mệnh hoặc bản đồ chỉ dẫn tới ga ngầm.
+16. `"item_offering_toys"`: Nải chuối và bộ đồ chơi đất nung cúng cô hồn. Mẹt tre lót tàu lá chuối đựng nải chuối chín vàng xanh, nồi đất - chén đất - con giống đất nung nhỏ cùng nén nhang cháy đỏ lập lòe tỏa khói mỏng. Phù hợp cảnh bà ngoại mang đồ cúng ra nền đất hoang cho oan hồn cô Hai Lụa.
+17. `"item_areca_palm_fan"`: Quạt mo cau miền quê. Chiếc quạt bẹ mo cau khô sạm gân dọc đặc trưng, tự đung đưa phe phẩy nhẹ theo chuyển động tay. Phù hợp cảnh nhân vật cầm quạt mo phe phẩy trằn trọc trong đêm hè oi bức.
+18. `"item_fresh_ginger"`: Lát gừng tươi giữ khí. Nhánh và lát gừng vàng tươi tỏa quầng sáng ấm áp nhẹ nhàng, biểu trưng cho mẹo dân gian ngậm hoặc cầm lát gừng tươi để "giữ khí" chống lại tà khí ban đêm.
 
 ---
 
@@ -292,7 +298,7 @@ export interface DirectorSceneScript {
     weather?: "none" | "heavy_rain" | "storm_thunder" | "blood_rain" | "floating_embers" | "drifting_ash" | "haunted_mist"; // Hiệu ứng thời tiết & hạt khí quyển thuần code
   };
   environment_items: Array<{
-    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub";
+    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub" | "market_stall_tent" | "abandoned_subway_station" | "rusty_train_tracks_tunnel" | "structure_old_apartment_gate" | "structure_wooden_sampan" | "structure_monkey_bridge";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right";
     offsetX?: number;
     offsetY?: number;
@@ -301,7 +307,7 @@ export interface DirectorSceneScript {
   actors: Array<{
     id: string;
     base: "male_adult" | "female_adult" | "elder_hunched" | "brute_hulking" | "skeletal_emaciated" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow";
-    costume?: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual";
+    costume?: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual" | "outfit_traditional_ba_ba";
     face: "face_calm" | "face_scared" | "face_screaming_gasp" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless";
     facialAction?: "none" | "blink_natural" | "blink_nervous" | "darting_eyes" | "crying_tears" | "bleeding_tears" | "creepy_laugh" | "terrified_scream" | "talking_jaw";
     pose: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging";
@@ -311,7 +317,7 @@ export interface DirectorSceneScript {
     offsetY?: number;
     scale?: number;
     opacity?: number;
-    heldItem?: "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head";
+    heldItem?: "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger";
     heldHand?: "right" | "left";
     motion?: {
       targetSlot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
@@ -979,6 +985,88 @@ Thay vì giữ nguyên 1 góc máy cố định suốt cả phân cảnh dài, A
   ],
   "dialogue": "Sau chuỗi ngày chạy trốn trong vô vọng, Hải lê bước kiệt sức rồi gục ngã trước cánh cổng sắt lạnh lẽo khóa chặt của khu chung cư cũ kỹ nơi cậu từng sống...",
   "narrative_note": "Cảnh kết thúc bi thảm: Hải gục ngã (pose_kneeling, face_haggard_gaunt, heavy_panting) ngay trước cổng sắt chung cư cũ (structure_old_apartment_gate) tại slot center."
+}
+```
+
+### 9.8. Kịch Bản JSON Mẫu: Đêm Cúng Cô Hồn Bên Mé Kênh Nước Nổi Miền Tây (Áo Bà Ba Trắng, Xuồng Ba Lá, Đồ Cúng Đất Nung, Quạt Mo & Gừng Tươi)
+```json
+{
+  "scene_id": "scene_mekong_canal_offering",
+  "title": "Đêm Cúng Cô Hồn Mé Kênh Cô Hai Lụa",
+  "duration_sec": 7,
+  "theme": "cursed_swamp",
+  "lighting": {
+    "sky_preset": "foggy_night",
+    "fog_density": 0.72,
+    "thunder_flash": false,
+    "weather": "haunted_mist"
+  },
+  "camera": {
+    "shot": "wide",
+    "shake": "none",
+    "keyframes": [
+      { "startTimeSec": 0, "transition": "cut", "shot": "wide", "shake": "none" },
+      { "startTimeSec": 3.0, "transition": "cut", "shot": "medium", "target_actor_id": "actor_grandma", "shake": "none" },
+      { "startTimeSec": 5.0, "transition": "smooth", "transitionDurationSec": 1.0, "shot": "close_up", "target_actor_id": "actor_hai_lua", "shake": "none" }
+    ]
+  },
+  "environment_items": [
+    { "asset_id": "creepy_banyan_tree", "slot": "far_left", "scale": 1.0 },
+    { "asset_id": "structure_monkey_bridge", "slot": "center", "scale": 0.95 },
+    { "asset_id": "structure_wooden_sampan", "slot": "far_right", "offsetX": -40, "scale": 1.0 }
+  ],
+  "actors": [
+    {
+      "id": "actor_grandma",
+      "base": "elder_hunched",
+      "costume": "outfit_tattered_tunic",
+      "face": "face_old_wrinkled",
+      "facialAction": "talking_jaw",
+      "pose": "pose_holding",
+      "facing": "right",
+      "slot": "mid_left",
+      "offsetX": -40,
+      "offsetY": 0,
+      "scale": 1.0,
+      "heldItem": "item_offering_toys",
+      "heldHand": "right"
+    },
+    {
+      "id": "actor_minh",
+      "base": "male_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_scared",
+      "facialAction": "darting_eyes",
+      "pose": "pose_standing",
+      "facing": "right",
+      "slot": "far_left",
+      "offsetX": 95,
+      "offsetY": 0,
+      "scale": 0.95,
+      "heldItem": "item_areca_palm_fan",
+      "heldHand": "right"
+    },
+    {
+      "id": "actor_hai_lua",
+      "base": "female_adult",
+      "costume": "outfit_traditional_ba_ba",
+      "face": "face_weeping_ghost",
+      "facialAction": "crying_tears",
+      "pose": "pose_standing",
+      "facing": "left",
+      "slot": "far_right",
+      "offsetX": -40,
+      "offsetY": 0,
+      "scale": 1.0,
+      "opacity": 0.78,
+      "heldItem": "none"
+    }
+  ],
+  "details": [
+    { "id": "detail_wisp_canal", "asset_id": "detail_will_o_wisp", "slot": "air_right" }
+  ],
+  "dialogue": "Bà ngoại khom lưng đặt mẹt nải chuối cùng bộ đồ chơi đất nung xuống nền đất hoang, dúi vội lát gừng tươi vào tay Minh để giữ khí... Ngoài mé kênh, bên chiếc xuồng ba lá chất đầy bông súng bông điên điển, bóng người phụ nữ mặc áo bà ba trắng tóc xõa dài vẫn đứng lặng lẽ nhìn theo...",
+  "narrative_note": "Tổ hợp asset văn hóa kinh dị Nam Bộ: bà ngoại cầm item_offering_toys (có thể đổi sang item_fresh_ginger ở cảnh trao gừng), Minh cầm item_areca_palm_fan, cầu khỉ tre miền Tây structure_monkey_bridge bắc ngang kênh, bóng cô Hai Lụa mặc outfit_traditional_ba_ba đứng cạnh xuồng ba lá structure_wooden_sampan."
 }
 ```
 

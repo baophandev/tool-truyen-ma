@@ -343,6 +343,26 @@
         "width": 460,
         "height": 450,
         "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_wooden_sampan",
+        "name": "Xuồng ba lá / Ghe nước miền Tây",
+        "semantic_role": "Chiếc xuồng ba lá gỗ miền Tây đậu trên con kênh nước nổi âm u, chất đầy bông súng, bông điên điển, gác mái dầm và buộc cọc tre mé kênh, gợi ký ức thê lương vùng sông nước",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 456,
+        "height": 130,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_monkey_bridge",
+        "name": "Cầu khỉ miền Tây",
+        "semantic_role": "Cây cầu khỉ tre miền Tây chênh vênh với chân tre cắm chữ X buộc dây lạt, thân cầu uốn cong và tay vịn một bên bắc ngang con kênh tối giữa bụi dừa nước và lục bình",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 490,
+        "height": 210,
+        "anchor": "bottom-center"
       }
     ]
   },
@@ -480,6 +500,11 @@
         "id": "outfit_modern_casual",
         "name": "Áo hoodie / Đồ hiện đại thường nhật",
         "desc": "Áo khoác hoodie hiện đại màu xám đen có khóa kéo và dây rút, quần jean ôm và giày thể thao đế trắng"
+      },
+      {
+        "id": "outfit_traditional_ba_ba",
+        "name": "Áo bà ba trắng truyền thống",
+        "desc": "Bộ áo bà ba trắng cổ tròn không bâu, hàng nút dọc giữa ngực, hai túi vuông nhỏ, vạt xẻ tà hông phối quần lụa đen ống rộng Nam Bộ, tạo hình bóng người phụ nữ ma mị ở mé kênh"
       }
     ],
     "faces": [
@@ -673,7 +698,10 @@
       { "id": "item_scalpel", "name": "Dao mổ phẫu thuật sắc lạnh" },
       { "id": "item_smartphone", "name": "Điện thoại di động phát sáng" },
       { "id": "item_severed_head", "name": "Thủ cấp đứt lìa vương máu" },
-      { "id": "item_mysterious_note", "name": "Mẩu giấy bí ẩn vương máu" }
+      { "id": "item_mysterious_note", "name": "Mẩu giấy bí ẩn vương máu" },
+      { "id": "item_offering_toys", "name": "Nải chuối và đồ chơi đất nung cúng cô hồn" },
+      { "id": "item_areca_palm_fan", "name": "Quạt mo cau" },
+      { "id": "item_fresh_ginger", "name": "Lát gừng tươi" }
     ]
   },
   "details": [

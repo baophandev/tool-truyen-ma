@@ -328,4 +328,14 @@ export const COSTUME_PALETTES: Record<CostumeId, CostumePalette> = {
     sleeve: "#1E293B",
     sleeveShadow: "#0F172A",
   },
+  outfit_traditional_ba_ba: {
+    primary: "#E5E7EB",
+    secondary: "#CBD5E1",
+    accent: "#64748B",
+    trim: "#94A3B8",
+    pantsPrimary: "#14161D",
+    pantsSecondary: "#0C0E14",
+    sleeve: "#DDE2E8",
+    sleeveShadow: "#B4BECB",
+  },
 };

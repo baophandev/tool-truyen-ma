@@ -19,6 +19,7 @@ import {
   setStoredModel,
   type SceneDescriptionSpec,
   type AssetAuditResult,
+  type MissingAssetItem,
 } from "../engine/geminiDirector";
 import {
   VOICE_PACE_PRESETS,
@@ -61,6 +62,7 @@ import {
   Trash2,
   Plus,
   Check,
+  Copy,
   Camera,
   Wand2,
   RefreshCw,
@@ -191,6 +193,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
   // Asset Audit state (Kiểm tra tài nguyên theo GEMINI_DIRECTOR_ASSETS.md)
   const [assetAudit, setAssetAudit] = useState<AssetAuditResult | null>(null);
   const [isAuditing, setIsAuditing] = useState<boolean>(false);
+  const [copiedAuditKey, setCopiedAuditKey] = useState<string | null>(null);
 
   // Single Scene Action Director state
   const [singleSceneEnvId, setSingleSceneEnvId] = useState<string>(() => {
@@ -380,6 +383,79 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         isSufficient: true,
         summary: "Đã xác nhận sử dụng asset thay thế có sẵn.",
       });
+    }
+  };
+
+  // Copy text helper with fallback
+  const copyTextToClipboard = async (text: string): Promise<boolean> => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch {
+      // Fallback to execCommand
+    }
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      return ok;
+    } catch {
+      return false;
+    }
+  };
+
+  // Format missing assets into a clean prompt ready to paste
+  const formatMissingAssetsPrompt = (items: MissingAssetItem[]): string => {
+    if (items.length === 1) {
+      const item = items[0];
+      return [
+        `Hãy thêm asset còn thiếu sau vào dự án (tuân thủ quy chuẩn đồng bộ 7 tệp trong GEMINI.md):`,
+        ``,
+        `- Tên asset: ${item.name}`,
+        `- Phân loại: ${item.categoryLabel} (${item.category})`,
+        `- ID cần đặt: ${item.suggestedId}`,
+        `- Mô tả / Lý do: ${item.reason}`,
+      ].join("\n");
+    }
+
+    const body = items
+      .map((item, idx) =>
+        [
+          `${idx + 1}. ${item.name}`,
+          `- Phân loại: ${item.categoryLabel} (${item.category})`,
+          `- ID cần đặt: ${item.suggestedId}`,
+          `- Mô tả / Lý do: ${item.reason}`,
+        ].join("\n")
+      )
+      .join("\n\n");
+
+    return `Hãy thêm danh sách ${items.length} asset còn thiếu sau vào dự án (tuân thủ quy chuẩn đồng bộ 7 tệp trong GEMINI.md):\n\n${body}`;
+  };
+
+  const handleCopyAllMissingAssets = async () => {
+    if (!assetAudit || !assetAudit.missingAssets.length) return;
+    const text = formatMissingAssetsPrompt(assetAudit.missingAssets);
+    const ok = await copyTextToClipboard(text);
+    if (ok) {
+      setCopiedAuditKey("all");
+      setTimeout(() => setCopiedAuditKey((prev) => (prev === "all" ? null : prev)), 2000);
+    }
+  };
+
+  const handleCopySingleMissingAsset = async (item: MissingAssetItem, idx: number) => {
+    const text = formatMissingAssetsPrompt([item]);
+    const ok = await copyTextToClipboard(text);
+    const key = `item-${idx}`;
+    if (ok) {
+      setCopiedAuditKey(key);
+      setTimeout(() => setCopiedAuditKey((prev) => (prev === key ? null : prev)), 2000);
     }
   };
 
@@ -1212,17 +1288,44 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Re-check Button */}
-                    <button
-                      type="button"
-                      onClick={handleRecheckAssets}
-                      disabled={isAuditing}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-xs font-bold text-neutral-200 hover:text-white transition-all shadow"
-                      title="Kiểm tra lại toàn bộ cốt truyện và các phân cảnh so với tài liệu GEMINI_DIRECTOR_ASSETS.md"
-                    >
-                      <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${isAuditing ? "animate-spin" : ""}`} />
-                      <span>{isAuditing ? "Đang kiểm tra lại..." : "🔄 Kiểm Tra Lại Asset"}</span>
-                    </button>
+                    {/* Action Buttons: Copy Prompt + Re-check */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {!assetAudit.isSufficient && assetAudit.missingAssets.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleCopyAllMissingAssets}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all shadow ${
+                            copiedAuditKey === "all"
+                              ? "bg-emerald-950/90 border-emerald-500/70 text-emerald-300"
+                              : "bg-amber-950/80 hover:bg-amber-900/80 border-amber-600/60 hover:border-amber-400 text-amber-200 hover:text-white"
+                          }`}
+                          title="Copy toàn bộ danh sách asset thiếu kèm ID đề xuất và mô tả dưới dạng prompt sẵn sàng dán"
+                        >
+                          {copiedAuditKey === "all" ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>Đã Copy Danh Sách!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5 text-amber-300" />
+                              <span>Copy Danh Sách (Prompt)</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={handleRecheckAssets}
+                        disabled={isAuditing}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-xs font-bold text-neutral-200 hover:text-white transition-all shadow"
+                        title="Kiểm tra lại toàn bộ cốt truyện và các phân cảnh so với tài liệu GEMINI_DIRECTOR_ASSETS.md"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${isAuditing ? "animate-spin" : ""}`} />
+                        <span>{isAuditing ? "Đang kiểm tra lại..." : "🔄 Kiểm Tra Lại Asset"}</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* MISSING ASSETS DETAILS TABLE / CARDS */}
@@ -1234,13 +1337,37 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                             key={idx}
                             className="bg-black/70 border border-amber-800/60 rounded-xl p-3 flex flex-col gap-1.5"
                           >
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-2">
                               <span className="text-xs font-bold text-amber-200">
                                 {item.name}
                               </span>
-                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-neutral-300">
-                                {item.categoryLabel}
-                              </span>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-neutral-300">
+                                  {item.categoryLabel}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopySingleMissingAsset(item, idx)}
+                                  className={`flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-semibold transition-all ${
+                                    copiedAuditKey === `item-${idx}`
+                                      ? "bg-emerald-950/90 border-emerald-500/70 text-emerald-300"
+                                      : "bg-neutral-900 hover:bg-amber-950/80 border-neutral-700 hover:border-amber-500/70 text-neutral-300 hover:text-amber-200"
+                                  }`}
+                                  title="Copy riêng asset này (Tên, ID đề xuất, Mô tả) để dán làm prompt"
+                                >
+                                  {copiedAuditKey === `item-${idx}` ? (
+                                    <>
+                                      <Check className="w-3 h-3 text-emerald-400" />
+                                      <span>Đã copy</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy className="w-3 h-3" />
+                                      <span>Copy</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
                             </div>
                             <div className="text-[11px] text-neutral-300">
                               <span className="text-neutral-400">ID đề xuất thêm:</span>{" "}

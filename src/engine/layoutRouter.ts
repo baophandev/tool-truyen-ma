@@ -130,6 +130,8 @@ const VALID_STRUCTURES: StructureId[] = [
   "abandoned_subway_station",
   "rusty_train_tracks_tunnel",
   "structure_old_apartment_gate",
+  "structure_wooden_sampan",
+  "structure_monkey_bridge",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -154,6 +156,7 @@ const VALID_COSTUMES: CostumeId[] = [
   "outfit_doctor_coat",
   "outfit_patient_gown",
   "outfit_modern_casual",
+  "outfit_traditional_ba_ba",
 ];
 const VALID_FACES: CharacterFaceId[] = [
   "face_calm",
@@ -212,6 +215,9 @@ const VALID_HELD_ITEMS: HeldItemId[] = [
   "item_smartphone",
   "item_severed_head",
   "item_mysterious_note",
+  "item_offering_toys",
+  "item_areca_palm_fan",
+  "item_fresh_ginger",
 ];
 const VALID_HELD_HANDS: HeldHand[] = ["right", "left"];
 const VALID_DETAILS: DetailId[] = [
@@ -321,6 +327,12 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       if (!item || typeof item !== "object") return;
       if (item.asset_id === "old_apartment_gate") {
         item.asset_id = "structure_old_apartment_gate";
+      }
+      if (item.asset_id === "wooden_sampan") {
+        item.asset_id = "structure_wooden_sampan";
+      }
+      if (item.asset_id === "monkey_bridge") {
+        item.asset_id = "structure_monkey_bridge";
       }
       if (!VALID_STRUCTURES.includes(item.asset_id)) return;
 
