@@ -1328,6 +1328,7 @@ export interface ProjectRaccordResult {
   characters?: NamedCharacterPreset[];
   environments?: NamedEnvironmentPreset[];
   sceneDrafts?: SceneDraftSpec[];
+  missingAssets?: MissingAssetItem[];
   error?: string;
   rawText?: string;
 }

@@ -83,7 +83,11 @@ import {
   UserCheck,
   Clapperboard,
   FileJson,
+  Download,
+  Upload,
 } from "lucide-react";
+import { validateDirectorScript } from "../engine/layoutRouter";
+import { sanitizeSceneShake } from "../engine/geminiDirector";
 
 export type AiModalMode =
   | "pre_production"
@@ -228,6 +232,21 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
   const [isAnalyzingBreakdown, setIsAnalyzingBreakdown] = useState<boolean>(false);
   const [projectRaccordResult, setProjectRaccordResult] = useState<ProjectRaccordResult | null>(null);
   const [preProdNotice, setPreProdNotice] = useState<string | null>(null);
+  const [preProdError, setPreProdError] = useState<string | null>(null);
+
+  // Generic JSON Import Modal state (for Tab 1 full scenes or Tab 4 single scene)
+  const [jsonImportModal, setJsonImportModal] = useState<{
+    isOpen: boolean;
+    target: "film_scenes" | "single_scene";
+  } | null>(null);
+  const [jsonImportInput, setJsonImportInput] = useState<string>("");
+  const [modalError, setModalError] = useState<string | null>(null);
+  const [copyFeedbackKey, setCopyFeedbackKey] = useState<string | null>(null);
+
+  const showCopyFeedback = (key: string) => {
+    setCopyFeedbackKey(key);
+    setTimeout(() => setCopyFeedbackKey((prev) => (prev === key ? null : prev)), 2500);
+  };
 
   // Sync mode whenever modal opens
   useEffect(() => {
@@ -421,6 +440,371 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     }
   };
 
+  // Helper to trigger JSON file download
+  const downloadJsonFile = (filename: string, data: any) => {
+    const jsonStr = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // EXPORT 1: Diễn viên (Tab 2)
+  const handleCopyCastForGemini = async () => {
+    if (!namedCharacters.length) {
+      setErrorMessage("Chưa có diễn viên nào để xuất.");
+      return;
+    }
+    const text = [
+      `# DÀN DIỄN VIÊN ĐÃ KHÓA RẮC-CO (CAST CONTINUITY) - LIMBO ENGINE`,
+      `Số lượng diễn viên: ${namedCharacters.length}`,
+      `Quy tắc: Khi viết kịch bản hoạt hình, BẮT BUỘC sử dụng đúng ID và cấu trúc của các nhân vật này (khung thân base, trang phục costume, mặt face, đồ vật cầm tay heldItem) để bảo toàn tính rắc-co liên tục:`,
+      ``,
+      `\`\`\`json`,
+      JSON.stringify(namedCharacters, null, 2),
+      `\`\`\``,
+    ].join("\n");
+    const ok = await copyTextToClipboard(text);
+    if (ok) showCopyFeedback("cast_copied");
+  };
+
+  const handleDownloadCastJson = () => {
+    downloadJsonFile("limbo_raccord_characters.json", namedCharacters);
+  };
+
+  // EXPORT 2: Bối cảnh (Tab 3)
+  const handleCopyEnvironmentsForGemini = async () => {
+    if (!namedEnvironments.length) {
+      setErrorMessage("Chưa có bối cảnh nào để xuất.");
+      return;
+    }
+    const text = [
+      `# DANH SÁCH BỐI CẢNH ĐÃ KHÓA RẮC-CO (ENVIRONMENT CONTINUITY) - LIMBO ENGINE`,
+      `Số lượng bối cảnh: ${namedEnvironments.length}`,
+      `Quy tắc: Khi đạo diễn từng phân cảnh, BẮT BUỘC chỉ định đúng ID bối cảnh và tuân thủ các công trình (structures) cùng đạo cụ (details/props) tương ứng:`,
+      ``,
+      `\`\`\`json`,
+      JSON.stringify(namedEnvironments, null, 2),
+      `\`\`\``,
+    ].join("\n");
+    const ok = await copyTextToClipboard(text);
+    if (ok) showCopyFeedback("envs_copied");
+  };
+
+  const handleDownloadEnvironmentsJson = () => {
+    downloadJsonFile("limbo_raccord_environments.json", namedEnvironments);
+  };
+
+  // EXPORT 3: Cảnh hiện tại (Tab 4)
+  const handleCopySingleSceneForGemini = async () => {
+    const text = [
+      `# DỮ LIỆU PHÂN CẢNH HIỆN TẠI (CẢNH ${currentSceneIndex + 1}) - LIMBO ENGINE`,
+      `Tiêu đề: ${currentScene.title || currentScene.scene_id}`,
+      `Thời lượng: ${currentScene.duration_sec || 6}s`,
+      `Bối cảnh: ${currentScene.theme} | Bầu trời: ${currentScene.lighting?.sky_preset}`,
+      `Lời thoại: "${currentScene.dialogue || ""}"`,
+      ``,
+      `## 1. Dữ liệu cảnh hiện tại (JSON DirectorSceneScript):`,
+      `\`\`\`json`,
+      JSON.stringify(currentScene, null, 2),
+      `\`\`\``,
+      ``,
+      `## 2. Dàn diễn viên rắc-co khả dụng trong dự án:`,
+      `\`\`\`json`,
+      JSON.stringify(
+        namedCharacters.map((c) => ({
+          id: c.id,
+          name: c.name,
+          base: c.base,
+          costume: c.costume,
+          face: c.face,
+          heldItem: c.defaultHeldItem,
+        })),
+        null,
+        2
+      ),
+      `\`\`\``,
+      ``,
+      `## 3. Danh sách bối cảnh rắc-co khả dụng:`,
+      `\`\`\`json`,
+      JSON.stringify(
+        namedEnvironments.map((e) => ({
+          id: e.id,
+          name: e.name,
+          theme: e.theme,
+          sky: e.lighting?.sky_preset,
+        })),
+        null,
+        2
+      ),
+      `\`\`\``,
+      ``,
+      `YÊU CẦU: Hãy điều chỉnh hoặc đạo diễn lại phân cảnh này theo kịch bản, trả về CHÍNH XÁC MỘT JSON Object duy nhất tuân thủ chuẩn DirectorSceneScript (bao gồm theme, lighting, structures, actors, motion, camera, dialogue).`,
+    ].join("\n");
+    const ok = await copyTextToClipboard(text);
+    if (ok) showCopyFeedback("single_scene_copied");
+  };
+
+  const handleDownloadSingleSceneJson = () => {
+    downloadJsonFile(`limbo_scene_${currentSceneIndex + 1}.json`, currentScene);
+  };
+
+  // EXPORT 4: Trọn bộ Rắc-co dự án (Tab 1)
+  const handleCopyProjectRaccordForGemini = async () => {
+    const text = [
+      `# BỘ TÀI NGUYÊN RẮC-CO DỰ ÁN (PROJECT RACCORD CONTEXT) - LIMBO ENGINE`,
+      `Hãy sử dụng bộ tài nguyên Diễn viên và Bối cảnh đã được chốt này để đạo diễn toàn bộ kịch bản phim:`,
+      ``,
+      `## 1. DÀN DIỄN VIÊN KHÓA RẮC-CO (${namedCharacters.length} diễn viên):`,
+      `\`\`\`json`,
+      JSON.stringify(namedCharacters, null, 2),
+      `\`\`\``,
+      ``,
+      `## 2. DÀN BỐI CẢNH DÙNG LẠI KHÓA RẮC-CO (${namedEnvironments.length} bối cảnh):`,
+      `\`\`\`json`,
+      JSON.stringify(namedEnvironments, null, 2),
+      `\`\`\``,
+    ].join("\n");
+    const ok = await copyTextToClipboard(text);
+    if (ok) showCopyFeedback("project_raccord_copied");
+  };
+
+  // UNIVERSAL ROBUST GEMINI JSON PARSER (Strips conversational text, markdown, trailing commas, comments)
+  const parseAnyGeminiJson = (input: string): { success: boolean; data?: any; error?: string } => {
+    const trimmed = (input || "").trim();
+    if (!trimmed) {
+      return { success: false, error: "Khung nhập đang để trống. Vui lòng dán đoạn JSON từ Gemini Web." };
+    }
+
+    let textToParse = trimmed;
+
+    // 1. Try extracting from code block with any number of backticks (3 or 4+)
+    const codeBlockMatch = trimmed.match(/`{3,}(?:json)?\s*([\s\S]*?)`{3,}/i);
+    if (codeBlockMatch && codeBlockMatch[1].trim()) {
+      textToParse = codeBlockMatch[1].trim();
+    } else {
+      // 2. Try finding outermost { ... } or [ ... ]
+      const firstBrace = trimmed.indexOf("{");
+      const firstBracket = trimmed.indexOf("[");
+
+      let start = -1;
+      let end = -1;
+
+      if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+        start = firstBrace;
+        end = trimmed.lastIndexOf("}");
+      } else if (firstBracket !== -1) {
+        start = firstBracket;
+        end = trimmed.lastIndexOf("]");
+      }
+
+      if (start !== -1 && end !== -1 && end > start) {
+        textToParse = trimmed.substring(start, end + 1);
+      }
+    }
+
+    // 3. Remove trailing commas before } or ]
+    const sanitizeCommas = (str: string) => str.replace(/,\s*([\]}])/g, "$1");
+
+    try {
+      const data = JSON.parse(sanitizeCommas(textToParse));
+      return { success: true, data };
+    } catch (err1: any) {
+      // 4. Try stripping comments
+      try {
+        const strippedComments = textToParse
+          .replace(/\/\*[\s\S]*?\*\//g, "")
+          .replace(/(^|[^\\:])\/\/.*$/gm, "$1");
+        const data = JSON.parse(sanitizeCommas(strippedComments));
+        return { success: true, data };
+      } catch (err2: any) {
+        return {
+          success: false,
+          error: `Không thể đọc cú pháp JSON: ${err1.message}. Hãy chắc chắn bạn đã copy trọn vẹn khối JSON từ dấu mở { hoặc [ đến dấu đóng } hoặc ].`,
+        };
+      }
+    }
+  };
+
+  // Helper to convert DirectorSceneScript or raw scene object into SceneDraftSpec for Tab 1
+  const mapSceneToDraftSpec = (s: any, idx: number, envs: NamedEnvironmentPreset[]): SceneDraftSpec => {
+    const defaultEnvId = envs[0]?.id || "env_graveyard_foggy";
+    const matchedEnv = envs.find((e) => e.id === s.environmentId || e.id === s.theme || e.theme === s.theme);
+    const environmentId = matchedEnv?.id || s.environmentId || s.theme || defaultEnvId;
+
+    // Prioritize rich human narrative description from narrative_note, actionDescription, description, or note
+    const note = s.narrative_note || s.narrativeNote || s.narrative;
+    const desc = s.actionDescription || s.action_description || s.description || s.action || s.note;
+
+    let actionDescription = "";
+    if (typeof note === "string" && note.trim()) {
+      actionDescription = note.trim();
+    } else if (typeof desc === "string" && desc.trim()) {
+      actionDescription = desc.trim();
+    } else if (Array.isArray(s.actors) && s.actors.length > 0) {
+      actionDescription = s.actors
+        .map((a: any) => {
+          const name = a.name || a.id || "Diễn viên";
+          const motion = a.motion ? ` ➔ ${a.motion.targetSlot}` : "";
+          const item = a.heldItem && a.heldItem !== "none" ? ` (cầm ${a.heldItem.replace("item_", "")})` : "";
+          return `${name}${motion}${item}`;
+        })
+        .join("; ");
+    } else {
+      actionDescription = `Diễn biến phân cảnh ${idx + 1}`;
+    }
+
+    return {
+      environmentId,
+      title: s.title || `Cảnh ${idx + 1}`,
+      actionDescription,
+      dialogue: s.dialogue || "",
+      duration_sec: s.duration_sec || 6,
+      cameraShot: (s.camera?.shot || "auto") as CameraShotType | "auto",
+    };
+  };
+
+  // EXECUTE IMPORT MODAL JSON (Tab 1 hoặc Tab 4)
+  const handleExecuteImportModalJson = () => {
+    setModalError(null);
+    setErrorMessage(null);
+
+    const parseRes = parseAnyGeminiJson(jsonImportInput);
+    if (!parseRes.success || !parseRes.data) {
+      setModalError(parseRes.error || "Không thể đọc cú pháp JSON.");
+      return;
+    }
+
+    const parsed = parseRes.data;
+
+    if (jsonImportModal?.target === "single_scene") {
+      const sceneObj = parsed.scene || (Array.isArray(parsed) ? parsed[0] : parsed);
+      if (!sceneObj || (!sceneObj.actors && !sceneObj.theme && !sceneObj.environment_items)) {
+        setModalError("JSON không đúng cấu trúc phân cảnh hoạt hình (cần ít nhất 'theme' hoặc 'actors').");
+        return;
+      }
+      if (!sceneObj.scene_id) sceneObj.scene_id = currentScene.scene_id;
+      if (!sceneObj.duration_sec) sceneObj.duration_sec = currentScene.duration_sec || 6;
+      const val = validateDirectorScript(sceneObj);
+      if (val.normalized) {
+        const sanitized = sanitizeSceneShake(val.normalized, sceneObj.dialogue || sceneObj.title || "");
+        setGeneratedSingleScene([sanitized]);
+        setJsonImportModal(null);
+        setJsonImportInput("");
+        return;
+      } else {
+        setModalError(`Dữ liệu cảnh không hợp lệ: ${val.errors.join("; ")}`);
+        return;
+      }
+    }
+
+    // Target === "film_scenes"
+    // Case 1: Full Scene Scripts: DirectorSceneScript[]
+    const rawScenes: any[] = Array.isArray(parsed)
+      ? parsed
+      : Array.isArray(parsed.scenes)
+      ? parsed.scenes
+      : Array.isArray(parsed.sceneScripts)
+      ? parsed.sceneScripts
+      : null;
+
+    if (rawScenes && rawScenes.length > 0 && (rawScenes[0].actors || rawScenes[0].environment_items || rawScenes[0].theme)) {
+      const validScenes: DirectorSceneScript[] = [];
+      const errors: string[] = [];
+      rawScenes.forEach((s, idx) => {
+        if (!s.scene_id) {
+          s.scene_id = `scene_${String(idx + 1).padStart(2, "0")}_gemini_${Date.now().toString().slice(-4)}`;
+        }
+        if (!s.duration_sec) {
+          s.duration_sec = 6;
+        }
+        const val = validateDirectorScript(s);
+        if (val.normalized) {
+          validScenes.push(sanitizeSceneShake(val.normalized, s.dialogue || s.title || ""));
+        } else {
+          errors.push(`Cảnh ${idx + 1}: ${val.errors.join("; ")}`);
+        }
+      });
+
+      if (validScenes.length > 0) {
+        setGeneratedScenes(validScenes);
+        setSceneCount(validScenes.length);
+
+        const mappedDrafts: SceneDraftSpec[] = validScenes.map((s, idx) => mapSceneToDraftSpec(s, idx, namedEnvironments));
+        setSceneDrafts(mappedDrafts);
+
+        setBreakdownNotice(`✨ Đã nạp thành công ${validScenes.length} phân cảnh hoạt hình hoàn chỉnh từ Gemini Web! Khung trên đã cập nhật đủ ${validScenes.length} cảnh.`);
+        setJsonImportModal(null);
+        setJsonImportInput("");
+        return;
+      } else {
+        setModalError(`Các phân cảnh không hợp lệ: ${errors.join(" | ")}`);
+        return;
+      }
+    }
+
+    // Case 2: Scene Drafts: SceneDraftSpec[]
+    const rawDrafts: any[] = Array.isArray(parsed.sceneDrafts)
+      ? parsed.sceneDrafts
+      : Array.isArray(parsed) && (parsed[0]?.actionDescription || parsed[0]?.narrative_note || parsed[0]?.description)
+      ? parsed
+      : null;
+
+    if (rawDrafts && rawDrafts.length > 0) {
+      const defaultEnvId = namedEnvironments[0]?.id || "env_graveyard_foggy";
+      const mappedDrafts: SceneDraftSpec[] = rawDrafts.map((d, idx) => ({
+        environmentId: d.environmentId || defaultEnvId,
+        title: d.title || `Cảnh ${idx + 1}`,
+        actionDescription: d.actionDescription || d.narrative_note || d.description || "",
+        dialogue: d.dialogue || "",
+        duration_sec: d.duration_sec || 6,
+        cameraShot: (d.cameraShot || "auto") as CameraShotType | "auto",
+      }));
+      setSceneDrafts(mappedDrafts);
+      setSceneCount(mappedDrafts.length);
+      setBreakdownNotice(`✨ Đã nạp thành công ${mappedDrafts.length} phân cảnh nháp từ Gemini Web!`);
+      setJsonImportModal(null);
+      setJsonImportInput("");
+      return;
+    }
+
+    // Case 3: User pasted Tab 0 Pre-prod JSON into Tab 1
+    if (parsed && (Array.isArray(parsed.characters) || Array.isArray(parsed.environments))) {
+      if (Array.isArray(parsed.characters) && parsed.characters.length > 0) {
+        setProjectNamedCharacters(parsed.characters);
+        setNamedCharacters(loadStoredNamedCharacters());
+      }
+      if (Array.isArray(parsed.environments) && parsed.environments.length > 0) {
+        setProjectNamedEnvironments(parsed.environments);
+        setNamedEnvironments(loadStoredNamedEnvironments());
+      }
+      if (Array.isArray(parsed.sceneDrafts) && parsed.sceneDrafts.length > 0) {
+        const defaultEnvId = parsed.environments?.[0]?.id || namedEnvironments[0]?.id || "env_graveyard_foggy";
+        const mappedDrafts: SceneDraftSpec[] = parsed.sceneDrafts.map((d: any, idx: number) => ({
+          environmentId: d.environmentId || defaultEnvId,
+          title: d.title || `Cảnh ${idx + 1}`,
+          actionDescription: d.actionDescription || d.narrative_note || d.description || "",
+          dialogue: d.dialogue || "",
+          duration_sec: d.duration_sec || 6,
+          cameraShot: (d.cameraShot || "auto") as CameraShotType | "auto",
+        }));
+        setSceneDrafts(mappedDrafts);
+        setSceneCount(mappedDrafts.length);
+      }
+      setBreakdownNotice(`✨ Đã nạp thành công toàn bộ Diễn viên, Bối cảnh và Phân cảnh từ JSON tiền kỳ!`);
+      setJsonImportModal(null);
+      setJsonImportInput("");
+      return;
+    }
+
+    setModalError("JSON không đúng định dạng phân cảnh. Cần mảng kịch bản [ { scene_id, theme, actors } ] hoặc danh sách sceneDrafts.");
+  };
+
   // Format missing assets into a clean prompt ready to paste
   const formatMissingAssetsPrompt = (items: MissingAssetItem[]): string => {
     if (items.length === 1) {
@@ -477,6 +861,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         if (text && text.trim()) {
           setBreakdownInput(text.trim());
           setErrorMessage(null);
+          setPreProdError(null);
         }
       }
     } catch {
@@ -484,45 +869,82 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     }
   };
 
-  // Helper to parse direct JSON output from Gemini Web
+  // Helper to parse direct JSON output from Gemini Web for Tab 0
   const tryParseDirectPreProdJson = (input: string): ProjectRaccordResult | null => {
-    const trimmed = input.trim();
-    if (!trimmed) return null;
-    let jsonStr = trimmed;
-    const match = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (match) {
-      jsonStr = match[1].trim();
-    }
-    if (!jsonStr.startsWith("{") || !jsonStr.endsWith("}")) {
-      return null;
-    }
-    try {
-      const parsed = JSON.parse(jsonStr);
-      if (parsed && (Array.isArray(parsed.characters) || Array.isArray(parsed.environments))) {
-        return {
-          success: true,
-          culturalTheme: parsed.culturalTheme || "Tiền kỳ tự định nghĩa (Gemini Web)",
-          summary: parsed.summary || `Đã nạp trực tiếp từ Gemini Web: ${parsed.characters?.length || 0} diễn viên, ${parsed.environments?.length || 0} bối cảnh, ${parsed.sceneDrafts?.length || 0} phân cảnh.`,
-          characters: Array.isArray(parsed.characters) ? parsed.characters : [],
-          environments: Array.isArray(parsed.environments) ? parsed.environments : [],
-          sceneDrafts: Array.isArray(parsed.sceneDrafts) ? parsed.sceneDrafts : undefined,
-          rawText: jsonStr,
-        };
-      }
-    } catch {
-      return null;
+    const parseRes = parseAnyGeminiJson(input);
+    if (!parseRes.success || !parseRes.data) return null;
+    const parsed = parseRes.data;
+
+    if (parsed && (Array.isArray(parsed.characters) || Array.isArray(parsed.environments) || Array.isArray(parsed.sceneDrafts))) {
+      return {
+        success: true,
+        culturalTheme: parsed.culturalTheme || "Tiền kỳ tự định nghĩa (Gemini Web)",
+        summary: parsed.summary || `Đã nạp trực tiếp từ Gemini Web: ${parsed.characters?.length || 0} diễn viên, ${parsed.environments?.length || 0} bối cảnh, ${parsed.sceneDrafts?.length || 0} phân cảnh.`,
+        characters: Array.isArray(parsed.characters) ? parsed.characters : [],
+        environments: Array.isArray(parsed.environments) ? parsed.environments : [],
+        sceneDrafts: Array.isArray(parsed.sceneDrafts)
+          ? parsed.sceneDrafts.map((d: any, idx: number) => ({
+              environmentId: d.environmentId || parsed.environments?.[0]?.id || "env_graveyard_foggy",
+              title: d.title || `Cảnh ${idx + 1}`,
+              actionDescription: d.actionDescription || d.narrative_note || d.description || "",
+              dialogue: d.dialogue || "",
+              duration_sec: d.duration_sec || 6,
+              cameraShot: (d.cameraShot || "auto") as CameraShotType | "auto",
+            }))
+          : undefined,
+        missingAssets: Array.isArray(parsed.missingAssets) ? parsed.missingAssets : undefined,
+        rawText: JSON.stringify(parsed, null, 2),
+      };
     }
     return null;
   };
 
-  // Direct manual load JSON button action
+  // Direct manual load JSON button action for Tab 0
   const handleDirectImportJson = () => {
-    const directResult = tryParseDirectPreProdJson(breakdownInput);
-    if (!directResult) {
-      setErrorMessage("Nội dung trong khung không phải là JSON hợp lệ. Vui lòng kiểm tra lại định dạng JSON từ Gemini Web.");
+    setPreProdError(null);
+    setErrorMessage(null);
+
+    const parseRes = parseAnyGeminiJson(breakdownInput);
+    if (!parseRes.success || !parseRes.data) {
+      setPreProdError(parseRes.error || "Không thể đọc JSON. Hãy kiểm tra lại đoạn mã bạn copy từ Gemini Web.");
       return;
     }
-    setErrorMessage(null);
+
+    const parsed = parseRes.data;
+
+    // Check if user accidentally pasted Tab 1 full scenes array in Tab 0
+    const isSceneScriptArray = Array.isArray(parsed) && parsed.length > 0 && (parsed[0].theme || parsed[0].actors || parsed[0].scene_id);
+    if (isSceneScriptArray || (parsed.scenes && Array.isArray(parsed.scenes))) {
+      const rawScenes = isSceneScriptArray ? parsed : parsed.scenes;
+      const validScenes: DirectorSceneScript[] = [];
+      rawScenes.forEach((s: any, idx: number) => {
+        if (!s.scene_id) s.scene_id = `scene_${String(idx + 1).padStart(2, "0")}_gemini_${Date.now().toString().slice(-4)}`;
+        if (!s.duration_sec) s.duration_sec = 6;
+        const val = validateDirectorScript(s);
+        if (val.normalized) {
+          validScenes.push(sanitizeSceneShake(val.normalized, s.dialogue || s.title || ""));
+        }
+      });
+      if (validScenes.length > 0) {
+        setGeneratedScenes(validScenes);
+        setSceneCount(validScenes.length);
+
+        const mappedDrafts: SceneDraftSpec[] = validScenes.map((s: any, idx: number) => mapSceneToDraftSpec(s, idx, namedEnvironments));
+        setSceneDrafts(mappedDrafts);
+
+        setMode("description_film");
+        setBreakdownNotice(`✨ Bạn đã dán kịch bản phân cảnh hoạt hình hoàn chỉnh (${validScenes.length} cảnh). Hệ thống đã tự động chuyển sang Tab 1 và cập nhật đủ ${validScenes.length} cảnh để bạn xem trước kết quả!`);
+        return;
+      }
+    }
+
+    // Check if it's Tab 0 Pre-prod format
+    const directResult = tryParseDirectPreProdJson(breakdownInput);
+    if (!directResult) {
+      setPreProdError("Nội dung trong khung không chứa các trường hợp lệ của Bước 0 (cần ít nhất 'characters' hoặc 'environments' hoặc 'sceneDrafts').");
+      return;
+    }
+
     setProjectRaccordResult(directResult);
     setPreProdNotice(
       `✅ Đã nhận diện JSON hợp lệ từ Gemini Web (${directResult.characters?.length || 0} diễn viên, ${directResult.environments?.length || 0} bối cảnh, ${directResult.sceneDrafts?.length || 0} phân cảnh). Nhấn "Áp Dụng Làm Dự Án Mới" bên dưới để hoàn tất!`
@@ -537,6 +959,16 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     }
 
     // Auto-detect if input is already direct JSON from Gemini Web
+    const parseRes = parseAnyGeminiJson(breakdownInput);
+    if (parseRes.success && parseRes.data) {
+      const parsed = parseRes.data;
+      const isSceneScriptArray = Array.isArray(parsed) && parsed.length > 0 && (parsed[0].theme || parsed[0].actors || parsed[0].scene_id);
+      if (isSceneScriptArray || (parsed.scenes && Array.isArray(parsed.scenes))) {
+        handleDirectImportJson();
+        return;
+      }
+    }
+
     const directResult = tryParseDirectPreProdJson(breakdownInput);
     if (directResult) {
       setErrorMessage(null);
@@ -996,7 +1428,103 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         </div>
 
         {/* MODAL BODY */}
-        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5 relative">
+          {/* FLOATING JSON IMPORT DIALOG (FOR TAB 1 OR TAB 4) */}
+          {jsonImportModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+              <div className="bg-neutral-950 border border-neutral-700 rounded-2xl w-full max-w-2xl p-5 flex flex-col gap-4 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
+                  <div className="flex items-center gap-2">
+                    <FileJson className="w-5 h-5 text-amber-400" />
+                    <h3 className="text-sm font-bold text-white">
+                      {jsonImportModal.target === "single_scene"
+                        ? `Nạp JSON Phân Cảnh ${currentSceneIndex + 1} (Từ Gemini Web)`
+                        : "Nạp JSON Kịch Bản Hoàn Chỉnh (Từ Gemini Web)"}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setJsonImportModal(null);
+                      setJsonImportInput("");
+                    }}
+                    className="text-neutral-400 hover:text-white p-1 rounded-lg hover:bg-neutral-800"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <p className="text-xs text-neutral-300 m-0">
+                  {jsonImportModal.target === "single_scene"
+                    ? "Dán đối tượng JSON phân cảnh (DirectorSceneScript) do Gemini Web tạo ra. Hệ thống sẽ xác thực và cập nhật ngay vào cảnh hiện tại."
+                    : "Dán đoạn JSON mảng các phân cảnh (DirectorSceneScript[]) hoặc danh sách cảnh nháp (sceneDrafts) từ Gemini Web. Hệ thống sẽ tự động xác thực và điền vào bảng."}
+                </p>
+
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-semibold text-neutral-300">Nội dung JSON:</span>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          if (navigator.clipboard && navigator.clipboard.readText) {
+                            const clip = await navigator.clipboard.readText();
+                            if (clip) setJsonImportInput(clip);
+                          }
+                        } catch {}
+                      }}
+                      className="flex items-center gap-1 text-[11px] text-amber-300 hover:text-white font-medium"
+                    >
+                      <Copy className="w-3 h-3" />
+                      <span>Dán từ Clipboard</span>
+                    </button>
+                  </div>
+                  <textarea
+                    rows={10}
+                    value={jsonImportInput}
+                    onChange={(e) => {
+                      setJsonImportInput(e.target.value);
+                      if (modalError) setModalError(null);
+                    }}
+                    placeholder={`[\n  {\n    "scene_id": "scene_01",\n    "theme": "...",\n    "actors": [...]\n  }\n]`}
+                    className="w-full bg-black border border-neutral-800 rounded-xl p-3 font-mono text-xs text-neutral-200 focus:outline-none focus:border-amber-500 resize-y"
+                  />
+                </div>
+
+                {/* ERROR IN IMPORT MODAL */}
+                {modalError && (
+                  <div className="p-3 bg-red-950/80 border border-red-700/80 rounded-xl text-xs text-red-200 flex items-start gap-2 animate-in fade-in">
+                    <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-bold text-red-300">Không thể nạp JSON:</span>
+                      <span className="leading-relaxed">{modalError}</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-800">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setJsonImportModal(null);
+                      setJsonImportInput("");
+                      setModalError(null);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-xs text-neutral-300 font-medium"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleExecuteImportModalJson}
+                    className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white text-xs font-bold shadow-lg shadow-amber-950/50"
+                  >
+                    <Upload className="w-4 h-4" />
+                    <span>⚡ Xác Nhận Nạp JSON</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           {/* TOP CONTROLS & API KEY SETTINGS BANNER */}
           <div className="flex flex-col gap-2 bg-neutral-950/90 border border-neutral-800/80 rounded-xl p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -1232,11 +1760,25 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                   <textarea
                     rows={8}
                     value={breakdownInput}
-                    onChange={(e) => setBreakdownInput(e.target.value)}
+                    onChange={(e) => {
+                      setBreakdownInput(e.target.value);
+                      if (preProdError) setPreProdError(null);
+                    }}
                     placeholder="Dán nội dung bảng bóc tách vào đây... (Ví dụ: Danh sách nhân vật, ngoại hình, trang phục, danh sách bối cảnh thôn quê/đô thị, đạo cụ cầm tay...)"
                     className="w-full bg-black/80 border border-neutral-800 rounded-xl p-3.5 text-xs text-neutral-200 font-mono focus:outline-none focus:border-amber-500 resize-y leading-relaxed"
                   />
                 </div>
+
+                {/* ERROR IN PRE-PROD TAB */}
+                {preProdError && (
+                  <div className="p-3 bg-red-950/80 border border-red-700 rounded-xl text-xs text-red-200 flex items-start gap-2 animate-in fade-in">
+                    <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-bold text-red-300">Không thể nạp JSON tiền kỳ:</span>
+                      <span className="leading-relaxed">{preProdError}</span>
+                    </div>
+                  </div>
+                )}
 
                 {/* ACTION BUTTON */}
                 <div className="flex items-center justify-between pt-1">
@@ -1480,7 +2022,36 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setJsonImportModal({ isOpen: true, target: "film_scenes" })}
+                      className="px-2.5 py-1.5 rounded-lg bg-neutral-900/90 hover:bg-neutral-800 border border-amber-600/60 hover:border-amber-400 text-amber-200 hover:text-white transition-all text-xs flex items-center gap-1.5 font-semibold shadow"
+                      title="Nạp trực tiếp kịch bản phân cảnh từ Gemini Web (không tốn API)"
+                    >
+                      <FileJson className="w-3.5 h-3.5 text-amber-400" />
+                      <span>📥 Nạp JSON Gemini</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleCopyProjectRaccordForGemini}
+                      className="px-2.5 py-1.5 rounded-lg bg-neutral-900/90 hover:bg-neutral-800 border border-purple-600/60 hover:border-purple-400 text-purple-200 hover:text-white transition-all text-xs flex items-center gap-1.5 font-semibold shadow"
+                      title="Copy toàn bộ dàn diễn viên và bối cảnh đã khóa để gửi cho Gemini Web"
+                    >
+                      {copyFeedbackKey === "project_raccord_copied" ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span className="text-emerald-300">Đã Copy Rắc-co!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-purple-400" />
+                          <span>📤 Export Rắc-co Dự Án</span>
+                        </>
+                      )}
+                    </button>
+
                     <button
                       type="button"
                       onClick={handleResetAssistant}
@@ -1921,6 +2492,11 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                         {cnt}
                       </button>
                     ))}
+                    {sceneCount > 5 && (
+                      <span className="px-2.5 py-1 rounded-lg font-mono text-xs font-bold bg-gradient-to-r from-purple-700 to-amber-700 text-white shadow-md ring-1 ring-purple-400">
+                        {sceneCount} cảnh
+                      </span>
+                    )}
                     <span className="text-xs text-neutral-400 ml-1">cảnh</span>
                   </div>
                 </div>
@@ -2020,11 +2596,11 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                         </div>
 
                         <textarea
-                          rows={2}
+                          rows={3}
                           value={draft.actionDescription}
                           onChange={(e) => handleUpdateDraft(idx, "actionDescription", e.target.value)}
                           placeholder="Ví dụ: Người nông dân mặc áo tơi cầm đèn bão sắt bước đi từ trái qua giữa, run rẩy dừng lại trước mộ cổ khi thấy quạ đen kêu..."
-                          className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600 resize-none leading-relaxed transition-all"
+                          className="w-full bg-neutral-950 border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-red-600 resize-y leading-relaxed transition-all"
                         />
                       </div>
 
@@ -2069,33 +2645,79 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                 })}
               </div>
 
-              {/* Action Button: Chạy Tạo Phim */}
+              {/* Action Button: Chạy Tạo Phim hoặc Áp Dụng Kịch Bản Đã Có */}
               <div className="flex flex-col gap-2 pt-1">
-                <button
-                  onClick={() => {
-                    if (assetAudit && !assetAudit.isSufficient && assetAudit.missingAssets.length > 0) {
-                      if (
-                        !window.confirm(
-                          `Phát hiện ${assetAudit.missingAssets.length} asset trong cốt truyện chưa có trong GEMINI_DIRECTOR_ASSETS.md.\n\nBạn có muốn tiếp tục tạo phim bằng các asset thay thế tạm thời không?`
-                        )
-                      ) {
-                        return;
+                {generatedScenes && generatedScenes.length > 0 ? (
+                  <div className="flex flex-col gap-3 p-4 bg-gradient-to-r from-emerald-950/90 via-teal-950/80 to-neutral-950 border-2 border-emerald-500 rounded-2xl shadow-2xl animate-in fade-in">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-800/60 pb-2">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                        <div>
+                          <h4 className="text-xs font-bold text-white uppercase tracking-wider m-0">
+                            Đã Hoàn Thành {generatedScenes.length} Phân Cảnh Hoạt Hình!
+                          </h4>
+                          <span className="text-[11px] text-emerald-300">
+                            (Đã nạp trực tiếp từ Gemini Web - Bấm nút bên dưới để áp dụng vào Timeline và phát ngay)
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-xs font-mono text-cyan-300 bg-black/60 px-2.5 py-1 rounded-lg border border-emerald-700/60 font-semibold">
+                        {generatedScenes.length} Cảnh Phim
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      {onAppendScenes && totalScenesCount > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleConfirmAppendFilm}
+                          className="flex-1 py-3.5 px-4 rounded-xl bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-lg border border-purple-400/50"
+                          title="Nối tiếp các cảnh này vào sau phim hiện có"
+                        >
+                          <Plus className="w-4 h-4 text-amber-300" />
+                          <span>➕ Nối Tiếp Vào Sau Phim ({totalScenesCount} cũ + {generatedScenes.length} mới)</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={handleConfirmApplyFilm}
+                        className="flex-1 py-3.5 px-5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-black font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-xl shadow-emerald-950/90 ring-2 ring-emerald-300 transform hover:scale-[1.01] active:scale-[0.99]"
+                        title="Áp dụng ngay toàn bộ các phân cảnh vào phim"
+                      >
+                        <Play className="w-4 h-4 text-black fill-black" />
+                        <span>▶ ÁP DỤNG NGAY {generatedScenes.length} CẢNH VÀO PHIM ĐỂ XEM</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      if (assetAudit && !assetAudit.isSufficient && assetAudit.missingAssets.length > 0) {
+                        if (
+                          !window.confirm(
+                            `Phát hiện ${assetAudit.missingAssets.length} asset trong cốt truyện chưa có trong GEMINI_DIRECTOR_ASSETS.md.\n\nBạn có muốn tiếp tục tạo phim bằng các asset thay thế tạm thời không?`
+                          )
+                        ) {
+                          return;
+                        }
                       }
-                    }
-                    handleGenerateFilmFromDescriptions();
-                  }}
-                  disabled={isLoading || isBreakingDown || isAuditing}
-                  className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-red-700 via-amber-700 to-purple-800 hover:from-red-600 hover:via-amber-600 hover:to-purple-700 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xl shadow-red-950/80 ring-1 ring-amber-400/30 transform hover:scale-[1.01] active:scale-[0.99]"
-                >
-                  <Play className="w-4 h-4 text-amber-300 fill-amber-300" />
-                  <span>
-                    {isLoading
-                      ? "Gemini Đang Biên Dịch Kịch Bản Sang Hoạt Hình 2D..."
-                      : `🎬 BƯỚC 3: CHẠY TẠO PHIM NGAY (Tạo ${sceneCount} Phân Cảnh)`}
-                  </span>
-                </button>
+                      handleGenerateFilmFromDescriptions();
+                    }}
+                    disabled={isLoading || isBreakingDown || isAuditing}
+                    className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-red-700 via-amber-700 to-purple-800 hover:from-red-600 hover:via-amber-600 hover:to-purple-700 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xl shadow-red-950/80 ring-1 ring-amber-400/30 transform hover:scale-[1.01] active:scale-[0.99]"
+                  >
+                    <Play className="w-4 h-4 text-amber-300 fill-amber-300" />
+                    <span>
+                      {isLoading
+                        ? "Gemini Đang Biên Dịch Kịch Bản Sang Hoạt Hình 2D..."
+                        : `🎬 BƯỚC 3: CHẠY TẠO PHIM NGAY (Tạo ${sceneCount} Phân Cảnh)`}
+                    </span>
+                  </button>
+                )}
                 <p className="text-[11px] text-neutral-400 text-center m-0">
-                  Sau khi kiểm tra asset và điền xong các phân cảnh, bạn nhấn nút này thì Engine mới bắt đầu biên dịch sang hoạt hình và mở Player.
+                  {generatedScenes && generatedScenes.length > 0
+                    ? `Bấm nút "ÁP DỤNG NGAY" màu xanh để đưa toàn bộ ${generatedScenes.length} phân cảnh vào Timeline và mở Player xem hoạt hình!`
+                    : "Sau khi kiểm tra asset và điền xong các phân cảnh, bạn nhấn nút này thì Engine mới bắt đầu biên dịch sang hoạt hình và mở Player."}
                 </p>
               </div>
             </div>
@@ -2173,7 +2795,39 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                   <span className="text-xs font-bold text-neutral-300">
                     Danh Sách Bối Cảnh Chung Đang Có Trong Thư Viện ({namedEnvironments.length}):
                   </span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {namedEnvironments.length > 0 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={handleCopyEnvironmentsForGemini}
+                          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-200 border border-cyan-700/60 text-[11px] transition-all font-medium shadow"
+                          title="Copy danh sách bối cảnh dưới dạng prompt kèm JSON để dán vào Gemini Web"
+                        >
+                          {copyFeedbackKey === "envs_copied" ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-400" />
+                              <span className="text-emerald-300">Đã Copy Bối Cảnh!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3 text-cyan-400" />
+                              <span>📋 Copy Cho Gemini Web</span>
+                            </>
+                          )}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleDownloadEnvironmentsJson}
+                          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-neutral-700 text-[11px] transition-all font-medium shadow"
+                          title="Tải file JSON danh sách bối cảnh về máy"
+                        >
+                          <Download className="w-3 h-3 text-cyan-400" />
+                          <span>Tải JSON</span>
+                        </button>
+                      </>
+                    )}
                     {namedEnvironments.length > 0 && (
                       <button
                         type="button"
@@ -2394,7 +3048,39 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                   <span className="text-xs font-bold text-neutral-300">
                     Dàn Diễn Viên Khóa Rắc-co Trong Thư Viện ({namedCharacters.length}):
                   </span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {namedCharacters.length > 0 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={handleCopyCastForGemini}
+                          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-950/60 hover:bg-purple-900/80 text-purple-200 border border-purple-700/60 text-[11px] transition-all font-medium shadow"
+                          title="Copy danh sách diễn viên dưới dạng prompt kèm JSON để dán vào Gemini Web"
+                        >
+                          {copyFeedbackKey === "cast_copied" ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-400" />
+                              <span className="text-emerald-300">Đã Copy Diễn Viên!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3 text-purple-400" />
+                              <span>📋 Copy Cho Gemini Web</span>
+                            </>
+                          )}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleDownloadCastJson}
+                          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-neutral-700 text-[11px] transition-all font-medium shadow"
+                          title="Tải file JSON dàn diễn viên về máy"
+                        >
+                          <Download className="w-3 h-3 text-cyan-400" />
+                          <span>Tải JSON</span>
+                        </button>
+                      </>
+                    )}
                     {namedCharacters.length > 0 && (
                       <button
                         type="button"
@@ -2517,20 +3203,62 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                   </span>
                 </div>
 
-                {/* Environment Selector */}
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-neutral-400">Bối Cảnh Khóa:</span>
-                  <select
-                    value={singleSceneEnvId}
-                    onChange={(e) => setSingleSceneEnvId(e.target.value)}
-                    className="bg-black border border-neutral-700 rounded-lg px-2.5 py-1 text-xs text-amber-200 font-medium focus:outline-none"
+                {/* Top Action Buttons for Tab 4: Export & Import */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setJsonImportModal({ isOpen: true, target: "single_scene" })}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-amber-300 border border-amber-600/60 text-[11px] transition-all font-medium shadow"
+                    title="Nạp trực tiếp JSON phân cảnh do Gemini Web đạo diễn vào cảnh này"
                   >
-                    {namedEnvironments.map((env) => (
-                      <option key={env.id} value={env.id}>
-                        📍 {env.name}
-                      </option>
-                    ))}
-                  </select>
+                    <FileJson className="w-3 h-3 text-amber-400" />
+                    <span>📥 Nạp JSON Cảnh Này</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleCopySingleSceneForGemini}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border border-neutral-700 text-[11px] transition-all font-medium shadow"
+                    title="Copy toàn bộ thông số cảnh này kèm dàn diễn viên và bối cảnh để gửi cho Gemini Web"
+                  >
+                    {copyFeedbackKey === "single_scene_copied" ? (
+                      <>
+                        <Check className="w-3 h-3 text-emerald-400" />
+                        <span className="text-emerald-300">Đã Copy Cảnh!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3 text-cyan-400" />
+                        <span>📋 Copy Cảnh Cho Gemini Web</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleDownloadSingleSceneJson}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-neutral-700 text-[11px] transition-all font-medium shadow"
+                    title="Tải file JSON cảnh này về máy"
+                  >
+                    <Download className="w-3 h-3 text-cyan-400" />
+                    <span>Tải JSON</span>
+                  </button>
+
+                  {/* Environment Selector */}
+                  <div className="flex items-center gap-1.5 pl-2 border-l border-neutral-800">
+                    <span className="text-[11px] text-neutral-400">Bối Cảnh Khóa:</span>
+                    <select
+                      value={singleSceneEnvId}
+                      onChange={(e) => setSingleSceneEnvId(e.target.value)}
+                      className="bg-black border border-neutral-700 rounded-lg px-2.5 py-1 text-xs text-amber-200 font-medium focus:outline-none"
+                    >
+                      {namedEnvironments.map((env) => (
+                        <option key={env.id} value={env.id}>
+                          📍 {env.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 

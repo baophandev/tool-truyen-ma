@@ -369,7 +369,8 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
 
       const structId = item.asset_id as StructureId;
       const rule = STRUCTURE_RULES[structId];
-      let slot: GroundSlotId = item.slot;
+      let rawSlot = typeof item.slot === "string" ? item.slot.trim().replace(/^ground_/, "").replace(/^air_slot_/, "air_") : "center";
+      let slot: GroundSlotId = rawSlot as GroundSlotId;
       if (!rule.allowedSlots.includes(slot)) {
         slot = rule.allowedSlots[0] || "center";
       }
@@ -405,12 +406,17 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     const facialAction: FacialActionId | undefined = VALID_FACIAL_ACTIONS.includes(actor.facialAction)
       ? actor.facialAction
       : undefined;
-    const pose: CharacterPoseId = VALID_POSES.includes(actor.pose) ? actor.pose : "pose_standing";
+    let rawPose = actor.pose;
+    if (rawPose === "pose_idle" || rawPose === "idle" || rawPose === "standing") {
+      rawPose = "pose_standing";
+    }
+    const pose: CharacterPoseId = VALID_POSES.includes(rawPose) ? rawPose : "pose_standing";
 
     const actorRule = getAllowedSlotsForActor({ base, pose });
 
     // Slot healing: ensure slot matches pose allowed area
-    let slot: SlotId = actor.slot;
+    let rawSlot = typeof actor.slot === "string" ? actor.slot.trim().replace(/^ground_/, "").replace(/^air_slot_/, "air_") : "center";
+    let slot: SlotId = rawSlot as SlotId;
     if (!VALID_SLOTS.includes(slot) || !isSlotAllowed(slot, actorRule.allowedSlots)) {
       const fallbackInitialSlot = isAirPose(pose) ? "air_center" : "center";
       const curCoord = getSlotCoordinates(VALID_SLOTS.includes(slot) ? slot : fallbackInitialSlot);
@@ -433,16 +439,19 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     // Motion healing: drop motion if null, false, empty object, or invalid
     let motion: DirectorSceneScript["actors"][0]["motion"] = undefined;
     const rawMotion = actor.motion;
+    const rawTargetSlot = rawMotion && typeof rawMotion.targetSlot === "string"
+      ? rawMotion.targetSlot.trim().replace(/^ground_/, "").replace(/^air_slot_/, "air_")
+      : "";
     if (
       rawMotion &&
       typeof rawMotion === "object" &&
       rawMotion !== null &&
       !Array.isArray(rawMotion) &&
-      rawMotion.targetSlot &&
-      VALID_SLOTS.includes(rawMotion.targetSlot) &&
-      rawMotion.targetSlot !== slot
+      rawTargetSlot &&
+      VALID_SLOTS.includes(rawTargetSlot as SlotId) &&
+      rawTargetSlot !== slot
     ) {
-      let targetSlot: SlotId = rawMotion.targetSlot;
+      let targetSlot: SlotId = rawTargetSlot as SlotId;
       if (!isSlotAllowed(targetSlot, actorRule.allowedSlots)) {
         const curTargetCoord = getSlotCoordinates(targetSlot);
         const nearest = findNearestAllowedSlot(curTargetCoord.x, curTargetCoord.y, actorRule.allowedSlots);
@@ -543,7 +552,8 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
 
       const detailId = dt.asset_id as DetailId;
       const rule = DETAIL_RULES[detailId];
-      let slot: SlotId = dt.slot;
+      let rawSlot = typeof dt.slot === "string" ? dt.slot.trim().replace(/^ground_/, "").replace(/^air_slot_/, "air_") : "center";
+      let slot: SlotId = rawSlot as SlotId;
       if (!VALID_SLOTS.includes(slot) || !isSlotAllowed(slot, rule.allowedSlots)) {
         slot = rule.allowedSlots[0] || "center";
       }
