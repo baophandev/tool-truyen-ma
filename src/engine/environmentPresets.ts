@@ -602,6 +602,54 @@ export const DEFAULT_NAMED_ENVIRONMENTS: NamedEnvironmentPreset[] = [
       },
     ],
   },
+  {
+    id: "env_thatched_house_interior",
+    name: "Bên Trong Gian Nhà Lá U Tịch",
+    description: "Không gian bên trong căn nhà lá vách nứa đơn sơ rách nát, mái tranh xơ xác rủ vì kèo tre, bàn thờ tổ tiên nghi ngút khói trầm, giường tre rách và cửa gỗ then cài u tối.",
+    theme: "thatched_house_interior",
+    lighting: {
+      sky_preset: "dim_indoor_night",
+      fog_density: 0.5,
+      thunder_flash: false,
+    },
+    environment_items: [
+      {
+        asset_id: "structure_ancestor_altar",
+        slot: "center",
+        scale: 1.0,
+      },
+      {
+        asset_id: "structure_bamboo_bed_net",
+        slot: "far_left",
+        scale: 0.95,
+      },
+      {
+        asset_id: "structure_wooden_latch_door",
+        slot: "far_right",
+        scale: 1.0,
+      },
+      {
+        asset_id: "structure_small_wooden_table",
+        slot: "mid_right",
+        scale: 0.9,
+        offsetX: -30,
+      },
+    ],
+    details: [
+      {
+        id: "detail_oil_lamp_hut",
+        asset_id: "detail_oil_lamp",
+        slot: "mid_right",
+        offsetX: -30,
+        offsetY: -75,
+      },
+      {
+        id: "detail_talisman_hut_ceiling",
+        asset_id: "detail_hanging_talisman",
+        slot: "air_center",
+      },
+    ],
+  },
 ];
 
 export const STORAGE_KEY_ISOLATED = "limbo_project_isolated";

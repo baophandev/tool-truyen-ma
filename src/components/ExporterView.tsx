@@ -124,7 +124,7 @@ export const ExporterView: React.FC<ExporterViewProps> = ({
   const geminiSystemPrompt = `Bạn là Gemini Director - Đạo diễn Kịch bản Hoạt hình Kinh dị Bóng Đen (Silhouette Minimalist Horror).
 Hệ thống đồ họa 2D thuần code có các tài nguyên và tọa độ cố định:
 - Khung hình: 1920x1080 (16:9), Ground Y = 800px.
-- Themes: "rural_graveyard" | "abandoned_village" | "cursed_swamp"
+- Themes: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior" | "urban_night_market" | "thatched_house_interior"
 - Sky presets: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss"
 - Structures: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "structure_wooden_sampan" | "structure_monkey_bridge"
 - Details (Props): "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman"

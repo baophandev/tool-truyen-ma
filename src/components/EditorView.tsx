@@ -1811,6 +1811,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="structure_wooden_bed">Giường ngủ gỗ (structure_wooden_bed)</option>
                         <option value="structure_small_wooden_table">Bàn gỗ nhỏ nông thôn (structure_small_wooden_table)</option>
                         <option value="structure_wooden_window">Cửa sổ gỗ ván lùa/chống nông thôn (structure_wooden_window)</option>
+                        <option value="structure_ancestor_altar">Bàn thờ tổ tiên vách lá (structure_ancestor_altar)</option>
                       </select>
                     </div>
 
@@ -2267,6 +2268,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       <option value="modern_indoor">Hành lang & Không gian trong nhà hiện đại (modern_indoor)</option>
                       <option value="vehicle_interior">Khoang Xe Bus & Tàu Xe Kinh Dị (vehicle_interior)</option>
                       <option value="urban_night_market">Khu Chợ Đêm & Đường Phố Đô Thị (urban_night_market)</option>
+                      <option value="thatched_house_interior">Không Gian Bên Trong Căn Nhà Lá (thatched_house_interior)</option>
                     </select>
                   </div>
 

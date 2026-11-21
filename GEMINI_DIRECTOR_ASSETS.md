@@ -66,6 +66,7 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"modern_indoor"`: Hành lang & Không gian trong nhà hiện đại (hành lang bệnh viện, sảnh khách sạn u ám, siêu thị bỏ hoang, nhà hàng đêm muộn với trần nhà drop-tile, đèn tuýp huỳnh quang, biển báo EXIT và sàn gạch bóng loáng).
 - `"vehicle_interior"`: Khoang xe bus & Tàu xe kinh dị (không gian bên trong xe buýt, xe khách hoặc toa tàu ma quái với trần uốn cong, khoang thoát hiểm, ô cửa sổ đêm nhìn ra đường vắng, hàng ghế hành khách, cột vịn tay màu vàng và sàn cao su chống trượt). BẮT BUỘC dùng cho các cảnh diễn ra bên trong xe buýt/tàu xe để tạo cảm giác ngột ngạt (claustrophobic), TUYỆT ĐỐI KHÔNG dùng modern_indoor.
 - `"urban_night_market"`: Khu chợ đêm & Đường phố đô thị (con phố đô thị sầm uất u tối về đêm với dãy nhà cao tầng mờ ảo, đèn neon rực rỡ chớp nháy, dây điện chằng chịt, dãy lều bạt chợ đêm bày bán cổ vật, mặt đường nhựa ướt sũng bóng nước và hơi nước bốc lên từ nắp cống ngầm). BẮT BUỘC dùng cho các cảnh đô thị ngoài trời, phố xá hiện đại hoặc khu chợ đêm.
+- `"thatched_house_interior"`: Không gian bên trong căn nhà lá (gian nhà lá ba gian vách nứa đơn sơ rách nát, mái tranh xơ xác rủ vì kèo tre, đòn dông buộc lạt mây, vách đan nan tre, cửa sổ liếp hé mở nhìn ra bóng chuối rặng tre trong đêm lạnh và nền đất nện cổ truyền với vết nứt rơm rạ). BẮT BUỘC dùng cho các phân cảnh diễn ra bên trong căn nhà lá, nhà tranh nông thôn hoặc gian thờ gia tiên.
 
 ### 3.2. Bầu Trời & Chiếu Sáng (Sky Presets)
 - `"blood_moon"`: Trăng Máu U Uất (Gradient đỏ rực `#2B0808` -> `#0D0202`, trăng đỏ quạch khổng lồ).
@@ -75,7 +76,7 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"flickering_fluorescent"`: Đèn Tuýp Huỳnh Quang Chập Chờn (Ánh sáng xanh ngọc lạnh lẽo trong nhà, bóng tuýp chập chờn, biển báo EXIT xanh lục phát sáng).
 - `"dim_indoor_night"`: Ánh Vàng Đêm Mờ Ảo (Ánh đèn vàng hổ phách u tịch trong khách sạn / nhà hàng đêm muộn).
 
-### 3.3. 28 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
+### 3.3. 30 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
 
 Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ được đặt tại các Slot được phép** sau:
 
@@ -111,6 +112,7 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `structure_wooden_bed` | Giường ngủ gỗ | Chiếc giường đôi gỗ gia đình ấm áp, vách đầu giường gỗ thanh lịch cao Y=-195px có gối nằm kê đầu tại X=-65px, mặt nệm chiếu phẳng phiu tại Y=-80px và chăn gấp gọn gàng; **tương tác hoàn hảo với tư thế nằm `pose_lying_down` (kèm `offsetY: -80`) hoặc tư thế ngồi `pose_sitting` ở mép giường** | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `structure_small_wooden_table` | Bàn gỗ nhỏ nông thôn | Bàn gỗ nhỏ mộc mạc đặt đèn dầu hột vịt và radio cassette cổ, gốc neo `[bottom-center]` tiếp đất Y=800px, mặt bàn cao Y=-75px (**tương thích hoàn hảo với đạo cụ `detail_oil_lamp`, `detail_vintage_radio` đặt trên bàn kèm `offsetY: -75`**) | `["mid_left", "center", "mid_right"]` |
 | `structure_wooden_window` | Cửa sổ gỗ ván lùa/chống nông thôn | Khung cửa sổ ván gỗ hai cánh khép hờ chừa khe dọc ở giữa hắt ánh sương lạnh mờ ảo ra ngoài màn đêm, có các thanh song cửa dọc; neo theo trục sàn Y=800px nhưng khung cửa sổ treo ở tầm cao Y=-260px đến Y=-120px (**tương ứng tầm mắt người nằm trên giường tre nhìn ra**) | `["far_left", "mid_left", "mid_right", "far_right"]` |
+| `structure_ancestor_altar` | Bàn thờ tổ tiên vách lá (Án gian cổ) | Án gian gỗ ba tầng chạm khắc cổ kính đặt sát vách nứa căn nhà lá, có yếm đỏ rách mép tua rua, khung di ảnh tổ tiên cổ kính phủ gương mờ, bài vị chữ Nho, bát hương gốm men rạn nghi ngút ba làn khói hương u uất và đôi chân nến đồng le lói ánh vàng ma mị | `["mid_left", "center", "mid_right"]` |
 
 ---
 
@@ -306,7 +308,7 @@ export interface DirectorSceneScript {
   scene_id: string;               // Mã định danh cảnh, ví dụ: "scene_01_graveyard"
   title: string;                  // Tiêu đề cảnh tiếng Việt
   duration_sec: number;           // Thời lượng cảnh (1 đến 60 giây, khuyến nghị 5-8s)
-  theme: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior";
+  theme: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior" | "urban_night_market" | "thatched_house_interior";
   lighting: {
     sky_preset: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss" | "flickering_fluorescent" | "dim_indoor_night";
     fog_density: number;          // Độ dày sương mù từ 0.0 đến 1.0
@@ -314,7 +316,7 @@ export interface DirectorSceneScript {
     weather?: "none" | "heavy_rain" | "storm_thunder" | "blood_rain" | "floating_embers" | "drifting_ash" | "haunted_mist"; // Hiệu ứng thời tiết & hạt khí quyển thuần code
   };
   environment_items: Array<{
-    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub" | "market_stall_tent" | "abandoned_subway_station" | "rusty_train_tracks_tunnel" | "structure_old_apartment_gate" | "structure_wooden_sampan" | "structure_monkey_bridge" | "structure_wooden_coffin" | "structure_bamboo_bed_net" | "structure_wooden_latch_door" | "structure_rural_passenger_bus" | "structure_coconut_banana_grove" | "structure_wooden_chair" | "structure_wooden_bed" | "structure_small_wooden_table" | "structure_wooden_window";
+    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub" | "market_stall_tent" | "abandoned_subway_station" | "rusty_train_tracks_tunnel" | "structure_old_apartment_gate" | "structure_wooden_sampan" | "structure_monkey_bridge" | "structure_wooden_coffin" | "structure_bamboo_bed_net" | "structure_wooden_latch_door" | "structure_rural_passenger_bus" | "structure_coconut_banana_grove" | "structure_wooden_chair" | "structure_wooden_bed" | "structure_small_wooden_table" | "structure_wooden_window" | "structure_ancestor_altar";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right";
     offsetX?: number;
     offsetY?: number;
@@ -1356,6 +1358,89 @@ Thay vì giữ nguyên 1 góc máy cố định suốt cả phân cảnh dài, A
   ],
   "dialogue": "Minh cầm chặt cây đèn dầu hột vịt nhỏ trong tay, run rẩy nhìn về phía khe cửa sổ gỗ khép hờ. Bên ngoài màn sương lạnh buốt, một bóng hình ma quái đang lặng lẽ dòm vào...",
   "narrative_note": "Tổ hợp visual chuẩn xác: structure_wooden_window tại vách trái với ánh sương lạnh lọt qua khe cửa; structure_small_wooden_table tại center làm bệ đỡ cho detail_oil_lamp và detail_vintage_radio ở tọa độ offsetY: -75 vừa khít mặt bàn; diễn viên Minh cầm item_oil_lamp tỏa quầng sáng vàng ấm soi rọi đối diện bóng ma ghost_wraith."
+}
+```
+
+### 9.13. Kịch Bản JSON Mẫu: Gian Nhà Lá Ba Gian Ban Đêm Bên Bàn Thờ Tổ Tiên
+```json
+{
+  "scene_id": "scene_thatched_house_altar_ritual",
+  "title": "Bên Trong Gian Nhà Lá U Tịch",
+  "duration_sec": 7,
+  "theme": "thatched_house_interior",
+  "lighting": {
+    "sky_preset": "dim_indoor_night",
+    "fog_density": 0.5,
+    "weather": "haunted_mist"
+  },
+  "camera": {
+    "shot": "medium_wide",
+    "target_slot": "center",
+    "shake": "subtle_handheld",
+    "motion": {
+      "type": "push_in",
+      "endZoom": 1.35,
+      "startTimeSec": 0.5,
+      "endTimeSec": 6.5,
+      "easing": "ease_in_out"
+    }
+  },
+  "environment_items": [
+    {
+      "asset_id": "structure_ancestor_altar",
+      "slot": "center",
+      "scale": 1.0
+    },
+    {
+      "asset_id": "structure_bamboo_bed_net",
+      "slot": "far_left",
+      "scale": 0.95
+    },
+    {
+      "asset_id": "structure_wooden_latch_door",
+      "slot": "far_right",
+      "scale": 1.0
+    },
+    {
+      "asset_id": "structure_small_wooden_table",
+      "slot": "mid_right",
+      "scale": 0.9,
+      "offsetX": -30
+    }
+  ],
+  "actors": [
+    {
+      "id": "actor_elder_grandmother",
+      "base": "elder_hunched",
+      "costume": "outfit_traditional_ba_ba",
+      "face": "face_old_wrinkled",
+      "facialAction": "darting_eyes",
+      "pose": "pose_shivering",
+      "facing": "right",
+      "slot": "mid_left",
+      "scale": 0.95,
+      "opacity": 1.0,
+      "heldItem": "item_soul_candle",
+      "heldHand": "right"
+    }
+  ],
+  "details": [
+    {
+      "id": "detail_lamp_on_table",
+      "asset_id": "detail_oil_lamp",
+      "slot": "mid_right",
+      "offsetX": -30,
+      "offsetY": -75,
+      "scale": 0.95
+    },
+    {
+      "id": "detail_talisman_ceiling",
+      "asset_id": "detail_hanging_talisman",
+      "slot": "air_center"
+    }
+  ],
+  "dialogue": "Ánh đèn dầu leo lét trên bàn thờ tổ tiên hắt bóng bà Hai chập chờn lên bức vách nứa. Ngoài sân, tiếng gió rít qua rui mè tre lạnh buốt xương sống...",
+  "narrative_note": "Không gian thuần chất kinh dị Nam Bộ: theme thatched_house_interior với vách nứa đan nan tre, vì kèo tre rủ mái tranh; structure_ancestor_altar ở trung tâm nghi ngút khói nhang đỏ rực; giường tre giăng mùng ở far_left và cửa gỗ cài then ở far_right."
 }
 ```
 

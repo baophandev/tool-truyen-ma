@@ -9,7 +9,8 @@ export type ThemeId =
   | "cursed_swamp"
   | "modern_indoor"
   | "vehicle_interior"
-  | "urban_night_market";
+  | "urban_night_market"
+  | "thatched_house_interior";
 
 export type SkyPresetId =
   | "blood_moon"
@@ -49,7 +50,8 @@ export type StructureId =
   | "structure_wooden_chair"
   | "structure_wooden_bed"
   | "structure_small_wooden_table"
-  | "structure_wooden_window";
+  | "structure_wooden_window"
+  | "structure_ancestor_altar";
 
 export type DetailId =
   | "detail_black_crow"

@@ -14,6 +14,7 @@ export const SkyLayer: React.FC<{
   const isStormy = skyPreset === "stormy_dark";
   const isEclipse = skyPreset === "eclipse_abyss";
   const isVehicle = theme === "vehicle_interior";
+  const isThatched = theme === "thatched_house_interior";
   const isIndoor =
     theme === "modern_indoor" ||
     (!theme && (skyPreset === "flickering_fluorescent" || skyPreset === "dim_indoor_night"));
@@ -42,9 +43,11 @@ export const SkyLayer: React.FC<{
         style={{ mixBlendMode: "screen", pointerEvents: "none" }}
       />
 
-      {/* Vehicle Ceiling vs. Indoor Hallway Ceiling vs. Outdoor Celestial Moon */}
+      {/* Vehicle Ceiling vs. Thatched Roof Ceiling vs. Indoor Hallway Ceiling vs. Outdoor Celestial Moon */}
       {isVehicle ? (
         <VehicleCabinCeilingLayer isFluorescent={isFluorescent} />
+      ) : isThatched ? (
+        <ThatchedRoofCeilingLayer skyPreset={skyPreset} />
       ) : isIndoor ? (
         <IndoorCeilingLayer isFluorescent={isFluorescent} />
       ) : (
@@ -396,6 +399,129 @@ const UrbanOverheadWiresAndLights: React.FC = () => {
 };
 
 /**
+ * THATCHED ROOF CEILING LAYER (Vì Kèo Tre, Đòn Dông & Mái Tranh Xơ Xác)
+ * Traditional rural Vietnamese thatched hut ceiling with bamboo trusses, hanging straw,
+ * and piercing shafts of faint moonlight / eerie night fog.
+ */
+const ThatchedRoofCeilingLayer: React.FC<{ skyPreset: SkyPresetId }> = ({ skyPreset }) => {
+  const isBlood = skyPreset === "blood_moon";
+
+  return (
+    <g className="thatched-roof-ceiling-layer">
+      {/* 1. Heavy Thatched Eaves Covering Upper Slopes (Mái lá dừa nước / mái rạ dốc hai bên) */}
+      {/* Left Roof Thatch Eaves */}
+      <path
+        d="M -200 -50 L 1000 -50 L 960 110 Q 720 140 460 130 Q 220 160 -50 150 Q -120 170 -200 160 Z"
+        fill="#07090D"
+        stroke="#161B26"
+        strokeWidth="2"
+      />
+      {/* Right Roof Thatch Eaves */}
+      <path
+        d="M 920 -50 L 2120 -50 L 2120 160 Q 1980 170 1760 145 Q 1500 165 1240 135 Q 1060 150 920 110 Z"
+        fill="#07090D"
+        stroke="#161B26"
+        strokeWidth="2"
+      />
+
+      {/* 2. Ragged Straw Fringe (Lá tranh & ngọn rạ xơ rách rủ xuống lưa thưa) */}
+      <path
+        d="M -100 130 
+           Q -60 180 -40 140 Q 0 195 30 145 Q 70 185 100 135 Q 140 190 180 140
+           Q 220 185 260 142 Q 310 195 360 140 Q 420 190 470 138 Q 520 185 570 145
+           Q 620 192 670 140 Q 730 188 780 142 Q 840 195 890 135 Q 940 180 980 130
+           Q 1030 188 1080 140 Q 1140 192 1190 145 Q 1250 185 1300 138 Q 1360 195 1410 142
+           Q 1470 186 1520 140 Q 1580 190 1630 145 Q 1690 185 1740 140 Q 1800 195 1850 142
+           Q 1910 188 1960 140 Q 2020 190 2060 135 L 2060 110 L -100 110 Z"
+        fill="#05060A"
+        stroke="#131620"
+        strokeWidth="1.2"
+      />
+
+      {/* 3. Main Central Ridge Pole / Bamboo Tie Beam (Đòn Dông Tre & Xà Gồ Ngang Y = 80px) */}
+      {/* Upper Ridge Beam */}
+      <line x1="-200" y1="45" x2="2120" y2="45" stroke="#090B10" strokeWidth="16" />
+      <line x1="-200" y1="43" x2="2120" y2="43" stroke="#181D29" strokeWidth="4" />
+      {/* Bamboo Nodes on Main Ridge Beam */}
+      {[120, 360, 600, 840, 1080, 1320, 1560, 1800].map((nodeX) => (
+        <g key={`ridge-node-${nodeX}`}>
+          <rect x={nodeX - 4} y="36" width="8" height="18" rx="2" fill="#242B3B" />
+          <line x1={nodeX} y1="36" x2={nodeX} y2="54" stroke="#06080C" strokeWidth="1" />
+        </g>
+      ))}
+
+      {/* Secondary Lower Tie Beam (Thanh xà gồ ngang thứ hai Y = 120px) */}
+      <line x1="-200" y1="120" x2="2120" y2="120" stroke="#080A0E" strokeWidth="12" />
+      <line x1="-200" y1="118" x2="2120" y2="118" stroke="#161A24" strokeWidth="3" />
+
+      {/* 4. Diagonal Bamboo Rafters & Trusses (Các thanh vì kèo xiên từ đòn dông xuống) */}
+      {[
+        { x1: 960, y1: 45, x2: 240, y2: 220 },
+        { x1: 960, y1: 45, x2: 480, y2: 220 },
+        { x1: 960, y1: 45, x2: 720, y2: 220 },
+        { x1: 960, y1: 45, x2: 1200, y2: 220 },
+        { x1: 960, y1: 45, x2: 1440, y2: 220 },
+        { x1: 960, y1: 45, x2: 1680, y2: 220 },
+        { x1: 480, y1: 45, x2: -60, y2: 220 },
+        { x1: 1440, y1: 45, x2: 1980, y2: 220 },
+      ].map((rafter, i) => (
+        <g key={`rafter-${i}`}>
+          <line x1={rafter.x1} y1={rafter.y1} x2={rafter.x2} y2={rafter.y2} stroke="#0B0E14" strokeWidth="8" />
+          <line x1={rafter.x1 - 1} y1={rafter.y1} x2={rafter.x2 - 1} y2={rafter.y2} stroke="#1C2230" strokeWidth="2" />
+        </g>
+      ))}
+
+      {/* Rattan Lashings / Knots (Dây lạt mây buộc rui mè tại các điểm giao cắt) */}
+      {[
+        [240, 120], [480, 120], [720, 120], [960, 45], [960, 120],
+        [1200, 120], [1440, 120], [1680, 120]
+      ].map(([kx, ky], idx) => (
+        <g key={`knot-${idx}`} transform={`translate(${kx}, ${ky})`}>
+          <ellipse cx="0" cy="0" rx="9" ry="8" fill="#1C1812" stroke="#524332" strokeWidth="1.2" />
+          <line x1="-7" y1="-5" x2="7" y2="5" stroke="#786047" strokeWidth="1.4" />
+          <line x1="-7" y1="5" x2="7" y2="-5" stroke="#786047" strokeWidth="1.4" />
+        </g>
+      ))}
+
+      {/* 5. Light Shaft Piercing Through Thatched Tear (Tia sáng trăng le lói xuyên qua lỗ rách trên mái) */}
+      <g opacity="0.65" pointerEvents="none">
+        <polygon
+          points="460,75 500,75 750,750 630,750"
+          fill="url(#thatched-light-beam)"
+          style={{ mixBlendMode: "screen" }}
+        />
+        {/* Glowing roof gap hole */}
+        <ellipse cx="480" cy="75" rx="14" ry="4" fill={isBlood ? "#DC2626" : "#E2E8F0"} opacity="0.5" />
+      </g>
+
+      {/* 6. Hanging Bundles from Rafters (Bắp khô, dải tỏi xua quỷ, dải bùa vàng đung đưa) */}
+      {/* Hanging Dried Corn Cob Bunch (Chùm bắp khô treo xà X = 320) */}
+      <g transform="translate(320, 120)" className="anim-pendulum-sway" style={{ transformOrigin: "0px -10px" }}>
+        <line x1="0" y1="0" x2="0" y2="28" stroke="#524332" strokeWidth="1.6" />
+        {[-8, 0, 8].map((cx, i) => (
+          <ellipse key={`corn-${i}`} cx={cx} cy={35 + i * 4} rx="5" ry="12" fill="#713F12" stroke="#A16207" strokeWidth="0.8" />
+        ))}
+      </g>
+
+      {/* Hanging Garlic/Chili string (Dải tỏi / ớt khô treo trừ tà X = 1380) */}
+      <g transform="translate(1380, 120)" className="anim-pendulum-sway" style={{ transformOrigin: "0px -10px", animationDelay: "0.8s" }}>
+        <line x1="0" y1="0" x2="0" y2="40" stroke="#524332" strokeWidth="1.4" />
+        {[10, 20, 30, 40].map((gy, i) => (
+          <circle key={`garlic-${i}`} cx={i % 2 === 0 ? -3 : 3} cy={gy} r="4" fill="#52525B" stroke="#71717A" strokeWidth="0.8" />
+        ))}
+      </g>
+
+      {/* Hanging Talisman from rafter (Bùa vàng trừ tà treo đỉnh rui X = 860) */}
+      <g transform="translate(860, 120)" className="anim-pendulum-sway" style={{ transformOrigin: "0px -10px", animationDelay: "0.4s" }}>
+        <line x1="0" y1="0" x2="0" y2="18" stroke="#524332" strokeWidth="1.2" />
+        <rect x="-7" y="18" width="14" height="42" fill="#FACC15" opacity="0.85" rx="1" />
+        <path d="M 0 22 L 0 54 M -4 30 L 4 30 M -4 42 L 4 42" stroke="#DC2626" strokeWidth="1" />
+      </g>
+    </g>
+  );
+};
+
+/**
  * LAYER 1: DISTANT BACKGROUND SILHOUETTES
  */
 export const BackgroundLayer: React.FC<{ theme: ThemeId; skyPreset: SkyPresetId }> = ({
@@ -409,8 +535,10 @@ export const BackgroundLayer: React.FC<{ theme: ThemeId; skyPreset: SkyPresetId 
 
   return (
     <g className="environment-layer-1-background">
-      {/* THEME 4 & 5: MODERN INDOOR CORRIDOR vs. VEHICLE INTERIOR */}
-      {theme === "modern_indoor" ? (
+      {/* THEME: THATCHED HOUSE vs. MODERN INDOOR vs. VEHICLE INTERIOR vs. URBAN NIGHT MARKET */}
+      {theme === "thatched_house_interior" ? (
+        <ThatchedHouseInteriorBackground skyPreset={skyPreset} />
+      ) : theme === "modern_indoor" ? (
         <IndoorCorridorBackground skyPreset={skyPreset} />
       ) : theme === "vehicle_interior" ? (
         <VehicleInteriorBackground skyPreset={skyPreset} />
@@ -540,6 +668,142 @@ const IndoorCorridorBackground: React.FC<{ skyPreset: SkyPresetId }> = ({ skyPre
         <line x1="380" y1="800" x2="860" y2="800" />
         <line x1="1540" y1="800" x2="1120" y2="800" />
         <line x1="1740" y1="800" x2="1060" y2="800" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * THATCHED HOUSE INTERIOR BACKGROUND (Vách Nứa Đan Nan Tre, Cột Gỗ Mộc & Cửa Sổ Liếp Nứa)
+ * Traditional Vietnamese rural hut interior wall with woven wicker/bamboo slat texture,
+ * rustic wooden pillars dividing into 3 bays (ba gian), and bamboo window revealing moonlit banana palms.
+ */
+const ThatchedHouseInteriorBackground: React.FC<{ skyPreset: SkyPresetId }> = ({ skyPreset }) => {
+  const isBlood = skyPreset === "blood_moon";
+  const outsideSky = isBlood ? "#2B0808" : skyPreset === "eclipse_abyss" ? "#021A12" : "#0A0E17";
+
+  return (
+    <g className="thatched-house-interior-background">
+      {/* 1. Base Wall Background Fill */}
+      <rect
+        x="-400"
+        y="100"
+        width={CANVAS_WIDTH + 800}
+        height="710"
+        fill="#080A0E"
+      />
+      <rect
+        x="-400"
+        y="100"
+        width={CANVAS_WIDTH + 800}
+        height="710"
+        fill="url(#thatched-wall-shadow)"
+      />
+
+      {/* 2. Woven Bamboo / Thatched Palm Wall Weave Texture (Đan nan nứa ngang dọc) */}
+      {/* Horizontal Bamboo Battens */}
+      {[160, 220, 280, 340, 400, 460, 520, 580, 640, 700, 750].map((wy) => (
+        <g key={`bamboo-rail-${wy}`}>
+          <line x1="-400" y1={wy} x2={CANVAS_WIDTH + 400} y2={wy} stroke="#0E121A" strokeWidth="5" />
+          <line x1="-400" y1={wy - 1} x2={CANVAS_WIDTH + 400} y2={wy - 1} stroke="#1B2230" strokeWidth="1.2" opacity="0.7" />
+        </g>
+      ))}
+
+      {/* Vertical Woven Bamboo Strips Pattern (Lạt nứa đan xen) */}
+      <g stroke="#0A0C12" strokeWidth="2" opacity="0.6">
+        {[
+          80, 140, 200, 260, 320, 420, 480, 540, 600, 660, 720, 780, 840,
+          900, 960, 1020, 1080, 1140, 1200, 1260, 1320, 1380, 1440, 1500,
+          1600, 1660, 1720, 1780, 1840
+        ].map((vx) => (
+          <line key={`vert-slat-${vx}`} x1={vx} y1="130" x2={vx} y2="800" strokeDasharray="18,12,24,10" />
+        ))}
+      </g>
+
+      {/* Soot / Smoke Stain Patches from Oil Lamps over decades (Vệt ố bồ hóng ám khói đen) */}
+      <ellipse cx="960" cy="380" rx="220" ry="140" fill="#030406" opacity="0.55" />
+      <ellipse cx="960" cy="460" rx="340" ry="180" fill="#040508" opacity="0.4" />
+
+      {/* 3. Bamboo Window with Outside Moonlit Night View (Cửa sổ liếp nan tre mở hé ở gian trái X: 160..320) */}
+      <g className="thatched-window-receding" transform="translate(160, 320)">
+        {/* Outer Window Cutout Opening (Bên ngoài trời đêm) */}
+        <rect x="0" y="0" width="160" height="210" fill={outsideSky} stroke="#1A202C" strokeWidth="4" />
+
+        {/* Distant moonlit banana leaves swaying outside window */}
+        <g opacity="0.75" className="anim-cloud-drift-slow">
+          {/* Banana frond 1 */}
+          <path
+            d="M 160 80 C 110 50, 60 70, 20 120 C 50 115, 90 95, 160 110 Z"
+            fill="#05080E"
+          />
+          {/* Banana frond 2 */}
+          <path
+            d="M 160 140 C 100 120, 40 160, 10 210 C 50 185, 95 170, 160 165 Z"
+            fill="#030508"
+          />
+        </g>
+
+        {/* Cold outside night fog filtering through window */}
+        <rect x="0" y="0" width="160" height="210" fill="#64748B" opacity="0.12" pointerEvents="none" />
+
+        {/* Vertical Bamboo Window Bars (Song cửa sổ bằng ống tre già) */}
+        {[32, 64, 96, 128].map((bx) => (
+          <g key={`win-bamboo-bar-${bx}`}>
+            <line x1={bx} y1="0" x2={bx} y2="210" stroke="#0B0D14" strokeWidth="6" />
+            <line x1={bx - 1} y1="0" x2={bx - 1} y2="210" stroke="#222B3D" strokeWidth="1.5" />
+          </g>
+        ))}
+
+        {/* Bamboo Shutter Leaf Propped Open with Stick (Cánh liếp nứa chống gậy xiên) */}
+        <polygon points="-8,-12 168,-12 185,45 -25,45" fill="#07090F" stroke="#1E2638" strokeWidth="2" />
+        {/* Prop Stick (Gậy tre chống liếp) */}
+        <line x1="140" y1="210" x2="165" y2="45" stroke="#2A241E" strokeWidth="3" />
+        <line x1="20" y1="210" x2="-5" y2="45" stroke="#2A241E" strokeWidth="3" />
+      </g>
+
+      {/* 4. Heavy Rustic Wooden Columns (Các cột gỗ mộc phân chia 3 gian: X = 390, 720, 1200, 1530) */}
+      {[
+        { x: 390, name: "Cột gian trái" },
+        { x: 720, name: "Cột hàng nhì trái" },
+        { x: 1200, name: "Cột hàng nhì phải" },
+        { x: 1530, name: "Cột gian phải" },
+      ].map((col, idx) => (
+        <g key={`pillar-${idx}`}>
+          {/* Main Wooden Column Body */}
+          <rect x={col.x - 16} y="110" width="32" height="690" fill="#0B0E14" stroke="#161C26" strokeWidth="1.5" />
+          {/* Column longitudinal edge highlight */}
+          <line x1={col.x - 11} y1="110" x2={col.x - 11} y2="800" stroke="#263147" strokeWidth="2" />
+          <line x1={col.x + 10} y1="110" x2={col.x + 10} y2="800" stroke="#05070A" strokeWidth="3" />
+          {/* Stone Plinth Footing (Chân tảng đá kê cột Y = 788..800px) */}
+          <polygon
+            points={`${col.x - 24},800 ${col.x + 24},800 ${col.x + 18},786 ${col.x - 18},786`}
+            fill="#141820"
+            stroke="#273142"
+            strokeWidth="1"
+          />
+        </g>
+      ))}
+
+      {/* 5. Horizontal Wooden Tie Beams Across Pillars (Thanh xà ngang liên kết các cột) */}
+      <line x1="-200" y1="260" x2="2120" y2="260" stroke="#090C12" strokeWidth="12" />
+      <line x1="-200" y1="258" x2="2120" y2="258" stroke="#1E2738" strokeWidth="2.5" />
+      <line x1="-200" y1="560" x2="2120" y2="560" stroke="#080B10" strokeWidth="10" />
+      <line x1="-200" y1="558" x2="2120" y2="558" stroke="#1A2230" strokeWidth="2" />
+
+      {/* 6. Faded Red Couplets Pinned on Center Pillars (Đôi câu đối đỏ chữ Nho phai màu dán cột) */}
+      {/* Left Couplet on Pillar X = 720 */}
+      <g transform="translate(712, 340)">
+        <rect x="0" y="0" width="16" height="180" rx="1" fill="#450A0A" stroke="#7F1D1D" strokeWidth="0.8" opacity="0.8" />
+        {[20, 50, 80, 110, 140, 165].map((cy, i) => (
+          <rect key={`chr-l-${i}`} x="3" y={cy} width="10" height="12" fill="#0A0303" opacity="0.75" />
+        ))}
+      </g>
+      {/* Right Couplet on Pillar X = 1200 */}
+      <g transform="translate(1192, 340)">
+        <rect x="0" y="0" width="16" height="180" rx="1" fill="#450A0A" stroke="#7F1D1D" strokeWidth="0.8" opacity="0.8" />
+        {[20, 50, 80, 110, 140, 165].map((cy, i) => (
+          <rect key={`chr-r-${i}`} x="3" y={cy} width="10" height="12" fill="#0A0303" opacity="0.75" />
+        ))}
       </g>
     </g>
   );
@@ -1114,9 +1378,80 @@ const UrbanNightMarketGroundLayer: React.FC = () => {
 };
 
 /**
+ * THATCHED HOUSE GROUND LAYER (Nền Đất Nện Cổ Truyền Y = 800px)
+ * Traditional compacted earthen dirt floor with natural unevenness,
+ * earthen cracks, scattered straw/bamboo debris, and skirting threshold beam.
+ */
+const ThatchedHouseGroundLayer: React.FC = () => {
+  return (
+    <g className="environment-layer-2-ground-thatched">
+      {/* 1. Solid Earthen Subsurface with overscan */}
+      <rect
+        x="-400"
+        y={GROUND_Y}
+        width={CANVAS_WIDTH + 800}
+        height={CANVAS_HEIGHT - GROUND_Y + 400}
+        fill={COLOR_PALETTE.silhouette_primary}
+      />
+
+      {/* 2. Top Skirting Threshold Beam (Thanh dầm gỗ nẹp chân vách nứa Y = 796px) */}
+      <rect
+        x="-400"
+        y={GROUND_Y - 4}
+        width={CANVAS_WIDTH + 800}
+        height="8"
+        fill="#0D1017"
+        stroke="#1A212E"
+        strokeWidth="1"
+      />
+      <line x1="-400" y1={GROUND_Y - 3} x2={CANVAS_WIDTH + 400} y2={GROUND_Y - 3} stroke="#2D3748" strokeWidth="1.2" />
+
+      {/* 3. Compacted Dirt Surface with natural slight undulation (Đường viền đất nện mấp mô nhẹ) */}
+      <path
+        d={`M -400 ${GROUND_Y}
+           L 0 ${GROUND_Y}
+           Q 250 ${GROUND_Y - 2} 480 ${GROUND_Y + 2}
+           Q 720 ${GROUND_Y - 3} 960 ${GROUND_Y}
+           Q 1200 ${GROUND_Y + 3} 1440 ${GROUND_Y - 2}
+           Q 1680 ${GROUND_Y + 1} 1920 ${GROUND_Y}
+           L 2320 ${GROUND_Y}
+           L 2320 ${CANVAS_HEIGHT + 400} L -400 ${CANVAS_HEIGHT + 400} Z`}
+        fill="#0A0C10"
+      />
+
+      {/* 4. Natural Earthen Ground Cracks (Vết nứt đất tự nhiên khô nẻ) */}
+      <g stroke="#050608" strokeWidth="1.4" opacity="0.8">
+        <path d={`M 280 ${GROUND_Y + 10} L 310 ${GROUND_Y + 35} L 305 ${GROUND_Y + 55} L 330 ${GROUND_Y + 80}`} />
+        <path d={`M 640 ${GROUND_Y + 15} L 665 ${GROUND_Y + 45} L 690 ${GROUND_Y + 60}`} />
+        <path d={`M 1120 ${GROUND_Y + 8} L 1145 ${GROUND_Y + 30} L 1135 ${GROUND_Y + 65} L 1160 ${GROUND_Y + 95}`} />
+        <path d={`M 1580 ${GROUND_Y + 12} L 1605 ${GROUND_Y + 40} L 1635 ${GROUND_Y + 70}`} />
+      </g>
+
+      {/* 5. Scattered Straw & Dried Bamboo Scraps (Vụn rơm rạ khô & mẩu tre vụn rải rác) */}
+      <g stroke="#1F1D17" strokeWidth="1.6" strokeLinecap="round">
+        <line x1="180" y1={GROUND_Y + 8} x2="205" y2={GROUND_Y + 14} />
+        <line x1="195" y1={GROUND_Y + 10} x2="215" y2={GROUND_Y + 6} />
+        <line x1="520" y1={GROUND_Y + 12} x2="545" y2={GROUND_Y + 7} />
+        <line x1="840" y1={GROUND_Y + 6} x2="865" y2={GROUND_Y + 15} />
+        <line x1="1350" y1={GROUND_Y + 10} x2="1375" y2={GROUND_Y + 16} />
+        <line x1="1720" y1={GROUND_Y + 7} x2="1748" y2={GROUND_Y + 13} />
+        <line x1="1735" y1={GROUND_Y + 12} x2="1755" y2={GROUND_Y + 6} />
+      </g>
+
+      {/* Worn Central Footpath Dirt Sheen (Vệt nhẵn mòn bóng nhẹ ở lối đi chính giữa) */}
+      <ellipse cx="960" cy={GROUND_Y + 18} rx="260" ry="8" fill="#141822" opacity="0.35" />
+    </g>
+  );
+};
+
+/**
  * LAYER 2: MAIN GROUND (Y = 800px)
  */
 export const MainGroundLayer: React.FC<{ theme?: ThemeId }> = ({ theme }) => {
+  if (theme === "thatched_house_interior") {
+    return <ThatchedHouseGroundLayer />;
+  }
+
   if (theme === "vehicle_interior") {
     return <VehicleFloorLayer />;
   }
@@ -1222,7 +1557,9 @@ export const ForegroundLayer: React.FC<{
       </g>
 
       {/* Foreground Framing Elements */}
-      {isVehicle ? (
+      {theme === "thatched_house_interior" ? (
+        <ThatchedHouseForegroundFraming />
+      ) : isVehicle ? (
         <g className="vehicle-foreground-framing">
           {/* Vertical Yellow Stanchion Poles with red STOP buttons spanning from ceiling rail (175) to floor (800) */}
           {[280, 720, 1200, 1640].map((poleX, idx) => (
@@ -1338,6 +1675,43 @@ const UrbanForegroundFraming: React.FC = () => {
       {/* 3. Vignette shadows at extreme screen borders */}
       <rect x="0" y="0" width="100" height={CANVAS_HEIGHT} fill="url(#left-shadow-vignette)" opacity="0.75" />
       <rect x={CANVAS_WIDTH - 100} y="0" width="100" height={CANVAS_HEIGHT} fill="url(#right-shadow-vignette)" opacity="0.75" />
+    </g>
+  );
+};
+
+/**
+ * THATCHED HOUSE FOREGROUND FRAMING (Cột Tiền Cảnh Đen Tuyền & Mái Tranh Rủ)
+ * Creates extreme cinematic claustrophobic depth with massive silhouette wooden pillars
+ * at extreme screen edges and straw fringes at the very top.
+ */
+const ThatchedHouseForegroundFraming: React.FC = () => {
+  return (
+    <g className="thatched-house-foreground-framing" pointerEvents="none">
+      {/* 1. Extreme Left Foreground Wooden Pillar (Cột gỗ tiền cảnh sát mép trái X = 0..55) */}
+      <path
+        d="M 0 0 L 55 0 L 45 1080 L 0 1080 Z"
+        fill="#040507"
+      />
+      <line x1="45" y1="0" x2="35" y2="1080" stroke="#0E121A" strokeWidth="2" opacity="0.7" />
+
+      {/* 2. Extreme Right Foreground Wooden Pillar (Cột gỗ tiền cảnh sát mép phải X = 1865..1920) */}
+      <path
+        d="M 1920 0 L 1865 0 L 1875 1080 L 1920 1080 Z"
+        fill="#040507"
+      />
+      <line x1="1875" y1="0" x2="1885" y2="1080" stroke="#0E121A" strokeWidth="2" opacity="0.7" />
+
+      {/* 3. Top Hanging Thatch Eaves Fringe along upper frame edge (Y = 0..45px) */}
+      <path
+        d="M 0 0 L 1920 0 L 1920 30 
+           Q 1800 55 1680 25 Q 1540 60 1420 30 Q 1280 55 1140 25 Q 1000 62 860 30
+           Q 720 58 580 25 Q 440 60 300 30 Q 160 55 0 25 Z"
+        fill="#040507"
+      />
+
+      {/* 4. Claustrophobic Vignette Shadows at lateral edges */}
+      <rect x="0" y="0" width="100" height={CANVAS_HEIGHT} fill="url(#left-shadow-vignette)" opacity="0.8" />
+      <rect x={CANVAS_WIDTH - 100} y="0" width="100" height={CANVAS_HEIGHT} fill="url(#right-shadow-vignette)" opacity="0.8" />
     </g>
   );
 };

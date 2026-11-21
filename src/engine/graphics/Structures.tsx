@@ -51,6 +51,7 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "structure_wooden_bed" && <WoodenBed />}
       {id === "structure_small_wooden_table" && <SmallWoodenTable />}
       {id === "structure_wooden_window" && <WoodenCountryWindow />}
+      {id === "structure_ancestor_altar" && <AncestorAltar />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -3724,6 +3725,249 @@ const WoodenCountryWindow: React.FC = () => {
 
       {/* 8. Soft Cold Mist hovering just under sill */}
       <ellipse cx="0" cy="-118" rx="38" ry="6" fill="#64748B" opacity="0.18" pointerEvents="none" />
+    </g>
+  );
+};
+
+/**
+ * 30. ANCESTOR ALTAR (Bàn Thờ Tổ Tiên Vách Lá / Án Gian Cổ)
+ * Traditional Vietnamese ancestral altar in rural thatched hut.
+ * Features upturned altar table, embroidered red valance, ancestral tablet & framed photo,
+ * ceramic incense burner with wafting incense smoke, brass candlesticks with warm eerie glow.
+ * Ground anchor: [0, 0] at bottom-center (Ground Line Y = 800px).
+ */
+const AncestorAltar: React.FC = () => {
+  return (
+    <g className="structure-ancestor-altar">
+      {/* 1. Floor Ground Contact Shadow */}
+      <ellipse cx="0" cy="0" rx="120" ry="5" fill="#000000" opacity="0.6" />
+
+      {/* 2. Curved Dragon-Claw / Cabriole Legs (Bốn chân quỳ dạ cá chạm khắc vững chãi) */}
+      {/* Back Legs (Bóng chân sau) */}
+      <path
+        d="M -90 0 C -98 -40, -104 -90, -88 -140 L -72 -140 C -86 -90, -82 -40, -76 0 Z"
+        fill="#07070A"
+        stroke="#181820"
+        strokeWidth="1"
+      />
+      <path
+        d="M 90 0 C 98 -40, 104 -90, 88 -140 L 72 -140 C 86 -90, 82 -40, 76 0 Z"
+        fill="#07070A"
+        stroke="#181820"
+        strokeWidth="1"
+      />
+
+      {/* Front Legs (Hai chân trước chạm gờ nổi) */}
+      <path
+        d="M -102 0 C -116 -45, -118 -95, -100 -142 L -84 -142 C -100 -95, -96 -45, -86 0 Z"
+        fill="#0B0B0F"
+        stroke="#27272A"
+        strokeWidth="1.2"
+      />
+      <path
+        d="M 102 0 C 116 -45, 118 -95, 100 -142 L 84 -142 C 100 -95, 96 -45, 86 0 Z"
+        fill="#0B0B0F"
+        stroke="#27272A"
+        strokeWidth="1.2"
+      />
+      {/* Front leg gold/wood highlight lines */}
+      <path d="M -99 -140 C -114 -95, -112 -45, -98 0" fill="none" stroke="#3F3F46" strokeWidth="1" />
+      <path d="M 99 -140 C 114 -95, 112 -45, 98 0" fill="none" stroke="#3F3F46" strokeWidth="1" />
+
+      {/* Lower Stretcher Bars (Thanh giằng ngang chạm then) */}
+      <rect x="-92" y="-30" width="184" height="8" rx="2" fill="#0D0D12" stroke="#27272A" strokeWidth="1" />
+      <line x1="-90" y1="-26" x2="90" y2="-26" stroke="#3F3F46" strokeWidth="0.8" />
+
+      {/* 3. Under-Table Storage Apron & Carved Openwork (Yếm dạ cá chạm lộng hoa văn mây cổ) */}
+      <path
+        d="M -94 -140 L 94 -140 L 90 -95 Q 60 -115 0 -98 Q -60 -115 -90 -95 Z"
+        fill="#07070A"
+        stroke="#181820"
+        strokeWidth="1"
+      />
+      {/* Cloud pattern relief slits on apron */}
+      <path d="M -60 -125 Q -30 -110 0 -125 Q 30 -110 60 -125" fill="none" stroke="#2A241E" strokeWidth="1.8" />
+
+      {/* 4. Deep Red Ancestral Altar Valance Cloth (Tấm yếm bàn thờ thêu đỏ rách mép tua rua) */}
+      <polygon
+        points="-88,-140 88,-140 84,-75 72,-85 60,-72 45,-86 30,-74 15,-88 0,-76 -15,-88 -30,-74 -45,-86 -60,-72 -72,-85 -84,-75"
+        fill="#3F0A0A"
+        stroke="#7F1D1D"
+        strokeWidth="1"
+      />
+      {/* Faded Gold Embroidered Thread Trim & Talismanic Trigram Marks on cloth */}
+      <path
+        d="M -80 -132 L 80 -132 M -75 -126 L 75 -126"
+        stroke="#B45309"
+        strokeWidth="1"
+        strokeDasharray="8,4,14,4"
+        opacity="0.6"
+      />
+      {/* Fringed tassels dangling */}
+      {[-65, -45, -25, 0, 25, 45, 65].map((tx) => (
+        <line key={`tassel-${tx}`} x1={tx} y1="-75" x2={tx} y2="-62" stroke="#D97706" strokeWidth="1" opacity="0.65" />
+      ))}
+
+      {/* 5. Main Heavy Altar Tabletop with Upturned Winged Ends (Mặt bàn gỗ hương dày, hai đầu gờ cong vút) */}
+      {/* Main Board Slab (Y = -142 to -156px) */}
+      <rect x="-105" y="-154" width="210" height="14" rx="2" fill="#0D0D12" stroke="#27272A" strokeWidth="1.2" />
+      {/* Top light reflection line */}
+      <line x1="-103" y1="-153" x2="103" y2="-153" stroke="#52525B" strokeWidth="1.2" strokeLinecap="round" />
+      {/* Left Wing Upturned Horn (Đầu gờ cánh én cong bên trái) */}
+      <path d="M -105 -142 L -118 -164 L -103 -156 Z" fill="#0D0D12" stroke="#27272A" strokeWidth="1" />
+      {/* Right Wing Upturned Horn (Đầu gờ cánh én cong bên phải) */}
+      <path d="M 105 -142 L 118 -164 L 103 -156 Z" fill="#0D0D12" stroke="#27272A" strokeWidth="1" />
+
+      {/* 6. Upper Stepped Pedestal (Bục tam cấp đặt di ảnh và bài vị, Y = -156 to -180px) */}
+      <rect x="-65" y="-178" width="130" height="24" rx="2" fill="#0A0A0E" stroke="#27272A" strokeWidth="1" />
+      <line x1="-63" y1="-177" x2="63" y2="-177" stroke="#3F3F46" strokeWidth="1" />
+      <rect x="-45" y="-200" width="90" height="22" rx="1.5" fill="#08080C" stroke="#1F1F24" strokeWidth="1" />
+
+      {/* 7. Center Ancestral Photo Frame & Wooden Tablet (Khung di ảnh tổ tiên & Bài vị chữ Nho) */}
+      {/* Outer Carved Wood Shorter Side Tablets (Hai bài vị phụ hai bên) */}
+      <g>
+        <polygon points="-58,-245 -48,-255 -38,-245 -38,-195 -58,-195" fill="#140606" stroke="#991B1B" strokeWidth="1" />
+        <rect x="-53" y="-238" width="10" height="38" fill="#FACC15" opacity="0.3" />
+        <polygon points="38,-245 48,-255 58,-245 58,-195 38,-195" fill="#140606" stroke="#991B1B" strokeWidth="1" />
+        <rect x="43" y="-238" width="10" height="38" fill="#FACC15" opacity="0.3" />
+      </g>
+
+      {/* Main Center Ancestral Portrait Frame (Khung di ảnh tổ tiên cổ kính) */}
+      <g transform="translate(0, -200)">
+        {/* Carved Pagoda Eaves Frame Crest (Đỉnh mái che di ảnh chạm trổ) */}
+        <polygon points="0,-122 -38,-96 38,-96" fill="#0A0A0E" stroke="#D4AF37" strokeWidth="1.2" />
+        <circle cx="0" cy="-114" r="3" fill="#D4AF37" />
+
+        {/* Frame Outer Border (Kích thước 64x85px) */}
+        <rect x="-32" y="-96" width="64" height="86" rx="2" fill="#050608" stroke="#D4AF37" strokeWidth="1.4" />
+        {/* Inner Molding */}
+        <rect x="-27" y="-91" width="54" height="76" fill="#020305" stroke="#713F12" strokeWidth="0.8" />
+
+        {/* Dusty Glass with Spectral Faded Silhouette Face (Khuôn mặt tổ tiên mờ ảo chập chờn) */}
+        <rect x="-25" y="-89" width="50" height="72" fill="#090D14" />
+        <ellipse cx="0" cy="-56" rx="13" ry="17" fill="#64748B" opacity="0.25" className="anim-pulse-eerie" />
+        <ellipse cx="0" cy="-34" rx="19" ry="15" fill="#475569" opacity="0.2" />
+        {/* Empty white hollow eyes in old portrait */}
+        <circle cx="-5" cy="-58" r="1.6" fill="#E2E8F0" opacity="0.4" />
+        <circle cx="5" cy="-58" r="1.6" fill="#E2E8F0" opacity="0.4" />
+
+        {/* Black Mourning Ribbons draped across corners (Dải băng tang đen vắt chéo góc khung ảnh) */}
+        <polygon points="-32,-96 -18,-96 -32,-78" fill="#000000" stroke="#1E293B" strokeWidth="0.6" />
+        <polygon points="32,-96 18,-96 32,-78" fill="#000000" stroke="#1E293B" strokeWidth="0.6" />
+
+        {/* Yellow Talisman strip pinned to left frame edge (Bùa vàng niêm phong trừ tà) */}
+        <g transform="translate(-32, -60)">
+          <rect x="-5" y="0" width="10" height="34" fill="#FACC15" opacity="0.85" rx="1" />
+          <line x1="-3" y1="4" x2="3" y2="4" stroke="#DC2626" strokeWidth="1" />
+          <path d="M 0 6 L 0 28 M -2 12 L 2 12 M -2 20 L 2 20" stroke="#DC2626" strokeWidth="0.8" />
+        </g>
+      </g>
+
+      {/* 8. Ceramic Incense Burner & Red Joss Sticks (Bát hương men rạn & Chân nhang đỏ) */}
+      <g transform="translate(0, -154)">
+        {/* Incense Burner Tripod Bowl (Bát hương đồng/gốm) */}
+        <path d="M -18 0 C -22 -14, -22 -20, -18 -22 L 18 -22 C 22 -20, 22 -14, 18 0 Z" fill="#1C1917" stroke="#78350F" strokeWidth="1.2" />
+        {/* Burner rim & handles */}
+        <ellipse cx="0" cy="-22" rx="18" ry="4" fill="#292524" stroke="#D97706" strokeWidth="0.8" />
+        <line x1="-21" y1="-16" x2="-18" y2="-12" stroke="#78350F" strokeWidth="2" strokeLinecap="round" />
+        <line x1="21" y1="-16" x2="18" y2="-12" stroke="#78350F" strokeWidth="2" strokeLinecap="round" />
+
+        {/* Ash pile in burner */}
+        <ellipse cx="0" cy="-22" rx="14" ry="2.5" fill="#44403C" />
+
+        {/* Joss Sticks (3 que nhang cắm nghiêng) */}
+        {/* Center stick */}
+        <line x1="0" y1="-22" x2="0" y2="-52" stroke="#DC2626" strokeWidth="1.4" />
+        <circle cx="0" cy="-52" r="1.8" fill="#FEF08A" className="anim-flicker-ember" />
+        {/* Left tilted stick */}
+        <line x1="-5" y1="-22" x2="-12" y2="-50" stroke="#DC2626" strokeWidth="1.4" />
+        <circle cx="-12" cy="-50" r="1.6" fill="#F97316" className="anim-flicker-fast" />
+        {/* Right tilted stick */}
+        <line x1="5" y1="-22" x2="11" y2="-49" stroke="#DC2626" strokeWidth="1.4" />
+        <circle cx="11" cy="-49" r="1.6" fill="#F97316" className="anim-flicker-ember" />
+
+        {/* Wafting Incense Smoke Ribbons (Khói nhang bảng lảng uốn lượn bay lên) */}
+        <path
+          d="M 0 -54 Q 6 -72 -4 -90 Q -14 -108 2 -130 Q 16 -152 -2 -175"
+          fill="none"
+          stroke="#CBD5E1"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          opacity="0.45"
+          className="anim-pulse-eerie"
+        />
+        <path
+          d="M -12 -52 Q -20 -70 -10 -88 Q 2 -106 -8 -126"
+          fill="none"
+          stroke="#E2E8F0"
+          strokeWidth="1"
+          strokeLinecap="round"
+          opacity="0.35"
+        />
+        <path
+          d="M 11 -51 Q 20 -68 12 -86 Q 4 -104 16 -124"
+          fill="none"
+          stroke="#E2E8F0"
+          strokeWidth="1"
+          strokeLinecap="round"
+          opacity="0.3"
+        />
+      </g>
+
+      {/* 9. Pair of Flickering Brass Candle Holders (Đôi chân nến đồng hai bên le lói ánh vàng ấm) */}
+      {/* Left Candlestick (X = -72) */}
+      <g transform="translate(-72, -154)">
+        {/* Brass Candle Stand Base */}
+        <polygon points="-12,0 12,0 8,-6 -8,-6" fill="#78350F" stroke="#D97706" strokeWidth="0.8" />
+        <line x1="0" y1="-6" x2="0" y2="-28" stroke="#B45309" strokeWidth="3" />
+        <ellipse cx="0" cy="-28" rx="8" ry="2.5" fill="#78350F" stroke="#D97706" strokeWidth="0.8" />
+        {/* Wax Candle Body */}
+        <rect x="-3" y="-48" width="6" height="20" rx="1" fill="#FEF3C7" stroke="#D97706" strokeWidth="0.6" />
+        {/* Wax drippings */}
+        <line x1="3" y1="-44" x2="3" y2="-34" stroke="#FDE68A" strokeWidth="1" />
+        {/* Wick & Flame with Ambient Glow */}
+        <line x1="0" y1="-48" x2="0" y2="-52" stroke="#451A03" strokeWidth="1" />
+        <circle cx="0" cy="-56" r="35" fill="url(#altar-warm-glow)" opacity="0.85" pointerEvents="none" />
+        <ellipse cx="0" cy="-56" rx="3.5" ry="6" fill="#FEF08A" className="anim-flicker-ember" />
+        <circle cx="0" cy="-54" r="1.5" fill="#F97316" />
+      </g>
+
+      {/* Right Candlestick (X = 72) */}
+      <g transform="translate(72, -154)">
+        {/* Brass Candle Stand Base */}
+        <polygon points="-12,0 12,0 8,-6 -8,-6" fill="#78350F" stroke="#D97706" strokeWidth="0.8" />
+        <line x1="0" y1="-6" x2="0" y2="-28" stroke="#B45309" strokeWidth="3" />
+        <ellipse cx="0" cy="-28" rx="8" ry="2.5" fill="#78350F" stroke="#D97706" strokeWidth="0.8" />
+        {/* Wax Candle Body */}
+        <rect x="-3" y="-48" width="6" height="20" rx="1" fill="#FEF3C7" stroke="#D97706" strokeWidth="0.6" />
+        {/* Wax drippings */}
+        <line x1="-3" y1="-42" x2="-3" y2="-32" stroke="#FDE68A" strokeWidth="1" />
+        {/* Wick & Flame with Ambient Glow */}
+        <line x1="0" y1="-48" x2="0" y2="-52" stroke="#451A03" strokeWidth="1" />
+        <circle cx="0" cy="-56" r="35" fill="url(#altar-warm-glow)" opacity="0.85" pointerEvents="none" />
+        <ellipse cx="0" cy="-56" rx="3.5" ry="6" fill="#FEF08A" className="anim-flicker-ember" />
+        <circle cx="0" cy="-54" r="1.5" fill="#F97316" />
+      </g>
+
+      {/* 10. Offering Vessels (Đĩa bồng chân cao bày hoa quả héo & 3 chung nước cúng) */}
+      <g transform="translate(0, -154)">
+        {/* Three Small Brass Offering Cups (3 chung nước cúng) */}
+        {[-32, -40, -48].map((cx, i) => (
+          <g key={`cup-${i}`}>
+            <rect x={cx - 3} y="-8" width="6" height="8" rx="1" fill="#78350F" stroke="#D97706" strokeWidth="0.6" />
+            <ellipse cx={cx} cy="-8" rx="3" ry="1.2" fill="#92400E" />
+          </g>
+        ))}
+        {/* Offering Plate with Withered Fruits on Right */}
+        <g transform="translate(38, 0)">
+          <polygon points="-12,0 12,0 8,-4 -8,-4" fill="#57534E" />
+          <ellipse cx="0" cy="-5" rx="16" ry="3" fill="#44403C" stroke="#78716C" strokeWidth="0.8" />
+          {/* Three withered rounded fruits */}
+          <circle cx="-5" cy="-9" r="4.5" fill="#450A0A" stroke="#7F1D1D" strokeWidth="0.6" />
+          <circle cx="5" cy="-9" r="4.5" fill="#450A0A" stroke="#7F1D1D" strokeWidth="0.6" />
+          <circle cx="0" cy="-13" r="4" fill="#3B0764" stroke="#581C87" strokeWidth="0.6" />
+        </g>
+      </g>
     </g>
   );
 };

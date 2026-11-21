@@ -248,7 +248,8 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
 - Đường Line tiếp đất liên tục: Có thể dùng offsetX để nhân vật đứng ở bất kỳ tọa độ X nào từ 80px đến 1840px (X_thực = slot.X + offsetX). Với nhân vật tiếp đất, offsetY BẮT BUỘC bằng 0.
 
 2. KHO TÀI NGUYÊN HỢP LỆ (CHỈ ĐƯỢC DÙNG CÁC ID SAU, KHÔNG ĐƯỢC TỰ BỊA ID MỚI):
-- Themes: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior" | "urban_night_market"
+- Themes: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior" | "urban_night_market" | "thatched_house_interior"
+  * "thatched_house_interior": Không gian bên trong căn nhà lá vách nứa rách nát, mái tranh xơ xác rủ vì kèo tre, đòn dông buộc lạt mây, cửa sổ liếp hé mở nhìn ra rặng tre đêm, nền đất nện cổ truyền. BẮT BUỘC dùng cho các phân cảnh diễn ra bên trong căn nhà lá, gian thờ cúng gia tiên.
   * "urban_night_market": Khu chợ đêm & đường phố đô thị rực rỡ ánh đèn neon chớp giật, dây lều bạt cổ vật, mặt đường nhựa bóng loáng trong mưa lạnh.
   * "vehicle_interior": Toàn bộ khoang bên trong xe bus / tàu hỏa (trần cong, ô cửa sổ nhìn ra đường đêm, ghế xe bus, cột tay vịn vàng với chuông bấm). BẮT BUỘC dùng cho cảnh trong xe, KHÔNG dùng modern_indoor vì modern_indoor là sảnh hành lang rộng lớn.
 - Sky presets (Bầu trời & Chiếu sáng):
@@ -260,7 +261,7 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
   * "dim_indoor_night" (Ánh vàng mờ ảo đêm muộn - trong nhà: khách sạn, nhà hàng)
 - Structures (Công trình & Vùng được phép):
   * "creepy_banyan_tree", "haunted_gallows_tree" -> CHỈ ĐẶT Ở: "far_left" | "far_right"
-  * "ancient_tomb", "abandoned_shrine", "creepy_well", "hospital_operating_bed", "hotel_reception_desk", "creepy_elevator_doors", "dining_table_chairs", "bus_interior", "creepy_bathtub", "structure_small_wooden_table" -> CHỈ ĐẶT Ở: "mid_left" | "center" | "mid_right"
+  * "ancient_tomb", "abandoned_shrine", "creepy_well", "hospital_operating_bed", "hotel_reception_desk", "creepy_elevator_doors", "dining_table_chairs", "bus_interior", "creepy_bathtub", "structure_small_wooden_table", "structure_ancestor_altar" -> CHỈ ĐẶT Ở: "mid_left" | "center" | "mid_right"
   * "dilapidated_hut", "broken_wooden_bridge", "supermarket_shelf_aisle" -> CHỈ ĐẶT Ở: "far_left" | "center" | "far_right"
   * "structure_wooden_window" -> CHỈ ĐẶT Ở: "far_left" | "mid_left" | "mid_right" | "far_right"
   * "scarecrow_of_the_damned", "market_stall_tent", "abandoned_subway_station", "rusty_train_tracks_tunnel", "structure_old_apartment_gate", "structure_wooden_sampan", "structure_monkey_bridge", "structure_wooden_coffin", "structure_bamboo_bed_net", "structure_wooden_latch_door", "structure_rural_passenger_bus", "structure_wooden_chair", "structure_wooden_bed" -> Đặt ở mọi ground slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right"
@@ -1456,7 +1457,7 @@ KHO TÀI NGUYÊN HOẠT HÌNH 2D SẴN CÓ TRONG HỆ THỐNG (CHỈ ĐƯỢC CH
    - "detail_broken_mirror" (Gương vỡ nứt vấy máu)
 
 7. THEMES & SKY PRESETS:
-   - Themes: "abandoned_village" (Làng quê bỏ hoang), "cursed_swamp" (Đầm lầy / ven kênh sông nước), "rural_graveyard" (Bãi tha ma cổ), "modern_indoor" (Trong nhà hiện đại), "vehicle_interior" (Khoang xe), "urban_night_market" (Chợ đêm đô thị)
+   - Themes: "abandoned_village" (Làng quê bỏ hoang), "cursed_swamp" (Đầm lầy / ven kênh sông nước), "rural_graveyard" (Bãi tha ma cổ), "modern_indoor" (Trong nhà hiện đại), "vehicle_interior" (Khoang xe), "urban_night_market" (Chợ đêm đô thị), "thatched_house_interior" (Bên trong căn nhà lá)
    - Sky: "foggy_night" (Sương mù lạnh buốt), "stormy_dark" (Bão đêm / Đêm oi ả ngột ngạt), "blood_moon" (Trăng máu), "eclipse_abyss" (Nhật thực lửa xanh)
 
 QUY TẮC LẮP GHÉP BẮT BUỘC (TUYỆT ĐỐI TUÂN THỦ):
@@ -1704,7 +1705,7 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "detail_broken_mirror" (Gương nhà tắm vỡ nứt vấy máu)
 
 7. THEMES & SKY PRESETS:
-   - Themes: rural_graveyard, abandoned_village, cursed_swamp, modern_indoor, vehicle_interior, urban_night_market (Chợ đêm & phố xá đô thị ngoài trời dùng urban_night_market, bên trong xe buýt/tàu xe dùng vehicle_interior)
+   - Themes: rural_graveyard, abandoned_village, cursed_swamp, modern_indoor, vehicle_interior, urban_night_market, thatched_house_interior (Chợ đêm & phố xá đô thị ngoài trời dùng urban_night_market, bên trong xe buýt/tàu xe dùng vehicle_interior, bên trong nhà lá dùng thatched_house_interior)
    - Sky: blood_moon, foggy_night, stormy_dark, eclipse_abyss, flickering_fluorescent, dim_indoor_night
 
 YÊU CẦU KIỂM TRA ĐỐI CHIẾU:

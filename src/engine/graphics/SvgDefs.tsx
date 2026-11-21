@@ -300,6 +300,27 @@ export const SvgDefs: React.FC = () => {
         <stop offset="70%" stopColor="rgba(180, 83, 9, 0.18)" />
         <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
       </radialGradient>
+
+      {/* 10. THATCHED HOUSE INTERIOR GRADIENTS */}
+      <radialGradient id="altar-warm-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="rgba(251, 191, 36, 0.85)" />
+        <stop offset="35%" stopColor="rgba(217, 119, 6, 0.45)" />
+        <stop offset="70%" stopColor="rgba(180, 83, 9, 0.12)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </radialGradient>
+
+      <linearGradient id="thatched-light-beam" x1="20%" y1="0%" x2="80%" y2="100%">
+        <stop offset="0%" stopColor="rgba(226, 232, 240, 0.16)" />
+        <stop offset="40%" stopColor="rgba(203, 213, 225, 0.08)" />
+        <stop offset="100%" stopColor="rgba(203, 213, 225, 0)" />
+      </linearGradient>
+
+      <linearGradient id="thatched-wall-shadow" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#05070B" stopOpacity="0.95" />
+        <stop offset="30%" stopColor="#0B0E14" stopOpacity="0.75" />
+        <stop offset="70%" stopColor="#080A10" stopOpacity="0.6" />
+        <stop offset="100%" stopColor="#040508" stopOpacity="0.9" />
+      </linearGradient>
     </defs>
   );
 };

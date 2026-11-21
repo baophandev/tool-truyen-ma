@@ -46,6 +46,12 @@
         "name": "Khu chợ đêm & Đường phố đô thị",
         "desc": "Con phố đô thị sầm uất u tối về đêm với dãy nhà cao tầng mờ ảo, đèn neon rực rỡ chớp nháy, dây điện chằng chịt, lều bạt chợ đêm bày bán cổ vật, mặt đường nhựa ướt sũng bóng nước và hơi nước bốc lên từ nắp cống ngầm",
         "sky_options": ["foggy_night", "stormy_dark", "blood_moon", "dim_indoor_night"]
+      },
+      {
+        "id": "thatched_house_interior",
+        "name": "Không gian bên trong căn nhà lá",
+        "desc": "Không gian bên trong căn nhà lá vách nứa đơn sơ rách nát với mái tranh xơ xác rủ vì kèo tre, đòn dông buộc lạt mây, vách đan nan tre, cửa sổ liếp hé mở nhìn ra bóng tre đêm và nền đất nện cổ truyền",
+        "sky_options": ["dim_indoor_night", "foggy_night", "stormy_dark", "blood_moon"]
       }
     ],
     "sky_presets": [
@@ -452,6 +458,16 @@
         "layer": "midground",
         "width": 130,
         "height": 260,
+        "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_ancestor_altar",
+        "name": "Bàn thờ tổ tiên vách lá (Án gian cổ)",
+        "semantic_role": "Án gian gỗ ba tầng chạm khắc cổ kính đặt sát vách nứa căn nhà lá, có yếm đỏ rách mép tua rua, khung di ảnh tổ tiên cổ kính, bài vị chữ Nho, bát hương gốm men rạn nghi ngút ba làn khói hương u uất và đôi chân nến đồng le lói ánh vàng ma mị",
+        "allowed_slots": ["mid_left", "center", "mid_right"],
+        "layer": "midground",
+        "width": 240,
+        "height": 340,
         "anchor": "bottom-center"
       }
     ]

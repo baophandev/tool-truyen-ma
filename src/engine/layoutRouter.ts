@@ -93,6 +93,7 @@ const VALID_THEMES: ThemeId[] = [
   "modern_indoor",
   "vehicle_interior",
   "urban_night_market",
+  "thatched_house_interior",
 ];
 const VALID_SKY_PRESETS: SkyPresetId[] = [
   "blood_moon",
@@ -142,6 +143,7 @@ const VALID_STRUCTURES: StructureId[] = [
   "structure_wooden_bed",
   "structure_small_wooden_table",
   "structure_wooden_window",
+  "structure_ancestor_altar",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -326,7 +328,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
   const lightingRaw = script.lighting && typeof script.lighting === "object" ? script.lighting : {};
   const sky_preset: SkyPresetId = VALID_SKY_PRESETS.includes(lightingRaw.sky_preset)
     ? lightingRaw.sky_preset
-    : (theme === "modern_indoor" || theme === "vehicle_interior" ? "flickering_fluorescent" : "foggy_night");
+    : (theme === "modern_indoor" || theme === "vehicle_interior" ? "flickering_fluorescent" : theme === "thatched_house_interior" ? "dim_indoor_night" : "foggy_night");
 
   const rawFog = Number(lightingRaw.fog_density);
   const fog_density = !isNaN(rawFog) ? Math.min(1, Math.max(0, rawFog)) : 0.65;

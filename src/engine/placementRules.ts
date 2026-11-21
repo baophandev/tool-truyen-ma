@@ -177,6 +177,11 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ["far_left", "mid_left", "mid_right", "far_right"],
     reason: "Cửa sổ gỗ ván nông thôn neo trên trục sàn Y=800px nhưng khung cửa treo tầm cao Y=-260px đến Y=-120px, đặt dọc các vách phòng bên trái hoặc bên phải (far_left, mid_left, mid_right, far_right).",
   },
+  structure_ancestor_altar: {
+    name: "Bàn thờ tổ tiên vách lá (Án gian cổ)",
+    allowedSlots: ["mid_left", "center", "mid_right"],
+    reason: "Bàn thờ tổ tiên và án gian cổ là nơi thờ cúng linh thiêng và u uất nhất trong căn nhà lá, đặt tại các vị trí tiếp đất trung tâm (mid_left, center, mid_right).",
+  },
 };
 
 export interface DetailRule {
