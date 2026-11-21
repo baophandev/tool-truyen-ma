@@ -4,6 +4,7 @@ import type {
   NamedEnvironmentPreset,
   NamedCharacterPreset,
   CameraShotType,
+  SceneDraftSpec,
 } from "../engine/types";
 import {
   generateFilmFromDescriptions,
@@ -81,6 +82,7 @@ import {
   UserPlus,
   UserCheck,
   Clapperboard,
+  FileJson,
 } from "lucide-react";
 
 export type AiModalMode =
@@ -103,15 +105,6 @@ interface AiDirectorModalProps {
   onAppendScene: (newScene: DirectorSceneScript) => void;
   onAppendScenes?: (newScenes: DirectorSceneScript[]) => void;
   initialMode?: AiModalMode;
-}
-
-interface SceneDraftSpec {
-  environmentId: string;
-  actionDescription: string;
-  duration_sec: number;
-  title: string;
-  dialogue?: string;
-  cameraShot?: CameraShotType | "auto";
 }
 
 export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
@@ -491,10 +484,66 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     }
   };
 
+  // Helper to parse direct JSON output from Gemini Web
+  const tryParseDirectPreProdJson = (input: string): ProjectRaccordResult | null => {
+    const trimmed = input.trim();
+    if (!trimmed) return null;
+    let jsonStr = trimmed;
+    const match = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (match) {
+      jsonStr = match[1].trim();
+    }
+    if (!jsonStr.startsWith("{") || !jsonStr.endsWith("}")) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(jsonStr);
+      if (parsed && (Array.isArray(parsed.characters) || Array.isArray(parsed.environments))) {
+        return {
+          success: true,
+          culturalTheme: parsed.culturalTheme || "Tiền kỳ tự định nghĩa (Gemini Web)",
+          summary: parsed.summary || `Đã nạp trực tiếp từ Gemini Web: ${parsed.characters?.length || 0} diễn viên, ${parsed.environments?.length || 0} bối cảnh, ${parsed.sceneDrafts?.length || 0} phân cảnh.`,
+          characters: Array.isArray(parsed.characters) ? parsed.characters : [],
+          environments: Array.isArray(parsed.environments) ? parsed.environments : [],
+          sceneDrafts: Array.isArray(parsed.sceneDrafts) ? parsed.sceneDrafts : undefined,
+          rawText: jsonStr,
+        };
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  };
+
+  // Direct manual load JSON button action
+  const handleDirectImportJson = () => {
+    const directResult = tryParseDirectPreProdJson(breakdownInput);
+    if (!directResult) {
+      setErrorMessage("Nội dung trong khung không phải là JSON hợp lệ. Vui lòng kiểm tra lại định dạng JSON từ Gemini Web.");
+      return;
+    }
+    setErrorMessage(null);
+    setProjectRaccordResult(directResult);
+    setPreProdNotice(
+      `✅ Đã nhận diện JSON hợp lệ từ Gemini Web (${directResult.characters?.length || 0} diễn viên, ${directResult.environments?.length || 0} bối cảnh, ${directResult.sceneDrafts?.length || 0} phân cảnh). Nhấn "Áp Dụng Làm Dự Án Mới" bên dưới để hoàn tất!`
+    );
+  };
+
   // Handle analyzing pre-production breakdown
   const handleAnalyzeBreakdown = async () => {
     if (!breakdownInput.trim()) {
-      setErrorMessage("Vui lòng dán nội dung bảng bóc tách kịch bản.");
+      setErrorMessage("Vui lòng dán nội dung bảng bóc tách kịch bản hoặc JSON từ Gemini Web.");
+      return;
+    }
+
+    // Auto-detect if input is already direct JSON from Gemini Web
+    const directResult = tryParseDirectPreProdJson(breakdownInput);
+    if (directResult) {
+      setErrorMessage(null);
+      setProjectRaccordResult(directResult);
+      setPreProdNotice(
+        `✅ Đã nhận diện JSON hợp lệ từ Gemini Web (${directResult.characters?.length || 0} diễn viên, ${directResult.environments?.length || 0} bối cảnh, ${directResult.sceneDrafts?.length || 0} phân cảnh)! Bạn có thể nhấn nút "Áp Dụng Làm Dự Án Mới" bên dưới.`
+      );
       return;
     }
 
@@ -525,6 +574,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     if (!projectRaccordResult) return;
     const chars = projectRaccordResult.characters || [];
     const envs = projectRaccordResult.environments || [];
+    const drafts = projectRaccordResult.sceneDrafts || [];
 
     if (chars.length === 0 && envs.length === 0) return;
 
@@ -536,9 +586,13 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
       setProjectNamedCharacters(chars);
       setNamedCharacters(chars);
     }
+    if (drafts.length > 0) {
+      setSceneDrafts(drafts);
+      setSceneCount(drafts.length);
+    }
 
     setPreProdNotice(
-      `🎉 Đã thiết lập thành công Dự Án Mới! Đã lưu ${chars.length} diễn viên và ${envs.length} bối cảnh chuẩn văn hóa (${projectRaccordResult.culturalTheme}). Toàn bộ bối cảnh không liên quan đã được dọn sạch!`
+      `🎉 Đã thiết lập thành công Dự Án Mới! Đã lưu ${chars.length} diễn viên, ${envs.length} bối cảnh${drafts.length > 0 ? ` và ${drafts.length} phân cảnh khởi tạo` : ""} (${projectRaccordResult.culturalTheme}). Toàn bộ bối cảnh không liên quan đã được dọn sạch!`
     );
 
     // Switch to description_film after 1.5s
@@ -1130,6 +1184,16 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
+                      onClick={handleDirectImportJson}
+                      disabled={!breakdownInput.trim()}
+                      className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-950/60 border border-cyan-700/60 hover:border-cyan-400 text-xs text-cyan-200 font-semibold hover:bg-cyan-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                      title="Nạp trực tiếp cấu hình JSON từ Gemini Web mà không cần gọi API"
+                    >
+                      <FileJson className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Nạp JSON Gemini</span>
+                    </button>
+                    <button
+                      type="button"
                       onClick={handlePasteBreakdownFromClipboard}
                       className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 hover:border-amber-500/50 text-xs text-neutral-300 font-medium hover:bg-neutral-800 transition-all"
                       title="Dán nhanh nội dung bảng bóc tách từ Clipboard"
@@ -1356,6 +1420,36 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                       ))}
                     </div>
                   </div>
+
+                  {/* SECTION 3: SCENE DRAFTS (NẾU CÓ TRONG JSON GEMINI WEB) */}
+                  {projectRaccordResult.sceneDrafts && projectRaccordResult.sceneDrafts.length > 0 && (
+                    <div className="flex flex-col gap-2.5 pt-2 border-t border-neutral-800/60">
+                      <h4 className="text-xs font-bold text-amber-300 flex items-center gap-2">
+                        <Clapperboard className="w-4 h-4 text-amber-400" />
+                        DANH SÁCH PHÂN CẢNH KHỞI TẠO ({projectRaccordResult.sceneDrafts.length} CẢNH)
+                      </h4>
+                      <div className="flex flex-col gap-2">
+                        {projectRaccordResult.sceneDrafts.map((draft, sIdx) => (
+                          <div
+                            key={sIdx}
+                            className="bg-black/60 border border-amber-900/30 rounded-xl p-3 flex flex-col gap-1.5"
+                          >
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="font-bold text-amber-200">
+                                {draft.title || `Cảnh ${sIdx + 1}`}
+                              </span>
+                              <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">
+                                Bối cảnh: {draft.environmentId} ({draft.duration_sec || 6}s)
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-neutral-300 leading-relaxed m-0">
+                              {draft.actionDescription}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

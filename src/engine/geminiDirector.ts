@@ -3,6 +3,7 @@ import type {
   NamedEnvironmentPreset,
   NamedCharacterPreset,
   CameraShotType,
+  SceneDraftSpec,
 } from "./types";
 import { validateDirectorScript, VALID_CAMERA_SHOTS } from "./layoutRouter";
 import { DEFAULT_NAMED_ENVIRONMENTS } from "./environmentPresets";
@@ -1326,6 +1327,7 @@ export interface ProjectRaccordResult {
   summary?: string;
   characters?: NamedCharacterPreset[];
   environments?: NamedEnvironmentPreset[];
+  sceneDrafts?: SceneDraftSpec[];
   error?: string;
   rawText?: string;
 }

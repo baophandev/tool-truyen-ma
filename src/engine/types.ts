@@ -364,6 +364,18 @@ export interface NamedCharacterPreset {
 }
 
 /**
+ * Pre-production scene draft specification
+ */
+export interface SceneDraftSpec {
+  environmentId: string;
+  title: string;
+  actionDescription: string;
+  duration_sec?: number;
+  dialogue?: string;
+  cameraShot?: CameraShotType | "auto";
+}
+
+/**
  * Coordinate definition for slot anchors
  */
 export interface SlotAnchor {
