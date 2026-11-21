@@ -548,7 +548,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
       const rule = getAllowedSlotsForStructure(st.asset_id);
       const coords = getSlotCoordinates(st.slot, st.offsetX, st.offsetY);
       return {
-        label: `Công trình #${selectedEntity.index + 1} (${STRUCTURE_RULES[st.asset_id].name})`,
+        label: `Công trình #${selectedEntity.index + 1} (${STRUCTURE_RULES[st.asset_id]?.name || st.asset_id})`,
         currentSlot: st.slot,
         worldX: Math.round(coords.x),
         worldY: Math.round(coords.y),
@@ -560,7 +560,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
     const rule = getAllowedSlotsForDetail(dt.asset_id);
     const coords = getSlotCoordinates(dt.slot, dt.offsetX, dt.offsetY);
     return {
-      label: `Chi tiết "${DETAIL_RULES[dt.asset_id].name}"`,
+      label: `Chi tiết "${DETAIL_RULES[dt.asset_id]?.name || dt.asset_id}"`,
       currentSlot: dt.slot,
       worldX: Math.round(coords.x),
       worldY: Math.round(coords.y),
@@ -1956,7 +1956,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                           : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300"
                       }`}
                     >
-                      {DETAIL_RULES[dt.asset_id].name} ({dt.slot})
+                      {DETAIL_RULES[dt.asset_id]?.name || dt.asset_id} ({dt.slot})
                     </button>
                   ))}
                 </div>
@@ -1979,7 +1979,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     onClick={() => addDetail(did)}
                     className="px-2.5 py-1 rounded-md bg-neutral-800/80 hover:bg-amber-900/50 border border-neutral-700 text-neutral-300 hover:text-amber-200 transition-all"
                   >
-                    + {DETAIL_RULES[did].name}
+                    + {DETAIL_RULES[did]?.name || did}
                   </button>
                 ))}
               </div>
@@ -2239,7 +2239,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="" disabled>-- Chọn bối cảnh mẫu để khóa khung cảnh --</option>
                         {loadStoredNamedEnvironments().map((env) => (
                           <option key={env.id} value={env.id}>
-                            📍 {env.name} ({env.theme} | {env.lighting.sky_preset})
+                            📍 {env.name} ({env.theme} | {env.lighting?.sky_preset || "mặc định"})
                           </option>
                         ))}
                       </>

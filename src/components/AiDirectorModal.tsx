@@ -40,6 +40,7 @@ import {
   extractEnvironmentFromScene,
   setProjectNamedEnvironments,
   isProjectIsolated,
+  DEFAULT_NAMED_ENVIRONMENTS,
 } from "../engine/environmentPresets";
 import {
   loadStoredNamedCharacters,
@@ -667,7 +668,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     }
 
     const envMap = new Map(namedEnvironments.map((e) => [e.id, e]));
-    const fallbackEnv = namedEnvironments[0];
+    const fallbackEnv = namedEnvironments[0] || DEFAULT_NAMED_ENVIRONMENTS[0];
 
     const specs: SceneDescriptionSpec[] = currentDrafts.map((draft) => {
       const env = envMap.get(draft.environmentId) || fallbackEnv;
@@ -725,7 +726,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     }
 
     const envMap = new Map(namedEnvironments.map((e) => [e.id, e]));
-    const env = envMap.get(singleSceneEnvId) || namedEnvironments[0];
+    const env = envMap.get(singleSceneEnvId) || namedEnvironments[0] || DEFAULT_NAMED_ENVIRONMENTS[0];
 
     setIsLoading(true);
     setErrorMessage(null);
@@ -805,7 +806,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
   const handleApplyEnvToCurrentScene = (env: NamedEnvironmentPreset) => {
     const updated = applyEnvironmentToScene(currentScene, env);
     onApplySingleScene(updated);
-    setEnvSaveSuccess(`Đã áp dụng bối cảnh "${env.name}" vào Cảnh ${currentSceneIndex + 1}!`);
+    setEnvSaveSuccess(`Đã áp dụng bối cảnh "${env?.name || "Bối cảnh"}" vào Cảnh ${currentSceneIndex + 1}!`);
     setTimeout(() => setEnvSaveSuccess(null), 3000);
   };
 
@@ -853,7 +854,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
     const updated = addOrUpdateNamedCharacter(newChar);
     setNamedCharacters(updated);
     setCustomCharSaveName("");
-    setCharSaveSuccess(`Đã lưu "${newChar.name}" vào Dàn diễn viên Rắc-co!`);
+    setCharSaveSuccess(`Đã lưu "${newChar?.name || "Diễn viên"}" vào Dàn diễn viên Rắc-co!`);
     setTimeout(() => setCharSaveSuccess(null), 3500);
   };
 
@@ -878,7 +879,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
       ...currentScene,
       actors: nextActors,
     });
-    setCharSaveSuccess(`Đã áp dụng tạo hình "${char.name}" vào Cảnh ${currentSceneIndex + 1}!`);
+    setCharSaveSuccess(`Đã áp dụng tạo hình "${char?.name || "Diễn viên"}" vào Cảnh ${currentSceneIndex + 1}!`);
     setTimeout(() => setCharSaveSuccess(null), 3000);
   };
 
@@ -1414,7 +1415,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-purple-400 shrink-0" />
                         <span className="text-neutral-300 font-medium text-[11px]">
-                          <strong className="text-purple-300">Khóa Rắc-co:</strong> {namedCharacters.length} diễn viên cố định ({namedCharacters.slice(0, 3).map((c) => c.name.split(" ")[0]).join(", ")}...)
+                          <strong className="text-purple-300">Khóa Rắc-co:</strong> {namedCharacters.length} diễn viên cố định ({namedCharacters.slice(0, 3).map((c) => (c?.name ? c.name.split(" ")[0] : "Diễn viên")).join(", ")}...)
                         </span>
                       </div>
                       <button

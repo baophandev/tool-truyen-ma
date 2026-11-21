@@ -296,6 +296,12 @@ export function getAllowedSlotsForStructure(assetId: StructureId): {
   reason: string;
 } {
   const rule = STRUCTURE_RULES[assetId];
+  if (!rule) {
+    return {
+      allowedSlots: ["mid_left", "center", "mid_right"],
+      reason: "Công trình tùy biến (mặc định đặt trên mặt đất).",
+    };
+  }
   return {
     allowedSlots: rule.allowedSlots,
     reason: rule.reason,
@@ -307,6 +313,12 @@ export function getAllowedSlotsForDetail(assetId: DetailId): {
   reason: string;
 } {
   const rule = DETAIL_RULES[assetId];
+  if (!rule) {
+    return {
+      allowedSlots: ["center", "mid_left", "mid_right"],
+      reason: "Đạo cụ chi tiết tùy biến.",
+    };
+  }
   return {
     allowedSlots: rule.allowedSlots,
     reason: rule.reason,

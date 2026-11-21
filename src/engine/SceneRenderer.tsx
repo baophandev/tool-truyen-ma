@@ -140,12 +140,12 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
       const struct = environment_items[entity.index];
       if (!struct) return null;
       const rule = getAllowedSlotsForStructure(struct.asset_id);
-      return { ...rule, label: `Công trình: ${STRUCTURE_RULES[struct.asset_id].name}` };
+      return { ...rule, label: `Công trình: ${STRUCTURE_RULES[struct.asset_id]?.name || struct.asset_id}` };
     }
     const detail = details.find((d) => d.id === entity.id);
     if (!detail) return null;
     const rule = getAllowedSlotsForDetail(detail.asset_id);
-    return { ...rule, label: `Chi tiết: ${DETAIL_RULES[detail.asset_id].name}` };
+    return { ...rule, label: `Chi tiết: ${DETAIL_RULES[detail.asset_id]?.name || detail.asset_id}` };
   };
 
   const activeSelectionRules = getSelectionRuleInfo(effectiveSelection);
@@ -907,7 +907,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                       fontFamily="monospace"
                       filter="drop-shadow(0 2px 4px rgba(0,0,0,0.95))"
                     >
-                      {DETAIL_RULES[detail.asset_id].name} ({detail.slot})
+                      {DETAIL_RULES[detail.asset_id]?.name || detail.asset_id} ({detail.slot})
                     </text>
                   )}
                 </g>

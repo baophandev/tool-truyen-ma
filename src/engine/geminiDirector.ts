@@ -5,6 +5,7 @@ import type {
   CameraShotType,
 } from "./types";
 import { validateDirectorScript, VALID_CAMERA_SHOTS } from "./layoutRouter";
+import { DEFAULT_NAMED_ENVIRONMENTS } from "./environmentPresets";
 import {
   estimateVoiceDurationSec,
   reconcileDialogueSlicesToStory,
@@ -803,13 +804,20 @@ export async function generateSceneFromDescription(
       ? `- Cỡ Cảnh Chỉ Định (BẮT BUỘC): Dùng camera.shot = "${options.cameraShot}", gán target_actor_id = "actor_1", shake mặc định là "none" (chỉ bật rung nếu mô tả có động đất, nổ tung hoặc jumpscare giật mình).`
       : `- Cỡ Cảnh & Đa Góc Máy Điện Ảnh (AI TỰ ĐẠO DIỄN): Bạn hãy tự suy luận đạo diễn xem cảnh này nên dùng 1 góc máy gọn hay một chuỗi **2–4 góc máy nối tiếp qua mảng "camera.keyframes"**! Với cảnh dài ≥ 6s, có nhiều diễn biến hành động hoặc từ 2 nhân vật trở lên, RẤT KHUYẾN KHÍCH dùng "keyframes" (ví dụ 0s: wide → cắt sang medium vào hành động → cắt/lướt sang close_up hoặc dutch_tilt vào biểu cảm kinh hoàng). Shake mặc định luôn là "none" (chỉ dùng shake khi mô tả có động đất, chấn động dữ dội hoặc quỷ dữ vồ jumpscare).`;
 
+  const env = environment || DEFAULT_NAMED_ENVIRONMENTS[0];
+  const envName = env?.name || "Bối cảnh mặc định";
+  const envTheme = env?.theme || "dark_monochrome";
+  const envLighting = env?.lighting ? JSON.stringify(env.lighting) : "{}";
+  const envItems = env?.environment_items ? JSON.stringify(env.environment_items) : "[]";
+  const envDetails = JSON.stringify(env?.details || []);
+
   const userPrompt = `BẠN LÀ CỖ MÁY ĐẠO DIỄN HOẠT HÌNH 2D THEO MÔ TẢ TRỰC TIẾP (DIRECT DESCRIPTION-DRIVEN 2D ENGINE).
 BỐI CẢNH DƯỚI ĐÂY ĐÃ ĐƯỢC NGƯỜI DÙNG CỐ ĐỊNH 100% (BẮT BUỘC GIỮ NGUYÊN BỐI CẢNH NÀY ĐỂ TRÁNH LỆCH CẢNH):
-- Tên bối cảnh: "${environment.name}"
-- Theme: "${environment.theme}"
-- Lighting: ${JSON.stringify(environment.lighting)}
-- Environment items (Công trình): ${JSON.stringify(environment.environment_items)}
-- Details (Đạo cụ cảnh): ${JSON.stringify(environment.details || [])}
+- Tên bối cảnh: "${envName}"
+- Theme: "${envTheme}"
+- Lighting: ${envLighting}
+- Environment items (Công trình): ${envItems}
+- Details (Đạo cụ cảnh): ${envDetails}
 
 MÔ TẢ CỦA NGƯỜI DÙNG VỀ NHÂN VẬT & HÀNH ĐỘNG TRONG PHÂN CẢNH ${idx}:
 """
@@ -963,21 +971,28 @@ export async function generateFilmFromDescriptions(
   }
 
   const castSummary = (options.availableCharacters || [])
+    .filter(Boolean)
     .map(
       (c) =>
-        `- Diễn Viên: "${c.name}" (ID: "${c.id}") | Khung thân (Base): "${c.base}" | Trang phục (Costume): "${c.costume}" | Mặt: "${c.face || "face_calm"}" | Đồ vật: "${c.defaultHeldItem || "none"}"`
+        `- Diễn Viên: "${c?.name || "Diễn viên"}" (ID: "${c?.id || "actor"}") | Khung thân (Base): "${c?.base || "male_adult"}" | Trang phục (Costume): "${c?.costume || "outfit_tattered_tunic"}" | Mặt: "${c?.face || "face_calm"}" | Đồ vật: "${c?.defaultHeldItem || "none"}"`
     )
     .join("\n");
 
   const promptSections = sceneSpecs.map((spec, i) => {
+    const env = spec.environment || DEFAULT_NAMED_ENVIRONMENTS[0];
+    const envName = env?.name || "Bối cảnh mặc định";
+    const envTheme = env?.theme || "dark_monochrome";
+    const envSky = env?.lighting?.sky_preset || "stormy_dark";
+    const envItems = JSON.stringify((env?.environment_items || []).map((e) => e.asset_id));
+
     const camReq =
       spec.cameraShot && spec.cameraShot !== "auto"
         ? `- Cỡ Cảnh Chỉ Định (BẮT BUỘC): "${spec.cameraShot}" (khóa target_actor_id vào nhân vật chính)`
         : `- Cỡ Cảnh (AI Tự Đạo Diễn Đa Góc Máy): Tự suy luận chọn 1 góc máy (nếu cảnh ngắn) HOẶC đạo diễn chuỗi 2–4 góc máy nối tiếp bằng "camera.keyframes" theo đúng diễn biến hành động & lời thoại trong thời lượng ${spec.duration_sec || 6}s (shake mặc định "none").`;
 
     return `[CẢNH ${i + 1}]:
-- Bối Cảnh Cố Định: "${spec.environment.name}" (Theme: "${spec.environment.theme}", Sky: "${spec.environment.lighting.sky_preset}")
-- Công trình cố định: ${JSON.stringify(spec.environment.environment_items.map((e) => e.asset_id))}
+- Bối Cảnh Cố Định: "${envName}" (Theme: "${envTheme}", Sky: "${envSky}")
+- Công trình cố định: ${envItems}
 - Mô Tả Hành Động & Nhân Vật: """${spec.actionDescription.trim() || "Nhân vật bước đi cẩn trọng trong màn đêm."}"""
 - Lời thoại / Phụ đề: """${spec.dialogue ? spec.dialogue.trim() : "..."}"""
 - Thời lượng: ${spec.duration_sec || 6}s
