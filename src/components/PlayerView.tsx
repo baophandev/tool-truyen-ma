@@ -14,7 +14,6 @@ import {
   Zap,
   Film,
   Layers,
-  Info,
   Activity,
 } from "lucide-react";
 
@@ -196,17 +195,6 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             interactiveDrag={false}
           />
         </div>
-
-        {/* Narrative Director Note in Corner */}
-        {activeScene?.narrative_note && (
-          <div className="absolute top-4 left-4 max-w-md bg-neutral-950/75 backdrop-blur-md border border-neutral-800/60 p-3 rounded-lg text-xs text-neutral-300 shadow-xl pointer-events-none">
-            <div className="flex items-center gap-1.5 text-red-400 font-semibold mb-1">
-              <Info className="w-3.5 h-3.5" />
-              <span>Ghi chú Đạo diễn</span>
-            </div>
-            <p className="leading-relaxed opacity-90">{activeScene.narrative_note}</p>
-          </div>
-        )}
       </div>
 
       {/* Playback Controls & Timeline Scrubber */}
