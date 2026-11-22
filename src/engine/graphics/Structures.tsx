@@ -53,6 +53,7 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "structure_wooden_window" && <WoodenCountryWindow />}
       {id === "structure_ancestor_altar" && <AncestorAltar />}
       {id === "structure_hammock" && <Hammock />}
+      {id === "structure_wooden_stairs" && <WoodenStairs />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -4122,6 +4123,219 @@ const Hammock: React.FC = () => {
 
         {/* Small rustic bolster pillow tucked into head end (X = -65, Y = -78) */}
         <ellipse cx="-64" cy="-78" rx="14" ry="7" fill="#1C1814" stroke="#3D2E22" strokeWidth="1" transform="rotate(-18, -64, -78)" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 32. WoodenStairs (Cầu thang gỗ cũ kỹ rùng rợn dẫn lên gác lửng / tầng trên)
+ * Style: Silhouette Minimalist Horror (Badland / Limbo)
+ * Anchor: [bottom-center] [0, 0] on Ground Line Y = 800px
+ * Elevation: Steps rise from X = -120, Y = 0 up to top landing at X = +75, Y = -180px
+ * Supports character climbing with pose_climbing_stairs or standing at top platform (offsetY: -180).
+ */
+const WoodenStairs: React.FC = () => {
+  return (
+    <g className="structure-wooden-stairs">
+      {/* 1. Ground Contact Shadow & Under-Stairs Void Depth */}
+      <g className="stairs-shadows-and-void">
+        {/* Ground shadow under entire staircase footprint */}
+        <ellipse cx="-5" cy="1" rx="135" ry="9" fill="#000000" opacity="0.65" />
+        <ellipse cx="25" cy="0" rx="95" ry="6" fill="#06090D" opacity="0.85" />
+
+        {/* Dark sinister hollow triangle beneath stairs (Gầm cầu thang tối om) */}
+        <path
+          d="M -120 0 L 75 -176 L 75 0 Z"
+          fill="#05070B"
+          opacity="0.96"
+        />
+        {/* Subtle deep inner shadow gradient layer */}
+        <path
+          d="M -90 0 L 70 -160 L 70 0 Z"
+          fill="#080C12"
+          opacity="0.75"
+        />
+
+        {/* Creepy vertical support studs inside dark cavity */}
+        <line x1="-50" y1="0" x2="-50" y2="-60" stroke="#0D131C" strokeWidth="5" />
+        <line x1="-5" y1="0" x2="-5" y2="-100" stroke="#0D131C" strokeWidth="5.5" />
+        <line x1="40" y1="0" x2="40" y2="-142" stroke="#0D131C" strokeWidth="6" />
+
+        {/* Diagonal bracing beam under stringer */}
+        <line x1="-100" y1="-5" x2="65" y2="-155" stroke="#111822" strokeWidth="6" />
+        <line x1="-80" y1="-2" x2="50" y2="-125" stroke="#0A0E15" strokeWidth="3.5" />
+
+        {/* Cobwebs clustered in the dark inner corner */}
+        <g opacity="0.4">
+          <path d="M 68 -150 Q 55 -135 68 -120" stroke="#475569" strokeWidth="0.8" fill="none" />
+          <path d="M 68 -140 Q 45 -125 55 -100" stroke="#475569" strokeWidth="0.7" fill="none" />
+          <path d="M 60 -148 L 48 -110" stroke="#334155" strokeWidth="0.6" />
+          <path d="M 40 -90 Q 25 -75 40 -60" stroke="#475569" strokeWidth="0.7" fill="none" />
+        </g>
+
+        {/* Flapping tattered cursed talisman strip hanging under step 3 */}
+        <g opacity="0.85">
+          <path
+            d="M -10 -96 L -8 -70 C -7 -62, -14 -58, -12 -50 L -17 -52 C -18 -60, -12 -65, -13 -72 L -15 -96 Z"
+            fill="#854D0E"
+            stroke="#1C1405"
+            strokeWidth="0.6"
+          />
+          {/* Faded crimson occult cinnabar runes on talisman */}
+          <line x1="-12" y1="-90" x2="-11" y2="-74" stroke="#7F1D1D" strokeWidth="1.2" />
+          <circle cx="-12" cy="-70" r="1.2" fill="#991B1B" />
+          <circle cx="-13" cy="-62" r="1.2" fill="#DC2626" />
+        </g>
+      </g>
+
+      {/* 2. Heavy Notched Wooden Stringers (Dầm chịu lực bậc thang xiên) */}
+      <g className="stairs-stringers">
+        {/* Main stepped riser/tread contour: rising from X=-120, Y=0 to X=+75, Y=-180 */}
+        <path
+          d="M -124 0
+             L -120 -34 L -82 -34
+             L -82 -70 L -45 -70
+             L -45 -106 L -8 -106
+             L -8 -142 L 30 -142
+             L 30 -178 L 78 -178
+             L 115 -178 L 115 -168
+             L 75 -168 L 75 0
+             Z"
+          fill="#0C1017"
+          stroke="#161E2E"
+          strokeWidth="1.5"
+        />
+
+        {/* Riser front panels with weathered wood grain */}
+        <rect x="-121" y="-34" width="6" height="34" fill="#131B26" stroke="#0B0F15" strokeWidth="0.8" />
+        <rect x="-83" y="-70" width="6" height="36" fill="#131B26" stroke="#0B0F15" strokeWidth="0.8" />
+        <rect x="-46" y="-106" width="6" height="36" fill="#131B26" stroke="#0B0F15" strokeWidth="0.8" />
+        <rect x="-9" y="-142" width="6" height="36" fill="#131B26" stroke="#0B0F15" strokeWidth="0.8" />
+        <rect x="29" y="-178" width="6" height="36" fill="#131B26" stroke="#0B0F15" strokeWidth="0.8" />
+
+        {/* Creaky vertical cracks on wood risers */}
+        <line x1="-118" y1="-28" x2="-119" y2="-6" stroke="#080C10" strokeWidth="0.9" />
+        <line x1="-80" y1="-64" x2="-81" y2="-40" stroke="#080C10" strokeWidth="0.9" />
+        <line x1="-43" y1="-100" x2="-43" y2="-76" stroke="#080C10" strokeWidth="0.9" />
+        <line x1="-6" y1="-136" x2="-7" y2="-112" stroke="#080C10" strokeWidth="0.9" />
+        <line x1="32" y1="-172" x2="31" y2="-148" stroke="#080C10" strokeWidth="0.9" />
+      </g>
+
+      {/* 3. Wooden Treads (Mặt bậc thang nằm ngang có mép nhô ra & vệt mòn) */}
+      <g className="stairs-treads">
+        {/* Step 1 Tread: Y = -34 */}
+        <g>
+          <rect x="-124" y="-37" width="46" height="6" rx="1.5" fill="#1A2332" stroke="#0F172A" strokeWidth="1" />
+          <line x1="-122" y1="-34" x2="-80" y2="-34" stroke="#334155" strokeWidth="1.2" opacity="0.6" />
+          {/* Worn scuff marks in center */}
+          <ellipse cx="-102" cy="-35" rx="12" ry="1.2" fill="#293548" />
+        </g>
+
+        {/* Step 2 Tread: Y = -70 */}
+        <g>
+          <rect x="-86" y="-73" width="45" height="6" rx="1.5" fill="#1A2332" stroke="#0F172A" strokeWidth="1" />
+          <line x1="-84" y1="-70" x2="-43" y2="-70" stroke="#334155" strokeWidth="1.2" opacity="0.6" />
+          <ellipse cx="-64" cy="-71" rx="12" ry="1.2" fill="#293548" />
+        </g>
+
+        {/* Step 3 Tread: Y = -106 */}
+        <g>
+          <rect x="-49" y="-109" width="45" height="6" rx="1.5" fill="#1A2332" stroke="#0F172A" strokeWidth="1" />
+          <line x1="-47" y1="-106" x2="-6" y2="-106" stroke="#334155" strokeWidth="1.2" opacity="0.6" />
+          <ellipse cx="-27" cy="-107" rx="12" ry="1.2" fill="#293548" />
+        </g>
+
+        {/* Step 4 Tread: Y = -142 */}
+        <g>
+          <rect x="-12" y="-145" width="46" height="6" rx="1.5" fill="#1A2332" stroke="#0F172A" strokeWidth="1" />
+          <line x1="-10" y1="-142" x2="32" y2="-142" stroke="#334155" strokeWidth="1.2" opacity="0.6" />
+          <ellipse cx="10" cy="-143" rx="12" ry="1.2" fill="#293548" />
+        </g>
+
+        {/* Top Landing Platform (Chiếu nghỉ / Ván sàn gác trên): X = 26 -> 118, Y = -178 */}
+        <g>
+          {/* Main top landing platform plank */}
+          <rect x="25" y="-182" width="94" height="8" rx="2" fill="#1E293B" stroke="#0F172A" strokeWidth="1.2" />
+          <line x1="27" y1="-179" x2="116" y2="-179" stroke="#475569" strokeWidth="1.4" opacity="0.75" />
+          {/* Extended attic floor / loft beam extending rightward */}
+          <line x1="117" y1="-180" x2="140" y2="-180" stroke="#161F2E" strokeWidth="7" strokeDasharray="6,3" />
+
+          {/* Character footstep worn indentation at docking zone (X = 75, Y = -180) */}
+          <ellipse cx="75" cy="-180" rx="22" ry="1.8" fill="#334155" opacity="0.5" />
+        </g>
+      </g>
+
+      {/* 4. Banister, Spindles & Handrail (Tay vịn & chấn song gỗ cổ quái) */}
+      <g className="stairs-banister">
+        {/* Bottom Newel Post (Trụ cái dưới sàn) */}
+        <g>
+          <rect x="-126" y="-96" width="7" height="96" rx="1.5" fill="#1E293B" stroke="#0F172A" strokeWidth="1.2" />
+          {/* Turned newel finial cap on top */}
+          <circle cx="-122.5" cy="-99" r="4.5" fill="#273549" stroke="#0F172A" strokeWidth="1" />
+          <line x1="-124" y1="-96" x2="-124" y2="0" stroke="#334155" strokeWidth="1" opacity="0.5" />
+        </g>
+
+        {/* Top Newel Post on Landing Platform (Trụ gác lửng trên) */}
+        <g>
+          <rect x="110" y="-260" width="7" height="80" rx="1.5" fill="#1E293B" stroke="#0F172A" strokeWidth="1.2" />
+          <circle cx="113.5" cy="-263" r="4.5" fill="#273549" stroke="#0F172A" strokeWidth="1" />
+          <line x1="112" y1="-260" x2="112" y2="-180" stroke="#334155" strokeWidth="1" opacity="0.5" />
+        </g>
+
+        {/* Spindles / Balusters along the stair run */}
+        {[
+          { x: -98, bottomY: -35, topY: -116 },
+          { x: -75, bottomY: -71, topY: -136 },
+          { x: -55, bottomY: -71, topY: -152 },
+          { x: -35, bottomY: -107, topY: -168 },
+          { x: -15, bottomY: -107, topY: -185 },
+          { x: 5, bottomY: -143, topY: -202 },
+          { x: 25, bottomY: -143, topY: -218 },
+          { x: 45, bottomY: -179, topY: -234 },
+          { x: 65, bottomY: -179, topY: -248 },
+          { x: 88, bottomY: -179, topY: -255 },
+        ].map((sp, idx) => (
+          <g key={`spindle-${idx}`}>
+            <line
+              x1={sp.x}
+              y1={sp.bottomY}
+              x2={sp.x}
+              y2={sp.topY}
+              stroke="#131B26"
+              strokeWidth="3.2"
+              strokeLinecap="round"
+            />
+            {/* Spindle highlight */}
+            <line
+              x1={sp.x + 0.8}
+              y1={sp.bottomY}
+              x2={sp.x + 0.8}
+              y2={sp.topY}
+              stroke="#273549"
+              strokeWidth="1"
+              opacity="0.4"
+            />
+          </g>
+        ))}
+
+        {/* Sloping Smooth Wooden Handrail (Tay vịn gỗ xiên nối liền từ đáy lên đỉnh gác) */}
+        {/* Main rail beam */}
+        <path
+          d="M -126 -96 L 72 -252 L 114 -258 L 114 -250 L 70 -244 L -126 -88 Z"
+          fill="#1E293B"
+          stroke="#0F172A"
+          strokeWidth="1.2"
+        />
+        {/* Top edge moonlight reflection line along the handrail */}
+        <path
+          d="M -125 -95 L 72 -251 L 113 -257"
+          fill="none"
+          stroke="#475569"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          opacity="0.8"
+        />
       </g>
     </g>
   );

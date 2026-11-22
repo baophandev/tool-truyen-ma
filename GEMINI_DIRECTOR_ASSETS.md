@@ -114,6 +114,7 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `structure_wooden_window` | Cửa sổ gỗ ván lùa/chống nông thôn | Khung cửa sổ ván gỗ hai cánh khép hờ chừa khe dọc ở giữa hắt ánh sương lạnh mờ ảo ra ngoài màn đêm, có các thanh song cửa dọc; neo theo trục sàn Y=800px nhưng khung cửa sổ treo ở tầm cao Y=-260px đến Y=-120px (**tương ứng tầm mắt người nằm trên giường tre nhìn ra**) | `["far_left", "mid_left", "mid_right", "far_right"]` |
 | `structure_ancestor_altar` | Bàn thờ tổ tiên vách lá (Án gian cổ) | Án gian gỗ ba tầng chạm khắc cổ kính đặt sát vách nứa căn nhà lá, có yếm đỏ rách mép tua rua, khung di ảnh tổ tiên cổ kính phủ gương mờ, bài vị chữ Nho, bát hương gốm men rạn nghi ngút ba làn khói hương u uất và đôi chân nến đồng le lói ánh vàng ma mị | `["mid_left", "center", "mid_right"]` |
 | `structure_hammock` | Võng dù / võng lưới miền quê đung đưa | Chiếc võng dù truyền thống mắc giữa hai cột nhà gỗ, đung đưa kẽo kẹt chậm rãi giữa đêm tối tĩnh mịch; **tương tác hoàn hảo với tư thế nằm võng `pose_lying_hammock` (kèm `offsetY: -60`) hoặc tư thế ngồi** (đùi gập trên mép võng, cẳng chân đung đưa). Thiết kế lọt lòng bao bọc trọn vẹn thân người nhân vật | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `structure_wooden_stairs` | Cầu thang gỗ cũ kỹ rùng rợn | Cầu thang ván gỗ cũ kỹ dẫn lên gác lửng / tầng trên căn nhà, các bậc thang ván gỗ nâng cao từ Y=0 đến chiếu nghỉ gác lửng Y=-180px, lan can tay vịn gỗ và chấn song cổ quái, gầm cầu thang tối om có màng nhện; **tương tác hoàn hảo với bước leo thang `pose_climbing_stairs` (motion lên gác lửng `targetOffsetY: -180`) hoặc đứng trên gác lửng (`offsetY: -180`)** | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 
 ---
 
@@ -232,6 +233,10 @@ Giúp nhân vật sống động, không bị đơ cứng như ảnh tĩnh mà l
 | `pose_lying_down` | Nằm ngửa / Co ro trên giường | Ground | Cả 5 Ground Slots (Hỗ trợ `offsetY` âm, ví dụ `offsetY: -80` để nằm khớp mặt phẳng giường tre `structure_bamboo_bed_net`) | Toàn bộ cơ thể xoay ngang song song với mặt đất, đầu kê trên gối, hai tay xếp trên ngực/bụng (hoặc cầm quạt mo, đèn, lát gừng), lồng ngực phập phồng nhẹ hoặc run rẩy cứng đờ vì sợ hãi. Rất phù hợp cảnh trốn trong mùng, nằm ngủ nghe tiếng gọi hoặc tử thi bất động bên quan tài. |
 | `pose_sitting_bed` | Ngồi xếp bằng / khoanh chân trên giường | Ground | Cả 5 Ground Slots (Hỗ trợ `offsetY: -80` để ngồi vững trên giường `structure_wooden_bed` / `structure_bamboo_bed_net`, hoặc `offsetY: 0` trên chiếu sàn) | **Tư thế ngồi xếp bằng truyền thống:** Hai đùi mở sang hai bên, hai cẳng chân đan chéo gấp ngang lòng đùi, bàn chân giấu gọn dưới đầu gối phẳng phiu trên mặt nệm, thân trên thẳng hoặc hơi chúi về trước, hai tay đặt trên đầu gối hoặc cầm bùa/đèn. Hoàn hảo cho cảnh ngồi niệm kinh trừ tà, ngồi canh xác hoặc ngồi co ro sợ hãi trên giường tre. |
 | `pose_lying_hammock` | Nằm võng đung đưa miền quê | Ground | Cả 5 Ground Slots (Hỗ trợ `offsetY: -60` để lọt vừa khít lòng võng `structure_hammock`) | **Tư thế nằm võng thư thái nhưng rùng rợn:** Toàn bộ sống lưng uốn lượn cong tự nhiên theo độ võng hình lòng chảo, đầu kê cao trên gối võng, chân co gối nhẹ duỗi theo đuôi võng, hai tay xếp nhẹ trên bụng hoặc buông lơi. Khi gắn vào cảnh quay, nhân vật đung đưa đồng bộ theo nhịp võng kẽo kẹt. |
+| `pose_climbing_stairs` | Bước leo cầu thang / bậc dốc cao | Ground | Cả 5 Ground Slots (Hỗ trợ `offsetY` và `targetOffsetY: -180` khi leo lên chiếu nghỉ gác lửng `structure_wooden_stairs`) | **Tư thế bước leo cầu thang dốc:** Chân trước co gối nhấc cao bước lên bậc trên (Y=-34), chân sau duỗi dài chạm bậc dưới/sàn, thân người đổ nhẹ về trước, một tay vươn bám lan can gỗ hoặc cầm đèn soi rọi lên gác xép u tối. Kết hợp hoàn hảo với khối `motion` để diễn xuất cảnh leo từ sàn nhà lên gác lửng. |
+| `pose_balancing_bridge` | Đi thăng bằng trên cầu khỉ / cầu tre | Ground | Cả 5 Ground Slots (Hỗ trợ `offsetY: -115` trên cầu khỉ `structure_monkey_bridge` hoặc `offsetY: -110` trên cầu gỗ gãy `broken_wooden_bridge`) | **Tư thế đi chênh vênh thăng bằng:** Hai bàn chân đặt so le thẳng hàng dọc theo thân tre hẹp, hai đầu gối chùng xuống hạ thấp trọng tâm, hai cánh tay dang rộng sang hai bên giữ thăng bằng (hoặc một tay giơ đèn soi đường, một tay dang ngang), cơ thể rung nhẹ trước những cơn gió lạnh thổi thốc qua lòng kênh tối. |
+| `pose_kneeling` | Quỳ gối lạy / khấn vái / xin tha mạng | Ground | Cả 5 Ground Slots (Hỗ trợ `offsetY: 0` trên mặt sàn hoặc `offsetY: -80` trên phản/giường) | **Tư thế quỳ gối kính cẩn hoặc kinh hãi:** Hai đầu gối chạm đất, hai cẳng chân và mu bàn chân xếp phẳng phía sau, thân mình thẳng hoặc hơi cúi lạy, hai tay chắp trước ngực cầu xin/khấn vái (hoặc hai tay dâng bùa/nến/hương). Hoàn hảo cho cảnh cúng bái trước bàn thờ `structure_ancestor_altar` hoặc quỳ xin tha mạng trước quỷ dữ. |
+| `pose_squatting` | Ngồi xổm / chồm hổm góc tối | Ground | Cả 5 Ground Slots (Hỗ trợ `offsetY: 0` trên mặt đất/sàn nhà) | **Dáng ngồi chồm hổm rùng rợn đặc trưng Á Đông:** Hai bàn chân đạp đất, hai đầu gối co gập nhô cao sát ngực tạo tam giác góc cạnh, hai tay khoác qua đầu gối hoặc buông thõng thủ thế giữa hai chân. Dùng cho cảnh kẻ ăn mày, đứa trẻ ma lẩn trốn trong góc tối hoặc ngạ quỷ rình rập con mồi. |
 
 ---
 
@@ -1444,6 +1449,104 @@ Thay vì giữ nguyên 1 góc máy cố định suốt cả phân cảnh dài, A
   ],
   "dialogue": "Ánh đèn dầu leo lét trên bàn thờ tổ tiên hắt bóng bà Hai chập chờn lên bức vách nứa. Ngoài sân, tiếng gió rít qua rui mè tre lạnh buốt xương sống...",
   "narrative_note": "Không gian thuần chất kinh dị Nam Bộ: theme thatched_house_interior với vách nứa đan nan tre, vì kèo tre rủ mái tranh; structure_ancestor_altar ở trung tâm nghi ngút khói nhang đỏ rực; giường tre giăng mùng ở far_left và cửa gỗ cài then ở far_right."
+}
+```
+
+---
+
+## 9. QUY CHUẨN TƯƠNG TÁC ASSETS ĐẶC BIỆT TRÊN CAO & NỘI THẤT (FURNITURE & ELEVATED STRUCTURES)
+
+Khi phân cảnh xuất hiện các công trình đặc biệt (Cầu thang gỗ, Cầu khỉ tre, Cầu gỗ gãy, Giường, Ghế, Võng), đạo diễn LLM BẮT BUỘC thiết lập tương tác thực tế thông qua các trường:
+- `interact_with`: ID công trình tương tác.
+- `offsetY`: Tọa độ bù trục Y để nhân vật tiếp xúc chuẩn xác với mặt phẳng vật lý.
+- `motion`: Di chuyển có cao độ (`targetOffsetY`, `movingPose`).
+
+### Bảng tra cứu tương tác chuẩn:
+
+| Công trình (`interact_with`) | Tư thế nhân vật (`pose` / `movingPose`) | `offsetY` / `targetOffsetY` | Hành vi & Diễn xuất trực quan |
+| :--- | :--- | :--- | :--- |
+| **`structure_wooden_stairs`** | `pose_climbing_stairs`<br>(kèm khối motion) | `offsetY: 0` -> `targetOffsetY: -180` | **Leo cầu thang lên gác lửng:** Chân trước co gối bước lên từng bậc, thân nghiêng về trước, tay vịn lan can leo từ sàn lên đỉnh gác Y=-180px. |
+| **`structure_wooden_stairs`** | `pose_standing`<br>hoặc `pose_shivering` | `offsetY: -180` | **Đứng quan sát trên đỉnh gác lửng:** Đứng vững chãi trên chiếu nghỉ sàn gác nhìn xuống tầng trệt. |
+| **`structure_monkey_bridge`** | `pose_balancing_bridge` | `offsetY: -115` | **Đi thăng bằng qua cầu khỉ:** Hai chân so le thẳng hàng trên thân tre, đầu gối chùng, hai tay dang ngang giữ thăng bằng soi đèn qua kênh tối. |
+| **`broken_wooden_bridge`** | `pose_balancing_bridge`<br>hoặc `pose_walking` | `offsetY: -110` | **Bước lên nhịp cầu gãy:** Đứng chênh vênh ở độ cao Y=-110px sát mép gãy của cầu gỗ nhìn xuống vực. |
+| **`structure_wooden_bed`**<br>hoặc **`structure_bamboo_bed_net`** | `pose_lying_down` | `offsetY: -80` | **Nằm ngủ / co ro trên giường:** Toàn thân nằm phẳng phiu trên mặt nệm, đầu kê gối, nằm lọt trong mùng. |
+| **`structure_wooden_bed`**<br>hoặc **`structure_bamboo_bed_net`** | `pose_sitting_bed` | `offsetY: -80` | **Ngồi xếp bằng trên giường:** Hai chân khoanh đan chéo phẳng phiu, hai tay đặt trên gối hoặc giơ bùa/đèn niệm chú. |
+| **`structure_hammock`** | `pose_lying_hammock` | `offsetY: -60` | **Nằm võng đung đưa:** Thân người uốn cong lọt lòng võng, đầu kê gối võng, đung đưa kẽo kẹt theo nhịp võng. |
+| **`structure_wooden_chair`** | `pose_sitting`<br>hoặc `pose_sitting_twisted_legs` | `offsetY: 0` | **Ngồi ghế tựa:** Đùi gập ngang mặt ghế Y=-72px, cẳng chân buông xuống sàn Y=0px phẳng phiu. |
+| **`structure_ancestor_altar`**<br>(hoặc mặt sàn) | `pose_kneeling` | `offsetY: 0` | **Quỳ lạy khấn vái:** Đầu gối tiếp đất, hai tay chắp trước ngực khấn vái linh thiêng trước bàn thờ tổ tiên hoặc quỳ van xin. |
+| **(Mọi bối cảnh sàn/đất)** | `pose_squatting` | `offsetY: 0` | **Ngồi xổm / chồm hổm:** Đầu gối nhô cao sát ngực, ngồi nép góc tối hoặc rình rập trong bóng đêm. |
+
+### JSON mẫu phân cảnh tương tác leo cầu thang & vượt cầu khỉ:
+
+```json
+{
+  "scene_id": "scene_02_elevated",
+  "title": "Leo Lên Gác Lửng Tối & Bóng Đen Cầu Khỉ",
+  "duration_sec": 12,
+  "theme": "thatched_house_interior",
+  "lighting": {
+    "sky_preset": "foggy_night",
+    "fog_density": 0.65
+  },
+  "camera": {
+    "shot": "medium_wide",
+    "shake": "subtle"
+  },
+  "environment_items": [
+    {
+      "asset_id": "structure_wooden_stairs",
+      "slot": "mid_left",
+      "scale": 1.0
+    },
+    {
+      "asset_id": "structure_monkey_bridge",
+      "slot": "mid_right",
+      "scale": 1.0
+    }
+  ],
+  "actors": [
+    {
+      "id": "char_climber",
+      "base": "male_adult",
+      "costume": "outfit_modern_casual",
+      "face": "face_scared",
+      "facialAction": "darting_eyes",
+      "pose": "pose_climbing_stairs",
+      "heldItem": "item_flashlight",
+      "heldHand": "right",
+      "facing": "right",
+      "slot": "mid_left",
+      "offsetX": -45,
+      "offsetY": 0,
+      "interact_with": "structure_wooden_stairs",
+      "motion": {
+        "targetSlot": "mid_left",
+        "targetOffsetX": 65,
+        "targetOffsetY": -180,
+        "startTimeSec": 0.5,
+        "endTimeSec": 6.0,
+        "easing": "ease_in_out",
+        "autoFaceTarget": true,
+        "movingPose": "pose_climbing_stairs"
+      }
+    },
+    {
+      "id": "char_ghost_bridge",
+      "base": "ghost_wraith",
+      "costume": "outfit_shredded_burial",
+      "face": "face_pale_corpse",
+      "facialAction": "none",
+      "pose": "pose_balancing_bridge",
+      "heldItem": "item_oil_lamp",
+      "heldHand": "right",
+      "facing": "left",
+      "slot": "mid_right",
+      "offsetY": -115,
+      "interact_with": "structure_monkey_bridge"
+    }
+  ],
+  "dialogue": "Từng bậc gỗ cầu thang kẽo kẹt dưới chân người đàn ông khi leo lên gác xép. Phía ngoài, bóng trắng lơ lửng bước chênh vênh qua cây cầu khỉ sương mờ...",
+  "narrative_note": "Nhân vật nam leo cầu thang gỗ structure_wooden_stairs từ sàn lên gác lửng Y=-180px với motion.movingPose='pose_climbing_stairs'. Oan hồn đứng thăng bằng giữa thân cầu khỉ structure_monkey_bridge với pose_balancing_bridge tại cao độ Y=-115px."
 }
 ```
 

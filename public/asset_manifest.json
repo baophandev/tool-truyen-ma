@@ -479,6 +479,16 @@
         "width": 300,
         "height": 230,
         "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_wooden_stairs",
+        "name": "Cầu thang gỗ cũ kỹ rùng rợn",
+        "semantic_role": "Cầu thang gỗ cũ kỹ rùng rợn dẫn lên gác lửng / tầng trên, ván bậc thang kêu cót két, lan can tay vịn gỗ cổ quái, gầm cầu thang tối om có màng nhện; tương tác với bước leo thang pose_climbing_stairs hoặc đứng trên gác lửng offsetY: -180",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 260,
+        "height": 280,
+        "anchor": "bottom-center"
       }
     ]
   },
@@ -812,6 +822,26 @@
         "id": "pose_lying_hammock",
         "type": "ground",
         "desc": "Tư thế nằm võng đung đưa miền quê: thân người uốn lượn cong tự nhiên theo độ võng, đầu kê cao gối đầu võng, chân co nhẹ, hai tay ôm ngực hoặc buông lơi, hỗ trợ offsetY: -60px lọt gọn vào lòng võng"
+      },
+      {
+        "id": "pose_climbing_stairs",
+        "type": "ground",
+        "desc": "Tư thế bước leo cầu thang / bậc dốc cao: chân trước co gối nhấc cao bước lên bậc trên, chân sau duỗi thẳng, thân người hơi cúi tiến về phía trước, một tay vịn lan can hoặc cầm đèn soi đường; hỗ trợ chuyển động lên gác lửng targetOffsetY: -180px"
+      },
+      {
+        "id": "pose_balancing_bridge",
+        "type": "ground",
+        "desc": "Tư thế đi thăng bằng trên cầu khỉ tre hoặc cầu gỗ gãy chênh vênh: hai bàn chân so le thẳng hàng, hai đầu gối chùng xuống giữ thăng bằng, hai tay dang ngang (hoặc một tay giơ đèn soi đường, một tay dang giữ thăng bằng), hỗ trợ đứng trên cầu khỉ offsetY: -115px hoặc cầu gãy offsetY: -110px"
+      },
+      {
+        "id": "pose_kneeling",
+        "type": "ground",
+        "desc": "Tư thế quỳ gối lạy / khấn vái / xin tha mạng: hai đầu gối chạm đất, hai cẳng chân và mu bàn chân áp sát mặt sàn, thân người thẳng hoặc hơi cúi lạy, hai tay chắp trước ngực khấn vái hoặc giơ bùa/nến; hoàn hảo cho các cảnh cầu xin, cúng bái trước bàn thờ tổ tiên hoặc quỳ run rẩy trước quỷ dữ"
+      },
+      {
+        "id": "pose_squatting",
+        "type": "ground",
+        "desc": "Tư thế ngồi xổm / ngồi chồm hổm góc tối: hai bàn chân đạp đất, hai đầu gối co gập nhô cao sát ngực, hai tay khoác qua đầu gối hoặc buông thõng thủ thế giữa hai chân; đặc trưng cho dáng ngồi rình rập của ngạ quỷ, kẻ ăn mày lẩn trốn, hoặc nhân vật co ro trong góc tối sợ hãi"
       },
       {
         "id": "pose_holding",

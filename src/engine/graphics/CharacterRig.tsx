@@ -104,6 +104,42 @@ function resolveHandSockets(
       right: rightRaised ? { x: 16, y: -130, rot: 10 } : { x: 34, y: -95, rot: 0 },
     };
   }
+  if (pose === "pose_climbing_stairs") {
+    const hasItem = Boolean(heldItem && heldItem !== "none");
+    const rightRaised = hasItem && heldHand === "right";
+    const leftRaised = hasItem && heldHand === "left";
+    return {
+      left: leftRaised ? { x: -28, y: -135, rot: 10 } : { x: -36, y: -94, rot: 15 },
+      right: rightRaised ? { x: 44, y: -145, rot: -5 } : { x: 38, y: -128, rot: -8 },
+    };
+  }
+  if (pose === "pose_balancing_bridge") {
+    const hasItem = Boolean(heldItem && heldItem !== "none");
+    const rightRaised = hasItem && heldHand === "right";
+    const leftRaised = hasItem && heldHand === "left";
+    return {
+      left: leftRaised ? { x: -45, y: -142, rot: -8 } : { x: -65, y: -130, rot: -18 },
+      right: rightRaised ? { x: 48, y: -144, rot: 8 } : { x: 65, y: -130, rot: 18 },
+    };
+  }
+  if (pose === "pose_kneeling") {
+    const hasItem = Boolean(heldItem && heldItem !== "none");
+    const rightRaised = hasItem && heldHand === "right";
+    const leftRaised = hasItem && heldHand === "left";
+    return {
+      left: leftRaised ? { x: -16, y: -138, rot: -10 } : { x: 8, y: -136, rot: 10 },
+      right: rightRaised ? { x: 26, y: -138, rot: 10 } : { x: 18, y: -136, rot: -10 },
+    };
+  }
+  if (pose === "pose_squatting") {
+    const hasItem = Boolean(heldItem && heldItem !== "none");
+    const rightRaised = hasItem && heldHand === "right";
+    const leftRaised = hasItem && heldHand === "left";
+    return {
+      left: leftRaised ? { x: -24, y: -125, rot: -5 } : { x: -16, y: -106, rot: 8 },
+      right: rightRaised ? { x: 38, y: -125, rot: 5 } : { x: 22, y: -106, rot: -8 },
+    };
+  }
   if (pose === "pose_reaching") {
     return {
       left: { x: -18, y: -115, rot: 0 },
@@ -431,6 +467,10 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
   if (pose === "pose_sitting") poseClass = "rig-sitting";
   if (pose === "pose_sitting_bed") poseClass = "rig-sitting-bed";
   if (pose === "pose_sitting_twisted_legs" || (pose as string) === "pose_twisted_legs_floating") poseClass = "rig-twisted-legs";
+  if (pose === "pose_climbing_stairs") poseClass = "rig-climbing-stairs";
+  if (pose === "pose_balancing_bridge") poseClass = "rig-balancing-bridge";
+  if (pose === "pose_kneeling") poseClass = "rig-kneeling";
+  if (pose === "pose_squatting") poseClass = "rig-squatting";
 
   return (
     <g
@@ -1069,6 +1109,10 @@ const LowerBodyOutfit: React.FC<{
   const isSittingTwisted =
     pose === "pose_sitting_twisted_legs" ||
     (pose as string) === "pose_twisted_legs_floating";
+  const isClimbingStairs = pose === "pose_climbing_stairs";
+  const isBalancingBridge = pose === "pose_balancing_bridge";
+  const isKneeling = pose === "pose_kneeling";
+  const isSquatting = pose === "pose_squatting";
 
   // Seated Cross-Legged on Bed / Mat Horror / Traditional Pose override
   if (isSittingBed) {
@@ -1244,6 +1288,302 @@ const LowerBodyOutfit: React.FC<{
         )}
         {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
           <path d="M -18 -90 C -22 -78, -22 -68, -14 -64 L 6 -64 C 12 -68, 14 -78, 12 -90 Z" fill={palette.primary} stroke={appearance.outline} strokeWidth="0.9" />
+        )}
+      </g>
+    );
+  }
+
+  // Climbing Stairs High Step Pose override (Leading leg raised high stepping up, trailing leg back)
+  if (isClimbingStairs) {
+    return (
+      <g className="climbing-stairs-legs">
+        {/* Contact Shadows: ground under trailing foot and step tread under raised foot */}
+        <ellipse cx="-26" cy="1" rx="16" ry="3.5" fill="#000000" opacity="0.45" />
+        <ellipse cx="32" cy="-33" rx="14" ry="3" fill="#000000" opacity="0.4" />
+
+        {/* Trailing Back Leg (extending down-left to lower step/ground) */}
+        <g opacity="0.9">
+          {/* Thigh from Hip (-10, -90) to Trailing Knee (-22, -48) */}
+          <path
+            d="M -10 -90 L -24 -48 L -18 -46 L -4 -90 Z"
+            fill={palette.pantsSecondary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          <ellipse cx="-21" cy="-47" rx="4.5" ry="4" fill={palette.pantsSecondary} />
+          {/* Shin to Ankle (-24, -4) */}
+          <path
+            d="M -24 -48 L -28 -4 L -20 -4 L -18 -46 Z"
+            fill={palette.pantsSecondary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          {/* Back foot on lower level */}
+          <ellipse cx="-25" cy="-2" rx="7" ry="3" fill="#11131A" />
+        </g>
+
+        {/* Leading Front Leg (Raised high, knee bent, stepping on higher tread Y = -34) */}
+        <g>
+          {/* Front Thigh from Hip (4, -90) forward & upward to Raised Knee (26, -56) */}
+          <path
+            d="M 4 -90 L 26 -58 L 28 -48 L 6 -82 Z"
+            fill={palette.pantsPrimary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          {/* Knee round cap */}
+          <ellipse cx="27" cy="-53" rx="5.5" ry="5" fill={palette.pantsPrimary} />
+          {/* Front Shin stepping vertically down onto step tread Y = -34 */}
+          <path
+            d="M 23 -52 L 28 -34 L 36 -34 L 31 -50 Z"
+            fill={palette.pantsPrimary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          {/* Front Foot planted firmly on upper step */}
+          <ellipse cx="33" cy="-34" rx="8" ry="3.5" fill="#181512" />
+        </g>
+
+        {/* Dynamic Costume Drapes for Climbing Stride */}
+        {costume === "outfit_flowing_ao_dai" && (
+          <path
+            d="M -16 -90 C -18 -60, -26 -25, -28 0 L -12 0 C -8 -30, 8 -55, 24 -52 L 18 -64 C 4 -68, -10 -75, -16 -90 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="0.9"
+            opacity="0.92"
+          />
+        )}
+        {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
+          <path
+            d="M -18 -90 C -14 -78, 6 -74, 22 -62 L 16 -50 C 4 -58, -12 -65, -18 -90 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="0.9"
+          />
+        )}
+        {costume === "outfit_modern_casual" && (
+          <line x1="26" y1="-32" x2="40" y2="-32" stroke={palette.accent} strokeWidth="1.8" strokeLinecap="round" />
+        )}
+      </g>
+    );
+  }
+
+  // Balancing Bridge Pose override (Narrow tightrope stance on shaky log, knees flexed)
+  if (isBalancingBridge) {
+    return (
+      <g className="balancing-bridge-legs anim-tremble-subtle">
+        {/* Tight contact shadow under feet along narrow bridge log */}
+        <ellipse cx="2" cy="1" rx="24" ry="4" fill="#000000" opacity="0.55" />
+
+        {/* Back Leg (Tense, slightly bent to lower center of mass) */}
+        <g opacity="0.9">
+          <path
+            d="M -6 -90 L -16 -48 L -10 -46 L 0 -90 Z"
+            fill={palette.pantsSecondary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          <ellipse cx="-13" cy="-47" rx="4.5" ry="4" fill={palette.pantsSecondary} />
+          <path
+            d="M -16 -48 L -14 -4 L -8 -4 L -10 -46 Z"
+            fill={palette.pantsSecondary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          <ellipse cx="-11" cy="-2" rx="6.5" ry="3" fill="#11131A" />
+        </g>
+
+        {/* Front Leg (In-line tightrope stance, slightly forward) */}
+        <g>
+          <path
+            d="M 2 -90 L 16 -48 L 10 -46 L -4 -90 Z"
+            fill={palette.pantsPrimary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          <ellipse cx="13" cy="-47" rx="4.5" ry="4" fill={palette.pantsPrimary} />
+          <path
+            d="M 16 -48 L 16 -4 L 10 -4 L 10 -46 Z"
+            fill={palette.pantsPrimary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          <ellipse cx="14" cy="-2" rx="6.5" ry="3" fill="#181512" />
+        </g>
+
+        {/* Costume draping slightly fluttering in bridge crosswind */}
+        {costume === "outfit_flowing_ao_dai" && (
+          <path
+            d="M -14 -90 C -18 -45, -20 -15, -22 0 L 22 0 C 20 -15, 18 -45, 14 -90 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="0.9"
+            opacity="0.92"
+          />
+        )}
+        {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
+          <path
+            d="M -16 -90 C -18 -75, -16 -64, -12 -62 L 12 -62 C 16 -64, 18 -75, 16 -90 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="0.9"
+          />
+        )}
+      </g>
+    );
+  }
+
+  // Kneeling Pose override (Knees planted on ground, shins/feet folded back flat)
+  if (isKneeling) {
+    return (
+      <g className="kneeling-legs">
+        {/* Contact Shadow under knees & folded shins */}
+        <ellipse cx="2" cy="1" rx="44" ry="6" fill="#000000" opacity="0.5" />
+
+        {/* Back Leg (Left Leg folded underneath) */}
+        <g opacity="0.9">
+          {/* Thigh from Hip (-10, -90) forward-down to Knee (16, -4) */}
+          <path
+            d="M -10 -90 L 16 -6 L 16 0 L -4 -84 Z"
+            fill={palette.pantsSecondary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          {/* Knee round cap on ground */}
+          <ellipse cx="16" cy="-3" rx="5" ry="3.5" fill={palette.pantsSecondary} />
+          {/* Shin flat on floor extending backward to foot (-22, -2) */}
+          <path
+            d="M 16 -5 L -20 -5 L -20 0 L 16 0 Z"
+            fill={palette.pantsSecondary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          {/* Foot heel / sole facing up/back */}
+          <ellipse cx="-22" cy="-2.5" rx="5.5" ry="2.8" fill="#11131A" />
+        </g>
+
+        {/* Front Leg (Right Leg folded underneath) */}
+        <g>
+          {/* Thigh from Hip (4, -90) forward-down to Knee (26, -4) */}
+          <path
+            d="M 4 -90 L 26 -6 L 26 0 L 8 -84 Z"
+            fill={palette.pantsPrimary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          {/* Knee round cap on ground */}
+          <ellipse cx="26" cy="-3" rx="5.5" ry="3.8" fill={palette.pantsPrimary} />
+          {/* Shin flat on floor extending backward to foot (-14, -2) */}
+          <path
+            d="M 26 -6 L -12 -6 L -12 0 L 26 0 Z"
+            fill={palette.pantsPrimary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          {/* Foot heel / sole facing up/back */}
+          <ellipse cx="-14" cy="-2.5" rx="5.5" ry="2.8" fill="#181512" />
+        </g>
+
+        {/* Costume Lap & Draping over Kneeling Thighs */}
+        {costume === "outfit_flowing_ao_dai" && (
+          <path
+            d="M -14 -90 C -6 -86, 12 -82, 30 -65 C 34 -40, 32 -10, 26 0 L 12 0 C 18 -25, 16 -50, 8 -65 C 0 -70, -8 -75, -14 -90 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+            opacity="0.92"
+          />
+        )}
+        {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
+          <path
+            d="M -16 -90 C -6 -86, 10 -84, 22 -72 L 18 -58 C 8 -64, -6 -68, -16 -90 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="0.9"
+          />
+        )}
+        {costume === "outfit_shrouded_cloak" && (
+          <path
+            d="M -25 -90 C -12 -80, 16 -75, 34 -55 C 38 -30, 36 0, 30 0 L -22 0 C -28 -25, -28 -60, -25 -90 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="1.2"
+          />
+        )}
+      </g>
+    );
+  }
+
+  // Squatting / Deep Crouch Horror Pose override (Knees raised high to chest, feet planted on floor)
+  if (isSquatting) {
+    return (
+      <g className="squatting-legs">
+        {/* Contact Shadow under planted feet */}
+        <ellipse cx="2" cy="1" rx="36" ry="5" fill="#000000" opacity="0.6" />
+
+        {/* Back Leg (Bent double: hip -> knee high -> foot ground) */}
+        <g opacity="0.9">
+          {/* Thigh sloping forward-up from Hip (-8, -82) to High Knee (-16, -96) */}
+          <path
+            d="M -8 -82 L -18 -98 L -12 -96 L -2 -78 Z"
+            fill={palette.pantsSecondary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          <ellipse cx="-15" cy="-96" rx="5" ry="4.5" fill={palette.pantsSecondary} />
+          {/* Shin dropping down from High Knee (-16, -96) to Back Foot (-14, 0) */}
+          <path
+            d="M -18 -96 L -16 0 L -10 0 L -12 -96 Z"
+            fill={palette.pantsSecondary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          {/* Back foot planted on ground */}
+          <ellipse cx="-13" cy="-2" rx="7.5" ry="3.5" fill="#11131A" />
+        </g>
+
+        {/* Front Leg (Bent double: hip -> knee high near chest -> foot ground) */}
+        <g>
+          {/* Thigh sloping forward-up from Hip (6, -82) to High Front Knee (22, -96) */}
+          <path
+            d="M 2 -82 L 20 -98 L 26 -96 L 8 -76 Z"
+            fill={palette.pantsPrimary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          <ellipse cx="23" cy="-96" rx="5.5" ry="5" fill={palette.pantsPrimary} />
+          {/* Shin dropping down from High Knee (22, -96) to Front Foot (18, 0) */}
+          <path
+            d="M 20 -96 L 14 0 L 22 0 L 26 -96 Z"
+            fill={palette.pantsPrimary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          {/* Front foot planted firmly on ground */}
+          <ellipse cx="18" cy="-2" rx="8" ry="3.8" fill="#181512" />
+        </g>
+
+        {/* Costume Drapes around Deep Crouch */}
+        {costume === "outfit_flowing_ao_dai" && (
+          <path
+            d="M -14 -82 C -18 -60, -22 -30, -20 0 L 22 0 C 24 -30, 20 -60, 16 -82 C 10 -76, -8 -76, -14 -82 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+            opacity="0.9"
+          />
+        )}
+        {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
+          <path
+            d="M -16 -82 C -20 -70, -18 -60, -12 -58 L 16 -58 C 22 -60, 20 -70, 16 -82 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="0.9"
+          />
+        )}
+        {costume === "outfit_modern_casual" && (
+          <line x1="10" y1="-2" x2="26" y2="-2" stroke={palette.accent} strokeWidth="2" strokeLinecap="round" />
         )}
       </g>
     );
@@ -1892,6 +2232,142 @@ const ArmsRig: React.FC<{
             raiseRight
               ? `M 18 -184 L 26 -144 L ${handSockets.right.x} ${handSockets.right.y + 4} L ${handSockets.right.x - 4} ${handSockets.right.y - 5} L 22 -155 L 10 -184 Z`
               : "M 22 -185 C 20 -150, 16 -120, 12 -88 L 18 -88 C 24 -120, 26 -150, 28 -185 Z"
+          }
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="0.9"
+        />
+        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.8" fill={handColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+    );
+  }
+
+  // Climbing Stairs arms (ascending posture, one arm reaching/holding, rear arm for momentum)
+  if (pose === "pose_climbing_stairs") {
+    const raiseLeft = hasItem && heldHand === "left";
+    const raiseRight = hasItem && heldHand === "right";
+    return (
+      <g className="anim-arms-climb">
+        {/* Back arm swinging backward or raised */}
+        <path
+          d={
+            raiseLeft
+              ? `M -22 -184 L -18 -150 L ${handSockets.left.x} ${handSockets.left.y + 4} L ${handSockets.left.x - 4} ${handSockets.left.y - 5} L -22 -158 L -14 -184 Z`
+              : "M -22 -185 C -28 -155, -34 -125, -38 -98 L -32 -96 C -28 -125, -22 -155, -16 -185 Z"
+          }
+          fill={sleeveShadowColor}
+        />
+        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.5" fill={handShadowColor} />
+
+        {/* Front arm reaching forward/upward to banister or holding item */}
+        <path
+          d={
+            raiseRight
+              ? `M 18 -184 L 28 -155 L ${handSockets.right.x} ${handSockets.right.y + 4} L ${handSockets.right.x - 4} ${handSockets.right.y - 5} L 22 -162 L 10 -184 Z`
+              : `M 18 -184 C 24 -155, 30 -140, ${handSockets.right.x} ${handSockets.right.y} L ${handSockets.right.x - 4} ${handSockets.right.y + 5} C 24 -135, 18 -155, 10 -184 Z`
+          }
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="0.9"
+        />
+        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.8" fill={handColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+    );
+  }
+
+  // Balancing Bridge arms (arms outstretched wide for balance over chasm)
+  if (pose === "pose_balancing_bridge") {
+    const raiseLeft = hasItem && heldHand === "left";
+    const raiseRight = hasItem && heldHand === "right";
+    return (
+      <g className="anim-arms-balancing">
+        {/* Left outstretched balance arm */}
+        <path
+          d={
+            raiseLeft
+              ? `M -22 -184 L -38 -155 L ${handSockets.left.x} ${handSockets.left.y + 4} L ${handSockets.left.x - 4} ${handSockets.left.y - 5} L -32 -162 L -14 -184 Z`
+              : `M -22 -184 C -42 -170, -55 -152, ${handSockets.left.x} ${handSockets.left.y} L ${handSockets.left.x + 3} ${handSockets.left.y + 6} C -48 -146, -38 -164, -16 -184 Z`
+          }
+          fill={sleeveShadowColor}
+        />
+        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.5" fill={handShadowColor} />
+
+        {/* Right outstretched balance arm */}
+        <path
+          d={
+            raiseRight
+              ? `M 18 -184 L 32 -155 L ${handSockets.right.x} ${handSockets.right.y + 4} L ${handSockets.right.x - 4} ${handSockets.right.y - 5} L 24 -162 L 10 -184 Z`
+              : `M 18 -184 C 40 -170, 55 -152, ${handSockets.right.x} ${handSockets.right.y} L ${handSockets.right.x - 3} ${handSockets.right.y + 6} C 48 -146, 36 -164, 12 -184 Z`
+          }
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="0.9"
+        />
+        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.8" fill={handColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+    );
+  }
+
+  // Kneeling pose arms (hands clasped in prayer / pleading or holding item reverently)
+  if (pose === "pose_kneeling") {
+    const raiseLeft = hasItem && heldHand === "left";
+    const raiseRight = hasItem && heldHand === "right";
+    return (
+      <g className="anim-arms-kneel">
+        {/* Back arm */}
+        <path
+          d={
+            raiseLeft
+              ? `M -22 -184 L -12 -150 L ${handSockets.left.x} ${handSockets.left.y + 4} L ${handSockets.left.x - 4} ${handSockets.left.y - 5} L -16 -158 L -14 -184 Z`
+              : `M -22 -184 C -16 -160, -8 -145, ${handSockets.left.x} ${handSockets.left.y} L ${handSockets.left.x + 4} ${handSockets.left.y + 4} C -2 -140, -10 -155, -14 -184 Z`
+          }
+          fill={sleeveShadowColor}
+        />
+        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.5" fill={handShadowColor} />
+
+        {/* Front arm */}
+        <path
+          d={
+            raiseRight
+              ? `M 18 -184 L 24 -152 L ${handSockets.right.x} ${handSockets.right.y + 4} L ${handSockets.right.x - 4} ${handSockets.right.y - 5} L 18 -158 L 10 -184 Z`
+              : `M 18 -184 C 18 -160, 16 -145, ${handSockets.right.x} ${handSockets.right.y} L ${handSockets.right.x - 4} ${handSockets.right.y + 4} C 10 -140, 12 -155, 10 -184 Z`
+          }
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="0.9"
+        />
+        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.8" fill={handColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+    );
+  }
+
+  // Squatting / crouching pose arms (draped over knees or holding prop between knees)
+  if (pose === "pose_squatting") {
+    const raiseLeft = hasItem && heldHand === "left";
+    const raiseRight = hasItem && heldHand === "right";
+    return (
+      <g className="anim-arms-squat">
+        {/* Back arm draped over knee or holding */}
+        <path
+          d={
+            raiseLeft
+              ? `M -22 -184 L -20 -145 L ${handSockets.left.x} ${handSockets.left.y + 4} L ${handSockets.left.x - 4} ${handSockets.left.y - 5} L -24 -150 L -14 -184 Z`
+              : `M -22 -184 C -22 -155, -20 -130, ${handSockets.left.x} ${handSockets.left.y} L ${handSockets.left.x + 4} ${handSockets.left.y + 4} C -14 -130, -16 -155, -14 -184 Z`
+          }
+          fill={sleeveShadowColor}
+        />
+        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.5" fill={handShadowColor} />
+
+        {/* Front arm draped over knee or holding */}
+        <path
+          d={
+            raiseRight
+              ? `M 18 -184 L 28 -148 L ${handSockets.right.x} ${handSockets.right.y + 4} L ${handSockets.right.x - 4} ${handSockets.right.y - 5} L 22 -155 L 10 -184 Z`
+              : `M 18 -184 C 22 -155, 24 -130, ${handSockets.right.x} ${handSockets.right.y} L ${handSockets.right.x - 4} ${handSockets.right.y + 4} C 16 -130, 14 -155, 10 -184 Z`
           }
           fill={sleeveColor}
           stroke={appearance.outline}

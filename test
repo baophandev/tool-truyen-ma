@@ -1,17 +1,17 @@
 Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đối tượng phân cảnh (`DirectorSceneScript[]`)**, trong đó mỗi phần tử đại diện cho một cảnh quay độc lập với đầy đủ thông số đạo diễn để nạp thẳng vào Bước 1 của Studio.
 
-### Cấu trúc tổng thể của một đối tượng phân cảnh
+### Mẫu Kịch Bản Đạo Diễn Hoàn Chỉnh (Một Mảng JSON Duy Nhất gồm các Cảnh nối tiếp)
 
 ```json
 [
   {
     "scene_id": "scene_01",
-    "title": "Tiêu đề phân cảnh mang tính điện ảnh",
+    "title": "Bóng Đen Xó Nhà & Tiếng Võng Kẽo Kẹt",
     "duration_sec": 12,
     "theme": "thatched_house_interior",
     "lighting": {
-      "sky_preset": "foggy_night",
-      "fog_density": 0.6
+      "sky_preset": "dim_indoor_night",
+      "fog_density": 0.4
     },
     "camera": {
       "shot": "medium_wide",
@@ -25,7 +25,8 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
         },
         {
           "startTimeSec": 5.0,
-          "transition": "cut",
+          "transition": "smooth",
+          "transitionDurationSec": 1.0,
           "shot": "close_up",
           "target_actor_id": "char_minh",
           "shake": "none"
@@ -47,7 +48,7 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
     "actors": [
       {
         "id": "char_minh",
-        "name": "Minh (Tèo)",
+        "name": "Minh",
         "base": "male_adult",
         "costume": "outfit_modern_casual",
         "face": "face_scared",
@@ -78,6 +79,23 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
         "offsetY": -60,
         "interact_with": "structure_hammock",
         "layer": "actor"
+      },
+      {
+        "id": "char_bong_ma_goc",
+        "name": "Bóng Ma Xó Tường",
+        "base": "skeletal_emaciated",
+        "costume": "outfit_shredded_burial",
+        "face": "face_creepy_smile",
+        "facialAction": "blink_nervous",
+        "pose": "pose_squatting",
+        "heldItem": "none",
+        "heldHand": "right",
+        "facing": "right",
+        "slot": "far_left",
+        "offsetX": 0,
+        "offsetY": 0,
+        "interact_with": "none",
+        "layer": "actor"
       }
     ],
     "details": [
@@ -86,8 +104,120 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
         "slot": "mid_left"
       }
     ],
-    "dialogue": "Minh nằm cứng đờ bên trong tấm mùng tre, hai tay bóp chặt lát gừng tươi... Ngoài hiên, chiếc võng dù của bà ngoại vẫn đung đưa kẽo kẹt trong đêm tĩnh mịch...",
-    "narrative_note": "Tương tác nội thất đặc biệt: Minh nằm trên giường tre structure_bamboo_bed_net (pose_lying_down, offsetY: -80, interact_with: structure_bamboo_bed_net). Chiếc võng structure_hammock đung đưa kẽo kẹt với bà ngoại nằm lọt lòng võng (pose_lying_hammock, offsetY: -60, interact_with: structure_hammock)."
+    "dialogue": "Minh nằm cứng đờ bên trong tấm mùng tre, hai tay bóp chặt lát gừng tươi... Ngoài hiên, chiếc võng dù của bà ngoại vẫn đung đưa kẽo kẹt, trong khi dưới xó tường tối om, một bóng người gầy trơ xương đang ngồi chồm hổm nhìn trừng trừng...",
+    "narrative_note": "Tương tác nội thất & tư thế đặc biệt: Minh nằm trên giường tre structure_bamboo_bed_net (pose_lying_down, offsetY: -80, interact_with: structure_bamboo_bed_net). Chiếc võng structure_hammock với bà ngoại nằm đung đưa (pose_lying_hammock, offsetY: -60, interact_with: structure_hammock). Bóng ma rình rập ngồi xổm chồm hổm góc tối (pose_squatting, slot: far_left)."
+  },
+  {
+    "scene_id": "scene_02",
+    "title": "Leo Lên Gác Lửng Tối & Cầu Xin Trước Cầu Khỉ",
+    "duration_sec": 12,
+    "theme": "cursed_swamp",
+    "lighting": {
+      "sky_preset": "foggy_night",
+      "fog_density": 0.65
+    },
+    "camera": {
+      "shot": "medium_wide",
+      "shake": "subtle",
+      "keyframes": [
+        {
+          "startTimeSec": 0,
+          "transition": "cut",
+          "shot": "medium_wide",
+          "shake": "subtle"
+        },
+        {
+          "startTimeSec": 6.0,
+          "transition": "cut",
+          "shot": "medium",
+          "target_actor_id": "char_thanh",
+          "shake": "subtle"
+        }
+      ]
+    },
+    "environment_items": [
+      {
+        "asset_id": "structure_wooden_stairs",
+        "slot": "mid_left",
+        "scale": 1
+      },
+      {
+        "asset_id": "structure_monkey_bridge",
+        "slot": "mid_right",
+        "scale": 1
+      }
+    ],
+    "actors": [
+      {
+        "id": "char_thanh",
+        "name": "Thanh",
+        "base": "male_adult",
+        "costume": "outfit_modern_casual",
+        "face": "face_scared",
+        "facialAction": "darting_eyes",
+        "pose": "pose_climbing_stairs",
+        "heldItem": "item_flashlight",
+        "heldHand": "right",
+        "facing": "right",
+        "slot": "mid_left",
+        "offsetX": -45,
+        "offsetY": 0,
+        "interact_with": "structure_wooden_stairs",
+        "motion": {
+          "targetSlot": "mid_left",
+          "targetOffsetX": 65,
+          "targetOffsetY": -180,
+          "startTimeSec": 0.5,
+          "endTimeSec": 6.0,
+          "easing": "ease_in_out",
+          "autoFaceTarget": true,
+          "movingPose": "pose_climbing_stairs"
+        },
+        "layer": "actor"
+      },
+      {
+        "id": "char_oan_hon",
+        "name": "Oan Hồn Cầu Khỉ",
+        "base": "ghost_wraith",
+        "costume": "outfit_flowing_ao_dai",
+        "face": "face_pale_corpse",
+        "facialAction": "blink_nervous",
+        "pose": "pose_balancing_bridge",
+        "heldItem": "item_oil_lamp",
+        "heldHand": "right",
+        "facing": "left",
+        "slot": "mid_right",
+        "offsetX": 0,
+        "offsetY": -115,
+        "interact_with": "structure_monkey_bridge",
+        "layer": "actor"
+      },
+      {
+        "id": "char_nguoi_van_vai",
+        "name": "Người Dân Vái Lạy",
+        "base": "male_adult",
+        "costume": "outfit_traditional_ba_ba",
+        "face": "face_weeping_ghost",
+        "facialAction": "tremble_jaw",
+        "pose": "pose_kneeling",
+        "heldItem": "item_yellow_talisman",
+        "heldHand": "right",
+        "facing": "right",
+        "slot": "far_left",
+        "offsetX": 0,
+        "offsetY": 0,
+        "interact_with": "none",
+        "layer": "actor"
+      }
+    ],
+    "details": [
+      {
+        "asset_id": "detail_oil_lamp",
+        "slot": "center"
+      }
+    ],
+    "dialogue": "Tiếng ván gỗ cầu thang rên rỉ từng nhịp dưới chân Thanh khi cậu vừa bám tay vịn vừa leo lên căn gác xép u tối... Phía ngoài bờ kênh mịt mù, một bóng trắng đang đứng chênh vênh thăng bằng giữa cầu khỉ, trong khi người dưới bến sụp quỳ lạy khấn vái xin tha mạng...",
+    "narrative_note": "Tương tác công trình trên cao & tư thế: Thanh bước leo cầu thang structure_wooden_stairs với motion lên độ cao targetOffsetY: -180 và movingPose: pose_climbing_stairs. Bóng trắng đứng thăng bằng trên thân tre cầu khỉ structure_monkey_bridge với pose_balancing_bridge và offsetY: -115. Nhân vật bờ kênh quỳ gối lạy khấn (pose_kneeling, offsetY: 0)."
   }
 ]
 ```
@@ -105,20 +235,31 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
 | **`lighting`** | `object` | Thiết lập ánh sáng và sương mù khóa theo Rắc-co Bối Cảnh: gồm `sky_preset` (preset bầu trời) và `fog_density` (độ dày sương từ `0` đến `1`). |
 | **`camera`** | `object` | Cấu hình ống kính mặc định (`shot`, `shake`) và mảng **`keyframes`** điều khiển chuyển cảnh (`transition`: `"cut"` / `"smooth"`), cỡ cảnh (`shot`: `"wide"`, `"medium_wide"`, `"medium"`, `"close_up"`, `"dutch_tilt"`), độ rung (`shake`: `"none"`, `"subtle"`, `"heavy"`) và mục tiêu bám nét (`target_actor_id`) theo mốc thời gian `startTimeSec`. |
 | **`environment_items`** | `array` | Danh sách các công trình/kiến trúc lớn trong cảnh, khóa theo Rắc-co Bối Cảnh, gồm `asset_id`, vị trí `slot` và tỷ lệ `scale` (tùy chọn). |
-| **`actors`** | `array` | Danh sách diễn viên xuất hiện trong cảnh (khóa `id`, `name`, `base`, `costume` từ Rắc-co Diễn Viên). Gồm các trường:<br>• `face`: Mã biểu cảm khuôn mặt.<br>• `facialAction`: Hành vi mắt/miệng động.<br>• `pose`: Tư thế (bao gồm các tư thế tương tác: `"pose_standing"`, `"pose_sitting"`, `"pose_sitting_twisted_legs"`, `"pose_sitting_bed"`, `"pose_lying_down"`, `"pose_lying_hammock"`, v.v.).<br>• `heldItem`: Đồ vật cầm tay qua Hand Socket.<br>• `heldHand`: `"right"` (tay trước) hoặc `"left"` (tay sau).<br>• `facing`: `"left"` hoặc `"right"`.<br>• `slot`: Slot định vị (`"far_left"` -> `"far_right"` hoặc air slots).<br>• **`offsetY` (MỚI)**: Tọa độ bù trục Y (px) để đặt khớp bề mặt tiếp xúc (`-80` cho giường, `-60` cho võng, `0` cho ghế/tiếp đất).<br>• **`interact_with` (MỚI)**: Mã ID công trình đặc biệt mà diễn viên tương tác trực tiếp (`"structure_wooden_bed"`, `"structure_bamboo_bed_net"`, `"structure_wooden_chair"`, `"structure_hammock"` hoặc `null` / `"none"`).<br>• `layer`: Phân lớp vẽ (`"foreground"` / `"actor"` / `"background"`).<br>• `motion` (tùy chọn): Chuyển động từ A sang B. |
+| **`actors`** | `array` | Danh sách diễn viên xuất hiện trong cảnh (khóa `id`, `name`, `base`, `costume` từ Rắc-co Diễn Viên). Gồm các trường:<br>• `face`: Mã biểu cảm khuôn mặt.<br>• `facialAction`: Hành vi mắt/miệng động.<br>• `pose`: Tư thế (bao gồm các tư thế tương tác: `"pose_standing"`, `"pose_sitting"`, `"pose_sitting_twisted_legs"`, `"pose_sitting_bed"`, `"pose_lying_down"`, `"pose_lying_hammock"`, `"pose_climbing_stairs"` [bước leo thang], `"pose_balancing_bridge"` [thăng bằng cầu khỉ/cầu tre], `"pose_kneeling"` [quỳ gối lạy/khấn], `"pose_squatting"` [ngồi xổm/chồm hổm], v.v.).<br>• `heldItem`: Đồ vật cầm tay qua Hand Socket.<br>• `heldHand`: `"right"` (tay trước) hoặc `"left"` (tay sau).<br>• `facing`: `"left"` hoặc `"right"`.<br>• `slot`: Slot định vị (`"far_left"` -> `"far_right"` hoặc air slots).<br>• **`offsetY`**: Tọa độ bù trục Y (px) để đặt khớp bề mặt tiếp xúc (`-180` cho đỉnh cầu thang/gác lửng, `-115` cho cầu khỉ tre, `-110` cho cầu gãy, `-80` cho giường, `-60` cho võng, `0` cho ghế/quỳ/ngồi xổm/tiếp đất).<br>• **`interact_with`**: Mã ID công trình đặc biệt mà diễn viên tương tác trực tiếp (`"structure_wooden_stairs"`, `"structure_monkey_bridge"`, `"broken_wooden_bridge"`, `"structure_wooden_bed"`, `"structure_bamboo_bed_net"`, `"structure_wooden_chair"`, `"structure_hammock"` hoặc `null` / `"none"`).<br>• `layer`: Phân lớp vẽ (`"foreground"` / `"actor"` / `"background"`).<br>• **`motion`**: Chuyển động từ A sang B hỗ trợ cả trục X và trục Y trên cao (`targetSlot`, `targetOffsetX`, `targetOffsetY`: tọa độ cao đích đến như `-180` khi leo thang, `movingPose`: `"pose_climbing_stairs"` / `"pose_balancing_bridge"` / `"pose_walking"` / `"pose_kneeling"` / `"pose_squatting"`). |
 | **`details`** | `array` | Danh sách đạo cụ nhỏ trang trí trong bối cảnh (khóa từ Rắc-co Bối Cảnh), gồm `asset_id` và `slot`. |
 | **`dialogue`** | `string` | Nguyên văn đoạn lời dẫn hoặc lời thoại thuộc phạm vi phân cảnh này. |
 | **`narrative_note`** | `string` | Ghi chú kỹ thuật đạo diễn mô tả hành động gắn liền với các mã ID assets (`base`, `costume`, `pose`, `environment_items`, `details`, `interact_with`) và tọa độ `slot`. |
 
 ---
 
-### Quy chuẩn tương tác Assets đặc biệt (Giường, Ghế, Võng)
+### Quy chuẩn tương tác Assets Nội Thất & Tư Thế Đặc Biệt (Giường, Ghế, Võng, Quỳ, Ngồi Xổm)
 
-Để loại bỏ tình trạng nhân vật đứng đờ đẫn (`pose_standing`) khi phân cảnh có đồ nội thất, đạo diễn bắt buộc áp dụng chuẩn ghép đôi sau:
-
-| Công trình đặc biệt (`asset_id`) | Tư thế tương tác (`pose`) | Trường `interact_with` | Trường `offsetY` | Hiệu ứng trực quan & Ngữ cảnh |
+| Công trình / Bối cảnh (`asset_id`) | Tư thế tương tác (`pose`) | Trường `interact_with` | Trường `offsetY` | Hiệu ứng trực quan & Ngữ cảnh |
 | :--- | :--- | :--- | :--- | :--- |
 | **`structure_wooden_chair`**<br>(Ghế gỗ tựa gia đình) | `pose_sitting`<br>hoặc `pose_sitting_twisted_legs` | `"structure_wooden_chair"` | `0` | Nhân vật ngồi đùi gập ngang mặt ghế Y=-72px, cẳng chân buông xuống sàn Y=0px phẳng phiu. (Với ma: chân xoay ngược 180° lơ lửng). |
 | **`structure_wooden_bed`**<br>hoặc **`structure_bamboo_bed_net`**<br>(Giường ngủ gỗ / Giường tre mùng) | `pose_lying_down` | `"structure_wooden_bed"`<br>hoặc `"structure_bamboo_bed_net"` | `-80` | Nhân vật nằm ngang phẳng phiu trên mặt nệm, đầu kê gối, lồng ngực phập phồng nhẹ, nằm lọt bên trong lớp mùng vải mỏng. |
 | **`structure_wooden_bed`**<br>hoặc **`structure_bamboo_bed_net`**<br>(Giường ngủ gỗ / Giường tre mùng) | `pose_sitting_bed` | `"structure_wooden_bed"`<br>hoặc `"structure_bamboo_bed_net"` | `-80` | Nhân vật ngồi xếp bằng / khoanh chân trên mặt giường, hai chân đan chéo phẳng phiu (dành cho cảnh ngồi niệm chú, ngồi canh xác, ngồi sợ hãi). |
 | **`structure_hammock`**<br>(Võng dù miền quê đung đưa) | `pose_lying_hammock` | `"structure_hammock"` | `-60` | Thân người uốn cong tự nhiên theo độ võng lòng chảo, đầu kê cao trên gối võng, viền lưới võng phủ qua người, đung đưa kẽo kẹt trong đêm. |
+| **`structure_ancestor_altar`**<br>(Bàn thờ tổ tiên hoặc trước bến/sàn) | `pose_kneeling` | `"structure_ancestor_altar"`<br>hoặc `null` / `"none"` | `0` | Nhân vật quỳ hai đầu gối chạm đất, hai cẳng chân xếp sau, hai tay chắp trước ngực khấn vái cầu xin hoặc quỳ run rẩy xin tha mạng trước quỷ dữ. |
+| **(Mọi mặt sàn / xó nhà / góc tối)** | `pose_squatting` | `null` / `"none"` | `0` | Nhân vật ngồi xổm / chồm hổm góc tối, hai đầu gối co gập sát ngực tạo góc cạnh sắc lạnh, hai tay khoác qua gối hoặc thủ thế rình rập. |
+
+---
+
+### Quy chuẩn tương tác Assets Trên Cao (Cầu Thang, Cầu Khỉ, Cầu Gỗ Gãy)
+
+| Công trình trên cao (`asset_id`) | Tư thế tương tác (`pose` / `movingPose`) | Trường `interact_with` | Trường `offsetY` / `targetOffsetY` | Cơ chế chuyển động & Hiệu ứng trực quan |
+| :--- | :--- | :--- | :--- | :--- |
+| **`structure_wooden_stairs`**<br>(Cầu thang gỗ cũ kỹ rùng rợn) | `pose_climbing_stairs`<br>(bước leo cầu thang) | `"structure_wooden_stairs"` | Đích đến gác lửng:<br>`targetOffsetY: -180` | **Leo cầu thang từ sàn lên gác lửng:**<br>• Nhân vật xuất phát tại chân thang: `slot: cùng slot cầu thang`, `offsetX: -45`, `offsetY: 0`.<br>• Khối `motion`: `{ "targetSlot": cùng slot, "targetOffsetX": 65, "targetOffsetY": -180, "movingPose": "pose_climbing_stairs", "startTimeSec": 0.5, "endTimeSec": 6.0 }`.<br>• Chân trước nhấc cao co gối bước lên từng bậc gỗ, chân sau duỗi thẳng, một tay vịn hoặc cầm đèn pin soi lên gác tối. |
+| **`structure_wooden_stairs`**<br>(Cầu thang gỗ cũ kỹ rùng rợn) | `pose_standing`<br>hoặc `pose_shivering` | `"structure_wooden_stairs"` | `offsetY: -180` | **Đứng quan sát trên đỉnh gác lửng:**<br>• Nhân vật đứng vững trên chiếu nghỉ sàn gác lửng (Y=-180px), nhìn xuống tầng dưới hoặc nhìn về phía trước trong nỗi sợ hãi. |
+| **`structure_monkey_bridge`**<br>(Cầu khỉ tre miền Tây chênh vênh) | `pose_balancing_bridge`<br>(đi thăng bằng cầu khỉ) | `"structure_monkey_bridge"` | `offsetY: -115`<br>(hoặc `targetOffsetY: -115`) | **Đi qua cầu khỉ tre:**<br>• Thân tre gác ngang kênh tối ở cao độ Y=-115px.<br>• Nhân vật đặt `offsetY: -115`, hai bàn chân đặt so le thẳng hàng dọc theo thân tre, đầu gối chùng xuống giữ trọng tâm, hai tay dang ngang giữ thăng bằng (hoặc một tay giơ đèn dầu `item_oil_lamp`, một tay dang), người rung khẽ trước gió lạnh. |
+| **`broken_wooden_bridge`**<br>(Cầu gỗ gãy nhịp bỏ hoang) | `pose_balancing_bridge`<br>hoặc `pose_walking` | `"broken_wooden_bridge"` | `offsetY: -110` | **Bước lên nhịp cầu gỗ gãy:**<br>• Các tấm ván sàn cầu nằm ở cao độ Y=-110px bên trên vực sâu hoặc dòng nước xoáy.<br>• Nhân vật đặt `offsetY: -110` đứng cạnh mép gãy của cầu gỗ nhìn xuống vực. |

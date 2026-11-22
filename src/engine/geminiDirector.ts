@@ -265,7 +265,7 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
   * "ancient_tomb", "abandoned_shrine", "creepy_well", "hospital_operating_bed", "hotel_reception_desk", "creepy_elevator_doors", "dining_table_chairs", "bus_interior", "creepy_bathtub", "structure_small_wooden_table", "structure_ancestor_altar" -> CHỈ ĐẶT Ở: "mid_left" | "center" | "mid_right"
   * "dilapidated_hut", "broken_wooden_bridge", "supermarket_shelf_aisle" -> CHỈ ĐẶT Ở: "far_left" | "center" | "far_right"
   * "structure_wooden_window" -> CHỈ ĐẶT Ở: "far_left" | "mid_left" | "mid_right" | "far_right"
-  * "scarecrow_of_the_damned", "market_stall_tent", "abandoned_subway_station", "rusty_train_tracks_tunnel", "structure_old_apartment_gate", "structure_wooden_sampan", "structure_monkey_bridge", "structure_wooden_coffin", "structure_bamboo_bed_net", "structure_wooden_latch_door", "structure_rural_passenger_bus", "structure_wooden_chair", "structure_wooden_bed", "structure_hammock" -> Đặt ở mọi ground slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right"
+  * "scarecrow_of_the_damned", "market_stall_tent", "abandoned_subway_station", "rusty_train_tracks_tunnel", "structure_old_apartment_gate", "structure_wooden_sampan", "structure_monkey_bridge", "structure_wooden_coffin", "structure_bamboo_bed_net", "structure_wooden_latch_door", "structure_rural_passenger_bus", "structure_wooden_chair", "structure_wooden_bed", "structure_hammock", "structure_wooden_stairs" -> Đặt ở mọi ground slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right"
 - Details (Đạo cụ cảnh):
   * "detail_black_crow", "detail_broken_mirror" -> Tất cả 5 ground slots và 3 air slots
   * "detail_will_o_wisp" -> "air_left" | "air_center" | "air_right" | "mid_left" | "center" | "mid_right"
@@ -302,15 +302,23 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
 - Actor Facing (BẮT BUỘC có trên mỗi actor):
   * "facing": "left" | "right" (hướng mặt quay sang trái hoặc sang phải)
 - Actor Poses (Tư thế & Quy định vùng):
-  * "pose_standing", "pose_sitting", "pose_sitting_twisted_legs", "pose_sitting_bed", "pose_lying_down", "pose_lying_hammock", "pose_holding", "pose_shivering", "pose_walking", "pose_crawling", "pose_reaching" -> BẮT BUỘC ở 5 Ground Slots
+  * "pose_standing", "pose_sitting", "pose_sitting_twisted_legs", "pose_sitting_bed", "pose_lying_down", "pose_lying_hammock", "pose_climbing_stairs", "pose_balancing_bridge", "pose_kneeling", "pose_squatting", "pose_holding", "pose_shivering", "pose_walking", "pose_crawling", "pose_reaching" -> BẮT BUỘC ở 5 Ground Slots
   * "pose_floating", "pose_hanging" -> BẮT BUỘC ở 3 Air Slots ("air_left" | "air_center" | "air_right")
-  * QUY TẮC ĐẠO DIỄN TƯƠNG TÁC ĐỒ NỘI THẤT (GHẾ, GIƯỜNG, VÕNG) - TUYỆT ĐỐI KHÔNG ĐỂ NHÂN VẬT ĐỨNG YÊN ĐƠ ĐẪN NẾU CẢNH CÓ ĐỒ ĐẶC BIỆT:
+  * QUY TẮC ĐẠO DIỄN TƯƠNG TÁC ĐỒ NỘI THẤT & CÔNG TRÌNH TRÊN CAO (GHẾ, GIƯỜNG, VÕNG, CẦU THANG, CẦU KHỈ):
     - Khi có Ghế ("structure_wooden_chair", "dining_table_chairs"): Đạo diễn nhân vật ngồi với "pose": "pose_sitting" (hoặc "pose_sitting_twisted_legs" cho ma), cùng slot với ghế, "offsetY": 0.
     - Khi có Giường ("structure_wooden_bed", "structure_bamboo_bed_net"):
       + Nằm ngủ / trốn / tử thi: "pose": "pose_lying_down", cùng slot với giường, BẮT BUỘC "offsetY": -80 (để nằm phẳng phiu trên mặt nệm, nằm lọt trong mùng).
       + Ngồi xếp bằng / niệm chú / canh người chết: "pose": "pose_sitting_bed", cùng slot với giường, BẮT BUỘC "offsetY": -80.
     - Khi có Võng ("structure_hammock"):
       + Nằm đung đưa trong võng: "pose": "pose_lying_hammock", cùng slot với võng, BẮT BUỘC "offsetY": -60 (để lọt gọn khít trong lòng võng đung đưa).
+    - Khi có Cầu Thang Gỗ ("structure_wooden_stairs"):
+      + Leo cầu thang từ sàn lên gác lửng: "pose": "pose_climbing_stairs", cùng slot với cầu thang, "offsetY": 0, "interact_with": "structure_wooden_stairs", "motion": { "targetSlot": cùng slot, "targetOffsetX": 65, "targetOffsetY": -180, "movingPose": "pose_climbing_stairs", "startTimeSec": 0.5, "endTimeSec": 6.0 }.
+      + Đứng trên đỉnh gác lửng quan sát: "pose": "pose_standing" / "pose_shivering", cùng slot với cầu thang, "offsetY": -180, "interact_with": "structure_wooden_stairs".
+    - Khi có Cầu Khỉ Tre ("structure_monkey_bridge") hoặc Cầu Gỗ Gãy ("broken_wooden_bridge"):
+      + Đi thăng bằng trên cầu khỉ: "pose": "pose_balancing_bridge", cùng slot với cầu, "offsetY": -115, "interact_with": "structure_monkey_bridge".
+      + Bước trên nhịp cầu gãy: "pose": "pose_balancing_bridge" / "pose_walking", cùng slot với cầu, "offsetY": -110, "interact_with": "broken_wooden_bridge".
+    - Khi nhân vật quỳ gối lạy / khấn vái trước bàn thờ tổ tiên hoặc van xin: "pose": "pose_kneeling", "offsetY": 0.
+    - Khi nhân vật ngồi xổm / chồm hổm góc tối rình rập hoặc sợ hãi: "pose": "pose_squatting", "offsetY": 0.
     - Đứng / đi lại trên mặt đất bình thường: "offsetY": 0.
 - Actor Handheld Items (Đồ vật cầm tay qua Hand Socket):
   * "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" (Mẩu giấy / lá thư bí ẩn vương máu) | "item_offering_toys" (Nải chuối & đồ chơi đất nung cúng cô hồn) | "item_areca_palm_fan" (Quạt mo cau) | "item_fresh_ginger" (Lát gừng tươi giữ khí) | "item_oil_lamp" (Đèn dầu hột vịt cầm tay soi sáng)
@@ -318,7 +326,7 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
 - Chuyển động A -> B (motion tweening):
   * NẾU NHÂN VẬT ĐỨNG YÊN KHÔNG DI CHUYỂN: BỎ HẲN trường "motion" (TUYỆT ĐỐI KHÔNG để null hay {}).
   * CHỈ KHI nhân vật thực sự di chuyển từ điểm A sang điểm B mới thêm:
-    "motion": { "targetSlot": SlotId, "targetOffsetX": number, "targetOffsetY": 0, "startTimeSec": number, "endTimeSec": number, "easing": "linear"|"ease_in_out"|"ease_in"|"ease_out", "autoFaceTarget": true, "movingPose": "pose_walking"|"pose_floating"|"pose_crawling"|"pose_reaching" }
+    "motion": { "targetSlot": SlotId, "targetOffsetX": number, "targetOffsetY": number, "startTimeSec": number, "endTimeSec": number, "easing": "linear"|"ease_in_out"|"ease_in"|"ease_out", "autoFaceTarget": true, "movingPose": "pose_walking"|"pose_climbing_stairs"|"pose_balancing_bridge"|"pose_floating"|"pose_crawling"|"pose_reaching" }
 
 3. QUY TẮC ĐẠO DIỄN GÓC MÁY ĐIỆN ẢNH (CINEMATIC CAMERA SYSTEM - BẮT BUỘC ĐẠO DIỄN SỬ DỤNG LINH HOẠT):
 Mỗi phân cảnh BẮT BUỘC có khối "camera" để điều phối góc nhìn điện ảnh, TUYỆT ĐỐI KHÔNG để toàn bộ các cảnh đều là "wide" đơn điệu! Khai thác triệt để độ phân giải vector vô hạn của SVG (không vỡ hạt khi zoom):
@@ -1033,12 +1041,13 @@ ${castSummary}
    - "base": "male_adult" | "female_adult" | "elder_hunched" | "brute_hulking" | "skeletal_emaciated" | "ghost_wraith" | "creepy_child" | "jiangshi_corpse" | "demon_shadow"
    - "costume": "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual" | "outfit_traditional_ba_ba" | "outfit_funeral_white"
    - "face": "face_calm" | "face_scared" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless"
-   - "pose": "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_sitting_bed" | "pose_lying_down" | "pose_lying_hammock" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_crawling" | "pose_reaching" (ở ground slots) | "pose_floating" | "pose_hanging" (ở air slots)
+   - "pose": "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_sitting_bed" | "pose_lying_down" | "pose_lying_hammock" | "pose_climbing_stairs" | "pose_balancing_bridge" | "pose_kneeling" | "pose_squatting" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_crawling" | "pose_reaching" (ở ground slots) | "pose_floating" | "pose_hanging" (ở air slots)
    - "slot": "far_left" | "mid_left" | "center" | "mid_right" | "far_right" (hoặc "air_left" | "air_center" | "air_right")
-   - "offsetX": 0, "offsetY": 0 (Ngoại lệ bắt buộc: Nằm/ngồi trên giường "structure_wooden_bed" / "structure_bamboo_bed_net" thì offsetY = -80; Nằm trên võng "structure_hammock" thì offsetY = -60)
+   - "offsetX": 0, "offsetY": 0 (Ngoại lệ bắt buộc: Đỉnh cầu thang "structure_wooden_stairs" thì offsetY = -180; Cầu khỉ tre "structure_monkey_bridge" thì offsetY = -115; Cầu gãy "broken_wooden_bridge" thì offsetY = -110; Nằm/ngồi trên giường "structure_wooden_bed" / "structure_bamboo_bed_net" thì offsetY = -80; Nằm trên võng "structure_hammock" thì offsetY = -60)
+   - "interact_with": "structure_wooden_stairs" | "structure_monkey_bridge" | "broken_wooden_bridge" | "structure_wooden_bed" | "structure_bamboo_bed_net" | "structure_wooden_chair" | "structure_hammock" | "none" (khi tương tác công trình)
    - "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger" | "item_oil_lamp"
    - "heldHand": "right" | "left"
-   - "motion": NẾU NHÂN VẬT ĐỨNG YÊN THÌ BỎ HẲN TRƯỜNG NÀY (TUYỆT ĐỐI KHÔNG để null hay {}). Chỉ khi nhân vật di chuyển từ điểm A sang điểm B mới thêm khối: { "targetSlot": "mid_right", "targetOffsetX": 0, "startTimeSec": 0.2, "endTimeSec": 5, "easing": "ease_in_out", "autoFaceTarget": true, "movingPose": "pose_walking" }.
+   - "motion": NẾU NHÂN VẬT ĐỨNG YÊN THÌ BỎ HẲN TRƯỜNG NÀY (TUYỆT ĐỐI KHÔNG để null hay {}). Chỉ khi nhân vật di chuyển từ điểm A sang điểm B mới thêm khối: { "targetSlot": "mid_right", "targetOffsetX": 0, "targetOffsetY": 0 (hoặc -180 khi leo lên cầu thang gác), "startTimeSec": 0.2, "endTimeSec": 5, "easing": "ease_in_out", "autoFaceTarget": true, "movingPose": "pose_walking" | "pose_climbing_stairs" | "pose_balancing_bridge" }.
 5. Xuất ra một JSON ARRAY gồm đúng ${sceneSpecs.length} đối tượng DirectorSceneScript:
 [
   {
@@ -1701,6 +1710,7 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "structure_small_wooden_table" (Bàn gỗ nhỏ nông thôn)
    - "structure_wooden_window" (Cửa sổ gỗ ván nông thôn)
    - "structure_ancestor_altar" (Bàn thờ tổ tiên vách lá)
+   - "structure_wooden_stairs" (Cầu thang gỗ cũ kỹ rùng rợn dẫn lên gác lửng)
 
 6. ĐẠO CỤ BỐI CẢNH (Details - 11 đạo cụ):
    - "detail_black_crow" (Quạ đen)
@@ -1719,12 +1729,16 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - Themes: rural_graveyard, abandoned_village, cursed_swamp, modern_indoor, vehicle_interior, urban_night_market, thatched_house_interior (Chợ đêm & phố xá đô thị ngoài trời dùng urban_night_market, bên trong xe buýt/tàu xe dùng vehicle_interior, bên trong nhà lá dùng thatched_house_interior)
    - Sky: blood_moon, foggy_night, stormy_dark, eclipse_abyss, flickering_fluorescent, dim_indoor_night
 
-8. CƠ CHẾ TƯƠNG TÁC ASSETS ĐẶC BIỆT & TƯ THẾ DIỄN VIÊN (Special Furniture Interactions & interact_with):
+8. CƠ CHẾ TƯƠNG TÁC ASSETS ĐẶC BIỆT & TƯ THẾ DIỄN VIÊN (Special Furniture & Elevated Structures Interactions):
    - Khi kịch bản nhắc đến nằm ngủ/co ro trên giường tre, giường gỗ: hệ thống hỗ trợ trường "interact_with": "structure_bamboo_bed_net" / "structure_wooden_bed", "pose": "pose_lying_down", "offsetY": -80.
    - Khi kịch bản nhắc đến ngồi xếp bằng/khoanh chân/niệm chú trên giường: "interact_with": "structure_bamboo_bed_net" / "structure_wooden_bed", "pose": "pose_sitting_bed", "offsetY": -80.
    - Khi kịch bản nhắc đến nằm đung đưa trên võng dù miền quê: "interact_with": "structure_hammock", "pose": "pose_lying_hammock", "offsetY": -60.
    - Khi kịch bản nhắc đến ngồi ghế: "interact_with": "structure_wooden_chair", "pose": "pose_sitting", "offsetY": 0.
-   * LƯU Ý CHO BƯỚC 1 (RÀ SOÁT ASSET): Hệ thống HOÀN TOÀN ĐẦY ĐỦ CẢ VÕNG, GIƯỜNG, GHẾ VÀ CÁC TƯ THẾ NẰM/NGỒI TƯƠNG TÁC ĐẶC BIỆT NÀY. TUYỆT ĐỐI KHÔNG BÁO THIẾU ASSET khi truyện nhắc đến nằm võng, nằm giường hay ngồi ghế!
+   - Khi kịch bản nhắc đến leo cầu thang / bước lên gác lửng: "interact_with": "structure_wooden_stairs", "pose": "pose_climbing_stairs" (kèm motion di chuyển lên cao targetOffsetY: -180), hoặc đứng trên gác lửng "offsetY": -180.
+   - Khi kịch bản nhắc đến đi/bước chênh vênh qua cầu khỉ / cầu tre / cầu gãy: "interact_with": "structure_monkey_bridge" / "broken_wooden_bridge", "pose": "pose_balancing_bridge", "offsetY": -115 (cầu khỉ) hoặc -110 (cầu gãy).
+   - Khi kịch bản nhắc đến quỳ lạy / khấn vái / xin tha mạng: "pose": "pose_kneeling", "offsetY": 0.
+   - Khi kịch bản nhắc đến ngồi xổm / co ro / chồm hổm góc tối / rình rập: "pose": "pose_squatting", "offsetY": 0.
+   * LƯU Ý CHO BƯỚC 1 (RÀ SOÁT ASSET): Hệ thống HOÀN TOÀN ĐẦY ĐỦ CẢ CẦU THANG GỖ (structure_wooden_stairs), CẦU KHỈ TRE (structure_monkey_bridge), CẦU GỖ GÃY (broken_wooden_bridge), VÕNG, GIƯỜNG, GHẾ VÀ CÁC TƯ THẾ QUỲ (pose_kneeling), NGỒI XỔM (pose_squatting), LEO THANG (pose_climbing_stairs), THĂNG BẰNG CẦU KHỈ (pose_balancing_bridge). TUYỆT ĐỐI KHÔNG BÁO THIẾU ASSET khi truyện nhắc đến quỳ lạy, khấn vái, ngồi xổm, leo cầu thang, đi cầu khỉ, nằm võng, nằm giường hay ngồi ghế!
 
 YÊU CẦU KIỂM TRA ĐỐI CHIẾU:
 1. KIỂM TRA TÍNH TƯƠNG THÍCH THỜI ĐẠI & VĂN HÓA (EPOCH & CULTURAL CONSISTENCY - BẮT BUỘC):

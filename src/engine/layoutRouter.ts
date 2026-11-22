@@ -145,6 +145,7 @@ const VALID_STRUCTURES: StructureId[] = [
   "structure_wooden_window",
   "structure_ancestor_altar",
   "structure_hammock",
+  "structure_wooden_stairs",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -215,6 +216,10 @@ const VALID_POSES: CharacterPoseId[] = [
   "pose_lying_down",
   "pose_lying_hammock",
   "pose_sitting_bed",
+  "pose_climbing_stairs",
+  "pose_balancing_bridge",
+  "pose_kneeling",
+  "pose_squatting",
 ];
 const VALID_HELD_ITEMS: HeldItemId[] = [
   "none",
@@ -434,7 +439,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     }
 
     const offsetX = Number(actor.offsetX) || 0;
-    let offsetY = supportsVerticalOffset(pose) ? (Number(actor.offsetY) || 0) : 0;
+    let offsetY = supportsVerticalOffset(pose, interact_with) ? (Number(actor.offsetY) || 0) : 0;
 
     // Auto-heal offsetY if interact_with is specified but offsetY was omitted or 0
     if (interact_with && offsetY === 0) {
@@ -447,6 +452,13 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
         offsetY = -80;
       } else if (interact_with === "structure_hammock" && pose === "pose_lying_hammock") {
         offsetY = -60;
+      } else if (interact_with === "structure_wooden_stairs") {
+        // When docked on stairs without active motion, default to upper landing platform
+        offsetY = -180;
+      } else if (interact_with === "structure_monkey_bridge") {
+        offsetY = -115;
+      } else if (interact_with === "broken_wooden_bridge") {
+        offsetY = -110;
       }
     }
     const scale = Number(actor.scale) || 1;
@@ -465,6 +477,9 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     const rawTargetSlot = rawMotion && typeof rawMotion.targetSlot === "string"
       ? rawMotion.targetSlot.trim().replace(/^ground_/, "").replace(/^air_slot_/, "air_")
       : "";
+    const rawTargetOffsetX = Number(rawMotion?.targetOffsetX) || 0;
+    const rawTargetOffsetY = Number(rawMotion?.targetOffsetY) || 0;
+    const isMovingSameSlot = rawTargetSlot === slot && (rawTargetOffsetX !== offsetX || rawTargetOffsetY !== offsetY);
     if (
       rawMotion &&
       typeof rawMotion === "object" &&
@@ -472,7 +487,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       !Array.isArray(rawMotion) &&
       rawTargetSlot &&
       VALID_SLOTS.includes(rawTargetSlot as SlotId) &&
-      rawTargetSlot !== slot
+      (rawTargetSlot !== slot || isMovingSameSlot)
     ) {
       let targetSlot: SlotId = rawTargetSlot as SlotId;
       if (!isSlotAllowed(targetSlot, actorRule.allowedSlots)) {
@@ -495,8 +510,18 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
         ? Math.max(startTimeSec + 0.5, Number(rawMotion.endTimeSec) || duration_sec)
         : duration_sec;
 
-      const targetOffsetX = Number(rawMotion.targetOffsetX) || 0;
-      const targetOffsetY = supportsVerticalOffset(pose) ? (Number(rawMotion.targetOffsetY) || 0) : 0;
+      const targetOffsetX = rawTargetOffsetX;
+      let targetOffsetY = (supportsVerticalOffset(pose, interact_with) || supportsVerticalOffset(movingPose, interact_with))
+        ? rawTargetOffsetY
+        : 0;
+
+      // Auto-heal targetOffsetY if climbing stairs and targetOffsetY is not explicitly set
+      if (
+        targetOffsetY === 0 &&
+        (interact_with === "structure_wooden_stairs" || movingPose === "pose_climbing_stairs")
+      ) {
+        targetOffsetY = -180;
+      }
 
       motion = {
         targetSlot,

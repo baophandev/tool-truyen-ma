@@ -146,6 +146,27 @@
   animation: rig-twisted-legs-hover 3.2s ease-in-out infinite;
 }
 
+/* 4h. Kneeling Pose Reverence / Pleading Breathing */
+@keyframes rig-kneeling-breath {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-1.2px) rotate(0.4deg); }
+}
+
+.rig-kneeling {
+  animation: rig-kneeling-breath 3.6s ease-in-out infinite;
+}
+
+/* 4i. Squatting / Feral Deep Crouch Tense Jitter */
+@keyframes rig-squatting-jitter {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  45% { transform: translateY(-1px) scaleY(1.008); }
+  55% { transform: translateY(-0.8px) scaleY(1.004); }
+}
+
+.rig-squatting {
+  animation: rig-squatting-jitter 2.8s ease-in-out infinite;
+}
+
 @keyframes arms-sitting-breath {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-1px); }

@@ -246,7 +246,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
             updatedMotion.targetOffsetX = 0;
             updatedMotion.targetOffsetY = 0;
           }
-          if (!supportsVerticalOffset(merged.pose) && updatedMotion.targetOffsetY) {
+          if (
+            !supportsVerticalOffset(merged.pose, merged.interact_with) &&
+            !supportsVerticalOffset(updatedMotion.movingPose, merged.interact_with) &&
+            updatedMotion.targetOffsetY
+          ) {
             updatedMotion.targetOffsetY = 0;
           }
           if (
@@ -258,7 +262,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
           merged.motion = updatedMotion;
         }
       }
-      if (!supportsVerticalOffset(merged.pose) && merged.offsetY) {
+      if (!supportsVerticalOffset(merged.pose, merged.interact_with) && merged.offsetY) {
         merged.offsetY = 0;
       }
       return merged;
@@ -1128,6 +1132,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="pose_hanging">Bị treo lơ lửng rũ đầu (pose_hanging)</option>
                         <option value="pose_lying_down">Nằm ngửa / Co ro trên giường (pose_lying_down)</option>
                         <option value="pose_lying_hammock">Nằm võng đung đưa miền quê (pose_lying_hammock)</option>
+                        <option value="pose_climbing_stairs">Bước leo cầu thang / dốc cao (pose_climbing_stairs)</option>
+                        <option value="pose_balancing_bridge">Đi thăng bằng trên cầu khỉ / cầu tre (pose_balancing_bridge)</option>
+                        <option value="pose_kneeling">Quỳ gối lạy / khấn vái / xin tha (pose_kneeling)</option>
+                        <option value="pose_squatting">Ngồi xổm / chồm hổm góc tối (pose_squatting)</option>
                       </select>
                     </div>
 
@@ -1312,18 +1320,18 @@ export const EditorView: React.FC<EditorViewProps> = ({
                       <div className="flex justify-between text-xs text-neutral-300">
                         <span>Tinh chỉnh Y (Độ cao / Offset):</span>
                         <span className="font-mono text-emerald-400">
-                          {supportsVerticalOffset(selectedActor.pose)
+                          {supportsVerticalOffset(selectedActor.pose, selectedActor.interact_with)
                             ? `${selectedActor.offsetY || 0}px`
                             : "Khóa Y=800px (Tiếp đất)"}
                         </span>
                       </div>
                       <input
                         type="range"
-                        min={isAirPose(selectedActor.pose) ? -160 : -140}
+                        min={isAirPose(selectedActor.pose) ? -220 : -220}
                         max={isAirPose(selectedActor.pose) ? 180 : 40}
                         step="5"
-                        disabled={!supportsVerticalOffset(selectedActor.pose)}
-                        value={supportsVerticalOffset(selectedActor.pose) ? selectedActor.offsetY || 0 : 0}
+                        disabled={!supportsVerticalOffset(selectedActor.pose, selectedActor.interact_with)}
+                        value={supportsVerticalOffset(selectedActor.pose, selectedActor.interact_with) ? selectedActor.offsetY || 0 : 0}
                         onChange={(e) =>
                           updateActor(selectedActor.id, {
                             offsetY: parseInt(e.target.value, 10),
@@ -1424,11 +1432,63 @@ export const EditorView: React.FC<EditorViewProps> = ({
                           </button>
                         </div>
                       )}
+                      {selectedActor.pose === "pose_climbing_stairs" && (
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            type="button"
+                            onClick={() => updateActor(selectedActor.id, { offsetY: -180 })}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
+                              (selectedActor.offsetY ?? 0) === -180
+                                ? "bg-red-800/90 text-white border-red-500 shadow"
+                                : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+                            }`}
+                          >
+                            🪜 Đỉnh Cầu Thang (Y=-180px)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => updateActor(selectedActor.id, { offsetY: 0 })}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
+                              (selectedActor.offsetY ?? 0) === 0
+                                ? "bg-red-800/90 text-white border-red-500 shadow"
+                                : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+                            }`}
+                          >
+                            🩸 Chân Cầu Thang (Y=0px)
+                          </button>
+                        </div>
+                      )}
+                      {selectedActor.pose === "pose_balancing_bridge" && (
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            type="button"
+                            onClick={() => updateActor(selectedActor.id, { offsetY: -115 })}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
+                              (selectedActor.offsetY ?? 0) === -115
+                                ? "bg-red-800/90 text-white border-red-500 shadow"
+                                : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+                            }`}
+                          >
+                            🌉 Thân Cầu Khỉ (Y=-115px)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => updateActor(selectedActor.id, { offsetY: -110 })}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
+                              (selectedActor.offsetY ?? 0) === -110
+                                ? "bg-red-800/90 text-white border-red-500 shadow"
+                                : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+                            }`}
+                          >
+                            🪵 Nhịp Cầu Gỗ (Y=-110px)
+                          </button>
+                        </div>
+                      )}
 
                       {/* SMART FURNITURE DOCKING QUICK ACTIONS */}
                       <div className="mt-3 p-2.5 rounded-lg border border-neutral-800 bg-neutral-900/60">
                         <div className="text-[11px] font-semibold text-neutral-300 mb-1.5 flex items-center justify-between">
-                          <span>✨ Tương Tác Nhanh (Ghế, Giường, Võng):</span>
+                          <span>✨ Tương Tác Nhanh (Ghế, Giường, Võng, Cầu Thang, Cầu Khỉ):</span>
                         </div>
                         <div className="grid grid-cols-2 gap-1.5">
                           <button
@@ -1453,7 +1513,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                             onClick={() => {
                               const bed = scene.environment_items.find(
                                 (i) =>
-                                  i.asset_id === "structure_wooden_bed" ||
+                                   i.asset_id === "structure_wooden_bed" ||
                                   i.asset_id === "structure_bamboo_bed_net" ||
                                   i.asset_id === "hospital_operating_bed"
                               );
@@ -1502,6 +1562,65 @@ export const EditorView: React.FC<EditorViewProps> = ({
                             title="Nằm trong Võng (Y=-60px, pose_lying_hammock)"
                           >
                             🌿 Nằm Vào Võng
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const stairs = scene.environment_items.find((i) => i.asset_id === "structure_wooden_stairs");
+                              updateActor(selectedActor.id, {
+                                pose: "pose_climbing_stairs",
+                                offsetY: -180,
+                                ...(stairs ? { slot: stairs.slot } : {}),
+                              });
+                            }}
+                            className="py-1 px-2 rounded text-[11px] font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-left truncate transition-colors"
+                            title="Leo Lên Gác Cầu Thang (Y=-180px, pose_climbing_stairs)"
+                          >
+                            🪜 Leo Cầu Thang
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const bridge = scene.environment_items.find(
+                                (i) => i.asset_id === "structure_monkey_bridge" || i.asset_id === "broken_wooden_bridge"
+                              );
+                              const isMonkey = bridge?.asset_id === "structure_monkey_bridge";
+                              updateActor(selectedActor.id, {
+                                pose: "pose_balancing_bridge",
+                                offsetY: isMonkey ? -115 : -110,
+                                ...(bridge ? { slot: bridge.slot } : {}),
+                              });
+                            }}
+                            className="py-1 px-2 rounded text-[11px] font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-left truncate transition-colors"
+                            title="Bước Thăng Bằng Trên Cầu Khỉ/Cầu Gỗ (Y=-115px/-110px, pose_balancing_bridge)"
+                          >
+                            🌉 Đi Qua Cầu Khỉ
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              updateActor(selectedActor.id, {
+                                pose: "pose_kneeling",
+                                offsetY: 0,
+                              });
+                            }}
+                            className="py-1 px-2 rounded text-[11px] font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-left truncate transition-colors"
+                            title="Quỳ Gối Khấn Vái / Xin Tha (Y=0, pose_kneeling)"
+                          >
+                            🧎 Quỳ Gối Khấn Vái
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              updateActor(selectedActor.id, {
+                                pose: "pose_squatting",
+                                offsetY: 0,
+                              });
+                            }}
+                            className="py-1 px-2 rounded text-[11px] font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-left truncate transition-colors"
+                            title="Ngồi Xổm / Chồm Hổm Góc Tối (Y=0, pose_squatting)"
+                          >
+                            🧘 Ngồi Xổm Góc Tối
                           </button>
                         </div>
                       </div>
@@ -1684,7 +1803,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
                                 value={Math.round(pointBCoords.x)}
                                 onChange={(e) => {
                                   const targetX = parseInt(e.target.value, 10);
-                                  const targetY = supportsVerticalOffset(selectedActor.pose)
+                                  const canElevateMotion =
+                                    supportsVerticalOffset(selectedActor.pose, selectedActor.interact_with) ||
+                                    supportsVerticalOffset(motion.movingPose, selectedActor.interact_with);
+                                  const targetY = canElevateMotion
                                     ? pointBCoords.y
                                     : GROUND_Y;
                                   const assigned = coordsToSlotAssignment(
@@ -1696,14 +1818,15 @@ export const EditorView: React.FC<EditorViewProps> = ({
                                     selectedActor.id,
                                     assigned.slot,
                                     assigned.offsetX,
-                                    supportsVerticalOffset(selectedActor.pose) ? assigned.offsetY : 0
+                                    canElevateMotion ? assigned.offsetY : 0
                                   );
                                 }}
                                 className="w-full accent-cyan-400"
                               />
                             </div>
 
-                            {supportsVerticalOffset(selectedActor.pose) && (
+                            {(supportsVerticalOffset(selectedActor.pose, selectedActor.interact_with) ||
+                              supportsVerticalOffset(motion.movingPose, selectedActor.interact_with)) && (
                               <div className="flex flex-col gap-1">
                                 <div className="flex justify-between text-xs text-neutral-300">
                                   <span>Độ cao Y Đích B (Offset):</span>
@@ -1713,7 +1836,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                                 </div>
                                 <input
                                   type="range"
-                                  min={isAirPose(selectedActor.pose) ? -160 : -140}
+                                  min={isAirPose(selectedActor.pose) ? -220 : -220}
                                   max={isAirPose(selectedActor.pose) ? 180 : 40}
                                   step="5"
                                   value={motion.targetOffsetY || 0}
@@ -1804,6 +1927,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
                                       <option value="pose_lying_down">Nằm ngửa / Nằm cứng đờ (pose_lying_down)</option>
                                       <option value="pose_sitting_bed">Ngồi xếp bằng trên giường (pose_sitting_bed)</option>
                                       <option value="pose_lying_hammock">Nằm võng đung đưa (pose_lying_hammock)</option>
+                                      <option value="pose_climbing_stairs">Leo cầu thang / dốc cao (pose_climbing_stairs)</option>
+                                      <option value="pose_balancing_bridge">Đi thăng bằng qua cầu khỉ (pose_balancing_bridge)</option>
+                                      <option value="pose_kneeling">Bò / Quỳ tiến tới (pose_kneeling)</option>
+                                      <option value="pose_squatting">Ngồi xổm / chồm hổm tiến tới (pose_squatting)</option>
                                     </>
                                   )}
                                 </select>
@@ -1939,6 +2066,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="structure_wooden_window">Cửa sổ gỗ ván lùa/chống nông thôn (structure_wooden_window)</option>
                         <option value="structure_ancestor_altar">Bàn thờ tổ tiên vách lá (structure_ancestor_altar)</option>
                         <option value="structure_hammock">Võng dù miền quê đung đưa (structure_hammock)</option>
+                        <option value="structure_wooden_stairs">Cầu thang gỗ cũ kỹ rùng rợn (structure_wooden_stairs)</option>
                       </select>
                     </div>
 

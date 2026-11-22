@@ -52,7 +52,8 @@ export type StructureId =
   | "structure_small_wooden_table"
   | "structure_wooden_window"
   | "structure_ancestor_altar"
-  | "structure_hammock";
+  | "structure_hammock"
+  | "structure_wooden_stairs";
 
 export type DetailId =
   | "detail_black_crow"
@@ -139,7 +140,11 @@ export type CharacterPoseId =
   | "pose_holding"
   | "pose_lying_down"
   | "pose_lying_hammock"
-  | "pose_sitting_bed";
+  | "pose_sitting_bed"
+  | "pose_climbing_stairs"
+  | "pose_balancing_bridge"
+  | "pose_kneeling"
+  | "pose_squatting";
 
 export type HeldItemId =
   | "none"

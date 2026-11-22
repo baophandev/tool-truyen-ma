@@ -187,6 +187,11 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ALL_GROUND_SLOT_IDS,
     reason: "Võng dù/võng lưới miền quê treo giữa 2 cọc cột nhà, tương tác hoàn hảo với tư thế nằm võng pose_lying_hammock (kèm offsetY: -60) hoặc ngồi đung đưa.",
   },
+  structure_wooden_stairs: {
+    name: "Cầu thang gỗ cũ kỹ",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Cầu thang gỗ cũ kỹ rùng rợn dẫn lên gác lửng / tầng trên, neo tiếp đất Y=800px với các bậc thang nâng cao dần lên chiếu nghỉ Y=-180px, tương tác với bước leo thang pose_climbing_stairs và đứng trên cao.",
+  },
 };
 
 export interface DetailRule {
@@ -279,13 +284,48 @@ export function isAirPose(pose: CharacterPoseId): boolean {
   return AIR_POSES.includes(pose);
 }
 
-export function supportsVerticalOffset(pose: CharacterPoseId): boolean {
+export function supportsVerticalOffset(
+  pose?: CharacterPoseId,
+  interact_with?: StructureId | "none" | null
+): boolean {
+  if (!pose) {
+    return Boolean(
+      interact_with != null &&
+        interact_with !== "none" &&
+        [
+          "structure_wooden_stairs",
+          "structure_monkey_bridge",
+          "broken_wooden_bridge",
+          "structure_wooden_bed",
+          "structure_bamboo_bed_net",
+          "structure_hammock",
+          "hospital_operating_bed",
+          "structure_wooden_chair",
+        ].includes(interact_with)
+    );
+  }
   return (
     isAirPose(pose) ||
     pose === "pose_lying_down" ||
     pose === "pose_lying_hammock" ||
     pose === "pose_sitting" ||
-    pose === "pose_sitting_bed"
+    pose === "pose_sitting_bed" ||
+    pose === "pose_climbing_stairs" ||
+    pose === "pose_balancing_bridge" ||
+    pose === "pose_kneeling" ||
+    pose === "pose_squatting" ||
+    (interact_with != null &&
+      interact_with !== "none" &&
+      [
+        "structure_wooden_stairs",
+        "structure_monkey_bridge",
+        "broken_wooden_bridge",
+        "structure_wooden_bed",
+        "structure_bamboo_bed_net",
+        "structure_hammock",
+        "hospital_operating_bed",
+        "structure_wooden_chair",
+      ].includes(interact_with))
   );
 }
 
