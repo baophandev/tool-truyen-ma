@@ -272,7 +272,8 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
   * "detail_will_o_wisp" -> "air_left" | "air_center" | "air_right" | "mid_left" | "center" | "mid_right"
   * "detail_blood_lantern" -> 5 ground slots hoặc "air_left" | "air_right"
   * "detail_incense_bowl" -> "mid_left" | "center" | "mid_right" (Ground only)
-  * "detail_skull_pile", "detail_iv_drip_stand", "detail_shopping_cart" -> 5 ground slots (Ground only)
+  * "detail_skull_pile", "detail_iv_drip_stand", "detail_shopping_cart", "detail_muddy_water_puddle", "detail_oil_lamp", "detail_water_hyacinth", "detail_child_sandals", "detail_offering_tray_toys" -> 5 ground slots (Ground only)
+  * "detail_vintage_radio" -> "mid_left" | "center" | "mid_right" (Ground hoặc bàn)
   * "detail_hanging_talisman", "detail_surveillance_camera", "detail_flickering_ceiling_lamp" -> "air_left" | "air_center" | "air_right" (Air only)
 - Actor Bases (Khung nhân vật):
   * "male_adult" (Nam thanh niên, người lữ khách gầy)
@@ -1479,13 +1480,19 @@ KHO TÀI NGUYÊN HOẠT HÌNH 2D SẴN CÓ TRONG HỆ THỐNG (CHỈ ĐƯỢC CH
    - Bối cảnh Đô Thị / Hiện Đại (CHỈ DÙNG KHI CỐT TRUYỆN THUỘC THỂ LOẠI ĐÔ THỊ HIỆN ĐẠI):
      * "hospital_operating_bed", "hotel_reception_desk", "supermarket_shelf_aisle", "creepy_elevator_doors", "dining_table_chairs", "bus_interior", "creepy_bathtub", "market_stall_tent", "abandoned_subway_station", "rusty_train_tracks_tunnel", "structure_old_apartment_gate"
 
-6. ĐẠO CỤ BỐI CẢNH (Details - 11 đạo cụ):
+6. ĐẠO CỤ BỐI CẢNH (Details - 17 đạo cụ):
    - "detail_black_crow" (Quạ đen)
    - "detail_will_o_wisp" (Đốm ma trơi xanh lân tinh)
    - "detail_blood_lantern" (Lồng đèn máu / ngọn đèn dầu)
    - "detail_incense_bowl" (Bát hương tàn / khói nhang cuộn)
    - "detail_skull_pile" (Đống sọ người)
    - "detail_hanging_talisman" (Dây bùa treo)
+   - "detail_muddy_water_puddle" (Vũng nước ướt sũng lẫn bùn non)
+   - "detail_oil_lamp" (Đèn dầu hột vịt cổ)
+   - "detail_vintage_radio" (Đài radio cassette cổ chạy pin)
+   - "detail_water_hyacinth" (Bụi lục bình trôi nổi)
+   - "detail_child_sandals" (Đôi dép trẻ con bỏ lại trên mặt đất đầu cầu khỉ vương bùn)
+   - "detail_offering_tray_toys" (Mẹt đồ cúng cô hồn trên đất: nải chuối, nhang & đồ chơi đất nung)
    - "detail_iv_drip_stand" (Cột truyền dịch - hiện đại)
    - "detail_shopping_cart" (Xe đẩy siêu thị - hiện đại)
    - "detail_surveillance_camera" (Camera an ninh - hiện đại)
@@ -1730,13 +1737,19 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "structure_ancestor_altar" (Bàn thờ tổ tiên vách lá)
    - "structure_wooden_stairs" (Cầu thang gỗ cũ kỹ rùng rợn dẫn lên gác lửng)
 
-6. ĐẠO CỤ BỐI CẢNH (Details - 11 đạo cụ):
+6. ĐẠO CỤ BỐI CẢNH (Details - 17 đạo cụ):
    - "detail_black_crow" (Quạ đen)
    - "detail_will_o_wisp" (Đốm ma trơi)
    - "detail_blood_lantern" (Lồng đèn máu)
    - "detail_incense_bowl" (Bát hương tàn)
    - "detail_skull_pile" (Đống sọ người)
    - "detail_hanging_talisman" (Dây bùa treo)
+   - "detail_muddy_water_puddle" (Vũng nước ướt sũng lẫn bùn non)
+   - "detail_oil_lamp" (Đèn dầu hột vịt)
+   - "detail_vintage_radio" (Đài radio cassette cổ)
+   - "detail_water_hyacinth" (Bụi lục bình trôi nổi)
+   - "detail_child_sandals" (Đôi dép trẻ con bỏ lại trên mặt đất)
+   - "detail_offering_tray_toys" (Mẹt đồ cúng cô hồn trên đất: nải chuối, nhang & đồ chơi đất nung)
    - "detail_iv_drip_stand" (Cột truyền dịch)
    - "detail_shopping_cart" (Xe đẩy siêu thị)
    - "detail_surveillance_camera" (Camera an ninh)

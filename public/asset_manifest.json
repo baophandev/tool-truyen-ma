@@ -1032,6 +1032,20 @@
       "semantic_role": "Cụm lá tròn phình cuống xốp bồng bềnh trên mặt nước, điểm xuyết chùm hoa tím nhạt u ám và rễ ngầm chìm dưới nước",
       "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
       "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_child_sandals",
+      "name": "Đôi dép trẻ con bỏ lại trên mặt đất",
+      "semantic_role": "Đôi dép nhựa / dép tổ ong trẻ em nhỏ xíu nằm chỏng chơ lệch nhau sát mép đất đầu cầu khỉ, vương chút bùn ướt lạnh lẽo trong đêm sương",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_offering_tray_toys",
+      "name": "Mẹt đồ cúng cô hồn trên đất (Nải chuối, nhang & đồ chơi đất nung)",
+      "semantic_role": "Mẹt tre lót lá chuối đặt tiếp đất Y=800px, bên trên có nải chuối chín, vài món đồ chơi con nít bằng đất nung nhỏ (nồi đất, chén đất, con giống) và một nén nhang đang cháy đỏ tỏa làn khói trắng mỏng cuộn lên không trung",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
     }
   ],
   "actor_motion_schema": {

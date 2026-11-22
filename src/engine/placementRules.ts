@@ -276,6 +276,16 @@ export const DETAIL_RULES: Record<DetailId, DetailRule> = {
     allowedSlots: ALL_GROUND_SLOT_IDS,
     reason: "Bụi lục bình trôi nổi bồng bềnh trên mặt nước kênh rạch trên trục Ground Y=800px (far_left -> far_right).",
   },
+  detail_child_sandals: {
+    name: "Đôi dép trẻ con bỏ lại trên mặt đất",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Đôi dép trẻ con nằm chỏng chơ bỏ lại bắt buộc phải tiếp đất tại Y=800px (đặc biệt ven mép nước bờ kênh, đầu cầu khỉ hoặc vệ cỏ hoang vu).",
+  },
+  detail_offering_tray_toys: {
+    name: "Mẹt đồ cúng cô hồn trên đất (Nải chuối, nhang & đồ chơi đất nung)",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Mẹt tre lót lá chuối cúng cô hồn kèm nải chuối, đồ chơi đất nung và nén nhang đỏ tỏa khói trắng tiếp đất tại mọi vị trí Y=800px.",
+  },
 };
 
 const AIR_POSES: CharacterPoseId[] = ["pose_floating", "pose_hanging"];

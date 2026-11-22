@@ -152,6 +152,8 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `detail_oil_lamp` | Đèn dầu hột vịt / Đèn dầu cổ để bàn | Bầu đèn thủy tinh tròn nhỏ, ống khói thon eo, ngọn lửa bấc vàng cam leo lét với quầng sáng ấm tỏa tròn xung quanh (Ground hoặc bàn với offsetY âm) | Cả 5 Ground Slots |
 | `detail_vintage_radio` | Đài radio cassette cổ chạy pin | Máy radio chữ nhật nhỏ gọn có ăng-ten kim loại chéo cao, hai màng loa tròn và dải đèn tần số xanh lục mờ | `["mid_left", "center", "mid_right"]` (Ground hoặc bàn) |
 | `detail_water_hyacinth` | Bụi lục bình dày đặc trôi nổi | Cụm lá tròn phình cuống xốp bồng bềnh trên mặt nước kênh rạch, chùm hoa tím nhạt u ám và rễ ngầm đen dưới nước | Cả 5 Ground Slots (Ground/Mặt nước Y=800px) |
+| `detail_child_sandals` | Đôi dép trẻ con bỏ lại trên mặt đất | Đôi dép nhựa / dép tổ ong nhỏ xíu nằm chỏng chơ lệch nhau sát mép đất đầu cầu khỉ vương bùn ướt lạnh đêm sương, gợi nhắc đứa trẻ mất tích bí ẩn | Cả 5 Ground Slots (Ground only Y=800px) |
+| `detail_offering_tray_toys` | Mẹt đồ cúng cô hồn trên đất (Nải chuối, nhang & đồ chơi đất nung) | Mẹt tre lót lá chuối đựng nải chuối chín, bộ đồ chơi con nít bằng đất nung nhỏ (nồi đất, chén con, con giống) và nén nhang cháy đỏ khói trắng mỏng cuộn bay | Cả 5 Ground Slots (Ground only Y=800px) |
 
 ---
 
@@ -405,7 +407,7 @@ export interface DirectorSceneScript {
   }>;
   details?: Array<{
     id: string;
-    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp" | "detail_broken_mirror" | "detail_muddy_water_puddle" | "detail_oil_lamp" | "detail_vintage_radio" | "detail_water_hyacinth";
+    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp" | "detail_broken_mirror" | "detail_muddy_water_puddle" | "detail_oil_lamp" | "detail_vintage_radio" | "detail_water_hyacinth" | "detail_child_sandals" | "detail_offering_tray_toys";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
     offsetX?: number;
     offsetY?: number;
@@ -1136,10 +1138,12 @@ Thay vì giữ nguyên 1 góc máy cố định suốt cả phân cảnh dài, A
     }
   ],
   "details": [
+    { "id": "detail_sandals_bridge", "asset_id": "detail_child_sandals", "slot": "center", "offsetX": -120, "offsetY": 0, "scale": 1.0 },
+    { "id": "detail_tray_ground", "asset_id": "detail_offering_tray_toys", "slot": "mid_left", "offsetX": 20, "offsetY": 0, "scale": 1.0 },
     { "id": "detail_wisp_canal", "asset_id": "detail_will_o_wisp", "slot": "air_right" }
   ],
-  "dialogue": "Bà ngoại khom lưng đặt mẹt nải chuối cùng bộ đồ chơi đất nung xuống nền đất hoang, dúi vội lát gừng tươi vào tay Minh để giữ khí... Ngoài mé kênh, bên chiếc xuồng ba lá chất đầy bông súng bông điên điển, bóng người phụ nữ mặc áo bà ba trắng tóc xõa dài vẫn đứng lặng lẽ nhìn theo...",
-  "narrative_note": "Tổ hợp asset văn hóa kinh dị Nam Bộ: bà ngoại cầm item_offering_toys (có thể đổi sang item_fresh_ginger ở cảnh trao gừng), Minh cầm item_areca_palm_fan, cầu khỉ tre miền Tây structure_monkey_bridge bắc ngang kênh, bóng cô Hai Lụa mặc outfit_traditional_ba_ba đứng cạnh xuồng ba lá structure_wooden_sampan."
+  "dialogue": "Bà ngoại khom lưng đặt mẹt nải chuối cùng bộ đồ chơi đất nung xuống nền đất hoang, nén nhang đỏ tỏa làn khói trắng cuộn trong sương... Cạnh chân cầu khỉ, đôi dép tổ ong nhỏ xíu của đứa trẻ bỏ lại vương bùn non lạnh ngắt. Ngoài mé kênh, bóng người phụ nữ mặc áo bà ba trắng tóc xõa dài vẫn đứng lặng lẽ nhìn theo...",
+  "narrative_note": "Tổ hợp asset văn hóa kinh dị Nam Bộ: mẹt cúng cô hồn tiếp đất detail_offering_tray_toys tỏa làn khói nhang mỏng, đôi dép trẻ con bỏ lại đầu cầu khỉ detail_child_sandals lấm lem bùn non, cầu khỉ tre miền Tây structure_monkey_bridge bắc ngang kênh, bóng cô Hai Lụa mặc outfit_traditional_ba_ba đứng cạnh xuồng ba lá structure_wooden_sampan."
 }
 ```
 

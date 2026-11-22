@@ -288,6 +288,8 @@ const VALID_DETAILS: DetailId[] = [
   "detail_oil_lamp",
   "detail_vintage_radio",
   "detail_water_hyacinth",
+  "detail_child_sandals",
+  "detail_offering_tray_toys",
 ];
 const VALID_FACINGS: FacingDirection[] = ["left", "right"];
 const VALID_SLOTS: SlotId[] = [

@@ -127,7 +127,7 @@ Hệ thống đồ họa 2D thuần code có các tài nguyên và tọa độ c
 - Themes: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior" | "urban_night_market" | "thatched_house_interior"
 - Sky presets: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss"
 - Structures: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "structure_wooden_sampan" | "structure_monkey_bridge"
-- Details (Props): "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman"
+- Details (Props): "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_muddy_water_puddle" | "detail_oil_lamp" | "detail_vintage_radio" | "detail_water_hyacinth" | "detail_child_sandals" | "detail_offering_tray_toys"
 - Ground Slots (Y=800): "far_left" (250), "mid_left" (600), "center" (960), "mid_right" (1320), "far_right" (1670)
 - Air Slots: "air_left" (400, 350), "air_center" (960, 280), "air_right" (1520, 350)
 - Placement Constraints:

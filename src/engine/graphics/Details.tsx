@@ -30,6 +30,8 @@ export const DetailRenderer: React.FC<DetailRendererProps> = ({
       {id === "detail_oil_lamp" && <OilLamp />}
       {id === "detail_vintage_radio" && <VintageRadio />}
       {id === "detail_water_hyacinth" && <WaterHyacinthClump />}
+      {id === "detail_child_sandals" && <ChildSandals />}
+      {id === "detail_offering_tray_toys" && <OfferingTrayToys />}
 
       {showAnchor && (
         <g className="detail-debug-anchor" pointerEvents="none">
@@ -794,4 +796,289 @@ const WaterHyacinthClump: React.FC = () => {
     </g>
   );
 };
+
+/**
+ * 16. CHILD SANDALS (Đôi Dép Trẻ Con Bỏ Lại Trên Mặt Đất)
+ * Tiny plastic / honeycomb sandals lying askew and abandoned in the squishy mud by the water's edge.
+ * Evokes an eerie sense of a child suddenly vanished or pulled into the deep dark canal.
+ * Anchored at [bottom-center] (0, 0) on Ground Y = 800px.
+ */
+const ChildSandals: React.FC = () => {
+  return (
+    <g className="detail-child-sandals">
+      {/* 1. Ground contact shadow & cold squishy mud puddle */}
+      <ellipse cx="0" cy="0" rx="46" ry="5.5" fill="#030504" opacity="0.65" />
+      <path
+        d="M -38 -2 Q -20 3 -4 -1 Q 14 4 38 -1 Q 20 -4 -12 -3 Z"
+        fill="#0A110C"
+        opacity="0.75"
+      />
+      {/* Wet mud splatters around the sandals */}
+      <ellipse cx="-26" cy="1" rx="4" ry="1.8" fill="#131C14" opacity="0.8" />
+      <ellipse cx="28" cy="2" rx="5" ry="2" fill="#131C14" opacity="0.8" />
+      <ellipse cx="2" cy="2.5" rx="3" ry="1.2" fill="#0C150E" opacity="0.9" />
+
+      {/* 2. Left Sandal (Dép trái - hơi chếch nghiêng góc -14 độ, lấm bùn) */}
+      <g transform="translate(-14, -2) rotate(-14)">
+        {/* Soft ground drop shadow beneath left sole */}
+        <ellipse cx="0" cy="1.5" rx="13" ry="3.2" fill="#000000" opacity="0.7" />
+
+        {/* Rubber Sole (Đế dép tổ ong dày dặn, có khía rãnh chống trượt) */}
+        <rect x="-12" y="-4" width="24" height="4.2" rx="2.1" fill="#141E28" stroke="#080C10" strokeWidth="0.9" />
+        {/* Sole bottom tread groove accents */}
+        <line x1="-8" y1="-0.4" x2="-8" y2="-1.8" stroke="#080C10" strokeWidth="0.8" />
+        <line x1="-3" y1="-0.4" x2="-3" y2="-1.8" stroke="#080C10" strokeWidth="0.8" />
+        <line x1="2" y1="-0.4" x2="2" y2="-1.8" stroke="#080C10" strokeWidth="0.8" />
+        <line x1="7" y1="-0.4" x2="7" y2="-1.8" stroke="#080C10" strokeWidth="0.8" />
+
+        {/* Inner Footbed / Insole highlight */}
+        <path d="M -10 -4 L 10 -4" stroke="#253545" strokeWidth="0.8" opacity="0.7" />
+
+        {/* Upper Strap Arch (Quai dép vòm quai ngang tổ ong) */}
+        <path
+          d="M -7 -4 C -7 -13, 5 -13, 6 -4"
+          fill="none"
+          stroke="#273849"
+          strokeWidth="3.2"
+          strokeLinecap="round"
+        />
+        {/* Inner strap shadow depth */}
+        <path
+          d="M -5.5 -4 C -5.5 -10.5, 4 -10.5, 4.8 -4"
+          fill="#0A0E13"
+          opacity="0.65"
+        />
+        {/* Characteristic honeycomb holes (Lỗ tổ ong li ti trên quai dép) */}
+        <circle cx="-3" cy="-9" r="0.7" fill="#0E161F" />
+        <circle cx="0" cy="-10.2" r="0.7" fill="#0E161F" />
+        <circle cx="2.8" cy="-9" r="0.7" fill="#0E161F" />
+        <circle cx="-4" cy="-6.5" r="0.7" fill="#0E161F" />
+        <circle cx="-1" cy="-7.2" r="0.7" fill="#0E161F" />
+        <circle cx="2" cy="-6.8" r="0.7" fill="#0E161F" />
+
+        {/* Wet brown mud smear on front toe */}
+        <path d="M -11 -3 Q -5 0 -1 -2" stroke="#1A1208" strokeWidth="1.4" strokeLinecap="round" opacity="0.85" />
+      </g>
+
+      {/* 3. Right Sandal (Dép phải - nằm vẹo hẳn sang một bên góc +26 độ, như bị tụt lại) */}
+      <g transform="translate(13, -1) rotate(26)">
+        {/* Soft ground drop shadow beneath right sole */}
+        <ellipse cx="0" cy="1.5" rx="12" ry="3" fill="#000000" opacity="0.7" />
+
+        {/* Rubber Sole */}
+        <rect x="-11" y="-4" width="22" height="4" rx="2" fill="#16222E" stroke="#080D12" strokeWidth="0.9" />
+        {/* Tread notches */}
+        <line x1="-6" y1="-0.4" x2="-6" y2="-1.8" stroke="#080C10" strokeWidth="0.8" />
+        <line x1="-1" y1="-0.4" x2="-1" y2="-1.8" stroke="#080C10" strokeWidth="0.8" />
+        <line x1="4" y1="-0.4" x2="4" y2="-1.8" stroke="#080C10" strokeWidth="0.8" />
+
+        {/* Insole outline */}
+        <path d="M -9 -4 L 9 -4" stroke="#2B3E52" strokeWidth="0.8" opacity="0.65" />
+
+        {/* Upper Strap Arch */}
+        <path
+          d="M -6 -4 C -6 -12.5, 4.5 -12.5, 5 -4"
+          fill="none"
+          stroke="#2E4256"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+        {/* Inner strap darkness */}
+        <path
+          d="M -4.5 -4 C -4.5 -10, 3.5 -10, 4 -4"
+          fill="#090E14"
+          opacity="0.6"
+        />
+        {/* Honeycomb perforations */}
+        <circle cx="-2.5" cy="-8.5" r="0.7" fill="#0D151F" />
+        <circle cx="0.5" cy="-9.5" r="0.7" fill="#0D151F" />
+        <circle cx="3" cy="-8.5" r="0.7" fill="#0D151F" />
+        <circle cx="-3.2" cy="-6.2" r="0.7" fill="#0D151F" />
+        <circle cx="-0.2" cy="-6.8" r="0.7" fill="#0D151F" />
+        <circle cx="2.5" cy="-6.3" r="0.7" fill="#0D151F" />
+
+        {/* Mud splatter on heel and side */}
+        <ellipse cx="6" cy="-2" rx="3.5" ry="1.6" fill="#1C140C" opacity="0.8" />
+      </g>
+
+      {/* 4. Tiny cold dew drops & eerie ground mist vapor */}
+      <circle cx="-22" cy="-4.5" r="0.8" fill="#E2E8F0" opacity="0.9" />
+      <circle cx="7" cy="-5" r="0.7" fill="#E2E8F0" opacity="0.85" />
+      <path
+        d="M -35 -1 Q -15 -6 5 -2 Q 25 3 42 -1"
+        fill="none"
+        stroke="#E2E8F0"
+        strokeWidth="0.8"
+        opacity="0.22"
+      />
+    </g>
+  );
+};
+
+/**
+ * 17. OFFERING TRAY WITH TOYS (Mẹt Đồ Cúng Cô Hồn Trên Đất)
+ * Woven bamboo tray with fresh banana leaf lining, a hand of ripe bananas, tiny terracotta clay toys
+ * (cooking pot, clay bowl, animal figurine), and lit incense stick with rising pale smoke.
+ * Placed on the ground Y = 800px for child wandering ghosts (cô hồn con nít).
+ * Anchored at [bottom-center] (0, 0) on Ground Y = 800px.
+ */
+const OfferingTrayToys: React.FC = () => {
+  return (
+    <g className="detail-offering-tray-toys">
+      {/* 1. Ground contact shadow & spiritual aura */}
+      <ellipse cx="0" cy="0" rx="58" ry="7" fill="#000000" opacity="0.6" />
+      <ellipse cx="0" cy="-1" rx="44" ry="4.5" fill="#080E0A" opacity="0.5" />
+      {/* Spiritual ambient glow */}
+      <ellipse cx="0" cy="-16" rx="52" ry="28" fill="url(#candle-eerie-glow)" opacity="0.28" pointerEvents="none" />
+
+      {/* 2. Woven Bamboo Tray (Mẹt tre viền mây mộc mạc) */}
+      <ellipse cx="0" cy="-4" rx="52" ry="12" fill="#3D2614" stroke="#1A1008" strokeWidth="1.8" />
+      <ellipse cx="0" cy="-5" rx="48" ry="10" fill="#5A3A1E" stroke="#2B1A0D" strokeWidth="1.2" />
+
+      {/* Subtle wicker woven radial weave lines */}
+      <g stroke="#3A2312" strokeWidth="0.8" opacity="0.5">
+        <line x1="-42" y1="-5" x2="42" y2="-5" />
+        <line x1="-30" y1="-10" x2="30" y2="0" />
+        <line x1="-30" y1="0" x2="30" y2="-10" />
+      </g>
+
+      {/* 3. Banana Leaf Lining (Tàu lá chuối xanh thẫm lót đáy mẹt) */}
+      <path
+        d="M -44 -6 C -32 -13, 32 -13, 44 -6 C 34 1, -34 1, -44 -6 Z"
+        fill="#143019"
+        stroke="#0A1C0E"
+        strokeWidth="1"
+      />
+      {/* Midrib and secondary leaf veins */}
+      <line x1="-40" y1="-6" x2="40" y2="-6" stroke="#23562C" strokeWidth="1.2" opacity="0.8" />
+      {[-30, -20, -10, 0, 10, 20, 30].map((vx) => (
+        <line
+          key={`leaf-vein-${vx}`}
+          x1={vx}
+          y1="-6"
+          x2={vx + 4}
+          y2="-10"
+          stroke="#1B4222"
+          strokeWidth="0.7"
+          opacity="0.6"
+        />
+      ))}
+
+      {/* 4. Hand of Bananas (Nải chuối cúng cô hồn nằm bên trái mẹt) */}
+      <g transform="translate(-16, -10)">
+        {/* Dark banana stalk crown */}
+        <path d="M -16 -8 Q -6 -13 4 -10 L 3 -6 Q -6 -9 -14 -4 Z" fill="#292524" stroke="#0C0A09" strokeWidth="1" />
+
+        {/* 5 Distinct curved bananas */}
+        {/* Banana 1 (leftmost, dark amber) */}
+        <path
+          d="M -16 -6 C -25 0, -23 9, -12 10 C -15 4, -15 -2, -9 -5 Z"
+          fill="#92400E"
+          stroke="#451A03"
+          strokeWidth="0.9"
+        />
+        {/* Banana 2 (golden brown) */}
+        <path
+          d="M -11 -7 C -18 1, -15 11, -4 11 C -8 5, -7 -2, -3 -6 Z"
+          fill="#B45309"
+          stroke="#451A03"
+          strokeWidth="0.9"
+        />
+        {/* Banana 3 (ripe yellow) */}
+        <path
+          d="M -5 -8 C -11 0, -7 11, 3 11 C -1 5, 0 -2, 2 -7 Z"
+          fill="#CA8A04"
+          stroke="#713F12"
+          strokeWidth="0.9"
+        />
+        {/* Banana 4 (bright yellow) */}
+        <path
+          d="M 0 -8 C -4 0, 0 11, 10 10 C 5 5, 5 -1, 6 -7 Z"
+          fill="#EAB308"
+          stroke="#854D0E"
+          strokeWidth="0.9"
+        />
+        {/* Banana 5 (greenish yellow accent) */}
+        <path
+          d="M 4 -7 C 3 0, 9 8, 16 6 C 11 3, 9 -2, 9 -6 Z"
+          fill="#65A30D"
+          stroke="#365314"
+          strokeWidth="0.9"
+        />
+        {/* Dark banana blossom tips */}
+        <circle cx="-12" cy="10" r="1" fill="#1C1917" />
+        <circle cx="-4" cy="11" r="1" fill="#1C1917" />
+        <circle cx="3" cy="11" r="1" fill="#1C1917" />
+        <circle cx="10" cy="10" r="1" fill="#1C1917" />
+        <circle cx="16" cy="6" r="1" fill="#1C1917" />
+      </g>
+
+      {/* 5. Miniature Terracotta Clay Toys (Đồ chơi đất nung con nít bên phải mẹt) */}
+      <g transform="translate(18, -8)">
+        {/* Tiny Clay Pot with Lid (Nồi đất nung kho cá nhỏ) */}
+        <ellipse cx="-5" cy="0" rx="7.5" ry="6" fill="#9A3412" stroke="#431407" strokeWidth="1.1" />
+        <ellipse cx="-5" cy="-4" rx="5.5" ry="1.8" fill="#7C2D12" stroke="#431407" strokeWidth="0.9" />
+        {/* Lid and cute clay knob */}
+        <path d="M -8.5 -4.8 Q -5 -8.5 -1.5 -4.8 Z" fill="#C2410C" stroke="#431407" strokeWidth="0.9" />
+        <circle cx="-5" cy="-7.5" r="1.3" fill="#EA580C" />
+
+        {/* Tiny Clay Bowl (Chén đất nung con nít) */}
+        <path d="M 5 2 Q 10 7 15 2 L 14 -0.8 L 6 -0.8 Z" fill="#B45309" stroke="#451A03" strokeWidth="1" />
+        <ellipse cx="10" cy="-0.8" rx="4.2" ry="1.4" fill="#78350F" />
+
+        {/* Tiny Clay Figurine / Animal Toy (Con giống đất nung nhỏ) */}
+        <g transform="translate(8, -8)">
+          <ellipse cx="0" cy="0" rx="4" ry="2.8" fill="#C2410C" stroke="#431407" strokeWidth="0.9" />
+          <circle cx="-3" cy="-3" r="2.2" fill="#EA580C" stroke="#431407" strokeWidth="0.8" />
+          {/* Ears */}
+          <polygon points="-4,-5 -3,-7 -2,-5" fill="#7C2D12" />
+          {/* Tiny legs */}
+          <line x1="-2" y1="2.5" x2="-2" y2="5" stroke="#431407" strokeWidth="1.1" />
+          <line x1="2" y1="2.5" x2="2" y2="5" stroke="#431407" strokeWidth="1.1" />
+        </g>
+      </g>
+
+      {/* 6. Lit Incense Stick & Rising Thin Smoke (Nén nhang cắm nghiêng đỏ lửa & khói trắng) */}
+      <g transform="translate(2, -12)">
+        {/* Bamboo incense stick */}
+        <line x1="0" y1="6" x2="-6" y2="-28" stroke="#78350F" strokeWidth="1.5" strokeLinecap="round" />
+        {/* Burning Ember Tip */}
+        <circle cx="-6" cy="-28" r="2.2" fill="#DC2626" className="anim-flicker-ember" />
+        <circle cx="-6" cy="-28" r="1.2" fill="#FCA5A5" />
+        {/* Subtle red glow around ember */}
+        <circle cx="-6" cy="-28" r="6" fill="#EF4444" opacity="0.32" pointerEvents="none" />
+
+        {/* Rising Thin Ghostly Smoke Tendril */}
+        <path
+          d="M -6 -30 C -12 -44, -1 -54, -7 -68 C -13 -80, -3 -92, -8 -105"
+          fill="none"
+          stroke="#E2E8F0"
+          strokeWidth="1.2"
+          opacity="0.6"
+          className="anim-smoke-rise"
+        />
+        {/* Secondary wispy smoke line */}
+        <path
+          d="M -6 -30 C -2 -42, -9 -52, -4 -64 C 2 -76, -5 -88, -2 -98"
+          fill="none"
+          stroke="#CBD5E1"
+          strokeWidth="0.8"
+          opacity="0.35"
+          className="anim-smoke-rise"
+        />
+      </g>
+
+      {/* 7. Scattered raw rice & salt grains on tray edge (Gạo muối cúng thí thực) */}
+      <g opacity="0.85">
+        <circle cx="-42" cy="-2" r="0.8" fill="#F8FAFC" />
+        <circle cx="-38" cy="1" r="0.7" fill="#F8FAFC" />
+        <circle cx="-34" cy="-3" r="0.8" fill="#F8FAFC" />
+        <circle cx="34" cy="-2" r="0.7" fill="#F8FAFC" />
+        <circle cx="38" cy="1" r="0.8" fill="#F8FAFC" />
+        <circle cx="43" cy="-1.5" r="0.7" fill="#F8FAFC" />
+      </g>
+    </g>
+  );
+};
+
 

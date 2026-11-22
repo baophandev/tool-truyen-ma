@@ -73,7 +73,9 @@ export type DetailId =
   | "detail_muddy_water_puddle"
   | "detail_oil_lamp"
   | "detail_vintage_radio"
-  | "detail_water_hyacinth";
+  | "detail_water_hyacinth"
+  | "detail_child_sandals"
+  | "detail_offering_tray_toys";
 
 export type CharacterBaseId =
   | "male_adult"
