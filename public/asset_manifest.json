@@ -15,19 +15,19 @@
         "id": "rural_graveyard",
         "name": "Bãi tha ma nông thôn",
         "desc": "Khu nghĩa địa âm u hoang tàn, bia đá rêu phong nghiêng ngả, rặng tre ma mị và sương mù dày đặc",
-        "sky_options": ["blood_moon", "foggy_night", "eclipse_abyss"]
+        "sky_options": ["clear_day", "golden_sunset", "morning_dawn", "blood_moon", "foggy_night", "eclipse_abyss"]
       },
       {
         "id": "abandoned_village",
         "name": "Đường làng hoang vắng",
         "desc": "Con đường đất quanh co vắng lặng, lều tranh xiêu vẹo rách nát, cây đa cổ thụ u uất",
-        "sky_options": ["stormy_dark", "foggy_night", "blood_moon"]
+        "sky_options": ["clear_day", "golden_sunset", "morning_dawn", "stormy_dark", "foggy_night", "blood_moon"]
       },
       {
         "id": "cursed_swamp",
         "name": "Đầm lầy u minh",
         "desc": "Vùng nước chết tĩnh mịch ngập chìm trong sương độc, lau sậy khẳng khiu, cây khô mục và bãi tha ma sình lầy",
-        "sky_options": ["eclipse_abyss", "foggy_night", "stormy_dark"]
+        "sky_options": ["clear_day", "golden_sunset", "morning_dawn", "eclipse_abyss", "foggy_night", "stormy_dark"]
       },
       {
         "id": "modern_indoor",
@@ -119,6 +119,39 @@
           "light_tubes": "#FDE68A",
           "exit_sign": "#F59E0B",
           "fog": "rgba(251, 191, 36, 0.18)"
+        }
+      },
+      {
+        "id": "clear_day",
+        "name": "Ngày Nắng Trong Tự Nhiên",
+        "palette": {
+          "top": "#1D4ED8",
+          "bottom": "#E0F2FE",
+          "sun": "#FFFDF0",
+          "sun_glow": "#FEF08A",
+          "fog": "rgba(224, 242, 254, 0.35)"
+        }
+      },
+      {
+        "id": "golden_sunset",
+        "name": "Hoàng Hôn Nắng Vàng",
+        "palette": {
+          "top": "#312E81",
+          "bottom": "#FDE047",
+          "sun": "#EA580C",
+          "sun_glow": "#F59E0B",
+          "fog": "rgba(249, 115, 22, 0.3)"
+        }
+      },
+      {
+        "id": "morning_dawn",
+        "name": "Bình Minh Rạng Đông",
+        "palette": {
+          "top": "#1E1B4B",
+          "bottom": "#FEF08A",
+          "sun": "#FEF9C3",
+          "sun_glow": "#FB7185",
+          "fog": "rgba(251, 207, 232, 0.28)"
         }
       }
     ],
@@ -869,6 +902,29 @@
       { "id": "item_areca_palm_fan", "name": "Quạt mo cau" },
       { "id": "item_fresh_ginger", "name": "Lát gừng tươi" },
       { "id": "item_oil_lamp", "name": "Đèn dầu hột vịt cầm tay" }
+    ],
+    "shoulder_items": [
+      { "id": "none", "name": "Không vác đồ vật", "desc": "Hai vai trống không" },
+      { "id": "shoulder_carrying_pole", "name": "Đòn gánh tre hai thúng quang dầu", "desc": "Đòn gánh tre uốn cong đặt ngang vai, hai đầu móc dây quang treo hai thúng nan tre đung đưa nhịp nhàng" },
+      { "id": "shoulder_coffin_pole", "name": "Đòn khiêng áo quan / đòn sóc", "desc": "Thanh đòn gỗ vuông vức vác ngang bờ vai quấn dây thừng gai chắc nịch" },
+      { "id": "shoulder_hoe", "name": "Cuốc cày rỉ sét vác vai", "desc": "Cán tre vác chéo qua vai, lưỡi cuốc sắt đen gỉ xám vương bùn đất chạng vạng" },
+      { "id": "shoulder_sack", "name": "Bao tải gai cũ kỹ vác trĩu vai", "desc": "Bao tải vải thô phồng tròn vác trĩu đè lên một bên vai sau lưng" },
+      { "id": "shoulder_firewood_bundle", "name": "Bó củi khô buộc lạt mây", "desc": "Chùm cành cây khô khẳng khiu buộc chặt bằng hai vòng lạt tre vàng" }
+    ],
+    "head_items": [
+      { "id": "none", "name": "Đầu trần", "desc": "Không đội nón hay phụ kiện" },
+      { "id": "head_conical_hat", "name": "Nón lá cổ truyền chóp nhọn", "desc": "Nón lá chóp nhọn nan tre, quai vải mềm che nghiêng nửa khuôn mặt ma mị" },
+      { "id": "head_funeral_band", "name": "Dải khăn tang trắng xô gai", "desc": "Khăn tang trắng quấn quanh trán thắt nút sau gáy, hai dải khăn dài rủ xơ xác qua vai" },
+      { "id": "head_straw_hat", "name": "Mũ cói / mũ rơm rách vành", "desc": "Mũ cói nông dân tròn vành tua rua rách mép tả tơi che nắng gió" },
+      { "id": "head_talisman_mask", "name": "Lá bùa vàng trấn yểm dán trán", "desc": "Lá bùa giấy vàng viết chu sa dán từ giữa trán rủ xuống che kín mắt mũi trừ tà" },
+      { "id": "head_basket", "name": "Thúng / Mẹt tre đội đầu", "desc": "Mẹt tre đan mộc mạc đội thăng bằng trên đỉnh đầu có khăn đệm vải đen" }
+    ],
+    "leg_items": [
+      { "id": "none", "name": "Chân tự do", "desc": "Không bị gông cùm hay thương tích" },
+      { "id": "leg_iron_chains", "name": "Cùm xích sắt hoen rỉ cổ chân", "desc": "Hai vòng cùm sắt đen rỉ ôm hai cổ chân, xích lê loẹt quẹt sát mặt đất khi bước đi" },
+      { "id": "leg_wooden_shackles", "name": "Gông cùm gỗ kẹp mắt cá chân", "desc": "Gông cùm gỗ kẹp chặt hai mắt cá chân có then chốt sắt tử tù" },
+      { "id": "leg_bloody_bandage", "name": "Băng vải trắng vấy máu quấn chân", "desc": "Dải băng vải xô quấn quanh cẳng chân rỉ vệt máu đỏ tươi" },
+      { "id": "leg_muddy_splatter", "name": "Vệt bùn sình lầy đầm lầy bám chân", "desc": "Bùn đen nâu ngập từ bàn chân lên ống chân sau khi lội kênh rạch" }
     ]
   },
   "details": [

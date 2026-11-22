@@ -8,6 +8,9 @@ import type {
   FacingDirection,
   HeldHand,
   HeldItemId,
+  ShoulderItemId,
+  HeadItemId,
+  LegItemId,
 } from "../types";
 import {
   COLOR_PALETTE,
@@ -18,6 +21,11 @@ import {
 } from "../constants";
 import { getDefaultCostumeForBase } from "../layoutRouter";
 import { HandheldItemRenderer } from "./HandheldItems";
+import {
+  ShoulderItemRenderer,
+  HeadItemRenderer,
+  LegItemRenderer,
+} from "./BodySocketItems";
 
 interface HandSocketPoint {
   x: number;
@@ -222,6 +230,9 @@ interface CharacterRigProps {
   opacity?: number;
   heldItem?: HeldItemId;
   heldHand?: HeldHand;
+  shoulderItem?: ShoulderItemId;
+  headItem?: HeadItemId;
+  legItem?: LegItemId;
   showSockets?: boolean;
 }
 
@@ -351,6 +362,9 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
   opacity = 1,
   heldItem = "none",
   heldHand = "right",
+  shoulderItem = "none",
+  headItem = "none",
+  legItem = "none",
   showSockets = false,
 }) => {
   const activeCostume = costume || getDefaultCostumeForBase(base);
@@ -535,6 +549,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
             appearance={appearance}
           />
         )}
+        <LegItemRenderer itemId={legItem} pose={pose} />
       </g>
 
       {/* 2. TORSO & OUTFIT COLLECTION */}
@@ -569,6 +584,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
           heldHand={heldHand}
           handSockets={handSockets}
         />
+        <ShoulderItemRenderer itemId={shoulderItem} pose={pose} />
       </g>
 
       {/* 4. NECK SOCKET */}
@@ -769,6 +785,9 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
           <FaceRig face={face} facialAction={facialAction} />
         </g>
       )}
+
+      {/* 7. HEAD ACCESSORY SOCKET (Nón lá, Khăn tang, Mũ rơm, Bùa dán trán, Mẹt đội đầu) */}
+      {!isHeadless && <HeadItemRenderer itemId={headItem} headPos={headPos} />}
 
       {/* DEBUG SOCKETS & GIZMO OVERLAY */}
       {showSockets && (

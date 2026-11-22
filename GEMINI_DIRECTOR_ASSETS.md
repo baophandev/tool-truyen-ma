@@ -69,6 +69,9 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"thatched_house_interior"`: Không gian bên trong căn nhà lá (gian nhà lá ba gian vách nứa đơn sơ rách nát, mái tranh xơ xác rủ vì kèo tre, đòn dông buộc lạt mây, vách đan nan tre, cửa sổ liếp hé mở nhìn ra bóng chuối rặng tre trong đêm lạnh và nền đất nện cổ truyền với vết nứt rơm rạ). BẮT BUỘC dùng cho các phân cảnh diễn ra bên trong căn nhà lá, nhà tranh nông thôn hoặc gian thờ gia tiên.
 
 ### 3.2. Bầu Trời & Chiếu Sáng (Sky Presets)
+- `"clear_day"`: Ngày Nắng Trong Tự Nhiên (Gradient xanh lam trong sáng `#1D4ED8` -> `#60A5FA` -> `#E0F2FE`, mặt trời rực rỡ với quầng hào quang ấm, mây trắng tơ xốp lững lờ trôi). **LƯU Ý:** Khi muốn diễn tả **ngày u ám, tang tóc hay ma mị**, dùng `"clear_day"` kết hợp `fog_density` cao ($0.6 - 0.9$) hoặc hiệu ứng thời tiết `"heavy_rain"`, `"haunted_mist"`.
+- `"golden_sunset"`: Hoàng Hôn Nắng Vàng / Chiều Tà (Gradient ráng chiều tím lam `#312E81` -> `#7C2D12` -> `#EA580C` -> vàng cam `#FDE047`, vầng thái dương lặn thấp tỏa bóng ấm).
+- `"morning_dawn"`: Bình Minh Rạng Đông / Nắng Sớm (Gradient hừng đông `#1E1B4B` -> tím hồng `#4F46E5` -> `#FB7185` -> vàng mơ `#FEF08A`, vầng dương non le lói).
 - `"blood_moon"`: Trăng Máu U Uất (Gradient đỏ rực `#2B0808` -> `#0D0202`, trăng đỏ quạch khổng lồ).
 - `"foggy_night"`: Đêm Sương Lạnh Buốt (Gradient đen tím `#06070B` -> `#141724`, trăng bạc nhợt nhạt).
 - `"stormy_dark"`: Bão Đêm Sấm Chớp (Trời dông đen đặc `#030408` -> `#0B0E17`, có thể bật `thunder_flash: true`).
@@ -76,7 +79,17 @@ Hệ thống cung cấp 8 vị trí neo cố định (5 trên mặt đất, 3 tr
 - `"flickering_fluorescent"`: Đèn Tuýp Huỳnh Quang Chập Chờn (Ánh sáng xanh ngọc lạnh lẽo trong nhà, bóng tuýp chập chờn, biển báo EXIT xanh lục phát sáng).
 - `"dim_indoor_night"`: Ánh Vàng Đêm Mờ Ảo (Ánh đèn vàng hổ phách u tịch trong khách sạn / nhà hàng đêm muộn).
 
-### 3.3. 30 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
+### 3.3. Hiệu Ứng Khí Quyển & Thời Tiết (Weather Effects)
+Trường `"weather"` cho phép đạo diễn chủ động quyết định phân cảnh có thời tiết xấu hay trong trẻo yên tĩnh (thay vì mặc định ép sương mù vào mọi cảnh):
+- `"none"`: Trời yên tĩnh, trong trẻo, không có hiện tượng thời tiết (mặc định không có sương mù `fog_density: 0`).
+- `"heavy_rain"`: Mưa rào bão tối (vệt mưa xiên tốc độ cao, bắn giọt nước tung tóe khi tiếp đất Y=800px).
+- `"storm_thunder"`: Cuồng phong dông bão sấm chớp (mưa to, gió giật chéo, chớp sáng màn hình `thunder_flash: true`).
+- `"blood_rain"`: Mưa máu ma quái (vệt mưa đỏ thẫm rơi rùng rợn).
+- `"floating_embers"`: Lửa ma trơi đầm lầy / Đốm than hồng bay lập lòe trong không trung.
+- `"drifting_ash"`: Tàn tro tử khí / Bụi tro lạnh lẽo bay lờ lững qua màn hình.
+- `"haunted_mist"`: Sương quái xoáy cuộn (khói sương ma mị chuyển động là là mặt đất).
+
+### 3.4. 30 Công Trình Môi Trường (Structures) & Quy Tắc Vị Trí Bắt Buộc
 
 Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ được đặt tại các Slot được phép** sau:
 
@@ -271,6 +284,36 @@ Nhân vật có thể cầm đồ vật trên tay thông qua Hand Socket. Vật 
 18. `"item_fresh_ginger"`: Lát gừng tươi giữ khí. Nhánh và lát gừng vàng tươi tỏa quầng sáng ấm áp nhẹ nhàng, biểu trưng cho mẹo dân gian ngậm hoặc cầm lát gừng tươi để "giữ khí" chống lại tà khí ban đêm.
 19. `"item_oil_lamp"`: Đèn dầu hột vịt cầm tay. Đèn dầu thủy tinh hột vịt thon eo nhỏ gọn cầm tại Hand Socket [0, 0] (bàn tay cầm vào đế/cổ đèn), ngọn lửa bấc vàng cam leo lét với quầng sáng ấm tỏa tròn soi tỏ bóng đêm. Rất phù hợp khi nhân vật vùng dậy soi quanh giường tre hoặc cầm đèn dầu rọi tìm dấu vết trong đêm tối.
 
+### 6.3. Hệ Thống Trang Bị Body Sockets (Vai, Đầu, Chân)
+
+Bên cạnh Hand Socket cầm tay, nhân vật được trang bị thêm 3 Body Sockets chuyên biệt chuẩn điện ảnh văn hóa Á Đông / Việt Nam:
+
+#### A. Shoulder Socket (Đồ vật vác / gánh trên vai - `shoulderItem`):
+Neo tại trục vai `[0, -188px]`, đung đưa tự nhiên khi bước đi:
+1. `"none"`: Hai vai trống không (mặc định).
+2. `"shoulder_carrying_pole"`: **Đòn gánh tre hai thúng quang dầu**. Cây đòn gánh tre uốn cong đặt ngang vai, hai đầu mấu sừng móc dây quang thừng treo hai thúng nan tre đung đưa nhịp nhàng theo bước đi `pose_walking`. Hình ảnh kinh điển của người mẹ, người phụ nữ tần tảo hoặc hồn ma gánh hàng rong đêm khuya.
+3. `"shoulder_coffin_pole"`: **Đòn khiêng áo quan / đòn sóc**. Thanh đòn gỗ vuông vức vác ngang bờ vai quấn nhiều vòng dây thừng gai chắc nịch dùng trong các đám tang cổ truyền.
+4. `"shoulder_hoe"`: **Cuốc cày rỉ sét vác vai**. Cán tre vác chéo qua vai, lưỡi cuốc sắt đen gỉ xám vương bùn đất chạng vạng của nông dân đi làm đồng về lúc nhá nhem.
+5. `"shoulder_sack"`: **Bao tải gai cũ kỹ vác trĩu vai**. Bao tải vải thô phồng tròn vác trĩu đè lên một bên vai sau lưng (kẻ cướp mộ, người trốn chạy hoặc người khuân vác).
+6. `"shoulder_firewood_bundle"`: **Bó củi khô buộc lạt mây**. Chùm cành cây khô khẳng khiu buộc chặt bằng hai vòng lạt tre vàng vác trên vai người tiều phu.
+
+#### B. Head Socket (Đồ vật đội / quấn trên đầu - `headItem`):
+Neo tại đỉnh đầu theo chuyển động đầu nhân vật:
+1. `"none"`: Đầu trần (mặc định).
+2. `"head_conical_hat"`: **Nón lá cổ truyền chóp nhọn**. Nón lá chóp nhọn đan nan tre, quai vải mềm che nghiêng nửa khuôn mặt tạo nét bí ẩn ma mị.
+3. `"head_funeral_band"`: **Dải khăn tang trắng xô gai**. Khăn tang trắng quấn quanh trán thắt nút sau gáy, hai dải khăn dài rủ xơ xác qua vai (dành cho người nhà có tang, như nhân vật Minh thức dậy trong nhà tang).
+4. `"head_straw_hat"`: **Mũ cói / mũ rơm rách vành**. Mũ cói nông dân tròn vành tua rua rách mép tả tơi che nắng gió.
+5. `"head_talisman_mask"`: **Lá bùa vàng trấn yểm dán trán**. Lá bùa giấy vàng viết chu sa dán từ giữa trán rủ xuống che kín mắt mũi trừ tà hoặc niêm phong cương thi/oan hồn.
+6. `"head_basket"`: **Thúng / Mẹt tre đội đầu**. Mẹt tre đan mộc mạc đội thăng bằng trên đỉnh đầu có khăn đệm vải đen của người buôn thúng bán mẹt.
+
+#### C. Leg / Feet Socket (Cùm xích / thương tích ở chân - `legItem`):
+Neo tại cổ chân và mắt cá chân `[0, -20px đến 0px]`:
+1. `"none"`: Chân tự do (mặc định).
+2. `"leg_iron_chains"`: **Cùm xích sắt hoen rỉ cổ chân**. Hai vòng cùm sắt đen rỉ ôm hai cổ chân, xích sắt lê loẹt quẹt sát mặt đất khi bước đi (tù nhân, oan hồn bị xiềng xích dưới địa phủ).
+3. `"leg_wooden_shackles"`: **Gông cùm gỗ kẹp mắt cá chân**. Gông cùm gỗ kẹp chặt hai mắt cá chân có then chốt sắt tử tù thời xưa.
+4. `"leg_bloody_bandage"`: **Băng vải trắng vấy máu quấn chân**. Dải băng vải xô quấn quanh cẳng chân rỉ vệt máu đỏ tươi do chấn thương hoặc dẫm phải bẫy chông.
+5. `"leg_muddy_splatter"`: **Vệt bùn sình lầy đầm lầy bám chân**. Bùn đen nâu ngập từ bàn chân lên cẳng chân sau khi lội kênh rạch hay sình lầy mùa nước nổi.
+
 ---
 
 ## 7. CƠ CHẾ CHUYỂN ĐỘNG KEYFRAME ĐIỂM A → ĐIỂM B (MOTION TWEENING)
@@ -346,6 +389,9 @@ export interface DirectorSceneScript {
     opacity?: number;
     heldItem?: "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger" | "item_oil_lamp";
     heldHand?: "right" | "left";
+    shoulderItem?: "none" | "shoulder_carrying_pole" | "shoulder_coffin_pole" | "shoulder_hoe" | "shoulder_sack" | "shoulder_firewood_bundle";
+    headItem?: "none" | "head_conical_hat" | "head_funeral_band" | "head_straw_hat" | "head_talisman_mask" | "head_basket";
+    legItem?: "none" | "leg_iron_chains" | "leg_wooden_shackles" | "leg_bloody_bandage" | "leg_muddy_splatter";
     motion?: {
       targetSlot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
       targetOffsetX?: number;

@@ -744,6 +744,9 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                     opacity={actor.opacity !== undefined ? actor.opacity : 1}
                     heldItem={actor.heldItem}
                     heldHand={actor.heldHand}
+                    shoulderItem={actor.shoulderItem}
+                    headItem={actor.headItem}
+                    legItem={actor.legItem}
                     showSockets={showGizmo || isSelected || isBeingDragged}
                   />
 
@@ -805,6 +808,9 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
                       opacity={isSelected || isDraggingB ? 0.36 : 0.18}
                       heldItem={actor.heldItem}
                       heldHand={actor.heldHand}
+                      shoulderItem={actor.shoulderItem}
+                      headItem={actor.headItem}
+                      legItem={actor.legItem}
                       showSockets={false}
                     />
 
@@ -930,7 +936,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
         {/* LAYER 3 (z-index 30): FOREGROUND MIST, DRY BRANCHES, VIGNETTE (Foreground Parallax: 1.35) */}
         <g id="layer-3-foreground" transform={cameraState.fgTransform}>
           <ForegroundLayer
-            fogDensity={lighting.fog_density}
+            fogDensity={lighting.fog_density ?? 0}
             skyPreset={lighting.sky_preset}
             theme={theme}
           />

@@ -9,9 +9,9 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
     "title": "Bóng Đen Xó Nhà & Tiếng Võng Kẽo Kẹt",
     "duration_sec": 12,
     "theme": "thatched_house_interior",
+    "weather": "none",
     "lighting": {
-      "sky_preset": "dim_indoor_night",
-      "fog_density": 0.4
+      "sky_preset": "dim_indoor_night"
     },
     "camera": {
       "shot": "medium_wide",
@@ -56,6 +56,9 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
         "pose": "pose_lying_down",
         "heldItem": "item_fresh_ginger",
         "heldHand": "right",
+        "shoulderItem": "none",
+        "headItem": "head_funeral_band",
+        "legItem": "none",
         "facing": "right",
         "slot": "center",
         "offsetX": 0,
@@ -73,6 +76,9 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
         "pose": "pose_lying_hammock",
         "heldItem": "item_areca_palm_fan",
         "heldHand": "right",
+        "shoulderItem": "none",
+        "headItem": "none",
+        "legItem": "none",
         "facing": "right",
         "slot": "mid_right",
         "offsetX": 0,
@@ -90,6 +96,9 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
         "pose": "pose_squatting",
         "heldItem": "none",
         "heldHand": "right",
+        "shoulderItem": "none",
+        "headItem": "none",
+        "legItem": "leg_iron_chains",
         "facing": "right",
         "slot": "far_left",
         "offsetX": 0,
@@ -112,6 +121,7 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
     "title": "Leo Lên Gác Lửng Tối & Cầu Xin Trước Cầu Khỉ",
     "duration_sec": 12,
     "theme": "cursed_swamp",
+    "weather": "haunted_mist",
     "lighting": {
       "sky_preset": "foggy_night",
       "fog_density": 0.65
@@ -158,6 +168,9 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
         "pose": "pose_climbing_stairs",
         "heldItem": "item_flashlight",
         "heldHand": "right",
+        "shoulderItem": "shoulder_sack",
+        "headItem": "none",
+        "legItem": "none",
         "facing": "right",
         "slot": "mid_left",
         "offsetX": -45,
@@ -185,6 +198,9 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
         "pose": "pose_balancing_bridge",
         "heldItem": "item_oil_lamp",
         "heldHand": "right",
+        "shoulderItem": "none",
+        "headItem": "head_conical_hat",
+        "legItem": "none",
         "facing": "left",
         "slot": "mid_right",
         "offsetX": 0,
@@ -202,6 +218,9 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
         "pose": "pose_kneeling",
         "heldItem": "item_yellow_talisman",
         "heldHand": "right",
+        "shoulderItem": "shoulder_carrying_pole",
+        "headItem": "head_straw_hat",
+        "legItem": "leg_wooden_shackles",
         "facing": "right",
         "slot": "far_left",
         "offsetX": 0,
@@ -232,10 +251,11 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
 | **`title`** | `string` | Tiêu đề ngắn gọn, mang tính điện ảnh cho phân cảnh. |
 | **`duration_sec`** | `number` | Thời lượng cảnh tính bằng giây (thường khoảng `10–20` giây để khớp giọng đọc). |
 | **`theme`** | `string` | Chủ đề không gian lấy chính xác từ tệp Rắc-co Bối Cảnh (ví dụ: `"thatched_house_interior"`, `"abandoned_village"`, `"cursed_swamp"`, `"rural_graveyard"`). |
-| **`lighting`** | `object` | Thiết lập ánh sáng và sương mù khóa theo Rắc-co Bối Cảnh: gồm `sky_preset` (preset bầu trời) và `fog_density` (độ dày sương từ `0` đến `1`). |
+| **`weather`** | `string` | **Hiệu ứng thời tiết chủ động lựa chọn:** *(tùy chọn, mặc định là `"none"`)*<br>• `"none"`: Trời yên tĩnh, trong trẻo, không có hiện tượng thời tiết xấu (sương mù = 0).<br>• `"heavy_rain"`: Mưa rào bão tối (vệt mưa xiên, giọt nước văng tóe mặt đất).<br>• `"storm_thunder"`: Cuồng phong dông bão sấm chớp (mưa to kèm chớp sáng).<br>• `"blood_rain"`: Mưa máu ma quái (vệt mưa đỏ thẫm).<br>• `"floating_embers"`: Lửa ma trơi than hồng bay lập lòe.<br>• `"drifting_ash"`: Tàn tro tử khí bay lờ lững lạnh lẽo.<br>• `"haunted_mist"`: Sương quái xoáy cuộn là là mặt đất. |
+| **`lighting`** | `object` | Thiết lập ánh sáng bầu trời & độ mờ cảnh quay:<br>• `sky_preset` (*bắt buộc*): Preset bầu trời (`"clear_day"`, `"golden_sunset"`, `"morning_dawn"`, `"blood_moon"`, `"foggy_night"`, `"stormy_dark"`, `"eclipse_abyss"`, `"flickering_fluorescent"`, `"dim_indoor_night"`).<br>• `fog_density` (*tùy chọn*): Mật độ sương mù (từ `0.0` đến `1.0`). **Mặc định là `0.0` (không có sương mù)**. Chỉ khai báo khi muốn cảnh vật mờ ảo u ám hoặc khi chọn thời tiết `"haunted_mist"`. |
 | **`camera`** | `object` | Cấu hình ống kính mặc định (`shot`, `shake`) và mảng **`keyframes`** điều khiển chuyển cảnh (`transition`: `"cut"` / `"smooth"`), cỡ cảnh (`shot`: `"wide"`, `"medium_wide"`, `"medium"`, `"close_up"`, `"dutch_tilt"`), độ rung (`shake`: `"none"`, `"subtle"`, `"heavy"`) và mục tiêu bám nét (`target_actor_id`) theo mốc thời gian `startTimeSec`. |
 | **`environment_items`** | `array` | Danh sách các công trình/kiến trúc lớn trong cảnh, khóa theo Rắc-co Bối Cảnh, gồm `asset_id`, vị trí `slot` và tỷ lệ `scale` (tùy chọn). |
-| **`actors`** | `array` | Danh sách diễn viên xuất hiện trong cảnh (khóa `id`, `name`, `base`, `costume` từ Rắc-co Diễn Viên). Gồm các trường:<br>• `face`: Mã biểu cảm khuôn mặt.<br>• `facialAction`: Hành vi mắt/miệng động.<br>• `pose`: Tư thế (bao gồm các tư thế tương tác: `"pose_standing"`, `"pose_sitting"`, `"pose_sitting_twisted_legs"`, `"pose_sitting_bed"`, `"pose_lying_down"`, `"pose_lying_hammock"`, `"pose_climbing_stairs"` [bước leo thang], `"pose_balancing_bridge"` [thăng bằng cầu khỉ/cầu tre], `"pose_kneeling"` [quỳ gối lạy/khấn], `"pose_squatting"` [ngồi xổm/chồm hổm], v.v.).<br>• `heldItem`: Đồ vật cầm tay qua Hand Socket.<br>• `heldHand`: `"right"` (tay trước) hoặc `"left"` (tay sau).<br>• `facing`: `"left"` hoặc `"right"`.<br>• `slot`: Slot định vị (`"far_left"` -> `"far_right"` hoặc air slots).<br>• **`offsetY`**: Tọa độ bù trục Y (px) để đặt khớp bề mặt tiếp xúc (`-180` cho đỉnh cầu thang/gác lửng, `-115` cho cầu khỉ tre, `-110` cho cầu gãy, `-80` cho giường, `-60` cho võng, `0` cho ghế/quỳ/ngồi xổm/tiếp đất).<br>• **`interact_with`**: Mã ID công trình đặc biệt mà diễn viên tương tác trực tiếp (`"structure_wooden_stairs"`, `"structure_monkey_bridge"`, `"broken_wooden_bridge"`, `"structure_wooden_bed"`, `"structure_bamboo_bed_net"`, `"structure_wooden_chair"`, `"structure_hammock"` hoặc `null` / `"none"`).<br>• `layer`: Phân lớp vẽ (`"foreground"` / `"actor"` / `"background"`).<br>• **`motion`**: Chuyển động từ A sang B hỗ trợ cả trục X và trục Y trên cao (`targetSlot`, `targetOffsetX`, `targetOffsetY`: tọa độ cao đích đến như `-180` khi leo thang, `movingPose`: `"pose_climbing_stairs"` / `"pose_balancing_bridge"` / `"pose_walking"` / `"pose_kneeling"` / `"pose_squatting"`). |
+| **`actors`** | `array` | Danh sách diễn viên xuất hiện trong cảnh (khóa `id`, `name`, `base`, `costume` từ Rắc-co Diễn Viên). Gồm các trường:<br>• `face`: Mã biểu cảm khuôn mặt.<br>• `facialAction`: Hành vi mắt/miệng động.<br>• `pose`: Tư thế (bao gồm các tư thế tương tác: `"pose_standing"`, `"pose_sitting"`, `"pose_sitting_twisted_legs"`, `"pose_sitting_bed"`, `"pose_lying_down"`, `"pose_lying_hammock"`, `"pose_climbing_stairs"` [bước leo thang], `"pose_balancing_bridge"` [thăng bằng cầu khỉ/cầu tre], `"pose_kneeling"` [quỳ gối lạy/khấn], `"pose_squatting"` [ngồi xổm/chồm hổm], v.v.).<br>• `heldItem`: Đồ vật cầm tay qua Hand Socket (`"item_storm_lantern"`, `"item_oil_lamp"`, `"item_fresh_ginger"`, v.v.).<br>• `heldHand`: `"right"` (tay trước) hoặc `"left"` (tay sau).<br>• **`shoulderItem`**: Đồ vật vác / gánh trên vai qua Shoulder Socket (`"shoulder_carrying_pole"`, `"shoulder_coffin_pole"`, `"shoulder_hoe"`, `"shoulder_sack"`, `"shoulder_firewood_bundle"`, `"none"`).<br>• **`headItem`**: Đồ vật đội / quấn trên đầu qua Head Socket (`"head_conical_hat"`, `"head_funeral_band"`, `"head_straw_hat"`, `"head_talisman_mask"`, `"head_basket"`, `"none"`).<br>• **`legItem`**: Cùm xích / thương tích ở chân qua Leg Socket (`"leg_iron_chains"`, `"leg_wooden_shackles"`, `"leg_bloody_bandage"`, `"leg_muddy_splatter"`, `"none"`).<br>• `facing`: `"left"` hoặc `"right"`.<br>• `slot`: Slot định vị (`"far_left"` -> `"far_right"` hoặc air slots).<br>• **`offsetY`**: Tọa độ bù trục Y (px) để đặt khớp bề mặt tiếp xúc (`-180` cho đỉnh cầu thang/gác lửng, `-115` cho cầu khỉ tre, `-110` cho cầu gãy, `-80` cho giường, `-60` cho võng, `0` cho ghế/quỳ/ngồi xổm/tiếp đất).<br>• **`interact_with`**: Mã ID công trình đặc biệt mà diễn viên tương tác trực tiếp (`"structure_wooden_stairs"`, `"structure_monkey_bridge"`, `"broken_wooden_bridge"`, `"structure_wooden_bed"`, `"structure_bamboo_bed_net"`, `"structure_wooden_chair"`, `"structure_hammock"` hoặc `null` / `"none"`).<br>• `layer`: Phân lớp vẽ (`"foreground"` / `"actor"` / `"background"`).<br>• **`motion`**: Chuyển động từ A sang B hỗ trợ cả trục X và trục Y trên cao (`targetSlot`, `targetOffsetX`, `targetOffsetY`: tọa độ cao đích đến như `-180` khi leo thang, `movingPose`: `"pose_climbing_stairs"` / `"pose_balancing_bridge"` / `"pose_walking"` / `"pose_kneeling"` / `"pose_squatting"`). |
 | **`details`** | `array` | Danh sách đạo cụ nhỏ trang trí trong bối cảnh (khóa từ Rắc-co Bối Cảnh), gồm `asset_id` và `slot`. |
 | **`dialogue`** | `string` | Nguyên văn đoạn lời dẫn hoặc lời thoại thuộc phạm vi phân cảnh này. |
 | **`narrative_note`** | `string` | Ghi chú kỹ thuật đạo diễn mô tả hành động gắn liền với các mã ID assets (`base`, `costume`, `pose`, `environment_items`, `details`, `interact_with`) và tọa độ `slot`. |
@@ -263,3 +283,15 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
 | **`structure_wooden_stairs`**<br>(Cầu thang gỗ cũ kỹ rùng rợn) | `pose_standing`<br>hoặc `pose_shivering` | `"structure_wooden_stairs"` | `offsetY: -180` | **Đứng quan sát trên đỉnh gác lửng:**<br>• Nhân vật đứng vững trên chiếu nghỉ sàn gác lửng (Y=-180px), nhìn xuống tầng dưới hoặc nhìn về phía trước trong nỗi sợ hãi. |
 | **`structure_monkey_bridge`**<br>(Cầu khỉ tre miền Tây chênh vênh) | `pose_balancing_bridge`<br>(đi thăng bằng cầu khỉ) | `"structure_monkey_bridge"` | `offsetY: -115`<br>(hoặc `targetOffsetY: -115`) | **Đi qua cầu khỉ tre:**<br>• Thân tre gác ngang kênh tối ở cao độ Y=-115px.<br>• Nhân vật đặt `offsetY: -115`, hai bàn chân đặt so le thẳng hàng dọc theo thân tre, đầu gối chùng xuống giữ trọng tâm, hai tay dang ngang giữ thăng bằng (hoặc một tay giơ đèn dầu `item_oil_lamp`, một tay dang), người rung khẽ trước gió lạnh. |
 | **`broken_wooden_bridge`**<br>(Cầu gỗ gãy nhịp bỏ hoang) | `pose_balancing_bridge`<br>hoặc `pose_walking` | `"broken_wooden_bridge"` | `offsetY: -110` | **Bước lên nhịp cầu gỗ gãy:**<br>• Các tấm ván sàn cầu nằm ở cao độ Y=-110px bên trên vực sâu hoặc dòng nước xoáy.<br>• Nhân vật đặt `offsetY: -110` đứng cạnh mép gãy của cầu gỗ nhìn xuống vực. |
+
+---
+
+### Quy chuẩn cơ chế Tương Tác Body Sockets (Vai, Đầu, Chân)
+
+Bên cạnh Hand Socket (`heldItem`, `heldHand`), nhân vật được tích hợp 3 socket cơ thể chuyên biệt với hoạt họa tự nhiên:
+
+| Socket Cơ Thể | Trường JSON | Giá trị hợp lệ | Ý nghĩa & Hiệu ứng trực quan |
+| :--- | :--- | :--- | :--- |
+| **Vai (Shoulder)** | **`shoulderItem`** | • `"none"` (mặc định)<br>• `"shoulder_carrying_pole"`<br>• `"shoulder_coffin_pole"`<br>• `"shoulder_hoe"`<br>• `"shoulder_sack"`<br>• `"shoulder_firewood_bundle"` | **Đồ vật vác / gánh ngang vai:**<br>• `shoulder_carrying_pole`: Đòn gánh tre hai thúng quang dầu uốn cong mềm mại, hai thúng nan tre đung đưa nhịp nhàng khi bước đi `pose_walking`.<br>• `shoulder_coffin_pole`: Đòn khiêng áo quan gỗ quấn thừng gai.<br>• `shoulder_hoe`: Cuốc cày rỉ sét vác vai của nông dân.<br>• `shoulder_sack`: Bao tải gai cũ kỹ vác trĩu vai.<br>• `shoulder_firewood_bundle`: Bó củi khô buộc lạt tre vàng. |
+| **Đầu (Head)** | **`headItem`** | • `"none"` (mặc định)<br>• `"head_conical_hat"`<br>• `"head_funeral_band"`<br>• `"head_straw_hat"`<br>• `"head_talisman_mask"`<br>• `"head_basket"` | **Phụ kiện đội / quấn trên đầu:**<br>• `head_conical_hat`: Nón lá chóp nhọn nan tre quai vải mềm nghiêng nửa mặt.<br>• `head_funeral_band`: Dải khăn tang trắng xô gai quấn ngang trán thắt sau gáy có hai vạt rủ.<br>• `head_straw_hat`: Mũ cói / mũ rơm nông dân tua rua rách mép.<br>• `head_talisman_mask`: Bùa vàng viết chu sa dán trán rủ kín mặt.<br>• `head_basket`: Thúng / Mẹt tre đan mộc mạc đội đỉnh đầu. |
+| **Chân (Leg/Feet)** | **`legItem`** | • `"none"` (mặc định)<br>• `"leg_iron_chains"`<br>• `"leg_wooden_shackles"`<br>• `"leg_bloody_bandage"`<br>• `"leg_muddy_splatter"` | **Cùm xích & thương tích ở chân:**<br>• `leg_iron_chains`: Hai vòng cùm sắt đen rỉ ôm hai cổ chân, xích lê loẹt quẹt sát mặt đất khi bước đi.<br>• `leg_wooden_shackles`: Gông cùm gỗ kẹp mắt cá chân có then sắt.<br>• `leg_bloody_bandage`: Băng vải trắng quấn cẳng chân rỉ vệt máu đỏ tươi.<br>• `leg_muddy_splatter`: Bùn sình lầy đầm lầy ngập bàn chân lên ống chân. |

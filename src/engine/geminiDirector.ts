@@ -4,6 +4,7 @@ import type {
   NamedCharacterPreset,
   CameraShotType,
   SceneDraftSpec,
+  WeatherEffectId,
 } from "./types";
 import { validateDirectorScript, VALID_CAMERA_SHOTS } from "./layoutRouter";
 import { DEFAULT_NAMED_ENVIRONMENTS } from "./environmentPresets";
@@ -323,6 +324,10 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
 - Actor Handheld Items (Đồ vật cầm tay qua Hand Socket):
   * "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" (Mẩu giấy / lá thư bí ẩn vương máu) | "item_offering_toys" (Nải chuối & đồ chơi đất nung cúng cô hồn) | "item_areca_palm_fan" (Quạt mo cau) | "item_fresh_ginger" (Lát gừng tươi giữ khí) | "item_oil_lamp" (Đèn dầu hột vịt cầm tay soi sáng)
   * "heldHand": "right" (tay trước) | "left" (tay sau)
+- Actor Body Socket Items (Tương tác Vai, Đầu, Chân):
+  * "shoulderItem" (Đồ vật vác / gánh trên vai): "none" | "shoulder_carrying_pole" (Đòn gánh tre hai thúng quang dầu đung đưa) | "shoulder_coffin_pole" (Đòn khiêng áo quan / đòn sóc quấn thừng) | "shoulder_hoe" (Cuốc cày rỉ sét vác vai) | "shoulder_sack" (Bao tải gai vác trĩu vai) | "shoulder_firewood_bundle" (Bó củi khô buộc lạt mây).
+  * "headItem" (Đồ vật đội / quấn trên đầu): "none" | "head_conical_hat" (Nón lá chóp nhọn nan tre quai vải mềm) | "head_funeral_band" (Khăn tang trắng xô gai quấn đầu có vạt rủ) | "head_straw_hat" (Mũ cói / mũ rơm nông dân rách vành) | "head_talisman_mask" (Lá bùa vàng trấn yểm dán trán che mắt mũi) | "head_basket" (Thúng / mẹt tre đội đầu).
+  * "legItem" (Đồ vật cùm / thương tích ở chân): "none" | "leg_iron_chains" (Cùm xích sắt rỉ ôm cổ chân lê loẹt quẹt) | "leg_wooden_shackles" (Gông cùm gỗ kẹp mắt cá chân) | "leg_bloody_bandage" (Băng vải trắng vấy máu quấn cẳng chân) | "leg_muddy_splatter" (Bùn sình lầy đầm lầy bám chân).
 - Chuyển động A -> B (motion tweening):
   * NẾU NHÂN VẬT ĐỨNG YÊN KHÔNG DI CHUYỂN: BỎ HẲN trường "motion" (TUYỆT ĐỐI KHÔNG để null hay {}).
   * CHỈ KHI nhân vật thực sự di chuyển từ điểm A sang điểm B mới thêm:
@@ -536,7 +541,8 @@ YÊU CẦU ĐẠO DIỄN BẮT BUỘC:
    ${effectiveSceneCount >= 5 ? `- Đối tượng JSON thứ 5 trong mảng trả về BẮT BUỘC phải là đạo diễn cho [PHÂN CẢNH 5].` : ""}
 2. Bố trí chuẩn xác tài nguyên theo GEMINI_DIRECTOR_ASSETS.md:
    - theme: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior"
-   - lighting (sky_preset: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss" | "flickering_fluorescent" | "dim_indoor_night", fog_density: 0.5 - 0.9, thunder_flash: boolean)
+   - lighting (sky_preset: "clear_day" | "golden_sunset" | "morning_dawn" | "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss" | "flickering_fluorescent" | "dim_indoor_night", fog_density: 0.0 - 0.9, thunder_flash: boolean)
+   - Lưu ý ánh sáng: Ban ngày dùng "clear_day" (trời trong sáng), "golden_sunset" (chiều tà nắng vàng), "morning_dawn" (sớm bình minh). Muốn ngày u ám/tang tóc thì dùng "clear_day" kết hợp fog_density cao (0.6 - 0.9) hoặc weather "heavy_rain"/"haunted_mist". Ban đêm dùng "foggy_night", "stormy_dark", "blood_moon", "eclipse_abyss". Trong nhà dùng "flickering_fluorescent" hoặc "dim_indoor_night".
    - structures & details tuân thủ tuyệt đối quy tắc vị trí neo (Ground Slots vs Air Slots, cây đa/cây gallows chỉ ở far_left/far_right, miếu/mộ/giếng ở giữa...)
    - actors: base, costume, face, pose, facing, slot, continuous offsetX, heldItem, heldHand
    - motion: chuyển động A -> B (nếu nhân vật di chuyển từ vị trí xuất phát tới vị trí đích)
@@ -847,6 +853,10 @@ NHIỆM VỤ CỦA BẠN:
    - BẮT BUỘC có "facing": "left" | "right" (hướng mặt nhìn trái hoặc phải).
    - Chọn đúng pose và vị trí slot tiếp đất (offsetY = 0): "far_left" (250) | "mid_left" (600) | "center" (960) | "mid_right" (1320) | "far_right" (1670). (Nếu pose_floating/pose_hanging dùng air_left | air_center | air_right).
    - Chọn đúng heldItem & heldHand: "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger" | "item_oil_lamp" | "none".
+   - Chọn đúng tương tác vai/đầu/chân (nếu có):
+     + shoulderItem: "shoulder_carrying_pole" | "shoulder_coffin_pole" | "shoulder_hoe" | "shoulder_sack" | "shoulder_firewood_bundle" | "none".
+     + headItem: "head_conical_hat" | "head_funeral_band" | "head_straw_hat" | "head_talisman_mask" | "head_basket" | "none".
+     + legItem: "leg_iron_chains" | "leg_wooden_shackles" | "leg_bloody_bandage" | "leg_muddy_splatter" | "none".
    - Nếu có di chuyển A -> B: gắn khối "motion" { targetSlot, targetOffsetX: 0, startTimeSec: 0.2, endTimeSec: ${duration - 0.5}, easing: "ease_in_out", autoFaceTarget: true, movingPose: "pose_walking"|"pose_floating"|"pose_crawling" }.
    - Nếu nhân vật ĐỨNG YÊN KHÔNG DI CHUYỂN: BỎ HẲN trường "motion" (TUYỆT ĐỐI KHÔNG để null hay {}).
 2. THIẾT LẬP GÓC MÁY ĐIỆN ẢNH (BẮT BUỘC):
@@ -954,6 +964,7 @@ export interface SceneDescriptionSpec {
   title?: string;
   dialogue?: string;
   cameraShot?: CameraShotType | "auto";
+  weather?: WeatherEffectId;
 }
 
 /**
@@ -1115,6 +1126,13 @@ ${castSummary}
       // STRICT ENVIRONMENT ENFORCEMENT: Override environment fields with the exact preset
       sc.theme = spec.environment.theme;
       sc.lighting = JSON.parse(JSON.stringify(spec.environment.lighting));
+      if (spec.weather && spec.weather !== "none") {
+        sc.weather = spec.weather;
+        sc.lighting.weather = spec.weather;
+        if (spec.weather === "storm_thunder") {
+          sc.lighting.thunder_flash = true;
+        }
+      }
       sc.environment_items = JSON.parse(JSON.stringify(spec.environment.environment_items));
       sc.details = spec.environment.details ? JSON.parse(JSON.stringify(spec.environment.details)) : [];
       if (spec.duration_sec) sc.duration_sec = spec.duration_sec;
@@ -1476,7 +1494,7 @@ KHO TÀI NGUYÊN HOẠT HÌNH 2D SẴN CÓ TRONG HỆ THỐNG (CHỈ ĐƯỢC CH
 
 7. THEMES & SKY PRESETS:
    - Themes: "abandoned_village" (Làng quê bỏ hoang), "cursed_swamp" (Đầm lầy / ven kênh sông nước), "rural_graveyard" (Bãi tha ma cổ), "modern_indoor" (Trong nhà hiện đại), "vehicle_interior" (Khoang xe), "urban_night_market" (Chợ đêm đô thị), "thatched_house_interior" (Bên trong căn nhà lá)
-   - Sky: "foggy_night" (Sương mù lạnh buốt), "stormy_dark" (Bão đêm / Đêm oi ả ngột ngạt), "blood_moon" (Trăng máu), "eclipse_abyss" (Nhật thực lửa xanh)
+   - Sky: "clear_day" (Ban ngày nắng trong tự nhiên), "golden_sunset" (Hoàng hôn nắng vàng / Chiều tà), "morning_dawn" (Bình minh rạng đông / Sáng sớm), "foggy_night" (Sương mù lạnh buốt), "stormy_dark" (Bão đêm / Đêm oi ả ngột ngạt), "blood_moon" (Trăng máu), "eclipse_abyss" (Nhật thực lửa xanh), "flickering_fluorescent" (Đèn huỳnh quang trong nhà), "dim_indoor_night" (Ánh vàng mờ ảo trong nhà)
 
 QUY TẮC LẮP GHÉP BẮT BUỘC (TUYỆT ĐỐI TUÂN THỦ):
 1. NHẬN DIỆN THỜI ĐẠI & KHÔNG GIAN BỐI CẢNH (CULTURAL & EPOCH FILTER):
@@ -1727,7 +1745,7 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
 
 7. THEMES & SKY PRESETS:
    - Themes: rural_graveyard, abandoned_village, cursed_swamp, modern_indoor, vehicle_interior, urban_night_market, thatched_house_interior (Chợ đêm & phố xá đô thị ngoài trời dùng urban_night_market, bên trong xe buýt/tàu xe dùng vehicle_interior, bên trong nhà lá dùng thatched_house_interior)
-   - Sky: blood_moon, foggy_night, stormy_dark, eclipse_abyss, flickering_fluorescent, dim_indoor_night
+   - Sky: clear_day (Ban ngày trong sáng), golden_sunset (Hoàng hôn chiều tà), morning_dawn (Bình minh sớm mai), blood_moon, foggy_night, stormy_dark, eclipse_abyss, flickering_fluorescent, dim_indoor_night
 
 8. CƠ CHẾ TƯƠNG TÁC ASSETS ĐẶC BIỆT & TƯ THẾ DIỄN VIÊN (Special Furniture & Elevated Structures Interactions):
    - Khi kịch bản nhắc đến nằm ngủ/co ro trên giường tre, giường gỗ: hệ thống hỗ trợ trường "interact_with": "structure_bamboo_bed_net" / "structure_wooden_bed", "pose": "pose_lying_down", "offsetY": -80.

@@ -12,6 +12,9 @@ import type {
   FacingDirection,
   HeldHand,
   HeldItemId,
+  ShoulderItemId,
+  HeadItemId,
+  LegItemId,
   StructureId,
   ThemeId,
   SkyPresetId,
@@ -102,6 +105,9 @@ const VALID_SKY_PRESETS: SkyPresetId[] = [
   "eclipse_abyss",
   "flickering_fluorescent",
   "dim_indoor_night",
+  "clear_day",
+  "golden_sunset",
+  "morning_dawn",
 ];
 export const VALID_WEATHER_EFFECTS: WeatherEffectId[] = [
   "none",
@@ -242,6 +248,29 @@ const VALID_HELD_ITEMS: HeldItemId[] = [
   "item_fresh_ginger",
   "item_oil_lamp",
 ];
+export const VALID_SHOULDER_ITEMS: ShoulderItemId[] = [
+  "none",
+  "shoulder_carrying_pole",
+  "shoulder_coffin_pole",
+  "shoulder_hoe",
+  "shoulder_sack",
+  "shoulder_firewood_bundle",
+];
+export const VALID_HEAD_ITEMS: HeadItemId[] = [
+  "none",
+  "head_conical_hat",
+  "head_funeral_band",
+  "head_straw_hat",
+  "head_talisman_mask",
+  "head_basket",
+];
+export const VALID_LEG_ITEMS: LegItemId[] = [
+  "none",
+  "leg_iron_chains",
+  "leg_wooden_shackles",
+  "leg_bloody_bandage",
+  "leg_muddy_splatter",
+];
 const VALID_HELD_HANDS: HeldHand[] = ["right", "left"];
 const VALID_DETAILS: DetailId[] = [
   "detail_black_crow",
@@ -338,14 +367,21 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     ? lightingRaw.sky_preset
     : (theme === "modern_indoor" || theme === "vehicle_interior" ? "flickering_fluorescent" : theme === "thatched_house_interior" ? "dim_indoor_night" : "foggy_night");
 
-  const rawFog = Number(lightingRaw.fog_density);
-  const fog_density = !isNaN(rawFog) ? Math.min(1, Math.max(0, rawFog)) : 0.65;
-  const thunder_flash = Boolean(lightingRaw.thunder_flash);
-  const ambient_tint = lightingRaw.ambient_tint;
-  const rawWeather = lightingRaw.weather;
+  const rawWeather = script.weather || lightingRaw.weather;
   const weather: WeatherEffectId = VALID_WEATHER_EFFECTS.includes(rawWeather)
     ? rawWeather
     : (sky_preset === "stormy_dark" ? "storm_thunder" : "none");
+
+  const rawFog =
+    lightingRaw.fog_density !== undefined && lightingRaw.fog_density !== null
+      ? Number(lightingRaw.fog_density)
+      : undefined;
+  const fog_density =
+    rawFog !== undefined && !isNaN(rawFog)
+      ? Math.min(1, Math.max(0, rawFog))
+      : (weather === "haunted_mist" ? 0.65 : sky_preset === "foggy_night" ? 0.35 : 0.0);
+  const thunder_flash = Boolean(lightingRaw.thunder_flash || weather === "storm_thunder");
+  const ambient_tint = lightingRaw.ambient_tint;
 
   // 4. Environment Items (Structures)
   const environment_items: DirectorSceneScript["environment_items"] = [];
@@ -471,6 +507,16 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     const heldItem: HeldItemId = VALID_HELD_ITEMS.includes(rawHeldItem) ? rawHeldItem : "none";
     const heldHand: HeldHand = VALID_HELD_HANDS.includes(actor.heldHand) ? actor.heldHand : "right";
 
+    const shoulderItem: ShoulderItemId = VALID_SHOULDER_ITEMS.includes(actor.shoulderItem)
+      ? actor.shoulderItem
+      : "none";
+    const headItem: HeadItemId = VALID_HEAD_ITEMS.includes(actor.headItem)
+      ? actor.headItem
+      : "none";
+    const legItem: LegItemId = VALID_LEG_ITEMS.includes(actor.legItem)
+      ? actor.legItem
+      : "none";
+
     // Motion healing: drop motion if null, false, empty object, or invalid
     let motion: DirectorSceneScript["actors"][0]["motion"] = undefined;
     const rawMotion = actor.motion;
@@ -570,6 +616,9 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       opacity,
       heldItem,
       heldHand,
+      ...(shoulderItem !== "none" ? { shoulderItem } : {}),
+      ...(headItem !== "none" ? { headItem } : {}),
+      ...(legItem !== "none" ? { legItem } : {}),
       ...(motion ? { motion } : {}),
     });
   });
@@ -837,6 +886,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     title,
     duration_sec,
     theme,
+    weather,
     lighting: {
       sky_preset,
       fog_density,

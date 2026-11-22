@@ -147,6 +147,7 @@ export const DEFAULT_NAMED_CHARACTERS: NamedCharacterPreset[] = [
     face: "face_scared",
     defaultHeldItem: "item_oil_lamp",
     defaultHeldHand: "right",
+    defaultHeadItem: "head_funeral_band",
     scale: 1.0,
   },
 ];
@@ -247,6 +248,9 @@ export function extractCharacterFromActor(actor: ActorConfig, customName?: strin
   const face = actor.face || "face_calm";
   const defaultHeldItem = actor.heldItem || "none";
   const defaultHeldHand = actor.heldHand || "right";
+  const defaultShoulderItem = actor.shoulderItem || "none";
+  const defaultHeadItem = actor.headItem || "none";
+  const defaultLegItem = actor.legItem || "none";
   const scale = actor.scale || 1.0;
 
   const id = `char_custom_${Date.now().toString().slice(-6)}`;
@@ -261,6 +265,9 @@ export function extractCharacterFromActor(actor: ActorConfig, customName?: strin
     face,
     defaultHeldItem,
     defaultHeldHand,
+    defaultShoulderItem,
+    defaultHeadItem,
+    defaultLegItem,
     scale,
   };
 }
@@ -277,5 +284,8 @@ export function applyCharacterToActor(actor: ActorConfig, char: NamedCharacterPr
     scale: char.scale !== undefined ? char.scale : actor.scale,
     heldItem: char.defaultHeldItem && char.defaultHeldItem !== "none" ? char.defaultHeldItem : actor.heldItem,
     heldHand: char.defaultHeldHand || actor.heldHand || "right",
+    shoulderItem: char.defaultShoulderItem && char.defaultShoulderItem !== "none" ? char.defaultShoulderItem : actor.shoulderItem,
+    headItem: char.defaultHeadItem && char.defaultHeadItem !== "none" ? char.defaultHeadItem : actor.headItem,
+    legItem: char.defaultLegItem && char.defaultLegItem !== "none" ? char.defaultLegItem : actor.legItem,
   };
 }

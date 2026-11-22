@@ -16,6 +16,9 @@ import type {
   EasingType,
   HeldItemId,
   HeldHand,
+  ShoulderItemId,
+  HeadItemId,
+  LegItemId,
   EnvironmentItemConfig,
   DetailItemConfig,
   SelectedEntity,
@@ -34,6 +37,11 @@ import { generateTimedSubtitleCues } from "../engine/subtitleUtils";
 import { SceneRenderer, type DragSnapMode } from "../engine/SceneRenderer";
 import { ALL_SLOTS, GROUND_Y } from "../engine/constants";
 import { HELD_ITEM_CATALOG } from "../engine/graphics/HandheldItems";
+import {
+  SHOULDER_ITEM_CATALOG,
+  HEAD_ITEM_CATALOG,
+  LEG_ITEM_CATALOG,
+} from "../engine/graphics/BodySocketItems";
 import { getDefaultCostumeForBase, getSlotCoordinates } from "../engine/layoutRouter";
 import {
   loadStoredNamedEnvironments,
@@ -1207,6 +1215,69 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-amber-500"
                       >
                         {HELD_ITEM_CATALOG.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.name} ({item.id})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Shoulder Socket (Đồ vật vác / gánh trên vai) */}
+                    <div className="flex flex-col gap-1.5 bg-yellow-950/15 border border-yellow-800/35 p-3 rounded-xl">
+                      <label className="text-xs font-semibold text-yellow-200">
+                        7. Đồ Vật Vác / Gánh Trên Vai (Shoulder Socket):
+                      </label>
+                      <select
+                        value={selectedActor.shoulderItem || "none"}
+                        onChange={(e) => {
+                          const nextItem = e.target.value as ShoulderItemId;
+                          updateActor(selectedActor.id, { shoulderItem: nextItem });
+                        }}
+                        className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-yellow-500"
+                      >
+                        {SHOULDER_ITEM_CATALOG.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.name} ({item.id})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Head Socket (Đồ vật đội / quấn trên đầu) */}
+                    <div className="flex flex-col gap-1.5 bg-cyan-950/15 border border-cyan-800/35 p-3 rounded-xl">
+                      <label className="text-xs font-semibold text-cyan-200">
+                        8. Phụ Kiện Đội / Quấn Trên Đầu (Head Socket):
+                      </label>
+                      <select
+                        value={selectedActor.headItem || "none"}
+                        onChange={(e) => {
+                          const nextItem = e.target.value as HeadItemId;
+                          updateActor(selectedActor.id, { headItem: nextItem });
+                        }}
+                        className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-cyan-500"
+                      >
+                        {HEAD_ITEM_CATALOG.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.name} ({item.id})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Leg Socket (Cùm xích / thương tích ở chân) */}
+                    <div className="flex flex-col gap-1.5 bg-rose-950/15 border border-rose-800/35 p-3 rounded-xl">
+                      <label className="text-xs font-semibold text-rose-200">
+                        9. Cùm Xích / Thương Tích Ở Chân (Leg Socket):
+                      </label>
+                      <select
+                        value={selectedActor.legItem || "none"}
+                        onChange={(e) => {
+                          const nextItem = e.target.value as LegItemId;
+                          updateActor(selectedActor.id, { legItem: nextItem });
+                        }}
+                        className="bg-black border border-neutral-800 rounded-lg p-2.5 text-xs text-neutral-200 focus:outline-none focus:border-rose-500"
+                      >
+                        {LEG_ITEM_CATALOG.map((item) => (
                           <option key={item.id} value={item.id}>
                             {item.name} ({item.id})
                           </option>
@@ -2548,6 +2619,9 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     <option value="foggy_night">Đêm Sương Lạnh Buốt (foggy_night - Gradient đen tím lạnh, trăng mờ nhạt)</option>
                     <option value="stormy_dark">Bão Đêm Sấm Chớp (stormy_dark - Trời dông tối om, chớp giật)</option>
                     <option value="eclipse_abyss">Nhật Thực Hắc Ám & Ma Trơi (eclipse_abyss - Lửa xanh lân tinh)</option>
+                    <option value="clear_day">Ngày Nắng Trong Tự Nhiên (clear_day - Trời xanh trong, nắng sáng, mây trắng)</option>
+                    <option value="golden_sunset">Hoàng Hôn Nắng Vàng (golden_sunset - Ráng chiều cam đỏ, tà dương buông)</option>
+                    <option value="morning_dawn">Bình Minh Rạng Đông (morning_dawn - Hừng đông tím hồng, nắng sớm dịu)</option>
                     <option value="flickering_fluorescent">Đèn Tuýp Huỳnh Quang Chập Chờn (flickering_fluorescent - Bệnh viện, siêu thị)</option>
                     <option value="dim_indoor_night">Ánh Vàng Đêm Mờ Ảo (dim_indoor_night - Khách sạn, nhà hàng)</option>
                   </select>
@@ -2558,14 +2632,14 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 <div className="flex flex-col gap-1">
                   <div className="flex justify-between text-xs text-neutral-300">
                     <span>Mật độ sương mù (Fog Density):</span>
-                    <span className="font-mono text-cyan-400">{scene.lighting.fog_density.toFixed(2)}</span>
+                    <span className="font-mono text-cyan-400">{(scene.lighting.fog_density ?? 0).toFixed(2)}</span>
                   </div>
                   <input
                     type="range"
                     min="0"
                     max="1"
                     step="0.05"
-                    value={scene.lighting.fog_density}
+                    value={scene.lighting.fog_density ?? 0}
                     onChange={(e) =>
                       onChangeScene({
                         ...scene,

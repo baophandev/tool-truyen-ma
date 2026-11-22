@@ -13,12 +13,40 @@ export const SkyLayer: React.FC<{
   const isBloodMoon = skyPreset === "blood_moon";
   const isStormy = skyPreset === "stormy_dark";
   const isEclipse = skyPreset === "eclipse_abyss";
+  const isClearDay = skyPreset === "clear_day";
+  const isSunset = skyPreset === "golden_sunset";
+  const isDawn = skyPreset === "morning_dawn";
+  const isDaytime = isClearDay || isSunset || isDawn;
   const isVehicle = theme === "vehicle_interior";
   const isThatched = theme === "thatched_house_interior";
   const isIndoor =
     theme === "modern_indoor" ||
     (!theme && (skyPreset === "flickering_fluorescent" || skyPreset === "dim_indoor_night"));
   const isFluorescent = skyPreset === "flickering_fluorescent";
+
+  const backCloudColor = isBloodMoon
+    ? "#1A0606"
+    : isEclipse
+    ? "#04140F"
+    : isClearDay
+    ? "rgba(255, 255, 255, 0.45)"
+    : isSunset
+    ? "rgba(124, 45, 18, 0.65)"
+    : isDawn
+    ? "rgba(131, 24, 67, 0.5)"
+    : "#0D111A";
+
+  const frontCloudColor = isBloodMoon
+    ? "#120303"
+    : isEclipse
+    ? "#030E0B"
+    : isClearDay
+    ? "rgba(255, 255, 255, 0.75)"
+    : isSunset
+    ? "rgba(194, 65, 12, 0.75)"
+    : isDawn
+    ? "rgba(190, 24, 93, 0.65)"
+    : "#080B12";
 
   return (
     <g className="environment-layer-0-sky">
@@ -52,87 +80,143 @@ export const SkyLayer: React.FC<{
         <IndoorCeilingLayer isFluorescent={isFluorescent} />
       ) : (
         <>
-          {/* Distant Stars / Embers */}
-          <g className="distant-embers" opacity="0.45">
-            <circle cx="210" cy="120" r="1.5" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-            <circle cx="340" cy="80" r="1.2" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-            <circle cx="580" cy="150" r="1.8" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-            <circle cx="720" cy="95" r="1" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-            <circle cx="1120" cy="130" r="1.5" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-            <circle cx="1280" cy="70" r="1.2" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-            <circle cx="1450" cy="110" r="1.8" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-            <circle cx="1780" cy="160" r="1.3" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
-          </g>
+          {/* Distant Stars / Embers (Chỉ hiện ban đêm) */}
+          {!isDaytime && (
+            <g className="distant-embers" opacity="0.45">
+              <circle cx="210" cy="120" r="1.5" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+              <circle cx="340" cy="80" r="1.2" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+              <circle cx="580" cy="150" r="1.8" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+              <circle cx="720" cy="95" r="1" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+              <circle cx="1120" cy="130" r="1.5" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+              <circle cx="1280" cy="70" r="1.2" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+              <circle cx="1450" cy="110" r="1.8" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+              <circle cx="1780" cy="160" r="1.3" fill={isEclipse ? "#34D399" : "#E2E8F0"} />
+            </g>
+          )}
 
-          {/* Massive Celestial Body: Blood Moon / Pale Moon / Solar Eclipse */}
-          <g className="horror-moon-group" transform="translate(1380, 240)">
-            {/* Halo Glow */}
-            <circle
-              cx="0"
-              cy="0"
-              r="165"
-              fill={
-                isBloodMoon
-                  ? "url(#blood-moon-glow-radial)"
-                  : isEclipse
-                  ? "url(#eclipse-glow-radial)"
-                  : "url(#pale-moon-glow-radial)"
+          {/* Massive Celestial Body: Daytime Celestial Sun vs. Night Horror Moon / Eclipse */}
+          {isDaytime ? (
+            <g
+              className="daytime-sun-group"
+              transform={
+                isClearDay
+                  ? "translate(1380, 200)"
+                  : isSunset
+                  ? "translate(1420, 360)"
+                  : "translate(1350, 310)"
               }
-              opacity="0.85"
-            />
-
-            {/* Eclipse Corona Flare Ring */}
-            {isEclipse && (
+            >
+              {/* Outer Radiant Flare */}
               <circle
                 cx="0"
                 cy="0"
-                r="102"
-                fill="none"
-                stroke="#10B981"
-                strokeWidth="5"
-                opacity="0.9"
+                r={isSunset ? 220 : 180}
+                fill={
+                  isClearDay
+                    ? "url(#sun-clear-glow-radial)"
+                    : isSunset
+                    ? "url(#sun-sunset-glow-radial)"
+                    : "url(#sun-dawn-glow-radial)"
+                }
+                opacity={isSunset ? 0.95 : 0.85}
+              />
+
+              {/* Corona Rays (Tia nắng thanh mảnh cho ngày nắng trong) */}
+              {isClearDay && (
+                <g opacity="0.4" stroke="#FEF08A" strokeWidth="2.5" strokeLinecap="round">
+                  <line x1="-115" y1="0" x2="-88" y2="0" />
+                  <line x1="88" y1="0" x2="115" y2="0" />
+                  <line x1="0" y1="-115" x2="0" y2="-88" />
+                  <line x1="0" y1="88" x2="0" y2="115" />
+                  <line x1="-80" y1="-80" x2="-62" y2="-62" />
+                  <line x1="62" y1="62" x2="80" y2="80" />
+                  <line x1="62" y1="-62" x2="80" y2="-80" />
+                  <line x1="-80" y1="80" x2="-62" y2="62" />
+                </g>
+              )}
+
+              {/* Main Sun Disc */}
+              <circle
+                cx="0"
+                cy="0"
+                r={isSunset ? 80 : isDawn ? 72 : 68}
+                fill={isSunset ? "#EA580C" : isDawn ? "#FEF08A" : "#FFFDF0"}
                 className="anim-moon-pulse"
               />
-            )}
+              {isSunset && (
+                <circle cx="0" cy="0" r="74" fill="#FBBF24" opacity="0.8" />
+              )}
+            </g>
+          ) : (
+            <g className="horror-moon-group" transform="translate(1380, 240)">
+              {/* Halo Glow */}
+              <circle
+                cx="0"
+                cy="0"
+                r="165"
+                fill={
+                  isBloodMoon
+                    ? "url(#blood-moon-glow-radial)"
+                    : isEclipse
+                    ? "url(#eclipse-glow-radial)"
+                    : "url(#pale-moon-glow-radial)"
+                }
+                opacity="0.85"
+              />
 
-            {/* Main Moon / Black Sun Disc */}
-            <circle
-              cx="0"
-              cy="0"
-              r="95"
-              fill={
-                isBloodMoon
-                  ? COLOR_PALETTE.accent_bright_red
-                  : isEclipse
-                  ? "#06070A"
-                  : isStormy
-                  ? "#64748B"
-                  : COLOR_PALETTE.accent_fog_white
-              }
-              className="anim-moon-pulse"
-            />
+              {/* Eclipse Corona Flare Ring */}
+              {isEclipse && (
+                <circle
+                  cx="0"
+                  cy="0"
+                  r="102"
+                  fill="none"
+                  stroke="#10B981"
+                  strokeWidth="5"
+                  opacity="0.9"
+                  className="anim-moon-pulse"
+                />
+              )}
 
-            {/* Craters / Occult Texture (when not eclipse) */}
-            {!isEclipse && (
-              <g>
-                <ellipse cx="-25" cy="-20" rx="18" ry="14" fill={isBloodMoon ? "#991B1B" : "#475569"} opacity="0.5" />
-                <ellipse cx="20" cy="25" rx="24" ry="16" fill={isBloodMoon ? "#7F1D1D" : "#334155"} opacity="0.45" />
-                <circle cx="-10" cy="35" r="10" fill={isBloodMoon ? "#7F1D1D" : "#334155"} opacity="0.4" />
-              </g>
-            )}
-          </g>
+              {/* Main Moon / Black Sun Disc */}
+              <circle
+                cx="0"
+                cy="0"
+                r="95"
+                fill={
+                  isBloodMoon
+                    ? COLOR_PALETTE.accent_bright_red
+                    : isEclipse
+                    ? "#06070A"
+                    : isStormy
+                    ? "#64748B"
+                    : COLOR_PALETTE.accent_fog_white
+                }
+                className="anim-moon-pulse"
+              />
+
+              {/* Craters / Occult Texture (when not eclipse) */}
+              {!isEclipse && (
+                <g>
+                  <ellipse cx="-25" cy="-20" rx="18" ry="14" fill={isBloodMoon ? "#991B1B" : "#475569"} opacity="0.5" />
+                  <ellipse cx="20" cy="25" rx="24" ry="16" fill={isBloodMoon ? "#7F1D1D" : "#334155"} opacity="0.45" />
+                  <circle cx="-10" cy="35" r="10" fill={isBloodMoon ? "#7F1D1D" : "#334155"} opacity="0.4" />
+                </g>
+              )}
+            </g>
+          )}
 
           {/* Drifting Clouds */}
-          <g className="drifting-clouds-back anim-cloud-drift-slow" opacity="0.55">
+          <g className="drifting-clouds-back anim-cloud-drift-slow" opacity={isClearDay ? 0.45 : 0.55}>
             <path
               d="M -200 180 C 100 140, 300 190, 600 160 C 900 130, 1200 180, 1600 150 C 1900 120, 2100 160, 2400 140 L 2400 320 L -200 320 Z"
-              fill={isBloodMoon ? "#1A0606" : isEclipse ? "#04140F" : "#0D111A"}
+              fill={backCloudColor}
             />
           </g>
-          <g className="drifting-clouds-front anim-cloud-drift-fast" opacity="0.75">
+          <g className="drifting-clouds-front anim-cloud-drift-fast" opacity={isClearDay ? 0.7 : 0.75}>
             <path
               d="M -100 240 C 250 200, 500 260, 850 220 C 1200 190, 1450 250, 1800 210 C 2050 180, 2250 220, 2500 200 L 2500 380 L -100 380 Z"
-              fill={isBloodMoon ? "#120303" : isEclipse ? "#030E0B" : "#080B12"}
+              fill={frontCloudColor}
             />
           </g>
 
@@ -530,8 +614,31 @@ export const BackgroundLayer: React.FC<{ theme: ThemeId; skyPreset: SkyPresetId 
 }) => {
   const isBlood = skyPreset === "blood_moon";
   const isEclipse = skyPreset === "eclipse_abyss";
-  const mountainColor = isBlood ? "#1F0808" : isEclipse ? "#071712" : "#0B0E17";
-  const groveColor = isBlood ? "#140505" : isEclipse ? "#05100C" : "#080A10";
+  const isClearDay = skyPreset === "clear_day";
+  const isSunset = skyPreset === "golden_sunset";
+  const isDawn = skyPreset === "morning_dawn";
+  const mountainColor = isBlood
+    ? "#1F0808"
+    : isEclipse
+    ? "#071712"
+    : isClearDay
+    ? "#334E68"
+    : isSunset
+    ? "#3B1C1A"
+    : isDawn
+    ? "#2A2847"
+    : "#0B0E17";
+  const groveColor = isBlood
+    ? "#140505"
+    : isEclipse
+    ? "#05100C"
+    : isClearDay
+    ? "#203445"
+    : isSunset
+    ? "#241010"
+    : isDawn
+    ? "#1C1B33"
+    : "#080A10";
 
   return (
     <g className="environment-layer-1-background">
@@ -1528,10 +1635,10 @@ export const MainGroundLayer: React.FC<{ theme?: ThemeId }> = ({ theme }) => {
  * LAYER 3: FOREGROUND
  */
 export const ForegroundLayer: React.FC<{
-  fogDensity: number;
+  fogDensity?: number;
   skyPreset: SkyPresetId;
   theme?: ThemeId;
-}> = ({ fogDensity, theme }) => {
+}> = ({ fogDensity = 0, theme }) => {
   const isVehicle = theme === "vehicle_interior";
   const isIndoor = theme === "modern_indoor";
 

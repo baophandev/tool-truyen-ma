@@ -18,7 +18,10 @@ export type SkyPresetId =
   | "stormy_dark"
   | "eclipse_abyss"
   | "flickering_fluorescent"
-  | "dim_indoor_night";
+  | "dim_indoor_night"
+  | "clear_day"
+  | "golden_sunset"
+  | "morning_dawn";
 
 export type StructureId =
   | "creepy_banyan_tree"
@@ -167,6 +170,29 @@ export type HeldItemId =
   | "item_fresh_ginger"       // Lát gừng tươi giữ khí chống tà khí ban đêm
   | "item_oil_lamp";          // Đèn dầu hột vịt cầm tay soi bóng đêm
 
+export type ShoulderItemId =
+  | "none"
+  | "shoulder_carrying_pole"       // Đòn gánh tre hai thúng quang dầu trĩu nặng đung đưa nhịp nhàng
+  | "shoulder_coffin_pole"         // Đòn khiêng áo quan / đòn khiêng tử thi vuông vức
+  | "shoulder_hoe"                 // Chiếc cuốc cày rỉ sét vác ngang vai nông phu
+  | "shoulder_sack"                // Bao tải gai cũ kỹ vác trĩu một bên vai
+  | "shoulder_firewood_bundle";    // Bó củi khô khẳng khiu buộc lạt mây vác vai
+
+export type HeadItemId =
+  | "none"
+  | "head_conical_hat"             // Nón lá cổ truyền chóp nhọn, quai vải mềm che nghiêng mặt ma mị
+  | "head_funeral_band"            // Dải khăn tang trắng xô gai quấn trán rủ hai vạt dài
+  | "head_straw_hat"               // Mũ cói rách vành che nắng gió ma mị
+  | "head_talisman_mask"           // Lá bùa vàng trấn yểm dán rủ trước trán che kín mặt
+  | "head_basket";                 // Thúng / Mẹt tre đội thăng bằng trên đỉnh đầu
+
+export type LegItemId =
+  | "none"
+  | "leg_iron_chains"              // Cùm xích sắt hoen rỉ ôm cổ chân, xích lê loẹt quẹt sát đất
+  | "leg_wooden_shackles"          // Gông cùm gỗ kẹp mắt cá chân tử tù
+  | "leg_bloody_bandage"           // Băng vải trắng vấy máu quấn quanh cổ chân
+  | "leg_muddy_splatter";          // Vệt bùn sình lầy đen ngòm bám quanh cổ chân lội kênh rạch
+
 export type HeldHand = "right" | "left";
 
 export type FacingDirection = "left" | "right";
@@ -229,6 +255,9 @@ export interface ActorConfig {
   opacity?: number; // e.g. 0.0 - 1.0 for spectral ghost
   heldItem?: HeldItemId; // Modular handheld prop attached to Hand Socket
   heldHand?: HeldHand;   // "right" (front arm, default) or "left" (back arm)
+  shoulderItem?: ShoulderItemId; // Modular prop anchored to Shoulder Socket (e.g. đòn gánh, cuốc, bao tải)
+  headItem?: HeadItemId;         // Modular prop anchored to Head Socket (e.g. nón lá, khăn tang, bùa dán)
+  legItem?: LegItemId;           // Modular prop anchored to Leg/Feet Socket (e.g. cùm xích sắt, gông cùm, băng bó máu)
   motion?: ActorMotionConfig; // Optional A -> B keyframe movement
 }
 
@@ -243,7 +272,7 @@ export type WeatherEffectId =
 
 export interface DirectorLightingConfig {
   sky_preset: SkyPresetId;
-  fog_density: number; // 0.0 to 1.0
+  fog_density?: number; // 0.0 to 1.0 (Tùy chọn, mặc định 0.0 nếu không có sương mù)
   ambient_tint?: string;
   thunder_flash?: boolean;
   weather?: WeatherEffectId;
@@ -332,6 +361,7 @@ export interface DirectorSceneScript {
   title?: string;
   duration_sec?: number;
   theme: ThemeId;
+  weather?: WeatherEffectId; // Hiệu ứng thời tiết cấp phân cảnh (none, heavy_rain, storm_thunder, haunted_mist...)
   lighting: DirectorLightingConfig;
   camera?: DirectorCameraConfig;
   environment_items: EnvironmentItemConfig[];
@@ -370,6 +400,9 @@ export interface NamedCharacterPreset {
   face?: CharacterFaceId; // Biểu cảm đặc trưng (mặc định e.g. face_scared, face_calm)
   defaultHeldItem?: HeldItemId; // Đồ vật quen thuộc (e.g. item_flashlight)
   defaultHeldHand?: HeldHand; // "right" | "left"
+  defaultShoulderItem?: ShoulderItemId; // Vật thể vác vai mặc định (e.g. shoulder_carrying_pole)
+  defaultHeadItem?: HeadItemId;         // Vật thể đội đầu mặc định (e.g. head_conical_hat)
+  defaultLegItem?: LegItemId;           // Vật thể chân mặc định (e.g. leg_iron_chains)
   scale?: number; // Tỷ lệ co giãn (mặc định 1.0)
 }
 
@@ -383,6 +416,7 @@ export interface SceneDraftSpec {
   duration_sec?: number;
   dialogue?: string;
   cameraShot?: CameraShotType | "auto";
+  weather?: WeatherEffectId;
 }
 
 /**

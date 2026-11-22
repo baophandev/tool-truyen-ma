@@ -47,6 +47,30 @@ export const SvgDefs: React.FC = () => {
         <stop offset="100%" stopColor={COLOR_PALETTE.skies.dim_indoor_night.gradient_bottom} />
       </linearGradient>
 
+      {/* Clear Day Sky (Ban ngày nắng trong tự nhiên) */}
+      <linearGradient id="sky-grad-clear_day" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#1D4ED8" />
+        <stop offset="40%" stopColor="#3B82F6" />
+        <stop offset="75%" stopColor="#93C5FD" />
+        <stop offset="100%" stopColor="#E0F2FE" />
+      </linearGradient>
+
+      {/* Golden Sunset Sky (Hoàng hôn nắng vàng / Chiều tà) */}
+      <linearGradient id="sky-grad-golden_sunset" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#312E81" />
+        <stop offset="30%" stopColor="#7C2D12" />
+        <stop offset="65%" stopColor="#EA580C" />
+        <stop offset="100%" stopColor="#FDE047" />
+      </linearGradient>
+
+      {/* Morning Dawn Sky (Bình minh rạng đông / Nắng sớm) */}
+      <linearGradient id="sky-grad-morning_dawn" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#1E1B4B" />
+        <stop offset="35%" stopColor="#4F46E5" />
+        <stop offset="65%" stopColor="#FB7185" />
+        <stop offset="100%" stopColor="#FEF08A" />
+      </linearGradient>
+
       {/* 2. MOON GLOW RADIAL GRADIENTS */}
       <radialGradient id="blood-moon-glow-radial" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stopColor="rgba(220, 38, 38, 0.7)" />
@@ -66,6 +90,29 @@ export const SvgDefs: React.FC = () => {
         <stop offset="0%" stopColor="rgba(16, 185, 129, 0.65)" />
         <stop offset="40%" stopColor="rgba(6, 182, 212, 0.35)" />
         <stop offset="75%" stopColor="rgba(5, 150, 105, 0.12)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </radialGradient>
+
+      {/* 2. CELESTIAL SUN GLOW RADIAL GRADIENTS (Ban ngày, Hoàng hôn & Bình minh) */}
+      <radialGradient id="sun-clear-glow-radial" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="rgba(255, 255, 255, 0.95)" />
+        <stop offset="25%" stopColor="rgba(254, 240, 138, 0.75)" />
+        <stop offset="55%" stopColor="rgba(250, 204, 21, 0.35)" />
+        <stop offset="85%" stopColor="rgba(253, 224, 71, 0.1)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </radialGradient>
+
+      <radialGradient id="sun-sunset-glow-radial" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="rgba(254, 240, 138, 0.9)" />
+        <stop offset="30%" stopColor="rgba(249, 115, 22, 0.75)" />
+        <stop offset="65%" stopColor="rgba(220, 38, 38, 0.35)" />
+        <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+      </radialGradient>
+
+      <radialGradient id="sun-dawn-glow-radial" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="rgba(255, 255, 255, 0.9)" />
+        <stop offset="30%" stopColor="rgba(253, 224, 71, 0.7)" />
+        <stop offset="65%" stopColor="rgba(244, 114, 182, 0.35)" />
         <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
       </radialGradient>
 
@@ -152,6 +199,24 @@ export const SvgDefs: React.FC = () => {
         <stop offset="0%" stopColor="rgba(202, 138, 4, 0)" />
         <stop offset="60%" stopColor="rgba(202, 138, 4, 0.16)" />
         <stop offset="100%" stopColor="rgba(14, 10, 6, 0.7)" />
+      </linearGradient>
+
+      <linearGradient id="mid-mist-grad-clear_day" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="rgba(224, 242, 254, 0)" />
+        <stop offset="60%" stopColor="rgba(186, 230, 253, 0.35)" />
+        <stop offset="100%" stopColor="rgba(147, 197, 253, 0.65)" />
+      </linearGradient>
+
+      <linearGradient id="mid-mist-grad-golden_sunset" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="rgba(249, 115, 22, 0)" />
+        <stop offset="60%" stopColor="rgba(249, 115, 22, 0.35)" />
+        <stop offset="100%" stopColor="rgba(124, 45, 18, 0.65)" />
+      </linearGradient>
+
+      <linearGradient id="mid-mist-grad-morning_dawn" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="rgba(253, 230, 138, 0)" />
+        <stop offset="60%" stopColor="rgba(244, 114, 182, 0.3)" />
+        <stop offset="100%" stopColor="rgba(79, 70, 229, 0.55)" />
       </linearGradient>
 
       {/* Modern Flashlight Conical Beam Glow */}

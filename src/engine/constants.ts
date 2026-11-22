@@ -72,6 +72,30 @@ export const COLOR_PALETTE = {
       cloud_color: "#0B0703",
       fog_color: "rgba(202, 138, 4, 0.18)",
     },
+    clear_day: {
+      gradient_top: "#1E40AF",
+      gradient_bottom: "#93C5FD",
+      moon_color: "#FFFDF0",
+      moon_glow: "rgba(254, 240, 138, 0.75)",
+      cloud_color: "#F8FAFC",
+      fog_color: "rgba(224, 242, 254, 0.35)",
+    },
+    golden_sunset: {
+      gradient_top: "#312E81",
+      gradient_bottom: "#F59E0B",
+      moon_color: "#EA580C",
+      moon_glow: "rgba(249, 115, 22, 0.7)",
+      cloud_color: "#7C2D12",
+      fog_color: "rgba(249, 115, 22, 0.3)",
+    },
+    morning_dawn: {
+      gradient_top: "#1E1B4B",
+      gradient_bottom: "#FDE68A",
+      moon_color: "#FEF9C3",
+      moon_glow: "rgba(253, 230, 138, 0.7)",
+      cloud_color: "#831843",
+      fog_color: "rgba(251, 207, 232, 0.28)",
+    },
   },
 };
 

@@ -5,6 +5,7 @@ import type {
   NamedCharacterPreset,
   CameraShotType,
   SceneDraftSpec,
+  WeatherEffectId,
 } from "../engine/types";
 import {
   generateFilmFromDescriptions,
@@ -85,8 +86,9 @@ import {
   FileJson,
   Download,
   Upload,
+  CloudRain,
 } from "lucide-react";
-import { validateDirectorScript } from "../engine/layoutRouter";
+import { validateDirectorScript, VALID_WEATHER_EFFECTS } from "../engine/layoutRouter";
 import { sanitizeSceneShake } from "../engine/geminiDirector";
 
 export type AiModalMode =
@@ -524,6 +526,9 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
           costume: c.costume,
           face: c.face,
           heldItem: c.defaultHeldItem,
+          shoulderItem: c.defaultShoulderItem,
+          headItem: c.defaultHeadItem,
+          legItem: c.defaultLegItem,
         })),
         null,
         2
@@ -652,15 +657,21 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
           const name = a.name || a.id || "Diễn viên";
           const motion = a.motion ? ` ➔ ${a.motion.targetSlot}` : "";
           const item = a.heldItem && a.heldItem !== "none" ? ` (cầm ${a.heldItem.replace("item_", "")})` : "";
+          const shoulder = a.shoulderItem && a.shoulderItem !== "none" ? ` (vác ${a.shoulderItem.replace("shoulder_", "")})` : "";
+          const head = a.headItem && a.headItem !== "none" ? ` (đội ${a.headItem.replace("head_", "")})` : "";
+          const leg = a.legItem && a.legItem !== "none" ? ` (chân ${a.legItem.replace("leg_", "")})` : "";
           const interaction = a.interact_with && a.interact_with !== "none"
             ? ` [tương tác ${a.interact_with.replace("structure_", "")}]`
             : "";
-          return `${name}${interaction}${motion}${item}`;
+          return `${name}${interaction}${motion}${item}${shoulder}${head}${leg}`;
         })
         .join("; ");
     } else {
       actionDescription = `Diễn biến phân cảnh ${idx + 1}`;
     }
+
+    const rawWeather = s.weather || s.lighting?.weather;
+    const weather: WeatherEffectId = VALID_WEATHER_EFFECTS.includes(rawWeather) ? rawWeather : "none";
 
     return {
       environmentId,
@@ -669,6 +680,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
       dialogue: s.dialogue || "",
       duration_sec: s.duration_sec || 6,
       cameraShot: (s.camera?.shot || "auto") as CameraShotType | "auto",
+      weather,
     };
   };
 
@@ -767,6 +779,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         dialogue: d.dialogue || "",
         duration_sec: d.duration_sec || 6,
         cameraShot: (d.cameraShot || "auto") as CameraShotType | "auto",
+        weather: VALID_WEATHER_EFFECTS.includes(d.weather || d.lighting?.weather) ? (d.weather || d.lighting?.weather) : "none",
       }));
       setSceneDrafts(mappedDrafts);
       setSceneCount(mappedDrafts.length);
@@ -795,6 +808,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
           dialogue: d.dialogue || "",
           duration_sec: d.duration_sec || 6,
           cameraShot: (d.cameraShot || "auto") as CameraShotType | "auto",
+          weather: VALID_WEATHER_EFFECTS.includes(d.weather || d.lighting?.weather) ? (d.weather || d.lighting?.weather) : "none",
         }));
         setSceneDrafts(mappedDrafts);
         setSceneCount(mappedDrafts.length);
@@ -893,6 +907,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
               dialogue: d.dialogue || "",
               duration_sec: d.duration_sec || 6,
               cameraShot: (d.cameraShot || "auto") as CameraShotType | "auto",
+              weather: VALID_WEATHER_EFFECTS.includes(d.weather || d.lighting?.weather) ? (d.weather || d.lighting?.weather) : "none",
             }))
           : undefined,
         missingAssets: Array.isArray(parsed.missingAssets) ? parsed.missingAssets : undefined,
@@ -1168,6 +1183,7 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
         title: draft.title || undefined,
         dialogue: draft.dialogue || undefined,
         cameraShot: draft.cameraShot || "auto",
+        weather: draft.weather || "none",
       };
     });
 
@@ -1983,9 +1999,16 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                               <span className="font-bold text-amber-200">
                                 {draft.title || `Cảnh ${sIdx + 1}`}
                               </span>
-                              <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">
-                                Bối cảnh: {draft.environmentId} ({draft.duration_sec || 6}s)
-                              </span>
+                              <div className="flex items-center gap-1.5">
+                                {draft.weather && draft.weather !== "none" && (
+                                  <span className="text-[10px] font-mono text-cyan-300 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-800/60">
+                                    Thời tiết: {draft.weather}
+                                  </span>
+                                )}
+                                <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">
+                                  Bối cảnh: {draft.environmentId} ({draft.duration_sec || 6}s)
+                                </span>
+                              </div>
                             </div>
                             <p className="text-[11px] text-neutral-300 leading-relaxed m-0">
                               {draft.actionDescription}
@@ -2569,6 +2592,25 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
                               <option value="close_up">🎥 Cận cảnh (Close-Up 2.85x)</option>
                               <option value="extreme_close_up">🎥 Đặc tả (Extreme Close-Up 4.3x)</option>
                               <option value="dutch_tilt">🎥 Góc nghiêng ma mị (Dutch -7.5°)</option>
+                            </select>
+                          </div>
+
+                          {/* Weather Selector Dropdown */}
+                          <div className="flex items-center gap-1.5 bg-neutral-900/90 border border-cyan-900/60 rounded-lg px-2 py-0.5">
+                            <CloudRain className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                            <span className="text-[11px] text-neutral-400">Thời tiết:</span>
+                            <select
+                              value={draft.weather || "none"}
+                              onChange={(e) => handleUpdateDraft(idx, "weather", e.target.value)}
+                              className="bg-transparent text-xs text-cyan-200 font-medium focus:outline-none cursor-pointer"
+                            >
+                              <option value="none">🌤️ Yên tĩnh</option>
+                              <option value="heavy_rain">🌧️ Mưa rào</option>
+                              <option value="storm_thunder">⛈️ Bão sét</option>
+                              <option value="haunted_mist">🌫️ Sương quái</option>
+                              <option value="drifting_ash">🌪️ Tro tàn</option>
+                              <option value="floating_embers">🔥 Ma trơi</option>
+                              <option value="blood_rain">🩸 Mưa máu</option>
                             </select>
                           </div>
 
