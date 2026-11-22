@@ -652,7 +652,10 @@ export const AiDirectorModal: React.FC<AiDirectorModalProps> = ({
           const name = a.name || a.id || "Diễn viên";
           const motion = a.motion ? ` ➔ ${a.motion.targetSlot}` : "";
           const item = a.heldItem && a.heldItem !== "none" ? ` (cầm ${a.heldItem.replace("item_", "")})` : "";
-          return `${name}${motion}${item}`;
+          const interaction = a.interact_with && a.interact_with !== "none"
+            ? ` [tương tác ${a.interact_with.replace("structure_", "")}]`
+            : "";
+          return `${name}${interaction}${motion}${item}`;
         })
         .join("; ");
     } else {

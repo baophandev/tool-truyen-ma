@@ -179,6 +179,40 @@
   animation: rig-lie-breath 4.5s ease-in-out infinite;
 }
 
+/* 4i. Hammock Gentle Pendulum Sway & Character Lying In Hammock */
+@keyframes hammock-gentle-sway {
+  0%, 100% {
+    transform: rotate(-1.8deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1.8deg) translateY(-1.5px);
+  }
+}
+
+.anim-hammock-sway {
+  animation: hammock-gentle-sway 4s ease-in-out infinite;
+  transform-origin: 0 -130px;
+}
+
+.rig-lying-hammock {
+  animation: hammock-gentle-sway 4s ease-in-out infinite;
+  transform-origin: 0 -130px;
+}
+
+/* 4j. Bed Seated Cross-legged Breathing */
+@keyframes rig-bed-seated-breath {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.5px);
+  }
+}
+
+.rig-sitting-bed {
+  animation: rig-bed-seated-breath 3.8s ease-in-out infinite;
+}
+
 /* Door Shiver / Shake on Ghost Knocking */
 @keyframes door-subtle-shake {
   0%, 100% { transform: translate(0, 0) rotate(0deg); }

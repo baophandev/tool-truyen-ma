@@ -89,6 +89,21 @@ function resolveHandSockets(
       right: { x: 16, y: -22, rot: 0 },
     };
   }
+  if (pose === "pose_lying_hammock") {
+    return {
+      left: { x: -8, y: -18, rot: 0 },
+      right: { x: 14, y: -18, rot: 0 },
+    };
+  }
+  if (pose === "pose_sitting_bed") {
+    const hasItem = Boolean(heldItem && heldItem !== "none");
+    const rightRaised = hasItem && heldHand === "right";
+    const leftRaised = hasItem && heldHand === "left";
+    return {
+      left: leftRaised ? { x: -16, y: -130, rot: -10 } : { x: -34, y: -95, rot: 0 },
+      right: rightRaised ? { x: 16, y: -130, rot: 10 } : { x: 34, y: -95, rot: 0 },
+    };
+  }
   if (pose === "pose_reaching") {
     return {
       left: { x: -18, y: -115, rot: 0 },
@@ -364,6 +379,28 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
     );
   }
 
+  // LYING HAMMOCK PROFILE OVERRIDE (Dùng cho nhân vật nằm võng dù miền quê đung đưa)
+  if (pose === "pose_lying_hammock") {
+    return (
+      <LyingHammockSideRig
+        id={id}
+        base={base}
+        costume={activeCostume}
+        face={face}
+        facialAction={facialAction}
+        scale={finalScale}
+        flip={flip}
+        opacity={opacity}
+        heldItem={heldItem}
+        heldHand={heldHand}
+        showSockets={showSockets}
+        palette={palette}
+        appearance={appearance}
+        handSockets={handSockets}
+      />
+    );
+  }
+
   // Dynamic Head Position based on Base (adjusting neck length to realistic & natural proportions)
   const headPos = isElder
     ? { x: 18, y: -212 }
@@ -392,6 +429,7 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
   if (pose === "pose_floating") poseClass = "rig-floating";
   if (pose === "pose_hanging") poseClass = "rig-hanging";
   if (pose === "pose_sitting") poseClass = "rig-sitting";
+  if (pose === "pose_sitting_bed") poseClass = "rig-sitting-bed";
   if (pose === "pose_sitting_twisted_legs" || (pose as string) === "pose_twisted_legs_floating") poseClass = "rig-twisted-legs";
 
   return (
@@ -1027,9 +1065,83 @@ const LowerBodyOutfit: React.FC<{
   const isWalking = pose === "pose_walking";
   const isShivering = pose === "pose_shivering";
   const isSitting = pose === "pose_sitting";
+  const isSittingBed = pose === "pose_sitting_bed";
   const isSittingTwisted =
     pose === "pose_sitting_twisted_legs" ||
     (pose as string) === "pose_twisted_legs_floating";
+
+  // Seated Cross-Legged on Bed / Mat Horror / Traditional Pose override
+  if (isSittingBed) {
+    return (
+      <g className="bed-cross-legged">
+        {/* Surface Contact Shadow under crossed legs on bed/floor */}
+        <ellipse cx="0" cy="-62" rx="48" ry="7" fill="#000000" opacity="0.4" />
+
+        {/* Left Folded Leg (thigh angled left-down to knee, shin crossed across front to right) */}
+        <g opacity="0.9">
+          {/* Left Thigh from Hip (-12, -90) to Left Knee (-42, -72) */}
+          <path
+            d="M -12 -90 L -42 -72 L -38 -62 L -6 -82 Z"
+            fill={palette.pantsSecondary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          {/* Left Knee round cap */}
+          <ellipse cx="-40" cy="-67" rx="6" ry="5" fill={palette.pantsSecondary} />
+          {/* Left Shin folded inward across lap: from (-40, -67) to (+22, -64) */}
+          <path
+            d="M -40 -70 L 22 -62 L 20 -54 L -38 -60 Z"
+            fill={palette.pantsSecondary}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+          {/* Left Foot tucked under right knee */}
+          <polygon points="22,-62 30,-64 28,-57 20,-54" fill="#11131A" />
+        </g>
+
+        {/* Right Folded Leg (thigh angled right-down to knee, shin crossed over front to left) */}
+        <g>
+          {/* Right Thigh from Hip (12, -90) to Right Knee (42, -72) */}
+          <path
+            d="M 6 -90 L 42 -72 L 38 -60 L 0 -82 Z"
+            fill={palette.pantsPrimary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          {/* Right Knee round cap */}
+          <ellipse cx="40" cy="-66" rx="6" ry="5.5" fill={palette.pantsPrimary} />
+          {/* Right Shin folded inward over lap: from (40, -66) to (-24, -60) */}
+          <path
+            d="M 40 -69 L -24 -59 L -22 -51 L 38 -58 Z"
+            fill={palette.pantsPrimary}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          {/* Right Foot tucked under left knee */}
+          <polygon points="-24,-59 -32,-61 -30,-54 -22,-51" fill="#181512" />
+        </g>
+
+        {/* Costume Lap Fabric Over Drapes */}
+        {costume === "outfit_flowing_ao_dai" && (
+          <path
+            d="M -18 -90 C -4 -88, 16 -88, 20 -90 C 38 -78, 36 -62, 28 -56 L -28 -56 C -36 -62, -38 -78, -18 -90 Z"
+            fill={palette.primary}
+            opacity="0.92"
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+        )}
+        {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
+          <path
+            d="M -16 -90 C -6 -86, 6 -86, 16 -90 L 22 -72 C 10 -68, -10 -68, -22 -72 Z"
+            fill={palette.primary}
+            stroke={appearance.outline}
+            strokeWidth="0.9"
+          />
+        )}
+      </g>
+    );
+  }
 
   // Deformed Twisted Legs Floating Horror Pose override
   if (isSittingTwisted) {
@@ -1714,6 +1826,39 @@ const ArmsRig: React.FC<{
             raiseRight
               ? `M 18 -184 L 28 -144 L ${handSockets.right.x} ${handSockets.right.y + 4} L ${handSockets.right.x - 4} ${handSockets.right.y - 5} L 24 -155 L 10 -184 Z`
               : "M 20 -185 C 24 -150, 26 -115, 26 -86 L 32 -86 C 34 -115, 32 -150, 26 -185 Z"
+          }
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="0.9"
+        />
+        <circle cx={handSockets.right.x} cy={handSockets.right.y} r="4.8" fill={handColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+    );
+  }
+
+  // Bed Seated Cross-Legged arms
+  if (pose === "pose_sitting_bed") {
+    const raiseLeft = hasItem && heldHand === "left";
+    const raiseRight = hasItem && heldHand === "right";
+    return (
+      <g className="anim-arms-sitting-bed">
+        {/* Back arm resting toward knee or raised */}
+        <path
+          d={
+            raiseLeft
+              ? `M -22 -184 L 14 -144 L ${handSockets.left.x} ${handSockets.left.y + 4} L ${handSockets.left.x - 4} ${handSockets.left.y - 5} L 10 -155 L -14 -184 Z`
+              : "M -22 -185 C -26 -155, -28 -125, -34 -95 L -28 -95 C -22 -125, -20 -155, -16 -185 Z"
+          }
+          fill={sleeveShadowColor}
+        />
+        <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4.5" fill={handShadowColor} />
+        {/* Front arm resting toward knee or raised */}
+        <path
+          d={
+            raiseRight
+              ? `M 18 -184 L 26 -144 L ${handSockets.right.x} ${handSockets.right.y + 4} L ${handSockets.right.x - 4} ${handSockets.right.y - 5} L 22 -155 L 10 -184 Z`
+              : "M 20 -185 C 26 -155, 28 -125, 34 -95 L 28 -95 C 22 -125, 20 -155, 14 -185 Z"
           }
           fill={sleeveColor}
           stroke={appearance.outline}
@@ -2910,6 +3055,249 @@ const LyingDownSideRig: React.FC<LyingDownSideRigProps> = ({
           <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4" fill="#A855F7" />
           <circle cx={handSockets.right.x} cy={handSockets.right.y} r="5" fill="#22D3EE" />
           <text x={handSockets.right.x + 6} y={handSockets.right.y - 4} fill="#67E8F9" fontSize="9" fontFamily="monospace">HandR</text>
+        </g>
+      )}
+    </g>
+  );
+};
+
+interface LyingHammockSideRigProps {
+  id?: string;
+  base: CharacterBaseId;
+  costume: CostumeId;
+  face: CharacterFaceId;
+  facialAction?: FacialActionId;
+  scale: number;
+  flip: number;
+  opacity: number;
+  heldItem?: HeldItemId;
+  heldHand?: HeldHand;
+  showSockets?: boolean;
+  palette: CostumePalette;
+  appearance: BaseAppearance;
+  handSockets: {
+    left: { x: number; y: number; rot: number };
+    right: { x: number; y: number; rot: number };
+  };
+}
+
+const LyingHammockSideRig: React.FC<LyingHammockSideRigProps> = ({
+  id,
+  base,
+  costume,
+  face,
+  facialAction,
+  scale,
+  flip,
+  opacity,
+  heldItem = "none",
+  heldHand = "right",
+  showSockets = false,
+  palette,
+  appearance,
+  handSockets,
+}) => {
+  const isGhost = base === "ghost_wraith";
+  const isDemon = base === "demon_shadow";
+  const isChild = base === "creepy_child";
+  const isElder = base === "elder_hunched";
+  const isHeadless = face === "face_headless";
+
+  const sleeveColor = costume === "outfit_child_pajamas" ? appearance.skin : palette.sleeve;
+  const handColor = appearance.skin;
+  const activeSocket = heldHand === "left" ? handSockets.left : handSockets.right;
+
+  // Head center tilted slightly up on hammock head bolster
+  const headPos = { x: -52, y: -26 };
+
+  return (
+    <g
+      id={id ? `actor-${id}` : undefined}
+      transform={`scale(${flip * scale}, ${scale})`}
+      opacity={isGhost ? Math.min(opacity, 0.88) : opacity}
+      className="character-rig rig-lying-hammock"
+    >
+      {/* 1. Ghost / Demon aura */}
+      {isGhost && (
+        <ellipse
+          cx="0"
+          cy="-18"
+          rx="85"
+          ry="30"
+          fill="url(#ghost-aura-grad)"
+          opacity="0.35"
+          className="anim-pulse-slow"
+        />
+      )}
+      {isDemon && (
+        <g opacity="0.35" filter="url(#ghost-blur)">
+          <ellipse cx="0" cy="-18" rx="90" ry="28" fill="#000000" />
+        </g>
+      )}
+
+      {/* 2. REAR LEG (Left Leg curved along rising hammock foot end) */}
+      <g className="hammock-back-leg" opacity="0.88">
+        {/* Thigh from Hip (6, -8) to Knee (38, -14) */}
+        <path
+          d="M 6 -12 L 38 -18 L 36 -10 L 6 -4 Z"
+          fill={palette.pantsSecondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        {/* Shin & Foot from Knee (38, -14) to Ankle/Foot (68, -24) */}
+        <path
+          d="M 36 -18 L 68 -28 L 66 -20 L 36 -10 Z"
+          fill={palette.pantsSecondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        <polygon points="68,-28 76,-32 78,-26 66,-20" fill="#11131A" />
+      </g>
+
+      {/* 3. REAR ARM (Left Arm resting across torso or hammock edge) */}
+      <g className="hammock-back-arm" opacity="0.9">
+        <path
+          d="M -30 -16 L -10 -14 L -8 -8 L -30 -10 Z"
+          fill={palette.secondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        <path
+          d="M -10 -14 L -6 -20 L -2 -16 L -8 -8 Z"
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        <ellipse cx={handSockets.left.x} cy={handSockets.left.y} rx="4.5" ry="3.5" fill={handColor} />
+      </g>
+
+      {/* 4. MAIN TORSO (Curving down naturally in hammock belly) */}
+      <g className="hammock-torso">
+        <path
+          d="M -36 -18 
+             C -20 -18, -4 -12, 10 -6 
+             L 10 4 
+             C -4 2, -20 -4, -36 -6 Z"
+          fill={palette.primary}
+          stroke={appearance.outline}
+          strokeWidth="1.2"
+        />
+
+        {/* Costume details */}
+        {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
+          <path d="M -32 -17 L 6 -5" stroke={palette.trim} strokeWidth="1.2" strokeDasharray="3,3" />
+        )}
+        {costume === "outfit_flowing_ao_dai" && (
+          <path
+            d="M -32 -17 C -12 -22, 12 -14, 30 -6 L 22 2 C 8 -4, -10 -10, -32 -8 Z"
+            fill={palette.primary}
+            opacity="0.9"
+          />
+        )}
+      </g>
+
+      {/* 5. FRONT LEG (Right Leg curved upward) */}
+      <g className="hammock-front-leg">
+        {/* Front Thigh from Hip (10, -4) to Knee (42, -18) */}
+        <path
+          d="M 8 -8 L 42 -22 L 40 -12 L 8 2 Z"
+          fill={palette.pantsPrimary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        <ellipse cx="41" cy="-17" rx="5" ry="4" fill={palette.pantsPrimary} />
+        {/* Front Shin from Knee (42, -18) to Foot (74, -28) */}
+        <path
+          d="M 40 -22 L 74 -32 L 72 -24 L 38 -12 Z"
+          fill={palette.pantsPrimary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        {/* Front Foot pointing relaxed upward along the hammock rising end */}
+        <polygon points="74,-32 84,-36 86,-30 72,-24" fill="#181512" />
+      </g>
+
+      {/* 6. FRONT ARM (Right Arm folded gently over chest / stomach) */}
+      <g className="hammock-front-arm">
+        {/* Shoulder (-30, -14) to Elbow (-2, -8) */}
+        <path
+          d="M -32 -16 L -2 -10 L -4 -2 L -32 -8 Z"
+          fill={palette.primary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        {/* Elbow (-2, -8) to Hand near stomach/chest (14, -18) */}
+        <path
+          d="M -2 -10 L 14 -19 L 16 -13 L 0 -2 Z"
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        <ellipse cx={handSockets.right.x} cy={handSockets.right.y} rx="5" ry="3.8" fill={handColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+
+      {/* 7. NECK & HEAD (Resting on Pillow at X = -52, Y = -26) */}
+      {!isHeadless && (
+        <g id="hammock-head-group">
+          {/* Neck */}
+          <path d="M -36 -18 L -46 -24 L -44 -18 L -36 -12 Z" fill={appearance.skinShadow} />
+          {/* Head tilted resting */}
+          <g transform={`translate(${headPos.x}, ${headPos.y}) rotate(12)`}>
+            {/* Hair */}
+            {base === "female_adult" && (
+              <path
+                d="M 10 4 C -6 2, -24 -4, -32 -8 C -26 8, -12 18, 5 18 Z"
+                fill={appearance.hair}
+              />
+            )}
+            {base === "male_adult" && (
+              <path
+                d="M 12 -4 C 4 -16, -10 -18, -20 -10 C -16 -2, -8 4, 6 6 Z"
+                fill={appearance.hair}
+              />
+            )}
+            <ellipse
+              cx="0"
+              cy="0"
+              rx={isChild ? "18" : isElder ? "17" : "19"}
+              ry={isChild ? "17" : isElder ? "18" : "18"}
+              fill={appearance.skin}
+              stroke={appearance.outline}
+              strokeWidth="1.5"
+            />
+            {isElder && (
+              <g stroke="#3A2E24" strokeWidth="0.9" fill="none" opacity="0.65">
+                <path d="M -8 -6 C -4 -4, 4 -4, 8 -6" />
+                <path d="M -6 6 C -2 8, 4 8, 8 6" />
+              </g>
+            )}
+            <FaceRig face={face} facialAction={facialAction} />
+          </g>
+        </g>
+      )}
+
+      {/* 8. FRONT MESH OVERLAY: The front edge of the hammock wrapping softly over the character */}
+      <path
+        d="M -80 -40 Q 0 -6 80 -40"
+        stroke="#2E4A3B"
+        strokeWidth="3.2"
+        fill="none"
+        opacity="0.85"
+      />
+      <path
+        d="M -78 -38 Q 0 -8 78 -38"
+        stroke="#16261E"
+        strokeWidth="1.2"
+        fill="none"
+        opacity="0.75"
+      />
+
+      {/* Socket debug indicators */}
+      {showSockets && (
+        <g className="debug-sockets" pointerEvents="none">
+          <circle cx={handSockets.left.x} cy={handSockets.left.y} r="3" fill="#3B82F6" />
+          <circle cx={handSockets.right.x} cy={handSockets.right.y} r="3" fill="#10B981" />
         </g>
       )}
     </g>

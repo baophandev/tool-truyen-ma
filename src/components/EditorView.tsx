@@ -1118,6 +1118,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="pose_standing">Đứng quan sát (pose_standing)</option>
                         <option value="pose_sitting">Ngồi ghế / sàn xe (pose_sitting)</option>
                         <option value="pose_sitting_twisted_legs">Ngồi chân xoay ngược lơ lửng (pose_sitting_twisted_legs)</option>
+                        <option value="pose_sitting_bed">Ngồi xếp bằng / khoanh chân trên giường (pose_sitting_bed)</option>
                         <option value="pose_holding">Cầm / Giơ đồ vật phía trước (pose_holding)</option>
                         <option value="pose_shivering">Run rẩy co ro (pose_shivering)</option>
                         <option value="pose_walking">Bước đi chậm rãi (pose_walking)</option>
@@ -1126,6 +1127,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="pose_reaching">Vươn tay bắt hồn (pose_reaching)</option>
                         <option value="pose_hanging">Bị treo lơ lửng rũ đầu (pose_hanging)</option>
                         <option value="pose_lying_down">Nằm ngửa / Co ro trên giường (pose_lying_down)</option>
+                        <option value="pose_lying_hammock">Nằm võng đung đưa miền quê (pose_lying_hammock)</option>
                       </select>
                     </div>
 
@@ -1381,6 +1383,128 @@ export const EditorView: React.FC<EditorViewProps> = ({
                           </button>
                         </div>
                       )}
+                      {selectedActor.pose === "pose_sitting_bed" && (
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            type="button"
+                            onClick={() => updateActor(selectedActor.id, { offsetY: -80 })}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
+                              (selectedActor.offsetY ?? 0) === -80
+                                ? "bg-red-800/90 text-white border-red-500 shadow"
+                                : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+                            }`}
+                          >
+                            🛏️ Ngồi Xếp Bằng Giường (Y=-80px)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => updateActor(selectedActor.id, { offsetY: 0 })}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
+                              (selectedActor.offsetY ?? 0) === 0
+                                ? "bg-red-800/90 text-white border-red-500 shadow"
+                                : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+                            }`}
+                          >
+                            🩸 Ngồi Chiếu Sàn (Y=0px)
+                          </button>
+                        </div>
+                      )}
+                      {selectedActor.pose === "pose_lying_hammock" && (
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            type="button"
+                            onClick={() => updateActor(selectedActor.id, { offsetY: -60 })}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium border transition-all ${
+                              (selectedActor.offsetY ?? 0) === -60
+                                ? "bg-red-800/90 text-white border-red-500 shadow"
+                                : "bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+                            }`}
+                          >
+                            🌿 Nằm Trong Võng (Y=-60px)
+                          </button>
+                        </div>
+                      )}
+
+                      {/* SMART FURNITURE DOCKING QUICK ACTIONS */}
+                      <div className="mt-3 p-2.5 rounded-lg border border-neutral-800 bg-neutral-900/60">
+                        <div className="text-[11px] font-semibold text-neutral-300 mb-1.5 flex items-center justify-between">
+                          <span>✨ Tương Tác Nhanh (Ghế, Giường, Võng):</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const chair = scene.environment_items.find(
+                                (i) => i.asset_id === "structure_wooden_chair" || i.asset_id === "dining_table_chairs"
+                              );
+                              updateActor(selectedActor.id, {
+                                pose: "pose_sitting",
+                                offsetY: 0,
+                                ...(chair ? { slot: chair.slot } : {}),
+                              });
+                            }}
+                            className="py-1 px-2 rounded text-[11px] font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-left truncate transition-colors"
+                            title="Ngồi vào Ghế (Y=0, pose_sitting)"
+                          >
+                            🪑 Ngồi Vào Ghế
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const bed = scene.environment_items.find(
+                                (i) =>
+                                  i.asset_id === "structure_wooden_bed" ||
+                                  i.asset_id === "structure_bamboo_bed_net" ||
+                                  i.asset_id === "hospital_operating_bed"
+                              );
+                              updateActor(selectedActor.id, {
+                                pose: "pose_lying_down",
+                                offsetY: -80,
+                                ...(bed ? { slot: bed.slot } : {}),
+                              });
+                            }}
+                            className="py-1 px-2 rounded text-[11px] font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-left truncate transition-colors"
+                            title="Nằm lên Giường (Y=-80px, pose_lying_down)"
+                          >
+                            🛏️ Nằm Lên Giường
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const bed = scene.environment_items.find(
+                                (i) =>
+                                  i.asset_id === "structure_wooden_bed" ||
+                                  i.asset_id === "structure_bamboo_bed_net" ||
+                                  i.asset_id === "hospital_operating_bed"
+                              );
+                              updateActor(selectedActor.id, {
+                                pose: "pose_sitting_bed",
+                                offsetY: -80,
+                                ...(bed ? { slot: bed.slot } : {}),
+                              });
+                            }}
+                            className="py-1 px-2 rounded text-[11px] font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-left truncate transition-colors"
+                            title="Ngồi xếp bằng trên Giường (Y=-80px, pose_sitting_bed)"
+                          >
+                            🧘 Ngồi Trên Giường
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const hammock = scene.environment_items.find((i) => i.asset_id === "structure_hammock");
+                              updateActor(selectedActor.id, {
+                                pose: "pose_lying_hammock",
+                                offsetY: -60,
+                                ...(hammock ? { slot: hammock.slot } : {}),
+                              });
+                            }}
+                            className="py-1 px-2 rounded text-[11px] font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-left truncate transition-colors"
+                            title="Nằm trong Võng (Y=-60px, pose_lying_hammock)"
+                          >
+                            🌿 Nằm Vào Võng
+                          </button>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="flex flex-col gap-1">
@@ -1678,6 +1802,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
                                       <option value="pose_shivering">Run rẩy tiến bước (pose_shivering)</option>
                                       <option value="pose_standing">Trượt giữ nguyên dáng (pose_standing)</option>
                                       <option value="pose_lying_down">Nằm ngửa / Nằm cứng đờ (pose_lying_down)</option>
+                                      <option value="pose_sitting_bed">Ngồi xếp bằng trên giường (pose_sitting_bed)</option>
+                                      <option value="pose_lying_hammock">Nằm võng đung đưa (pose_lying_hammock)</option>
                                     </>
                                   )}
                                 </select>
@@ -1812,6 +1938,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="structure_small_wooden_table">Bàn gỗ nhỏ nông thôn (structure_small_wooden_table)</option>
                         <option value="structure_wooden_window">Cửa sổ gỗ ván lùa/chống nông thôn (structure_wooden_window)</option>
                         <option value="structure_ancestor_altar">Bàn thờ tổ tiên vách lá (structure_ancestor_altar)</option>
+                        <option value="structure_hammock">Võng dù miền quê đung đưa (structure_hammock)</option>
                       </select>
                     </div>
 

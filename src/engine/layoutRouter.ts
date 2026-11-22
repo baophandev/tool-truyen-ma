@@ -144,6 +144,7 @@ const VALID_STRUCTURES: StructureId[] = [
   "structure_small_wooden_table",
   "structure_wooden_window",
   "structure_ancestor_altar",
+  "structure_hammock",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -212,6 +213,8 @@ const VALID_POSES: CharacterPoseId[] = [
   "pose_hanging",
   "pose_holding",
   "pose_lying_down",
+  "pose_lying_hammock",
+  "pose_sitting_bed",
 ];
 const VALID_HELD_ITEMS: HeldItemId[] = [
   "none",
@@ -424,8 +427,28 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       slot = nearest.slot.id;
     }
 
+    const name = typeof actor.name === "string" && actor.name.trim() ? actor.name.trim() : undefined;
+    let interact_with: StructureId | "none" | null | undefined = undefined;
+    if (actor.interact_with && actor.interact_with !== "none" && VALID_STRUCTURES.includes(actor.interact_with as StructureId)) {
+      interact_with = actor.interact_with as StructureId;
+    }
+
     const offsetX = Number(actor.offsetX) || 0;
-    const offsetY = supportsVerticalOffset(pose) ? (Number(actor.offsetY) || 0) : 0;
+    let offsetY = supportsVerticalOffset(pose) ? (Number(actor.offsetY) || 0) : 0;
+
+    // Auto-heal offsetY if interact_with is specified but offsetY was omitted or 0
+    if (interact_with && offsetY === 0) {
+      if (
+        (interact_with === "structure_wooden_bed" ||
+          interact_with === "structure_bamboo_bed_net" ||
+          interact_with === "hospital_operating_bed") &&
+        (pose === "pose_lying_down" || pose === "pose_sitting_bed")
+      ) {
+        offsetY = -80;
+      } else if (interact_with === "structure_hammock" && pose === "pose_lying_hammock") {
+        offsetY = -60;
+      }
+    }
     const scale = Number(actor.scale) || 1;
     const opacity = actor.opacity !== undefined ? Math.min(1, Math.max(0, Number(actor.opacity))) : 1;
 
@@ -507,6 +530,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
 
     actors.push({
       id,
+      ...(name ? { name } : {}),
       base,
       costume,
       face,
@@ -516,6 +540,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       slot,
       offsetX,
       offsetY,
+      ...(interact_with ? { interact_with } : {}),
       scale,
       opacity,
       heldItem,

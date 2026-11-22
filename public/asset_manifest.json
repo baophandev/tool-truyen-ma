@@ -469,6 +469,16 @@
         "width": 240,
         "height": 340,
         "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_hammock",
+        "name": "Võng dù miền quê đung đưa",
+        "semantic_role": "Võng dù hoặc võng lưới miền quê treo giữa hai cột nhà gỗ, đung đưa kẽo kẹt chậm rãi giữa đêm tối; tương tác hoàn hảo với tư thế nằm võng pose_lying_hammock (offsetY: -60) hoặc ngồi đung đưa",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 300,
+        "height": 230,
+        "anchor": "bottom-center"
       }
     ]
   },
@@ -792,6 +802,16 @@
         "id": "pose_lying_down",
         "type": "ground",
         "desc": "Tư thế nằm ngửa / nằm co ro trên giường hoặc sàn nhà: toàn bộ cơ thể xoay ngang song song với mặt đất, đầu kê trên gối, hai tay xếp trên ngực/bụng, hỗ trợ offsetY âm (-80px) để đặt khít lên giường tre structure_bamboo_bed_net"
+      },
+      {
+        "id": "pose_sitting_bed",
+        "type": "ground",
+        "desc": "Tư thế ngồi xếp bằng / khoanh chân trên giường hoặc chiếu sàn: hai chân gập đan chéo phẳng phiu, hai tay đặt trên gối hoặc giơ bùa/đèn, hỗ trợ offsetY: -80px để ngồi vững trên giường"
+      },
+      {
+        "id": "pose_lying_hammock",
+        "type": "ground",
+        "desc": "Tư thế nằm võng đung đưa miền quê: thân người uốn lượn cong tự nhiên theo độ võng, đầu kê cao gối đầu võng, chân co nhẹ, hai tay ôm ngực hoặc buông lơi, hỗ trợ offsetY: -60px lọt gọn vào lòng võng"
       },
       {
         "id": "pose_holding",

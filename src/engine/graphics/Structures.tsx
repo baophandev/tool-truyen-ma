@@ -52,6 +52,7 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "structure_small_wooden_table" && <SmallWoodenTable />}
       {id === "structure_wooden_window" && <WoodenCountryWindow />}
       {id === "structure_ancestor_altar" && <AncestorAltar />}
+      {id === "structure_hammock" && <Hammock />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -3967,6 +3968,160 @@ const AncestorAltar: React.FC = () => {
           <circle cx="5" cy="-9" r="4.5" fill="#450A0A" stroke="#7F1D1D" strokeWidth="0.6" />
           <circle cx="0" cy="-13" r="4" fill="#3B0764" stroke="#581C87" strokeWidth="0.6" />
         </g>
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 32. HAMMOCK (Võng Dù / Võng Lưới Miền Quê Treo Cột)
+ * Traditional rural Vietnamese hammock strung between two wooden house pillars or veranda posts.
+ * Suspended cradle at Y = -60px to -65px, with subtle hypnotic sway animation.
+ * Perfectly integrates with pose_lying_hammock (offsetY: -60) and pose_sitting (seated sideways).
+ */
+const Hammock: React.FC = () => {
+  return (
+    <g className="structure-hammock">
+      {/* 1. Floor Shadows Under Posts & Hammock Belly */}
+      <ellipse cx="-138" cy="-2" rx="22" ry="5" fill="#000000" opacity="0.6" />
+      <ellipse cx="138" cy="-2" rx="22" ry="5" fill="#000000" opacity="0.6" />
+      <ellipse cx="0" cy="-2" rx="105" ry="7" fill="#000000" opacity="0.4" />
+      <ellipse cx="0" cy="-2" rx="60" ry="4" fill="#000000" opacity="0.3" className="anim-pulse-slow" />
+
+      {/* 2. Left Wooden / Bamboo Pillar (Cột nhà gỗ bên trái X = -138px) */}
+      <g opacity="0.95">
+        {/* Stone Pedestal base */}
+        <polygon points="-152,0 -124,0 -128,-14 -148,-14" fill="#1C1917" stroke="#292524" strokeWidth="1" />
+        <rect x="-144" y="-14" width="12" height="6" fill="#292524" />
+        {/* Main Pillar Trunk */}
+        <rect x="-144" y="-220" width="12" height="206" fill="#17120E" stroke="#332418" strokeWidth="1" />
+        <line x1="-140" y1="-220" x2="-140" y2="-14" stroke="#453222" strokeWidth="1.2" opacity="0.8" />
+        {/* Wood grain notches */}
+        {[-45, -95, -145, -195].map((py, idx) => (
+          <ellipse key={`lp-notch-${idx}`} cx="-138" cy={py} rx="5" ry="1.5" fill="#2B1D13" />
+        ))}
+      </g>
+
+      {/* 3. Right Wooden / Bamboo Pillar (Cột nhà gỗ bên phải X = +138px) */}
+      <g opacity="0.95">
+        {/* Stone Pedestal base */}
+        <polygon points="124,0 152,0 148,-14 128,-14" fill="#1C1917" stroke="#292524" strokeWidth="1" />
+        <rect x="132" y="-14" width="12" height="6" fill="#292524" />
+        {/* Main Pillar Trunk */}
+        <rect x="132" y="-220" width="12" height="206" fill="#17120E" stroke="#332418" strokeWidth="1" />
+        <line x1="136" y1="-220" x2="136" y2="-14" stroke="#453222" strokeWidth="1.2" opacity="0.8" />
+        {/* Wood grain notches */}
+        {[-45, -95, -145, -195].map((py, idx) => (
+          <ellipse key={`rp-notch-${idx}`} cx="138" cy={py} rx="5" ry="1.5" fill="#2B1D13" />
+        ))}
+      </g>
+
+      {/* 4. Anchor Ropes & Iron Suspension Hooks */}
+      {/* Left Anchor Rope looped around pillar at Y = -135 */}
+      <rect x="-146" y="-140" width="16" height="12" rx="2" fill="#2D2115" stroke="#523B26" strokeWidth="1" />
+      <path d="M -138 -134 Q -128 -130 -120 -124" stroke="#634830" strokeWidth="3" fill="none" />
+      <circle cx="-120" cy="-124" r="3.5" fill="#1F2937" stroke="#4B5563" strokeWidth="1" />
+
+      {/* Right Anchor Rope looped around pillar at Y = -135 */}
+      <rect x="130" y="-140" width="16" height="12" rx="2" fill="#2D2115" stroke="#523B26" strokeWidth="1" />
+      <path d="M 138 -134 Q 128 -130 120 -124" stroke="#634830" strokeWidth="3" fill="none" />
+      <circle cx="120" cy="-124" r="3.5" fill="#1F2937" stroke="#4B5563" strokeWidth="1" />
+
+      {/* 5. GENTLY SWAYING HAMMOCK BODY */}
+      <g className="anim-hammock-sway">
+        {/* Fan-out suspension cords from iron ring to hammock ends */}
+        {/* Left fan cords */}
+        <g stroke="#4A3B2C" strokeWidth="1.2" opacity="0.9">
+          <line x1="-120" y1="-124" x2="-98" y2="-106" />
+          <line x1="-120" y1="-124" x2="-96" y2="-98" />
+          <line x1="-120" y1="-124" x2="-94" y2="-90" />
+          <line x1="-120" y1="-124" x2="-92" y2="-82" />
+        </g>
+        {/* Left Spreader Bar (Thanh gỗ giữ đầu võng) */}
+        <line x1="-98" y1="-106" x2="-92" y2="-82" stroke="#2B1D12" strokeWidth="4.5" strokeLinecap="round" />
+        <line x1="-98" y1="-106" x2="-92" y2="-82" stroke="#5C3F28" strokeWidth="1.5" strokeLinecap="round" />
+
+        {/* Right fan cords */}
+        <g stroke="#4A3B2C" strokeWidth="1.2" opacity="0.9">
+          <line x1="120" y1="-124" x2="98" y2="-106" />
+          <line x1="120" y1="-124" x2="96" y2="-98" />
+          <line x1="120" y1="-124" x2="94" y2="-90" />
+          <line x1="120" y1="-124" x2="92" y2="-82" />
+        </g>
+        {/* Right Spreader Bar */}
+        <line x1="98" y1="-106" x2="92" y2="-82" stroke="#2B1D12" strokeWidth="4.5" strokeLinecap="round" />
+        <line x1="98" y1="-106" x2="92" y2="-82" stroke="#5C3F28" strokeWidth="1.5" strokeLinecap="round" />
+
+        {/* REAR HAMMOCK MESH (Lưng võng phía sau) */}
+        {/* Deep sagging catenary curve filled silhouette */}
+        <path
+          d="M -98 -106 Q 0 -45 98 -106 L 92 -82 Q 0 -22 -92 -82 Z"
+          fill="#0D1612"
+          stroke="#192A22"
+          strokeWidth="1.2"
+        />
+
+        {/* Diagonal Woven Diamond Mesh Lines (Lưới mắt cáo) */}
+        <g stroke="#1F362C" strokeWidth="0.8" opacity="0.75">
+          {[-70, -50, -30, -10, 10, 30, 50, 70].map((mx) => (
+            <path
+              key={`mesh-diag-1-${mx}`}
+              d={`M ${mx - 25} ${-70 + Math.abs(mx) * 0.4} Q ${mx} ${-42 + Math.abs(mx) * 0.25} ${mx + 25} ${-55 + Math.abs(mx) * 0.3}`}
+              fill="none"
+            />
+          ))}
+          {[-60, -40, -20, 0, 20, 40, 60].map((mx) => (
+            <path
+              key={`mesh-diag-2-${mx}`}
+              d={`M ${mx + 25} ${-70 + Math.abs(mx) * 0.4} Q ${mx} ${-42 + Math.abs(mx) * 0.25} ${mx - 25} ${-55 + Math.abs(mx) * 0.3}`}
+              fill="none"
+            />
+          ))}
+        </g>
+
+        {/* Lower Sagging Belly Hem & Frayed Fringes */}
+        <path
+          d="M -92 -82 Q 0 -22 92 -82"
+          stroke="#2A4538"
+          strokeWidth="2.5"
+          fill="none"
+        />
+        <path
+          d="M -85 -78 Q 0 -24 85 -78"
+          stroke="#16241D"
+          strokeWidth="1.2"
+          fill="none"
+        />
+
+        {/* Frayed small fringe tassels hanging down from lowest belly */}
+        {[-36, -24, -12, 0, 12, 24, 36].map((tx) => (
+          <line
+            key={`fringe-${tx}`}
+            x1={tx}
+            y1={-25 + Math.abs(tx) * 0.15}
+            x2={tx + (tx < 0 ? -1.5 : 1.5)}
+            y2={-17 + Math.abs(tx) * 0.15}
+            stroke="#1B2F25"
+            strokeWidth="1.2"
+          />
+        ))}
+
+        {/* Upper Rim Tension Cable (Mép trên võng uốn lượn khi đung đưa) */}
+        <path
+          d="M -98 -106 Q 0 -48 98 -106"
+          stroke="#385C4B"
+          strokeWidth="2.2"
+          fill="none"
+        />
+        <path
+          d="M -96 -104 Q 0 -50 96 -104"
+          stroke="#172720"
+          strokeWidth="1"
+          fill="none"
+        />
+
+        {/* Small rustic bolster pillow tucked into head end (X = -65, Y = -78) */}
+        <ellipse cx="-64" cy="-78" rx="14" ry="7" fill="#1C1814" stroke="#3D2E22" strokeWidth="1" transform="rotate(-18, -64, -78)" />
       </g>
     </g>
   );

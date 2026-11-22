@@ -1,12 +1,17 @@
+Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đối tượng phân cảnh (`DirectorSceneScript[]`)**, trong đó mỗi phần tử đại diện cho một cảnh quay độc lập với đầy đủ thông số đạo diễn để nạp thẳng vào Bước 1 của Studio.
+
+### Cấu trúc tổng thể của một đối tượng phân cảnh
+
+```json
 [
   {
     "scene_id": "scene_01",
-    "title": "Bàn Tay Trên Then Cửa Gỗ",
+    "title": "Tiêu đề phân cảnh mang tính điện ảnh",
     "duration_sec": 12,
-    "theme": "abandoned_village",
+    "theme": "thatched_house_interior",
     "lighting": {
       "sky_preset": "foggy_night",
-      "fog_density": 0.55
+      "fog_density": 0.6
     },
     "camera": {
       "shot": "medium_wide",
@@ -19,26 +24,24 @@
           "shake": "none"
         },
         {
-          "startTimeSec": 4.5,
-          "transition": "smooth",
+          "startTimeSec": 5.0,
+          "transition": "cut",
           "shot": "close_up",
           "target_actor_id": "char_minh",
-          "shake": "subtle"
+          "shake": "none"
         }
       ]
     },
     "environment_items": [
       {
         "asset_id": "structure_bamboo_bed_net",
-        "slot": "mid_left"
+        "slot": "center",
+        "scale": 1
       },
       {
-        "asset_id": "structure_wooden_latch_door",
-        "slot": "mid_right"
-      },
-      {
-        "asset_id": "structure_wooden_bed",
-        "slot": "far_left"
+        "asset_id": "structure_hammock",
+        "slot": "mid_right",
+        "scale": 1
       }
     ],
     "actors": [
@@ -49,238 +52,31 @@
         "costume": "outfit_modern_casual",
         "face": "face_scared",
         "facialAction": "darting_eyes",
-        "pose": "pose_reaching",
-        "heldItem": "none",
+        "pose": "pose_lying_down",
+        "heldItem": "item_fresh_ginger",
+        "heldHand": "right",
         "facing": "right",
         "slot": "center",
-        "layer": "actor",
-        "motion": {
-          "targetSlot": "mid_right",
-          "startTimeSec": 0.5,
-          "endTimeSec": 3.5,
-          "easing": "ease_in_out",
-          "autoFaceTarget": true,
-          "movingPose": "pose_walking"
-        }
-      }
-    ],
-    "details": [
-      {
-        "asset_id": "detail_oil_lamp",
-        "slot": "mid_left"
+        "offsetX": 0,
+        "offsetY": -80,
+        "interact_with": "structure_bamboo_bed_net",
+        "layer": "actor"
       },
-      {
-        "asset_id": "detail_vintage_radio",
-        "slot": "center"
-      },
-      {
-        "asset_id": "detail_muddy_water_puddle",
-        "slot": "mid_right"
-      }
-    ],
-    "dialogue": "Năm tôi mười chín tuổi, có một đêm tôi đứng sát cánh cửa gỗ của căn nhà lá bà ngoại, tay đã đặt lên then cài, chỉ còn một nhịp thở nữa là mở ra, vì ngoài sân có tiếng bà gọi tôi.",
-    "narrative_note": "Minh (Tèo) dáng người male_adult mặc áo outfit_modern_casual, mặt face_scared với biểu cảm liếc mắt lo âu darting_eyes, di chuyển từ slot center đến sát cánh cửa gỗ structure_wooden_latch_door ở slot mid_right và dừng lại ở tư thế pose_reaching đưa tay đặt lên then cài. Xung quanh không gian tối của căn nhà lá có giường tre giăng mùng structure_bamboo_bed_net ở mid_left, giường gỗ structure_wooden_bed ở far_left, đèn dầu detail_oil_lamp ở mid_left, đài radio detail_vintage_radio ở center và vũng nước bùn detail_muddy_water_puddle dưới chân cửa ở mid_right."
-  },
-  {
-    "scene_id": "scene_02",
-    "title": "Giọng Gọi Quen Thuộc Ngoài Bến Nước",
-    "duration_sec": 9,
-    "theme": "cursed_swamp",
-    "lighting": {
-      "sky_preset": "foggy_night",
-      "fog_density": 0.65
-    },
-    "camera": {
-      "shot": "medium_wide",
-      "shake": "none",
-      "keyframes": [
-        {
-          "startTimeSec": 0,
-          "transition": "cut",
-          "shot": "medium_wide",
-          "shake": "none"
-        },
-        {
-          "startTimeSec": 4.0,
-          "transition": "smooth",
-          "shot": "medium_close",
-          "target_actor_id": "char_hai_lua",
-          "shake": "none"
-        }
-      ]
-    },
-    "environment_items": [
-      {
-        "asset_id": "dilapidated_hut",
-        "slot": "far_left"
-      },
-      {
-        "asset_id": "structure_monkey_bridge",
-        "slot": "center"
-      },
-      {
-        "asset_id": "structure_coconut_banana_grove",
-        "slot": "far_right"
-      }
-    ],
-    "actors": [
-      {
-        "id": "char_hai_lua",
-        "name": "Oan Hồn Cô Hai Lụa",
-        "base": "female_adult",
-        "costume": "outfit_traditional_ba_ba",
-        "face": "face_weeping_ghost",
-        "facialAction": "whispering",
-        "pose": "pose_idle_creepy",
-        "heldItem": "none",
-        "facing": "left",
-        "slot": "mid_right",
-        "layer": "actor",
-        "motion": {
-          "targetSlot": "mid_left",
-          "startTimeSec": 1.0,
-          "endTimeSec": 7.5,
-          "easing": "linear",
-          "autoFaceTarget": true,
-          "movingPose": "pose_floating"
-        }
-      }
-    ],
-    "details": [
-      {
-        "asset_id": "detail_water_hyacinth",
-        "slot": "mid_right"
-      },
-      {
-        "asset_id": "detail_will_o_wisp",
-        "slot": "air_right"
-      }
-    ],
-    "dialogue": "Giọng bà, đúng từng hơi thở, đúng từng chỗ ngập ngừng quen thuộc.",
-    "narrative_note": "Ngoài sân mé kênh mờ sương foggy_night, Oan Hồn Cô Hai Lụa dáng người female_adult mặc áo bà ba trắng outfit_traditional_ba_ba, khuôn mặt ma khóc face_weeping_ghost đang thì thầm gọi tên facialAction whispering, tư thế pose_idle_creepy lướt nhẹ theo chuyển động pose_floating từ cầu khỉ structure_monkey_bridge (mid_right) tiến về phía căn nhà lá dilapidated_hut ở slot far_left. Bối cảnh có bụi dừa chuối structure_coconut_banana_grove ở far_right, lục bình detail_water_hyacinth trôi ở mid_right và đốm lửa ma trơi detail_will_o_wisp lơ lửng trên cao tại air_right."
-  },
-  {
-    "scene_id": "scene_03",
-    "title": "Sự Thật Cách Hai Trăm Mét",
-    "duration_sec": 11,
-    "theme": "abandoned_village",
-    "lighting": {
-      "sky_preset": "dim_indoor_night",
-      "fog_density": 0.6
-    },
-    "camera": {
-      "shot": "wide",
-      "shake": "none",
-      "keyframes": [
-        {
-          "startTimeSec": 0,
-          "transition": "cut",
-          "shot": "wide",
-          "shake": "none"
-        },
-        {
-          "startTimeSec": 5.0,
-          "transition": "smooth",
-          "shot": "medium_close",
-          "target_actor_id": "char_ba_ngoai",
-          "shake": "none"
-        }
-      ]
-    },
-    "environment_items": [
-      {
-        "asset_id": "creepy_banyan_tree",
-        "slot": "far_left"
-      },
-      {
-        "asset_id": "structure_coconut_banana_grove",
-        "slot": "far_right"
-      }
-    ],
-    "actors": [
       {
         "id": "char_ba_ngoai",
         "name": "Bà Ngoại",
         "base": "elder_hunched",
         "costume": "outfit_traditional_ba_ba",
-        "face": "face_old_wrinkled",
-        "facialAction": "idle",
-        "pose": "pose_sitting",
-        "heldItem": "none",
-        "facing": "right",
-        "slot": "center",
-        "layer": "actor"
-      }
-    ],
-    "details": [
-      {
-        "asset_id": "detail_incense_bowl",
-        "slot": "center"
-      },
-      {
-        "asset_id": "detail_water_hyacinth",
-        "slot": "mid_right"
-      }
-    ],
-    "dialogue": "Chỉ có điều lúc đó bà tôi không hề đứng ngoài sân. Bà đang ở cách tôi hai trăm mét, ngồi bên giường một người bệnh nặng ở đầu xóm.",
-    "narrative_note": "Tại khu vực cách nhà ngoại hai trăm mét trong ánh sáng tối dim_indoor_night, Bà Ngoại dáng người lưng còng elder_hunched mặc áo bà ba outfit_traditional_ba_ba, khuôn mặt nhăn nheo face_old_wrinkled, ngồi bất động ở tư thế pose_sitting tại slot center cạnh bát hương detail_incense_bowl. Xung quanh có cây đa rùng rợn creepy_banyan_tree ở far_left, rặng dừa chuối structure_coconut_banana_grove ở far_right và đám lục bình detail_water_hyacinth ở mid_right."
-  },
-  {
-    "scene_id": "scene_04",
-    "title": "Bí Mật Mười Năm Chưa Kể",
-    "duration_sec": 13,
-    "theme": "abandoned_village",
-    "lighting": {
-      "sky_preset": "foggy_night",
-      "fog_density": 0.55
-    },
-    "camera": {
-      "shot": "close_up",
-      "target_actor_id": "char_minh",
-      "shake": "subtle",
-      "keyframes": [
-        {
-          "startTimeSec": 0,
-          "transition": "cut",
-          "shot": "close_up",
-          "target_actor_id": "char_minh",
-          "shake": "subtle"
-        },
-        {
-          "startTimeSec": 6.5,
-          "transition": "smooth",
-          "shot": "dutch_tilt",
-          "target_actor_id": "char_minh",
-          "shake": "none"
-        }
-      ]
-    },
-    "environment_items": [
-      {
-        "asset_id": "structure_bamboo_bed_net",
-        "slot": "mid_left"
-      },
-      {
-        "asset_id": "structure_wooden_latch_door",
-        "slot": "mid_right"
-      },
-      {
-        "asset_id": "structure_wooden_bed",
-        "slot": "far_left"
-      }
-    ],
-    "actors": [
-      {
-        "id": "char_minh",
-        "name": "Minh (Tèo)",
-        "base": "male_adult",
-        "costume": "outfit_modern_casual",
-        "face": "face_scared",
-        "facialAction": "trembling",
-        "pose": "pose_frozen_fear",
-        "heldItem": "none",
+        "face": "face_calm",
+        "facialAction": "none",
+        "pose": "pose_lying_hammock",
+        "heldItem": "item_areca_palm_fan",
+        "heldHand": "right",
         "facing": "right",
         "slot": "mid_right",
+        "offsetX": 0,
+        "offsetY": -60,
+        "interact_with": "structure_hammock",
         "layer": "actor"
       }
     ],
@@ -288,17 +84,41 @@
       {
         "asset_id": "detail_oil_lamp",
         "slot": "mid_left"
-      },
-      {
-        "asset_id": "detail_vintage_radio",
-        "slot": "center"
-      },
-      {
-        "asset_id": "detail_muddy_water_puddle",
-        "slot": "mid_right"
       }
     ],
-    "dialogue": "Chuyện này tôi giữ trong bụng hơn mười năm, chưa từng kể trọn vẹn cho ai, vì kể ra thì người ta bảo tôi bịa. Nhưng hôm nay tôi sẽ kể hết, đúng như những gì tôi còn nhớ.",
-    "narrative_note": "Trở lại bên trong căn nhà lá bà ngoại tối om, máy quay cận cảnh và nghiêng góc tà khí dutch_tilt vào Minh (Tèo) dáng người male_adult mặc outfit_modern_casual, khuôn mặt kinh hoàng face_scared run rẩy facialAction trembling, đông cứng toàn thân trong tư thế pose_frozen_fear ngay trước cánh cửa gỗ structure_wooden_latch_door ở slot mid_right. Toàn bộ nội thất rắc-co giữ nguyên gồm giường tre giăng mùng structure_bamboo_bed_net ở mid_left, giường gỗ structure_wooden_bed ở far_left, đèn dầu detail_oil_lamp ở mid_left, đài radio detail_vintage_radio ở center và vũng nước bùn detail_muddy_water_puddle ở mid_right."
+    "dialogue": "Minh nằm cứng đờ bên trong tấm mùng tre, hai tay bóp chặt lát gừng tươi... Ngoài hiên, chiếc võng dù của bà ngoại vẫn đung đưa kẽo kẹt trong đêm tĩnh mịch...",
+    "narrative_note": "Tương tác nội thất đặc biệt: Minh nằm trên giường tre structure_bamboo_bed_net (pose_lying_down, offsetY: -80, interact_with: structure_bamboo_bed_net). Chiếc võng structure_hammock đung đưa kẽo kẹt với bà ngoại nằm lọt lòng võng (pose_lying_hammock, offsetY: -60, interact_with: structure_hammock)."
   }
 ]
+```
+
+---
+
+### Chi tiết các trường (fields) trong mỗi cảnh
+
+| Trường | Kiểu dữ liệu | Ý nghĩa & Quy tắc |
+| --- | --- | --- |
+| **`scene_id`** | `string` | Mã định danh thứ tự cảnh quay (ví dụ: `"scene_01"`, `"scene_02"`...). |
+| **`title`** | `string` | Tiêu đề ngắn gọn, mang tính điện ảnh cho phân cảnh. |
+| **`duration_sec`** | `number` | Thời lượng cảnh tính bằng giây (thường khoảng `10–20` giây để khớp giọng đọc). |
+| **`theme`** | `string` | Chủ đề không gian lấy chính xác từ tệp Rắc-co Bối Cảnh (ví dụ: `"thatched_house_interior"`, `"abandoned_village"`, `"cursed_swamp"`, `"rural_graveyard"`). |
+| **`lighting`** | `object` | Thiết lập ánh sáng và sương mù khóa theo Rắc-co Bối Cảnh: gồm `sky_preset` (preset bầu trời) và `fog_density` (độ dày sương từ `0` đến `1`). |
+| **`camera`** | `object` | Cấu hình ống kính mặc định (`shot`, `shake`) và mảng **`keyframes`** điều khiển chuyển cảnh (`transition`: `"cut"` / `"smooth"`), cỡ cảnh (`shot`: `"wide"`, `"medium_wide"`, `"medium"`, `"close_up"`, `"dutch_tilt"`), độ rung (`shake`: `"none"`, `"subtle"`, `"heavy"`) và mục tiêu bám nét (`target_actor_id`) theo mốc thời gian `startTimeSec`. |
+| **`environment_items`** | `array` | Danh sách các công trình/kiến trúc lớn trong cảnh, khóa theo Rắc-co Bối Cảnh, gồm `asset_id`, vị trí `slot` và tỷ lệ `scale` (tùy chọn). |
+| **`actors`** | `array` | Danh sách diễn viên xuất hiện trong cảnh (khóa `id`, `name`, `base`, `costume` từ Rắc-co Diễn Viên). Gồm các trường:<br>• `face`: Mã biểu cảm khuôn mặt.<br>• `facialAction`: Hành vi mắt/miệng động.<br>• `pose`: Tư thế (bao gồm các tư thế tương tác: `"pose_standing"`, `"pose_sitting"`, `"pose_sitting_twisted_legs"`, `"pose_sitting_bed"`, `"pose_lying_down"`, `"pose_lying_hammock"`, v.v.).<br>• `heldItem`: Đồ vật cầm tay qua Hand Socket.<br>• `heldHand`: `"right"` (tay trước) hoặc `"left"` (tay sau).<br>• `facing`: `"left"` hoặc `"right"`.<br>• `slot`: Slot định vị (`"far_left"` -> `"far_right"` hoặc air slots).<br>• **`offsetY` (MỚI)**: Tọa độ bù trục Y (px) để đặt khớp bề mặt tiếp xúc (`-80` cho giường, `-60` cho võng, `0` cho ghế/tiếp đất).<br>• **`interact_with` (MỚI)**: Mã ID công trình đặc biệt mà diễn viên tương tác trực tiếp (`"structure_wooden_bed"`, `"structure_bamboo_bed_net"`, `"structure_wooden_chair"`, `"structure_hammock"` hoặc `null` / `"none"`).<br>• `layer`: Phân lớp vẽ (`"foreground"` / `"actor"` / `"background"`).<br>• `motion` (tùy chọn): Chuyển động từ A sang B. |
+| **`details`** | `array` | Danh sách đạo cụ nhỏ trang trí trong bối cảnh (khóa từ Rắc-co Bối Cảnh), gồm `asset_id` và `slot`. |
+| **`dialogue`** | `string` | Nguyên văn đoạn lời dẫn hoặc lời thoại thuộc phạm vi phân cảnh này. |
+| **`narrative_note`** | `string` | Ghi chú kỹ thuật đạo diễn mô tả hành động gắn liền với các mã ID assets (`base`, `costume`, `pose`, `environment_items`, `details`, `interact_with`) và tọa độ `slot`. |
+
+---
+
+### Quy chuẩn tương tác Assets đặc biệt (Giường, Ghế, Võng)
+
+Để loại bỏ tình trạng nhân vật đứng đờ đẫn (`pose_standing`) khi phân cảnh có đồ nội thất, đạo diễn bắt buộc áp dụng chuẩn ghép đôi sau:
+
+| Công trình đặc biệt (`asset_id`) | Tư thế tương tác (`pose`) | Trường `interact_with` | Trường `offsetY` | Hiệu ứng trực quan & Ngữ cảnh |
+| :--- | :--- | :--- | :--- | :--- |
+| **`structure_wooden_chair`**<br>(Ghế gỗ tựa gia đình) | `pose_sitting`<br>hoặc `pose_sitting_twisted_legs` | `"structure_wooden_chair"` | `0` | Nhân vật ngồi đùi gập ngang mặt ghế Y=-72px, cẳng chân buông xuống sàn Y=0px phẳng phiu. (Với ma: chân xoay ngược 180° lơ lửng). |
+| **`structure_wooden_bed`**<br>hoặc **`structure_bamboo_bed_net`**<br>(Giường ngủ gỗ / Giường tre mùng) | `pose_lying_down` | `"structure_wooden_bed"`<br>hoặc `"structure_bamboo_bed_net"` | `-80` | Nhân vật nằm ngang phẳng phiu trên mặt nệm, đầu kê gối, lồng ngực phập phồng nhẹ, nằm lọt bên trong lớp mùng vải mỏng. |
+| **`structure_wooden_bed`**<br>hoặc **`structure_bamboo_bed_net`**<br>(Giường ngủ gỗ / Giường tre mùng) | `pose_sitting_bed` | `"structure_wooden_bed"`<br>hoặc `"structure_bamboo_bed_net"` | `-80` | Nhân vật ngồi xếp bằng / khoanh chân trên mặt giường, hai chân đan chéo phẳng phiu (dành cho cảnh ngồi niệm chú, ngồi canh xác, ngồi sợ hãi). |
+| **`structure_hammock`**<br>(Võng dù miền quê đung đưa) | `pose_lying_hammock` | `"structure_hammock"` | `-60` | Thân người uốn cong tự nhiên theo độ võng lòng chảo, đầu kê cao trên gối võng, viền lưới võng phủ qua người, đung đưa kẽo kẹt trong đêm. |

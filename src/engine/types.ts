@@ -51,7 +51,8 @@ export type StructureId =
   | "structure_wooden_bed"
   | "structure_small_wooden_table"
   | "structure_wooden_window"
-  | "structure_ancestor_altar";
+  | "structure_ancestor_altar"
+  | "structure_hammock";
 
 export type DetailId =
   | "detail_black_crow"
@@ -136,7 +137,9 @@ export type CharacterPoseId =
   | "pose_reaching"
   | "pose_hanging"
   | "pose_holding"
-  | "pose_lying_down";
+  | "pose_lying_down"
+  | "pose_lying_hammock"
+  | "pose_sitting_bed";
 
 export type HeldItemId =
   | "none"
@@ -206,6 +209,7 @@ export interface ActorMotionConfig {
 
 export interface ActorConfig {
   id: string;
+  name?: string; // Optional character display name
   base: CharacterBaseId;
   costume?: CostumeId; // Modular Clothing / Outfit Asset
   face: CharacterFaceId;
@@ -214,7 +218,8 @@ export interface ActorConfig {
   facing: FacingDirection;
   slot: SlotId;
   offsetX?: number; // Optional fine-tuning in px
-  offsetY?: number; // Optional fine-tuning in px
+  offsetY?: number; // Optional fine-tuning in px (-80 for beds, -60 for hammock, 0 for ground/chair)
+  interact_with?: StructureId | "none" | null; // Optional special interactive structure docked to (bed, chair, hammock)
   scale?: number;   // Optional scaling factor
   opacity?: number; // e.g. 0.0 - 1.0 for spectral ghost
   heldItem?: HeldItemId; // Modular handheld prop attached to Hand Socket

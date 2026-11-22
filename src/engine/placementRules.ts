@@ -182,6 +182,11 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ["mid_left", "center", "mid_right"],
     reason: "Bàn thờ tổ tiên và án gian cổ là nơi thờ cúng linh thiêng và u uất nhất trong căn nhà lá, đặt tại các vị trí tiếp đất trung tâm (mid_left, center, mid_right).",
   },
+  structure_hammock: {
+    name: "Võng dù miền quê",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Võng dù/võng lưới miền quê treo giữa 2 cọc cột nhà, tương tác hoàn hảo với tư thế nằm võng pose_lying_hammock (kèm offsetY: -60) hoặc ngồi đung đưa.",
+  },
 };
 
 export interface DetailRule {
@@ -275,7 +280,13 @@ export function isAirPose(pose: CharacterPoseId): boolean {
 }
 
 export function supportsVerticalOffset(pose: CharacterPoseId): boolean {
-  return isAirPose(pose) || pose === "pose_lying_down" || pose === "pose_sitting";
+  return (
+    isAirPose(pose) ||
+    pose === "pose_lying_down" ||
+    pose === "pose_lying_hammock" ||
+    pose === "pose_sitting" ||
+    pose === "pose_sitting_bed"
+  );
 }
 
 export function getAllowedSlotsForActor(actor: Pick<ActorConfig, "base" | "pose">): {
