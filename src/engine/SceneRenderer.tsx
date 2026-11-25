@@ -1,9 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import type {
   DirectorSceneScript,
   GroundSlotId,
   SelectedEntity,
   SlotId,
+  EnvironmentItemConfig,
+  ActorConfig,
+  DetailItemConfig,
 } from "./types";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GROUND_Y, ALL_SLOTS } from "./constants";
 import { getSlotCoordinates } from "./layoutRouter";
@@ -26,6 +29,7 @@ import { WeatherLayer } from "./graphics/WeatherLayer";
 import { StructureRenderer } from "./graphics/Structures";
 import { CharacterRig } from "./graphics/CharacterRig";
 import { DetailRenderer } from "./graphics/Details";
+import { SpaceDividerRenderer } from "./graphics/SpaceDivider";
 import { soundEngine } from "./AudioSynthesizer";
 import { evaluateActorAtTime } from "./motionUtils";
 import { evaluateCameraAtTime, CAMERA_SHOT_PRESETS } from "./cameraUtils";
@@ -40,6 +44,7 @@ interface SceneRendererProps {
   script: DirectorSceneScript;
   showGizmo?: boolean;
   showSubtitles?: boolean;
+  showVignette?: boolean;
   currentTime?: number;
   selectedEntity?: SelectedEntity;
   activeActorId?: string | null;
@@ -78,6 +83,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
   script,
   showGizmo = false,
   showSubtitles = true,
+  showVignette = true,
   currentTime,
   selectedEntity,
   activeActorId = null,
@@ -150,6 +156,46 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
 
   const activeSelectionRules = getSelectionRuleInfo(effectiveSelection);
   const activeRuleAllowedSlots = dragSession?.allowedSlots ?? activeSelectionRules?.allowedSlots ?? null;
+
+  // Unified Layer 2 Render Entities sorted by zIndex / layer depth
+  type UnifiedRenderItem =
+    | { type: "structure"; item: EnvironmentItemConfig; index: number; z: number }
+    | { type: "actor"; actor: ActorConfig; index: number; z: number }
+    | { type: "detail"; detail: DetailItemConfig; index: number; z: number };
+
+  const unifiedRenderEntities: UnifiedRenderItem[] = useMemo(() => {
+    const list: UnifiedRenderItem[] = [];
+
+    environment_items.forEach((item, index) => {
+      const z = item.zIndex !== undefined ? item.zIndex : 10 + index * 0.05;
+      list.push({ type: "structure", item, index, z });
+    });
+
+    actors.forEach((actor, index) => {
+      const z = actor.zIndex !== undefined ? actor.zIndex : 20 + index * 0.05;
+      list.push({ type: "actor", actor, index, z });
+    });
+
+    details.forEach((detail, index) => {
+      const z = detail.zIndex !== undefined ? detail.zIndex : 30 + index * 0.05;
+      list.push({ type: "detail", detail, index, z });
+    });
+
+    return list.sort((a, b) => {
+      const isDraggingA =
+        (dragSession?.type === "structure" && a.type === "structure" && dragSession.index === a.index) ||
+        (dragSession?.type === "actor" && a.type === "actor" && dragSession.id === a.actor.id) ||
+        (dragSession?.type === "detail" && a.type === "detail" && dragSession.id === a.detail.id);
+      const isDraggingB =
+        (dragSession?.type === "structure" && b.type === "structure" && dragSession.index === b.index) ||
+        (dragSession?.type === "actor" && b.type === "actor" && dragSession.id === b.actor.id) ||
+        (dragSession?.type === "detail" && b.type === "detail" && dragSession.id === b.detail.id);
+
+      if (isDraggingA && !isDraggingB) return 1;
+      if (!isDraggingA && isDraggingB) return -1;
+      return a.z - b.z;
+    });
+  }, [environment_items, actors, details, dragSession]);
 
   // Helper: Convert client PointerEvent to SVG World (0..1920, Y=800) coordinates, automatically inverting Camera Matrix
   const getSvgCoordinates = (e: React.PointerEvent | PointerEvent): { x: number; y: number } => {
@@ -557,70 +603,215 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
               />
             )}
 
-          {/* Environment Structures */}
-          <g id="structures-group">
-            {environment_items.map((item, index) => {
-              const coords = getSlotCoordinates(item.slot, item.offsetX, item.offsetY);
-              const isSelected =
-                effectiveSelection?.type === "structure" && effectiveSelection.index === index;
-              const isBeingDragged = dragSession?.type === "structure" && dragSession.index === index;
-              const displayCoords = isBeingDragged ? dragSession.currentCoords : coords;
+          {/* Unified Ground World Entities (Structures, Actors, Details sorted by Z-Index) */}
+          <g id="unified-ground-entities-group">
+            {unifiedRenderEntities.map((entity) => {
+              if (entity.type === "structure") {
+                const { item, index } = entity;
+                const coords = getSlotCoordinates(item.slot, item.offsetX, item.offsetY);
+                const isSelected =
+                  effectiveSelection?.type === "structure" && effectiveSelection.index === index;
+                const isBeingDragged = dragSession?.type === "structure" && dragSession.index === index;
+                const displayCoords = isBeingDragged ? dragSession.currentCoords : coords;
 
-              return (
-                <g
-                  key={`struct-${item.asset_id}-${index}`}
-                  transform={`translate(${displayCoords.x}, ${displayCoords.y})`}
-                  className={`${interactiveDrag ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}`}
-                  onPointerDown={(e) => handleStructurePointerDown(e, index)}
-                >
-                  {interactiveDrag && (
-                    <rect x="-130" y="-280" width="260" height="290" fill="transparent" />
-                  )}
+                return (
+                  <g
+                    key={`struct-${item.asset_id}-${index}`}
+                    transform={`translate(${displayCoords.x}, ${displayCoords.y})`}
+                    className={`${interactiveDrag ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}`}
+                    onPointerDown={(e) => handleStructurePointerDown(e, index)}
+                  >
+                    {interactiveDrag && (
+                      <rect x="-130" y="-280" width="260" height="290" fill="transparent" />
+                    )}
 
-                  {/* Selection / Drag Highlight Ring */}
-                  {(isSelected || isBeingDragged) && (
-                    <ellipse
-                      cx="0"
-                      cy="0"
-                      rx="82"
-                      ry="18"
-                      fill="none"
-                      stroke={
-                        isBeingDragged
-                          ? dragSession.isOverAllowedZone
-                            ? "#10B981"
-                            : "#EF4444"
-                          : "#34D399"
-                      }
-                      strokeWidth="3.5"
-                      strokeDasharray="7,4"
-                      className="anim-pulse-slow"
+                    {/* Selection / Drag Highlight Ring */}
+                    {(isSelected || isBeingDragged) && (
+                      <ellipse
+                        cx="0"
+                        cy="0"
+                        rx="82"
+                        ry="18"
+                        fill="none"
+                        stroke={
+                          isBeingDragged
+                            ? dragSession.isOverAllowedZone
+                              ? "#10B981"
+                              : "#EF4444"
+                            : "#34D399"
+                        }
+                        strokeWidth="3.5"
+                        strokeDasharray="7,4"
+                        className="anim-pulse-slow"
+                      />
+                    )}
+
+                    <StructureRenderer
+                      id={item.asset_id}
+                      scale={item.scale || 1}
+                      facing={item.facing}
+                      isShaking={item.isShaking}
+                      showAnchor={showGizmo || isSelected || isBeingDragged}
                     />
-                  )}
 
-                  <StructureRenderer
-                    id={item.asset_id}
-                    scale={item.scale || 1}
-                    facing={item.facing}
-                    showAnchor={showGizmo || isSelected || isBeingDragged}
-                  />
+                    {(showGizmo || isSelected) && !isBeingDragged && (
+                      <text
+                        x="0"
+                        y="-240"
+                        textAnchor="middle"
+                        fill="#A7F3D0"
+                        fontSize="13"
+                        fontWeight="bold"
+                        fontFamily="monospace"
+                        filter="drop-shadow(0 2px 4px rgba(0,0,0,0.95))"
+                      >
+                        #{index + 1} {item.asset_id} ({item.slot})
+                      </text>
+                    )}
+                  </g>
+                );
+              }
 
-                  {(showGizmo || isSelected) && !isBeingDragged && (
-                    <text
-                      x="0"
-                      y="-240"
-                      textAnchor="middle"
-                      fill="#A7F3D0"
-                      fontSize="13"
-                      fontWeight="bold"
-                      fontFamily="monospace"
-                      filter="drop-shadow(0 2px 4px rgba(0,0,0,0.95))"
-                    >
-                      #{index + 1} {item.asset_id} ({item.slot})
-                    </text>
-                  )}
-                </g>
-              );
+              if (entity.type === "actor") {
+                const { actor } = entity;
+                const evaluated = evaluateActorAtTime(actor, currentTime, script.duration_sec || 6);
+                const isSelected = effectiveSelection?.type === "actor" && effectiveSelection.id === actor.id;
+                const isBeingDragged = dragSession?.type === "actor" && dragSession.id === actor.id;
+                const displayCoords = isBeingDragged ? dragSession.currentCoords : evaluated.coords;
+
+                return (
+                  <g
+                    key={`actor-${actor.id}`}
+                    transform={`translate(${displayCoords.x}, ${displayCoords.y})`}
+                    className={`${interactiveDrag ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}`}
+                    onPointerDown={(e) => handleActorPointerDown(e, actor.id)}
+                  >
+                    {interactiveDrag && (
+                      <rect x="-60" y="-305" width="120" height="320" fill="transparent" />
+                    )}
+
+                    {/* Selection / Drag Highlight Ring */}
+                    {(isSelected || isBeingDragged) && (
+                      <ellipse
+                        cx="0"
+                        cy="0"
+                        rx="52"
+                        ry="15"
+                        fill="none"
+                        stroke={
+                          isBeingDragged
+                            ? dragSession.isOverAllowedZone
+                              ? "#10B981"
+                              : "#EF4444"
+                            : "#EF4444"
+                        }
+                        strokeWidth="3.5"
+                        strokeDasharray="6,4"
+                        className="anim-pulse-slow"
+                      />
+                    )}
+
+                    {/* Character Rig */}
+                    <CharacterRig
+                      id={actor.id}
+                      base={actor.base}
+                      costume={actor.costume}
+                      face={actor.face}
+                      facialAction={actor.facialAction}
+                      pose={evaluated.pose}
+                      facing={evaluated.facing}
+                      scale={actor.scale || 1}
+                      opacity={actor.opacity !== undefined ? actor.opacity : 1}
+                      heldItem={actor.heldItem}
+                      heldHand={actor.heldHand}
+                      shoulderItem={actor.shoulderItem}
+                      headItem={actor.headItem}
+                      legItem={actor.legItem}
+                      showSockets={showGizmo || isSelected || isBeingDragged}
+                    />
+
+                    {/* Label in Debug/Gizmo Mode */}
+                    {(showGizmo || isSelected) && !isBeingDragged && (
+                      <text
+                        x="0"
+                        y="-310"
+                        textAnchor="middle"
+                        fill="#FFFFFF"
+                        fontSize="14"
+                        fontWeight="bold"
+                        fontFamily="monospace"
+                        filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))"
+                      >
+                        {actor.id} ({actor.slot}{evaluated.hasMotion ? " → B" : ""})
+                      </text>
+                    )}
+                  </g>
+                );
+              }
+
+              if (entity.type === "detail") {
+                const { detail } = entity;
+                const coords = getSlotCoordinates(detail.slot, detail.offsetX, detail.offsetY);
+                const isSelected = effectiveSelection?.type === "detail" && effectiveSelection.id === detail.id;
+                const isBeingDragged = dragSession?.type === "detail" && dragSession.id === detail.id;
+                const displayCoords = isBeingDragged ? dragSession.currentCoords : coords;
+
+                return (
+                  <g
+                    key={`detail-${detail.id}`}
+                    transform={`translate(${displayCoords.x}, ${displayCoords.y})`}
+                    className={`${interactiveDrag ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}`}
+                    onPointerDown={(e) => handleDetailPointerDown(e, detail.id)}
+                  >
+                    {interactiveDrag && (
+                      <rect x="-70" y="-140" width="140" height="165" fill="transparent" />
+                    )}
+
+                    {(isSelected || isBeingDragged) && (
+                      <ellipse
+                        cx="0"
+                        cy="0"
+                        rx="42"
+                        ry="12"
+                        fill="none"
+                        stroke={
+                          isBeingDragged
+                            ? dragSession.isOverAllowedZone
+                              ? "#10B981"
+                              : "#EF4444"
+                            : "#F59E0B"
+                        }
+                        strokeWidth="3"
+                        strokeDasharray="5,4"
+                        className="anim-pulse-slow"
+                      />
+                    )}
+
+                    <DetailRenderer
+                      id={detail.asset_id}
+                      scale={detail.scale || 1}
+                      showAnchor={showGizmo || isSelected || isBeingDragged}
+                    />
+
+                    {(showGizmo || isSelected) && !isBeingDragged && (
+                      <text
+                        x="0"
+                        y="-118"
+                        textAnchor="middle"
+                        fill="#FDE68A"
+                        fontSize="12"
+                        fontWeight="bold"
+                        fontFamily="monospace"
+                        filter="drop-shadow(0 2px 4px rgba(0,0,0,0.95))"
+                      >
+                        {DETAIL_RULES[detail.asset_id]?.name || detail.asset_id} ({detail.slot})
+                      </text>
+                    )}
+                  </g>
+                );
+              }
+
+              return null;
             })}
           </g>
 
@@ -690,85 +881,6 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
               })}
             </g>
           )}
-
-          {/* Actors / Modular Character Rigs */}
-          <g id="actors-group">
-            {actors.map((actor) => {
-              const evaluated = evaluateActorAtTime(actor, currentTime, script.duration_sec || 6);
-              const isSelected = effectiveSelection?.type === "actor" && effectiveSelection.id === actor.id;
-              const isBeingDragged = dragSession?.type === "actor" && dragSession.id === actor.id;
-              const displayCoords = isBeingDragged ? dragSession.currentCoords : evaluated.coords;
-
-              return (
-                <g
-                  key={`actor-${actor.id}`}
-                  transform={`translate(${displayCoords.x}, ${displayCoords.y})`}
-                  className={`${interactiveDrag ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}`}
-                  onPointerDown={(e) => handleActorPointerDown(e, actor.id)}
-                >
-                  {interactiveDrag && (
-                    <rect x="-60" y="-305" width="120" height="320" fill="transparent" />
-                  )}
-
-                  {/* Selection / Drag Highlight Ring */}
-                  {(isSelected || isBeingDragged) && (
-                    <ellipse
-                      cx="0"
-                      cy="0"
-                      rx="52"
-                      ry="15"
-                      fill="none"
-                      stroke={
-                        isBeingDragged
-                          ? dragSession.isOverAllowedZone
-                            ? "#10B981"
-                            : "#EF4444"
-                          : "#EF4444"
-                      }
-                      strokeWidth="3.5"
-                      strokeDasharray="6,4"
-                      className="anim-pulse-slow"
-                    />
-                  )}
-
-                  {/* Character Rig */}
-                  <CharacterRig
-                    id={actor.id}
-                    base={actor.base}
-                    costume={actor.costume}
-                    face={actor.face}
-                    facialAction={actor.facialAction}
-                    pose={evaluated.pose}
-                    facing={evaluated.facing}
-                    scale={actor.scale || 1}
-                    opacity={actor.opacity !== undefined ? actor.opacity : 1}
-                    heldItem={actor.heldItem}
-                    heldHand={actor.heldHand}
-                    shoulderItem={actor.shoulderItem}
-                    headItem={actor.headItem}
-                    legItem={actor.legItem}
-                    showSockets={showGizmo || isSelected || isBeingDragged}
-                  />
-
-                  {/* Label in Debug/Gizmo Mode */}
-                  {(showGizmo || isSelected) && !isBeingDragged && (
-                    <text
-                      x="0"
-                      y="-310"
-                      textAnchor="middle"
-                      fill="#FFFFFF"
-                      fontSize="14"
-                      fontWeight="bold"
-                      fontFamily="monospace"
-                      filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))"
-                    >
-                      {actor.id} ({actor.slot}{evaluated.hasMotion ? " → B" : ""})
-                    </text>
-                  )}
-                </g>
-              );
-            })}
-          </g>
 
           {/* Draggable Destination Handles (Point B Ghosts in Interactive Editor Mode) */}
           {interactiveDrag && (
@@ -857,69 +969,13 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
             </g>
           )}
 
-          {/* Scene Details / Horror Props */}
-          <g id="details-group">
-            {details.map((detail) => {
-              const coords = getSlotCoordinates(detail.slot, detail.offsetX, detail.offsetY);
-              const isSelected = effectiveSelection?.type === "detail" && effectiveSelection.id === detail.id;
-              const isBeingDragged = dragSession?.type === "detail" && dragSession.id === detail.id;
-              const displayCoords = isBeingDragged ? dragSession.currentCoords : coords;
-
-              return (
-                <g
-                  key={`detail-${detail.id}`}
-                  transform={`translate(${displayCoords.x}, ${displayCoords.y})`}
-                  className={`${interactiveDrag ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}`}
-                  onPointerDown={(e) => handleDetailPointerDown(e, detail.id)}
-                >
-                  {interactiveDrag && (
-                    <rect x="-70" y="-140" width="140" height="165" fill="transparent" />
-                  )}
-
-                  {(isSelected || isBeingDragged) && (
-                    <ellipse
-                      cx="0"
-                      cy="0"
-                      rx="42"
-                      ry="12"
-                      fill="none"
-                      stroke={
-                        isBeingDragged
-                          ? dragSession.isOverAllowedZone
-                            ? "#10B981"
-                            : "#EF4444"
-                          : "#F59E0B"
-                      }
-                      strokeWidth="3"
-                      strokeDasharray="5,4"
-                      className="anim-pulse-slow"
-                    />
-                  )}
-
-                  <DetailRenderer
-                    id={detail.asset_id}
-                    scale={detail.scale || 1}
-                    showAnchor={showGizmo || isSelected || isBeingDragged}
-                  />
-
-                  {(showGizmo || isSelected) && !isBeingDragged && (
-                    <text
-                      x="0"
-                      y="-118"
-                      textAnchor="middle"
-                      fill="#FDE68A"
-                      fontSize="12"
-                      fontWeight="bold"
-                      fontFamily="monospace"
-                      filter="drop-shadow(0 2px 4px rgba(0,0,0,0.95))"
-                    >
-                      {DETAIL_RULES[detail.asset_id]?.name || detail.asset_id} ({detail.slot})
-                    </text>
-                  )}
-                </g>
-              );
-            })}
-          </g>
+          {/* SPACE DIVIDER: Cột / Vách Ngăn Phân Chia 2 Không Gian Độc Lập */}
+          {script.space_divider && (
+            <SpaceDividerRenderer
+              config={script.space_divider}
+              showLabels={showGizmo}
+            />
+          )}
         </g>
 
         {/* PROCEDURAL WEATHER & ATMOSPHERIC PARTICLE LAYER (Rain, Blood Rain, Embers, Ash, Haunted Mist) */}
@@ -933,7 +989,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
           </g>
         )}
 
-        {/* LAYER 3 (z-index 30): FOREGROUND MIST, DRY BRANCHES, VIGNETTE (Foreground Parallax: 1.35) */}
+        {/* LAYER 3 (z-index 30): FOREGROUND MIST, DRY BRANCHES (Foreground Parallax: 1.35) */}
         <g id="layer-3-foreground" transform={cameraState.fgTransform}>
           <ForegroundLayer
             fogDensity={lighting.fog_density ?? 0}
@@ -941,6 +997,20 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
             theme={theme}
           />
         </g>
+
+        {/* SCREEN-SPACE CINEMATIC VIGNETTE (Tối 4 góc điện ảnh, neo cố định toàn màn hình 1920x1080) */}
+        {showVignette && (
+          <rect
+            id="cinematic-lens-vignette"
+            x="0"
+            y="0"
+            width={CANVAS_WIDTH}
+            height={CANVAS_HEIGHT}
+            fill="url(#vignette-grad)"
+            style={{ mixBlendMode: "multiply" }}
+            pointerEvents="none"
+          />
+        )}
 
         {/* DEBUG GIZMO OVERLAY: GROUND PLANE & ALLOWED/LOCKED SLOT MARKERS */}
         {(showGizmo || Boolean(dragSession) || (interactiveDrag && Boolean(activeRuleAllowedSlots))) && (

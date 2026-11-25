@@ -286,6 +286,16 @@ export const DETAIL_RULES: Record<DetailId, DetailRule> = {
     allowedSlots: ALL_GROUND_SLOT_IDS,
     reason: "Mẹt tre lót lá chuối cúng cô hồn kèm nải chuối, đồ chơi đất nung và nén nhang đỏ tỏa khói trắng tiếp đất tại mọi vị trí Y=800px.",
   },
+  detail_matchbox: {
+    name: "Hộp quẹt diêm cổ để bàn",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Bao diêm giấy nhỏ màu vàng nâu cũ kỹ đặt trên mặt bàn gỗ cạnh đèn dầu hột vịt (hỗ trợ offsetY âm để đặt trên bàn) hoặc tiếp đất Y=800px.",
+  },
+  detail_water_droplets: {
+    name: "Giọt nước nhỏ tí tách bên ngoài cửa sổ",
+    allowedSlots: ALL_SLOT_IDS,
+    reason: "Chuỗi giọt nước đọng và rơi tí tách tạo gợn sóng nhỏ ngay bên ngoài bệ cửa sổ gỗ hoặc trên mặt đất đêm khuya, hỗ trợ mọi slot và offsetY.",
+  },
 };
 
 const AIR_POSES: CharacterPoseId[] = ["pose_floating", "pose_hanging"];
@@ -324,6 +334,10 @@ export function supportsVerticalOffset(
     pose === "pose_balancing_bridge" ||
     pose === "pose_kneeling" ||
     pose === "pose_squatting" ||
+    pose === "pose_lying_ground" ||
+    pose === "pose_swimming" ||
+    pose === "pose_drowning" ||
+    pose === "pose_floating_corpse" ||
     (interact_with != null &&
       interact_with !== "none" &&
       [

@@ -426,8 +426,9 @@
       {
         "id": "structure_wooden_latch_door",
         "name": "Cánh cửa gỗ cũ cài then ngang có khe hở chân cửa",
-        "semantic_role": "Khung cửa gỗ ghép từ nhiều tấm ván dọc nứt nẻ lọt ánh sáng xanh đêm lạnh, thanh then cài gỗ ngang tại tầm cao Y=580px, khe hở 15px sát đất cho vệt nước bùn tràn qua",
+        "semantic_role": "Khung cửa gỗ ghép từ nhiều tấm ván dọc nứt nẻ lọt ánh sáng xanh đêm lạnh, thanh then cài gỗ ngang tại tầm cao Y=580px, khe hở 15px sát đất cho vệt nước bùn tràn qua. Hỗ trợ tùy chọn isShaking: true để cửa rung bần bật khi có ma quỷ đập cửa (mặc định đứng yên)",
         "allowed_slots": ["mid_left", "center", "mid_right"],
+        "supports_shaking": true,
         "layer": "midground",
         "width": 260,
         "height": 400,
@@ -880,6 +881,26 @@
         "id": "pose_holding",
         "type": "ground",
         "desc": "Giơ tay cầm đồ vật ra phía trước (soi đèn, giơ bùa, thủ kiếm)"
+      },
+      {
+        "id": "pose_lying_ground",
+        "type": "ground",
+        "desc": "Tư thế nằm sõng soài / gục ngã trên đất (không có gối): toàn bộ cơ thể nằm ngang bẹp sát sàn đất hoặc mặt đường (Y=0px), má áp sát nền đất, hai chân và hai tay buông xuôi rũ rượi hoặc một tay vươn yếu ớt chạm đất; thích hợp cho cảnh bị đánh bất tỉnh, kiệt sức gục ngã hoặc tử thi bất động trên sàn nhà / bãi cỏ hoang"
+      },
+      {
+        "id": "pose_swimming",
+        "type": "ground",
+        "desc": "Tư thế bơi lội / rẽ nước trên sông rạch đầm lầy: nửa thân chìm dưới làn nước tối, thân trên nhô rẽ sóng, đầu ngẩng cao thở, hai cánh tay vung sải chèo quạt nước nhịp nhàng tạo các gợn sóng hình elip lan tỏa và bọt nước dập dềnh; kết hợp hoàn hảo với di chuyển qua sông rạch bằng khối motion (movingPose: pose_swimming)"
+      },
+      {
+        "id": "pose_drowning",
+        "type": "ground",
+        "desc": "Tư thế chết đuối / ngoi ngóp chới với cầu cứu: toàn thân chìm sâu dưới mặt nước ngập đến cằm, đầu ngửa ra sau há hốc kinh hoàng đớp khí, hai cánh tay vươn cao chới với lên khỏi mặt nước run rẩy vẫy vùng tuyệt vọng, bọt khí sủi tăm sùng sục và vòng xoáy nước ma quái hút xuống; đặc trưng cho cảnh trượt chân ngã sông hoặc bị ma da kéo chân"
+      },
+      {
+        "id": "pose_floating_corpse",
+        "type": "ground",
+        "desc": "Tư thế xác chết trôi sông / xác chết đuối nổi lờ đờ: toàn thân bất động nổi ngang dập dềnh theo nhịp sóng nước bập bềnh, tóc xõa dài bồng bềnh lơ lửng như rêu nước, tay chân buông thõng chìm dưới dòng nước lạnh, có vệt sóng nước và rêu rác phù sa dạt quanh; kinh điển cho truyện kinh dị vớt xác sông nước Nam Bộ"
       }
     ],
     "held_items": [
@@ -901,7 +922,10 @@
       { "id": "item_offering_toys", "name": "Nải chuối và đồ chơi đất nung cúng cô hồn" },
       { "id": "item_areca_palm_fan", "name": "Quạt mo cau" },
       { "id": "item_fresh_ginger", "name": "Lát gừng tươi" },
-      { "id": "item_oil_lamp", "name": "Đèn dầu hột vịt cầm tay" }
+      { "id": "item_oil_lamp", "name": "Đèn dầu hột vịt cầm tay" },
+      { "id": "item_incense_sticks", "name": "Nén / Bó nhang đang cháy cầm tay khấn vái" },
+      { "id": "item_book", "name": "Cuốn sách giấy bìa cũ" },
+      { "id": "item_betel_quid", "name": "Miếng trầu têm cánh phượng" }
     ],
     "shoulder_items": [
       { "id": "none", "name": "Không vác đồ vật", "desc": "Hai vai trống không" },
@@ -1045,6 +1069,20 @@
       "name": "Mẹt đồ cúng cô hồn trên đất (Nải chuối, nhang & đồ chơi đất nung)",
       "semantic_role": "Mẹt tre lót lá chuối đặt tiếp đất Y=800px, bên trên có nải chuối chín, vài món đồ chơi con nít bằng đất nung nhỏ (nồi đất, chén đất, con giống) và một nén nhang đang cháy đỏ tỏa làn khói trắng mỏng cuộn lên không trung",
       "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_matchbox",
+      "name": "Hộp quẹt diêm cổ để bàn",
+      "semantic_role": "Bao diêm giấy nhỏ màu vàng nâu cũ kỹ đặt trên mặt bàn gỗ cạnh đèn dầu hột vịt (hỗ trợ offsetY âm để đặt trên bàn)",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_water_droplets",
+      "name": "Giọt nước nhỏ tí tách bên ngoài cửa sổ",
+      "semantic_role": "Chuỗi giọt nước đọng và rơi tí tách tạo vòng gợn sóng nhỏ ngay bên ngoài bệ cửa sổ gỗ trong đêm khuya, gợi dấu vết thực thể ướt sũng đứng rình rập",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right", "air_left", "air_center", "air_right"],
       "anchor": "bottom-center"
     }
   ],

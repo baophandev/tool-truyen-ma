@@ -118,7 +118,7 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `structure_monkey_bridge` | Cầu khỉ miền Tây | Cây cầu khỉ tre miền Tây chênh vênh với chân tre cắm chữ X buộc dây lạt, thân cầu uốn cong và tay vịn tre một bên bắc ngang con kênh tối giữa bụi dừa nước và lục bình | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `structure_wooden_coffin` | Cỗ quan tài gỗ đặt trong nhà | Tâm điểm đám tang truyền thống bà ngoại; cỗ áo quan gỗ hình lục giác nắp vát cạnh chạm khắc chữ "Thọ" mờ, kê trên hai đôn gỗ cao, ánh nến vàng hắt nhẹ lên nắp hòm và dải băng tang trắng rủ mép | `["mid_left", "center", "mid_right"]` |
 | `structure_bamboo_bed_net` | Giường tre nông thôn giăng mùng ngủ | Giường tre nông thôn 4 cọc tre vươn cao treo mùng vải trắng mỏng bán trong suốt rủ quanh giường, bên trong có chiếu cói và gối mây; mặt giường tại Y=-80px vừa khít với tư thế nằm `pose_lying_down` (offsetY: -80) | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
-| `structure_wooden_latch_door` | Cánh cửa gỗ cũ cài then ngang có khe hở chân cửa | Khung cửa gỗ ghép từ nhiều tấm ván dọc nứt nẻ lọt ánh sáng đêm lạnh, thanh then cài gỗ ngang tại tầm cao Y=580px (offsetY=-220px từ Ground Y=800px), chừa khe hở 15px sát đất cho vệt nước bùn tràn qua | `["mid_left", "center", "mid_right"]` |
+| `structure_wooden_latch_door` | Cánh cửa gỗ cũ cài then ngang có khe hở chân cửa | Khung cửa gỗ ghép từ nhiều tấm ván dọc nứt nẻ lọt ánh sáng đêm lạnh, thanh then cài gỗ ngang tại tầm cao Y=580px (offsetY=-220px từ Ground Y=800px), chừa khe hở 15px sát đất cho vệt nước bùn tràn qua. **Hỗ trợ cờ `"isShaking": true` để tạo hiệu ứng cánh cửa rung bần bật khi có ma quỷ đập cửa hoặc cảnh căng thẳng (mặc định cửa đứng yên tĩnh hoàn toàn)** | `["mid_left", "center", "mid_right"]` |
 | `structure_rural_passenger_bus` | Xe đò khách cũ vùng quê | Xe khách cổ điển thập niên 90-2000 dạng hộp bo tròn góc, giá chở hàng chằng bạt trên nóc, các ô cửa sổ kính tối màu, đèn pha trước chiếu luồng sáng vàng mờ nhạt | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `structure_coconut_banana_grove` | Rặng dừa nước và bụi chuối rậm rạp | Thân dừa cao vươn nghiêng duyên dáng với tán lá xòe hình lược răng cưa sắc nhọn, bên dưới là bụi chuối xiêm rậm rạp với các tàu lá bản to rách gió và bắp chuối tím sẫm, khung viền đặc trưng Nam Bộ | `["far_left", "far_right"]` |
 | `structure_wooden_chair` | Ghế gỗ tựa | Chiếc ghế gỗ tựa gia đình mộc mạc trang nhã, lưng tựa nan cao vút từ Y=-72px lên Y=-198px tại X=-20px, tay vịn gỗ thanh lịch; **tương tác vừa khít 100% với tư thế ngồi `pose_sitting` và `pose_sitting_twisted_legs`** (đùi gập ngang trên mặt ghế Y=-72px, cẳng chân buông xuống sàn, bàn chân tiếp đất tại Y=0px). Hỗ trợ `facing: "left" | "right"` để xoay ghế đón nhân vật ngồi từ mọi hướng | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
@@ -154,6 +154,8 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `detail_water_hyacinth` | Bụi lục bình dày đặc trôi nổi | Cụm lá tròn phình cuống xốp bồng bềnh trên mặt nước kênh rạch, chùm hoa tím nhạt u ám và rễ ngầm đen dưới nước | Cả 5 Ground Slots (Ground/Mặt nước Y=800px) |
 | `detail_child_sandals` | Đôi dép trẻ con bỏ lại trên mặt đất | Đôi dép nhựa / dép tổ ong nhỏ xíu nằm chỏng chơ lệch nhau sát mép đất đầu cầu khỉ vương bùn ướt lạnh đêm sương, gợi nhắc đứa trẻ mất tích bí ẩn | Cả 5 Ground Slots (Ground only Y=800px) |
 | `detail_offering_tray_toys` | Mẹt đồ cúng cô hồn trên đất (Nải chuối, nhang & đồ chơi đất nung) | Mẹt tre lót lá chuối đựng nải chuối chín, bộ đồ chơi con nít bằng đất nung nhỏ (nồi đất, chén con, con giống) và nén nhang cháy đỏ khói trắng mỏng cuộn bay | Cả 5 Ground Slots (Ground only Y=800px) |
+| `detail_matchbox` | Hộp quẹt diêm cổ để bàn | Bao diêm giấy nhỏ màu vàng nâu cũ kỹ kéo hé lộ que diêm đầu đỏ đặt trên mặt bàn gỗ cạnh đèn dầu hột vịt (hỗ trợ `offsetY` âm để đặt trên bàn) | Cả 5 Ground Slots |
+| `detail_water_droplets` | Giọt nước nhỏ tí tách bên ngoài cửa sổ | Chuỗi giọt nước đọng và rơi tí tách tạo vòng gợn sóng nhỏ ngay bên ngoài bệ cửa sổ gỗ trong đêm khuya, gợi dấu vết thực thể ướt sũng đứng rình rập | Cả 5 Ground Slots và 3 Air Slots |
 
 ---
 
@@ -252,6 +254,10 @@ Giúp nhân vật sống động, không bị đơ cứng như ảnh tĩnh mà l
 | `pose_balancing_bridge` | Đi thăng bằng trên cầu khỉ / cầu tre | Ground | Cả 5 Ground Slots (Hỗ trợ `offsetY: -115` trên cầu khỉ `structure_monkey_bridge` hoặc `offsetY: -110` trên cầu gỗ gãy `broken_wooden_bridge`) | **Tư thế đi chênh vênh thăng bằng:** Hai bàn chân đặt so le thẳng hàng dọc theo thân tre hẹp, hai đầu gối chùng xuống hạ thấp trọng tâm, hai cánh tay dang rộng sang hai bên giữ thăng bằng (hoặc một tay giơ đèn soi đường, một tay dang ngang), cơ thể rung nhẹ trước những cơn gió lạnh thổi thốc qua lòng kênh tối. |
 | `pose_kneeling` | Quỳ gối lạy / khấn vái / xin tha mạng | Ground | Cả 5 Ground Slots (Hỗ trợ `offsetY: 0` trên mặt sàn hoặc `offsetY: -80` trên phản/giường) | **Tư thế quỳ gối kính cẩn hoặc kinh hãi:** Hai đầu gối chạm đất, hai cẳng chân và mu bàn chân xếp phẳng phía sau, thân mình thẳng hoặc hơi cúi lạy, hai tay chắp trước ngực cầu xin/khấn vái (hoặc hai tay dâng bùa/nến/hương). Hoàn hảo cho cảnh cúng bái trước bàn thờ `structure_ancestor_altar` hoặc quỳ xin tha mạng trước quỷ dữ. |
 | `pose_squatting` | Ngồi xổm / chồm hổm góc tối | Ground | Cả 5 Ground Slots (Hỗ trợ `offsetY: 0` trên mặt đất/sàn nhà) | **Dáng ngồi chồm hổm rùng rợn đặc trưng Á Đông:** Hai bàn chân đạp đất, hai đầu gối co gập nhô cao sát ngực tạo tam giác góc cạnh, hai tay khoác qua đầu gối hoặc buông thõng thủ thế giữa hai chân. Dùng cho cảnh kẻ ăn mày, đứa trẻ ma lẩn trốn trong góc tối hoặc ngạ quỷ rình rập con mồi. |
+| `pose_lying_ground` | Nằm sõng soài / gục ngã trên đất | Ground | Cả 5 Ground Slots (Y=800, `offsetY: 0`) | **Nằm bẹp trên mặt đất không có gối:** Toàn bộ thân thể nằm ngang song song mặt sàn đất (cao ~20px), má và thái dương áp sát nền đất lạnh, tóc xõa phẳng ra nền đất, hai cánh tay buông xuôi rũ rượi hoặc một tay vươn yếu ớt chạm đất, hai chân duỗi thẳng mềm oặt, có bóng đổ tiếp xúc và vệt đất ẩm loang dưới thân. Tuyệt đối phù hợp cho cảnh ngất xỉu, bị đánh bất tỉnh, kiệt sức gục ngã hoặc xác chết nằm bẹp trên đường lộ/sàn gạch. |
+| `pose_swimming` | Bơi lội / rẽ nước trên sông đầm | Ground | Cả 5 Ground Slots (Y=800 mặt nước, hỗ trợ `offsetY`) | **Tư thế bơi lội rẽ sóng nước:** Nửa thân dưới ngập trong bóng nước tối bí ẩn, thân trên nhô lên rẽ sóng, đầu ngẩng cao thở hoặc nghiêng mắt nhìn, hai cánh tay chèo sải rẽ nước nhịp nhàng (`anim-swimming-arm`). Xung quanh có các gợn sóng elip lan tỏa (`anim-water-ripple`) và bọt nước trắng đục dập dềnh (`anim-water-bob`). Hoàn hảo cho cảnh bơi qua đầm lầy `cursed_swamp`, bơi bám mạn xuồng `structure_wooden_sampan`, hoặc di chuyển bơi qua sông bằng khối `motion` (`movingPose: "pose_swimming"`). |
+| `pose_drowning` | Chết đuối / ngoi ngóp chới với | Ground | Cả 5 Ground Slots (Y=800 mặt nước, hỗ trợ `offsetY`) | **Vùng vẫy tuyệt vọng trong cơn ngạt nước:** Thân mình chìm sâu ngập đến cổ/cằm trong làn nước tối, đầu ngửa ra sau há hốc kinh hoàng đớp khí (`anim-drowning-body`), hai cánh tay giơ cao vung vẫy chới với lên khỏi mặt nước với các ngón tay co quắp run rẩy cầu cứu (`anim-drowning-arms`). Xung quanh có vòng xoáy nước ma quái hút xoáy và bọt khí sủi tăm sùng sục vỡ tung tóe (`anim-bubble-rise`). Rất đắt giá cho cảnh rơi xuống sông sâu, bị ma da túm chân lôi xuống nước. |
+| `pose_floating_corpse` | Xác chết trôi sông / trôi lờ đờ | Ground | Cả 5 Ground Slots (Y=800 mặt nước, hỗ trợ `offsetY`) | **Xác chết đuối nổi lờ đờ trên mặt sông rạch:** Toàn thân mềm oặt nằm ngang dập dềnh bập bềnh theo nhịp sóng nước trôi (`anim-corpse-drift`), mặt ngửa trắng bệch vô hồn, tóc xõa dài lơ lửng bồng bềnh trong làn nước như rong rêu ma quái, tay chân buông thõng chìm dưới dòng nước lạnh, có các vệt sóng nước và rêu rác phù sa dạt quanh. Yếu tố kinh dị kinh điển trong truyện ma sông nước, vớt xác lúc nửa đêm. |
 
 ---
 
@@ -285,6 +291,9 @@ Nhân vật có thể cầm đồ vật trên tay thông qua Hand Socket. Vật 
 17. `"item_areca_palm_fan"`: Quạt mo cau miền quê. Chiếc quạt bẹ mo cau khô sạm gân dọc đặc trưng, tự đung đưa phe phẩy nhẹ theo chuyển động tay. Phù hợp cảnh nhân vật cầm quạt mo phe phẩy trằn trọc trong đêm hè oi bức.
 18. `"item_fresh_ginger"`: Lát gừng tươi giữ khí. Nhánh và lát gừng vàng tươi tỏa quầng sáng ấm áp nhẹ nhàng, biểu trưng cho mẹo dân gian ngậm hoặc cầm lát gừng tươi để "giữ khí" chống lại tà khí ban đêm.
 19. `"item_oil_lamp"`: Đèn dầu hột vịt cầm tay. Đèn dầu thủy tinh hột vịt thon eo nhỏ gọn cầm tại Hand Socket [0, 0] (bàn tay cầm vào đế/cổ đèn), ngọn lửa bấc vàng cam leo lét với quầng sáng ấm tỏa tròn soi tỏ bóng đêm. Rất phù hợp khi nhân vật vùng dậy soi quanh giường tre hoặc cầm đèn dầu rọi tìm dấu vết trong đêm tối.
+20. `"item_incense_sticks"`: Nén / Bó nhang đang cháy cầm tay khấn vái. Ba nén nhang mảnh cầm thẳng đứng tại Hand Socket [0, 0], đầu nhang có đốm lửa đỏ hồng lập lòe kèm làn khói trắng mỏng uốn lượn bay lên, dùng cho cảnh bà ngoại khấn vái cầu siêu.
+21. `"item_book"`: Cuốn sách giấy bìa cũ. Cuốn sách mở đôi cầm trên tay nhân vật khi nằm võng đọc sách ban chiều, trang giấy trắng ngà đổ bóng tối giản phong cách 2D silhouette.
+22. `"item_betel_quid"`: Miếng trầu têm cánh phượng. Miếng trầu xanh têm vôi trắng nhỏ gọn cầm trên tay cụ bà nông thôn Nam Bộ khi ngồi trò chuyện bên bậu cửa.
 
 ### 6.3. Hệ Thống Trang Bị Body Sockets (Vai, Đầu, Chân)
 
@@ -375,6 +384,8 @@ export interface DirectorSceneScript {
     offsetY?: number;
     scale?: number;
     facing?: "left" | "right";
+    isShaking?: boolean;          // Tùy chọn rung lắc (đặc biệt cho structure_wooden_latch_door khi có ma quỷ đập cửa, chấn động kịch tính)
+    zIndex?: number;             // Thứ tự lớp hiển thị (số càng lớn càng nằm trên, mặc định 10)
   }>;
   actors: Array<{
     id: string;
@@ -382,14 +393,15 @@ export interface DirectorSceneScript {
     costume?: "outfit_tattered_tunic" | "outfit_flowing_ao_dai" | "outfit_shrouded_cloak" | "outfit_mandarin_court" | "outfit_monk_cassock" | "outfit_shredded_burial" | "outfit_ancient_armor" | "outfit_child_pajamas" | "outfit_doctor_coat" | "outfit_patient_gown" | "outfit_modern_casual" | "outfit_traditional_ba_ba" | "outfit_funeral_white";
     face: "face_calm" | "face_scared" | "face_screaming_gasp" | "face_creepy_smile" | "face_bleeding_eyes" | "face_old_wrinkled" | "face_rage_furious" | "face_pale_corpse" | "face_weeping_ghost" | "face_sewn_mouth" | "face_haggard_gaunt" | "face_faceless" | "face_glowing_hollow" | "face_talisman_covered" | "face_headless";
     facialAction?: "none" | "blink_natural" | "blink_nervous" | "darting_eyes" | "crying_tears" | "bleeding_tears" | "creepy_laugh" | "terrified_scream" | "talking_jaw";
-    pose: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging" | "pose_lying_down";
+    pose: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging" | "pose_lying_down" | "pose_lying_hammock" | "pose_sitting_bed" | "pose_climbing_stairs" | "pose_balancing_bridge" | "pose_kneeling" | "pose_squatting" | "pose_lying_ground" | "pose_swimming" | "pose_drowning" | "pose_floating_corpse";
     facing: "left" | "right";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
     offsetX?: number;
     offsetY?: number;
     scale?: number;
     opacity?: number;
-    heldItem?: "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger" | "item_oil_lamp";
+    zIndex?: number;             // Thứ tự lớp hiển thị (số càng lớn càng nằm trên, mặc định 20)
+    heldItem?: "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger" | "item_oil_lamp" | "item_incense_sticks" | "item_book" | "item_betel_quid";
     heldHand?: "right" | "left";
     shoulderItem?: "none" | "shoulder_carrying_pole" | "shoulder_coffin_pole" | "shoulder_hoe" | "shoulder_sack" | "shoulder_firewood_bundle";
     headItem?: "none" | "head_conical_hat" | "head_funeral_band" | "head_straw_hat" | "head_talisman_mask" | "head_basket";
@@ -402,17 +414,25 @@ export interface DirectorSceneScript {
       endTimeSec?: number;
       easing?: "linear" | "ease_in_out" | "ease_in" | "ease_out";
       autoFaceTarget?: boolean;
-      movingPose?: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging" | "pose_lying_down";
+      movingPose?: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_holding" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging" | "pose_lying_down" | "pose_lying_hammock" | "pose_sitting_bed" | "pose_climbing_stairs" | "pose_balancing_bridge" | "pose_kneeling" | "pose_squatting" | "pose_lying_ground" | "pose_swimming" | "pose_drowning" | "pose_floating_corpse";
     };
   }>;
   details?: Array<{
     id: string;
-    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp" | "detail_broken_mirror" | "detail_muddy_water_puddle" | "detail_oil_lamp" | "detail_vintage_radio" | "detail_water_hyacinth" | "detail_child_sandals" | "detail_offering_tray_toys";
+    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp" | "detail_broken_mirror" | "detail_muddy_water_puddle" | "detail_oil_lamp" | "detail_vintage_radio" | "detail_water_hyacinth" | "detail_child_sandals" | "detail_offering_tray_toys" | "detail_matchbox" | "detail_water_droplets";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
     offsetX?: number;
     offsetY?: number;
     scale?: number;
   }>;
+  space_divider?: {               // Tùy chọn cột/vách ngăn phân chia 2 không gian kiến trúc độc lập (vd: Ngoài hiên/sông vs Trong buồng nhà)
+    slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right";
+    style?: "wooden_pillar" | "bamboo_partition" | "brick_wall" | "black_silhouette";
+    offsetX?: number;
+    width?: number;
+    label_left?: string;
+    label_right?: string;
+  };
   dialogue?: string;              // Lời thoại / Phụ đề điện ảnh hiển thị đáy màn hình
   subtitle_style?: "blood_red" | "smoky_grey" | "emerald_phantom" | "candle_amber" | "cyan_fluorescent"; // Font & theme chữ phụ đề cổ điển/kinh dị
   subtitle_anim?: "typewriter" | "word_fade" | "classic_fade"; // Hiệu ứng chữ xuất hiện theo nhịp diễn biến câu chuyện
@@ -1169,7 +1189,7 @@ Thay vì giữ nguyên 1 góc máy cố định suốt cả phân cảnh dài, A
   },
   "environment_items": [
     { "asset_id": "structure_bamboo_bed_net", "slot": "mid_left", "scale": 1.0 },
-    { "asset_id": "structure_wooden_latch_door", "slot": "mid_right", "offsetX": 20, "scale": 1.0 }
+    { "asset_id": "structure_wooden_latch_door", "slot": "mid_right", "offsetX": 20, "scale": 1.0, "isShaking": true }
   ],
   "actors": [
     {
@@ -1525,6 +1545,10 @@ Khi phân cảnh xuất hiện các công trình đặc biệt (Cầu thang gỗ
 | **`structure_wooden_chair`** | `pose_sitting`<br>hoặc `pose_sitting_twisted_legs` | `offsetY: 0` | **Ngồi ghế tựa:** Đùi gập ngang mặt ghế Y=-72px, cẳng chân buông xuống sàn Y=0px phẳng phiu. |
 | **`structure_ancestor_altar`**<br>(hoặc mặt sàn) | `pose_kneeling` | `offsetY: 0` | **Quỳ lạy khấn vái:** Đầu gối tiếp đất, hai tay chắp trước ngực khấn vái linh thiêng trước bàn thờ tổ tiên hoặc quỳ van xin. |
 | **(Mọi bối cảnh sàn/đất)** | `pose_squatting` | `offsetY: 0` | **Ngồi xổm / chồm hổm:** Đầu gối nhô cao sát ngực, ngồi nép góc tối hoặc rình rập trong bóng đêm. |
+| **(Mọi bối cảnh sàn/đất/đường lộ)** | `pose_lying_ground` | `offsetY: 0` | **Nằm sõng soài / gục ngã trên đất:** Toàn thân nằm phẳng rạp sát sàn đất, không có gối, má áp sát nền đất, hai tay buông rũ, bất tỉnh hoặc xác chết nằm bẹp. |
+| **`cursed_swamp`**<br>hoặc **`structure_wooden_sampan`** | `pose_swimming`<br>(hỗ trợ motion) | `offsetY: 0` (mặt nước Y=800) | **Bơi lội rẽ sóng nước sông đầm:** Nửa thân dưới ngập trong nước, hai tay vung sải chèo quạt nước rẽ sóng, gợn sóng và bọt nước dập dềnh bơi qua đầm lầy. |
+| **`cursed_swamp`**<br>hoặc bờ kênh sông | `pose_drowning` | `offsetY: 0` (mặt nước Y=800) | **Chết đuối ngoi ngóp chới với:** Ngập sâu đến cằm, đầu ngửa há hốc đớp khí kinh hãi, hai tay vươn cao khỏi mặt nước run rẩy vẫy vùng cầu cứu, bọt khí sủi tăm sùng sục và xoáy nước ma quái. |
+| **`cursed_swamp`**<br>hoặc bờ kênh sông | `pose_floating_corpse` | `offsetY: 0` (mặt nước Y=800) | **Xác chết trôi sông nổi lờ đờ:** Xác chết đuối nằm ngang dập dềnh theo nhịp sóng nước, tóc xõa dài bồng bềnh như rong rêu, tay chân buông thõng chìm dưới dòng nước lạnh. |
 
 ### JSON mẫu phân cảnh tương tác leo cầu thang & vượt cầu khỉ:
 
@@ -1599,6 +1623,102 @@ Khi phân cảnh xuất hiện các công trình đặc biệt (Cầu thang gỗ
   "narrative_note": "Nhân vật nam leo cầu thang gỗ structure_wooden_stairs từ sàn lên gác lửng Y=-180px với motion.movingPose='pose_climbing_stairs'. Oan hồn đứng thăng bằng giữa thân cầu khỉ structure_monkey_bridge với pose_balancing_bridge tại cao độ Y=-115px."
 }
 ```
+
+### JSON mẫu phân cảnh kinh dị sông nước & chết đuối (Water Horror & Drowning / Swimming / Ground Collapse):
+
+```json
+{
+  "scene_id": "scene_water_horror_drowning_and_corpse",
+  "title": "Bóng Ma Da Dưới Đầm Lầy & Tiếng Kêu Cứu Trong Vọng Nước",
+  "duration_sec": 10,
+  "theme": "cursed_swamp",
+  "lighting": {
+    "sky_preset": "stormy_dark",
+    "fog_density": 0.6,
+    "weather": "haunted_mist"
+  },
+  "camera": {
+    "shot": "medium_wide",
+    "target_slot": "center",
+    "shake": "subtle_handheld"
+  },
+  "environment_items": [
+    {
+      "asset_id": "structure_wooden_sampan",
+      "slot": "far_left",
+      "offsetX": 20,
+      "scale": 1.0
+    },
+    {
+      "asset_id": "structure_monkey_bridge",
+      "slot": "far_right",
+      "offsetX": -30,
+      "scale": 1.0
+    }
+  ],
+  "actors": [
+    {
+      "id": "actor_drowning_victim",
+      "base": "male_adult",
+      "costume": "outfit_tattered_tunic",
+      "face": "face_screaming_gasp",
+      "facialAction": "terrified_scream",
+      "pose": "pose_drowning",
+      "facing": "right",
+      "slot": "center",
+      "offsetX": -50,
+      "offsetY": 0,
+      "scale": 1.0,
+      "opacity": 1.0
+    },
+    {
+      "id": "actor_swimming_rescuer",
+      "base": "male_adult",
+      "costume": "outfit_traditional_ba_ba",
+      "face": "face_scared",
+      "facialAction": "darting_eyes",
+      "pose": "pose_swimming",
+      "facing": "right",
+      "slot": "mid_left",
+      "offsetX": 40,
+      "offsetY": 0,
+      "scale": 1.0,
+      "opacity": 1.0,
+      "motion": {
+        "targetSlot": "center",
+        "targetOffsetX": -120,
+        "targetOffsetY": 0,
+        "startTimeSec": 1.0,
+        "endTimeSec": 7.0,
+        "easing": "ease_in_out",
+        "movingPose": "pose_swimming"
+      }
+    },
+    {
+      "id": "actor_floating_corpse_swamp",
+      "base": "female_adult",
+      "costume": "outfit_flowing_ao_dai",
+      "face": "face_pale_corpse",
+      "facialAction": "none",
+      "pose": "pose_floating_corpse",
+      "facing": "left",
+      "slot": "mid_right",
+      "offsetX": 30,
+      "offsetY": 0,
+      "scale": 1.0,
+      "opacity": 0.9
+    }
+  ],
+  "details": [
+    { "id": "detail_water_hyacinth_left", "asset_id": "detail_water_hyacinth", "slot": "mid_left", "offsetX": -20, "offsetY": 0, "scale": 1.0 },
+    { "id": "detail_water_hyacinth_right", "asset_id": "detail_water_hyacinth", "slot": "mid_right", "offsetX": 70, "offsetY": 0, "scale": 1.1 },
+    { "id": "detail_wisp_swamp", "asset_id": "detail_will_o_wisp", "slot": "air_center", "offsetX": 10, "offsetY": 0, "scale": 1.0 }
+  ],
+  "dialogue": "Dòng nước xoáy đen ngòm cuộn trào bọt khí khi nạn nhân ngoi ngóp giơ hai tay cầu cứu tuyệt vọng. Phía bên kia chiếc xuồng, một xác áo dài trắng đang trôi nổi lờ đờ theo nhịp sóng...",
+  "narrative_note": "Tổ hợp kinh dị sông nước hoàn hảo: actor_drowning_victim ở pose_drowning chìm sâu ngập cằm vùng vẫy bọt khí; actor_swimming_rescuer ở pose_swimming đang rẽ sóng bơi tới cứu; actor_floating_corpse_swamp ở pose_floating_corpse dập dềnh bập bềnh trôi sông giữa các bụi lục bình detail_water_hyacinth và xuồng ba lá structure_wooden_sampan."
+}
+```
+
 
 
 

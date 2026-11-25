@@ -15,6 +15,7 @@ import {
   Film,
   Layers,
   Activity,
+  CircleDot,
 } from "lucide-react";
 
 interface PlayerViewProps {
@@ -23,6 +24,8 @@ interface PlayerViewProps {
   onSelectScene: (index: number) => void;
   showGizmo: boolean;
   onToggleGizmo: () => void;
+  showVignette?: boolean;
+  onToggleVignette?: () => void;
   onDisableAllShake?: () => void;
 }
 
@@ -32,6 +35,8 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   onSelectScene,
   showGizmo,
   onToggleGizmo,
+  showVignette = true,
+  onToggleVignette,
   onDisableAllShake,
 }) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -160,6 +165,22 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             <span>{showGizmo ? "Tắt Lưới Neo" : "Hiện Lưới Neo"}</span>
           </button>
 
+          {/* Vignette Filter Toggle */}
+          {onToggleVignette && (
+            <button
+              onClick={onToggleVignette}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                showVignette
+                  ? "bg-neutral-800 hover:bg-neutral-700 text-purple-300 border border-purple-600/40"
+                  : "bg-neutral-850 hover:bg-neutral-800 text-neutral-400 opacity-60 border border-neutral-700/50"
+              }`}
+              title="Bật/Tắt hiệu ứng tối 4 góc màn hình điện ảnh (Cinematic Vignette Filter)"
+            >
+              <CircleDot className={`w-4 h-4 ${showVignette ? "text-purple-400" : "text-neutral-500"}`} />
+              <span>{showVignette ? "Tối Góc: Bật" : "Tối Góc: Tắt"}</span>
+            </button>
+          )}
+
           {/* Quick Disable All Shake if any scene has shake */}
           {scenes.some(
             (s) =>
@@ -191,6 +212,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             script={activeScene}
             showGizmo={showGizmo}
             showSubtitles={true}
+            showVignette={showVignette}
             currentTime={currentTime}
             interactiveDrag={false}
           />

@@ -3,6 +3,22 @@
  * Style: Silhouette Minimalist Horror (Limbo / Badland / U Linh Kỳ Truyện)
  */
 
+export type SpaceDividerStyle =
+  | "wooden_pillar"
+  | "bamboo_partition"
+  | "brick_wall"
+  | "black_silhouette";
+
+export interface SpaceDividerConfig {
+  enabled?: boolean;
+  slot?: GroundSlotId; // Slot đặt vách ngăn chia 2 không gian ("far_left" | "mid_left" | "center" | "mid_right" | "far_right"), mặc định "mid_left"
+  offsetX?: number;    // Tinh chỉnh pixel X nếu muốn xê dịch vách ngăn
+  style?: SpaceDividerStyle; // Kiểu dáng vách/cột ("wooden_pillar", "bamboo_partition", "brick_wall", "black_silhouette")
+  width?: number;      // Bề rộng vách/cột (px, mặc định 64px)
+  label_left?: string;  // Nhãn không gian bên trái (vd: "Ngoài Hiên / Bờ Kênh")
+  label_right?: string; // Nhãn không gian bên phải (vd: "Trong Buồng / Gian Nhà")
+}
+
 export type ThemeId =
   | "rural_graveyard"
   | "abandoned_village"
@@ -75,7 +91,9 @@ export type DetailId =
   | "detail_vintage_radio"
   | "detail_water_hyacinth"
   | "detail_child_sandals"
-  | "detail_offering_tray_toys";
+  | "detail_offering_tray_toys"
+  | "detail_matchbox"
+  | "detail_water_droplets";
 
 export type CharacterBaseId =
   | "male_adult"
@@ -149,7 +167,11 @@ export type CharacterPoseId =
   | "pose_climbing_stairs"
   | "pose_balancing_bridge"
   | "pose_kneeling"
-  | "pose_squatting";
+  | "pose_squatting"
+  | "pose_lying_ground"
+  | "pose_swimming"
+  | "pose_drowning"
+  | "pose_floating_corpse";
 
 export type HeldItemId =
   | "none"
@@ -170,7 +192,10 @@ export type HeldItemId =
   | "item_offering_toys"      // Nải chuối & đồ chơi đất nung cúng cô hồn trên tàu lá chuối
   | "item_areca_palm_fan"     // Quạt mo cau miền quê phe phẩy đêm hè oi bức
   | "item_fresh_ginger"       // Lát gừng tươi giữ khí chống tà khí ban đêm
-  | "item_oil_lamp";          // Đèn dầu hột vịt cầm tay soi bóng đêm
+  | "item_oil_lamp"           // Đèn dầu hột vịt cầm tay soi bóng đêm
+  | "item_incense_sticks"     // Ba nén nhang đang cháy cầm tay khấn vái
+  | "item_book"               // Cuốn sách giấy bìa cũ mở đôi
+  | "item_betel_quid";        // Miếng trầu têm cánh phượng
 
 export type ShoulderItemId =
   | "none"
@@ -216,6 +241,8 @@ export interface EnvironmentItemConfig {
   offsetY?: number; // Optional fine-tuning in px
   scale?: number;   // Optional scaling factor
   facing?: FacingDirection; // Optional horizontal facing direction ("left" | "right")
+  isShaking?: boolean; // Tùy chọn rung lắc (ví dụ cánh cửa gỗ bị đập mạnh, chấn động kịch tính)
+  zIndex?: number;  // Độ sâu lớp hiển thị (ai trên ai dưới - số càng lớn càng ở phía trên)
 }
 
 export interface DetailItemConfig {
@@ -225,6 +252,7 @@ export interface DetailItemConfig {
   offsetX?: number;
   offsetY?: number;
   scale?: number;
+  zIndex?: number;  // Độ sâu lớp hiển thị (ai trên ai dưới - số càng lớn càng ở phía trên)
 }
 
 export type EasingType = "linear" | "ease_in_out" | "ease_in" | "ease_out";
@@ -261,6 +289,7 @@ export interface ActorConfig {
   headItem?: HeadItemId;         // Modular prop anchored to Head Socket (e.g. nón lá, khăn tang, bùa dán)
   legItem?: LegItemId;           // Modular prop anchored to Leg/Feet Socket (e.g. cùm xích sắt, gông cùm, băng bó máu)
   motion?: ActorMotionConfig; // Optional A -> B keyframe movement
+  zIndex?: number;  // Độ sâu lớp hiển thị (ai trên ai dưới - số càng lớn càng ở phía trên)
 }
 
 export type WeatherEffectId =
@@ -369,6 +398,7 @@ export interface DirectorSceneScript {
   environment_items: EnvironmentItemConfig[];
   actors: ActorConfig[];
   details?: DetailItemConfig[];
+  space_divider?: SpaceDividerConfig | boolean | GroundSlotId; // Cột / Vách ngăn kiến trúc chia 2 không gian độc lập
   dialogue?: string;
   subtitle_style?: SubtitleStyleId;
   subtitle_anim?: SubtitleAnimId;

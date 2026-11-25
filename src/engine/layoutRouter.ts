@@ -23,6 +23,8 @@ import type {
   WeatherEffectId,
   FacialActionId,
   DirectorCameraConfig,
+  SpaceDividerConfig,
+  SpaceDividerStyle,
   CameraKeyframe,
   CameraMotionConfig,
   CameraShotType,
@@ -226,6 +228,10 @@ const VALID_POSES: CharacterPoseId[] = [
   "pose_balancing_bridge",
   "pose_kneeling",
   "pose_squatting",
+  "pose_lying_ground",
+  "pose_swimming",
+  "pose_drowning",
+  "pose_floating_corpse",
 ];
 const VALID_HELD_ITEMS: HeldItemId[] = [
   "none",
@@ -247,6 +253,9 @@ const VALID_HELD_ITEMS: HeldItemId[] = [
   "item_areca_palm_fan",
   "item_fresh_ginger",
   "item_oil_lamp",
+  "item_incense_sticks",
+  "item_book",
+  "item_betel_quid",
 ];
 export const VALID_SHOULDER_ITEMS: ShoulderItemId[] = [
   "none",
@@ -290,6 +299,8 @@ const VALID_DETAILS: DetailId[] = [
   "detail_water_hyacinth",
   "detail_child_sandals",
   "detail_offering_tray_toys",
+  "detail_matchbox",
+  "detail_water_droplets",
 ];
 const VALID_FACINGS: FacingDirection[] = ["left", "right"];
 const VALID_SLOTS: SlotId[] = [
@@ -411,6 +422,9 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       if (item.asset_id === "wooden_window" || item.asset_id === "window" || item.asset_id === "country_window") {
         item.asset_id = "structure_wooden_window";
       }
+      if (item.asset_id === "hammock" || item.asset_id === "wooden_hammock" || item.asset_id === "bamboo_hammock") {
+        item.asset_id = "structure_hammock";
+      }
       if (!VALID_STRUCTURES.includes(item.asset_id)) return;
 
       const structId = item.asset_id as StructureId;
@@ -421,6 +435,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
         slot = rule.allowedSlots[0] || "center";
       }
 
+      const isShaking = Boolean(item.isShaking || item.shaking);
       environment_items.push({
         asset_id: structId,
         slot,
@@ -428,6 +443,8 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
         offsetY: Number(item.offsetY) || 0,
         scale: Number(item.scale) || 1,
         ...(item.facing === "left" || item.facing === "right" ? { facing: item.facing } : {}),
+        ...(isShaking ? { isShaking: true } : {}),
+        ...(item.zIndex !== undefined && !isNaN(Number(item.zIndex)) ? { zIndex: Number(item.zIndex) } : {}),
       });
     });
   }
@@ -499,6 +516,20 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
         offsetY = -110;
       }
     }
+    // Auto-heal missing structure_hammock whenever an actor uses pose_lying_hammock
+    if (pose === "pose_lying_hammock") {
+      if (offsetY === 0) offsetY = -60;
+      if (!environment_items.some((e) => e.asset_id === "structure_hammock" && e.slot === slot)) {
+        environment_items.push({
+          asset_id: "structure_hammock",
+          slot: slot as GroundSlotId,
+          offsetX,
+          offsetY: 0,
+          scale: 1,
+        });
+      }
+    }
+
     const scale = Number(actor.scale) || 1;
     const opacity = actor.opacity !== undefined ? Math.min(1, Math.max(0, Number(actor.opacity))) : 1;
 
@@ -622,6 +653,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
       ...(headItem !== "none" ? { headItem } : {}),
       ...(legItem !== "none" ? { legItem } : {}),
       ...(motion ? { motion } : {}),
+      ...(actor.zIndex !== undefined && !isNaN(Number(actor.zIndex)) ? { zIndex: Number(actor.zIndex) } : {}),
     });
   });
 
@@ -666,6 +698,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
         offsetX: Number(dt.offsetX) || 0,
         offsetY: Number(dt.offsetY) || 0,
         scale: Number(dt.scale) || 1,
+        ...(dt.zIndex !== undefined && !isNaN(Number(dt.zIndex)) ? { zIndex: Number(dt.zIndex) } : {}),
       });
     });
   }
@@ -883,6 +916,44 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     };
   }
 
+  // Space Divider Normalization (Vách ngăn chia 2 không gian độc lập)
+  let space_divider: SpaceDividerConfig | undefined = undefined;
+  if (script.space_divider) {
+    if (typeof script.space_divider === "string") {
+      const slot = VALID_SLOTS.includes(script.space_divider as any)
+        ? (script.space_divider as GroundSlotId)
+        : "mid_left";
+      space_divider = { enabled: true, slot, style: "wooden_pillar" };
+    } else if (typeof script.space_divider === "boolean") {
+      space_divider = script.space_divider
+        ? { enabled: true, slot: "mid_left", style: "wooden_pillar" }
+        : undefined;
+    } else if (typeof script.space_divider === "object") {
+      const raw = script.space_divider as any;
+      if (raw.enabled !== false) {
+        const slot = VALID_SLOTS.includes(raw.slot) ? raw.slot : "mid_left";
+        const VALID_STYLES: SpaceDividerStyle[] = [
+          "wooden_pillar",
+          "bamboo_partition",
+          "brick_wall",
+          "black_silhouette",
+        ];
+        const style: SpaceDividerStyle = VALID_STYLES.includes(raw.style)
+          ? raw.style
+          : "wooden_pillar";
+        space_divider = {
+          enabled: true,
+          slot,
+          offsetX: Number(raw.offsetX) || 0,
+          style,
+          width: Number(raw.width) || 64,
+          ...(typeof raw.label_left === "string" ? { label_left: raw.label_left.trim() } : {}),
+          ...(typeof raw.label_right === "string" ? { label_right: raw.label_right.trim() } : {}),
+        };
+      }
+    }
+  }
+
   const normalized: DirectorSceneScript = {
     scene_id,
     title,
@@ -900,6 +971,7 @@ export function validateDirectorScript(script: any): { valid: boolean; errors: s
     environment_items,
     actors,
     details,
+    ...(space_divider ? { space_divider } : {}),
     dialogue,
     subtitle_style,
     subtitle_anim,

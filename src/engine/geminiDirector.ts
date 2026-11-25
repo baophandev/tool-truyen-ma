@@ -268,11 +268,11 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
   * "structure_wooden_window" -> CHỈ ĐẶT Ở: "far_left" | "mid_left" | "mid_right" | "far_right"
   * "scarecrow_of_the_damned", "market_stall_tent", "abandoned_subway_station", "rusty_train_tracks_tunnel", "structure_old_apartment_gate", "structure_wooden_sampan", "structure_monkey_bridge", "structure_wooden_coffin", "structure_bamboo_bed_net", "structure_wooden_latch_door", "structure_rural_passenger_bus", "structure_wooden_chair", "structure_wooden_bed", "structure_hammock", "structure_wooden_stairs" -> Đặt ở mọi ground slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right"
 - Details (Đạo cụ cảnh):
-  * "detail_black_crow", "detail_broken_mirror" -> Tất cả 5 ground slots và 3 air slots
+  * "detail_black_crow", "detail_broken_mirror", "detail_water_droplets" -> Tất cả 5 ground slots và 3 air slots
   * "detail_will_o_wisp" -> "air_left" | "air_center" | "air_right" | "mid_left" | "center" | "mid_right"
   * "detail_blood_lantern" -> 5 ground slots hoặc "air_left" | "air_right"
   * "detail_incense_bowl" -> "mid_left" | "center" | "mid_right" (Ground only)
-  * "detail_skull_pile", "detail_iv_drip_stand", "detail_shopping_cart", "detail_muddy_water_puddle", "detail_oil_lamp", "detail_water_hyacinth", "detail_child_sandals", "detail_offering_tray_toys" -> 5 ground slots (Ground only)
+  * "detail_skull_pile", "detail_iv_drip_stand", "detail_shopping_cart", "detail_muddy_water_puddle", "detail_oil_lamp", "detail_matchbox", "detail_water_hyacinth", "detail_child_sandals", "detail_offering_tray_toys" -> 5 ground slots (Ground only)
   * "detail_vintage_radio" -> "mid_left" | "center" | "mid_right" (Ground hoặc bàn)
   * "detail_hanging_talisman", "detail_surveillance_camera", "detail_flickering_ceiling_lamp" -> "air_left" | "air_center" | "air_right" (Air only)
 - Actor Bases (Khung nhân vật):
@@ -323,7 +323,7 @@ Nhiệm vụ của bạn là nhận câu chuyện, kịch bản hoặc yêu cầ
     - Khi nhân vật ngồi xổm / chồm hổm góc tối rình rập hoặc sợ hãi: "pose": "pose_squatting", "offsetY": 0.
     - Đứng / đi lại trên mặt đất bình thường: "offsetY": 0.
 - Actor Handheld Items (Đồ vật cầm tay qua Hand Socket):
-  * "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" (Mẩu giấy / lá thư bí ẩn vương máu) | "item_offering_toys" (Nải chuối & đồ chơi đất nung cúng cô hồn) | "item_areca_palm_fan" (Quạt mo cau) | "item_fresh_ginger" (Lát gừng tươi giữ khí) | "item_oil_lamp" (Đèn dầu hột vịt cầm tay soi sáng)
+  * "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" (Mẩu giấy / lá thư bí ẩn vương máu) | "item_offering_toys" (Nải chuối & đồ chơi đất nung cúng cô hồn) | "item_areca_palm_fan" (Quạt mo cau) | "item_fresh_ginger" (Lát gừng tươi giữ khí) | "item_oil_lamp" (Đèn dầu hột vịt cầm tay soi sáng) | "item_incense_sticks" (Ba nén nhang đang cháy cầm tay khấn vái) | "item_book" (Cuốn sách giấy bìa cũ mở đôi) | "item_betel_quid" (Miếng trầu têm cánh phượng)
   * "heldHand": "right" (tay trước) | "left" (tay sau)
 - Actor Body Socket Items (Tương tác Vai, Đầu, Chân):
   * "shoulderItem" (Đồ vật vác / gánh trên vai): "none" | "shoulder_carrying_pole" (Đòn gánh tre hai thúng quang dầu đung đưa) | "shoulder_coffin_pole" (Đòn khiêng áo quan / đòn sóc quấn thừng) | "shoulder_hoe" (Cuốc cày rỉ sét vác vai) | "shoulder_sack" (Bao tải gai vác trĩu vai) | "shoulder_firewood_bundle" (Bó củi khô buộc lạt mây).
@@ -1057,7 +1057,7 @@ ${castSummary}
    - "slot": "far_left" | "mid_left" | "center" | "mid_right" | "far_right" (hoặc "air_left" | "air_center" | "air_right")
    - "offsetX": 0, "offsetY": 0 (Ngoại lệ bắt buộc: Đỉnh cầu thang "structure_wooden_stairs" thì offsetY = -180; Cầu khỉ tre "structure_monkey_bridge" thì offsetY = -115; Cầu gãy "broken_wooden_bridge" thì offsetY = -110; Nằm/ngồi trên giường "structure_wooden_bed" / "structure_bamboo_bed_net" thì offsetY = -80; Nằm trên võng "structure_hammock" thì offsetY = -60)
    - "interact_with": "structure_wooden_stairs" | "structure_monkey_bridge" | "broken_wooden_bridge" | "structure_wooden_bed" | "structure_bamboo_bed_net" | "structure_wooden_chair" | "structure_hammock" | "none" (khi tương tác công trình)
-   - "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger" | "item_oil_lamp"
+   - "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger" | "item_oil_lamp" | "item_incense_sticks" | "item_book" | "item_betel_quid"
    - "heldHand": "right" | "left"
    - "motion": NẾU NHÂN VẬT ĐỨNG YÊN THÌ BỎ HẲN TRƯỜNG NÀY (TUYỆT ĐỐI KHÔNG để null hay {}). Chỉ khi nhân vật di chuyển từ điểm A sang điểm B mới thêm khối: { "targetSlot": "mid_right", "targetOffsetX": 0, "targetOffsetY": 0 (hoặc -180 khi leo lên cầu thang gác), "startTimeSec": 0.2, "endTimeSec": 5, "easing": "ease_in_out", "autoFaceTarget": true, "movingPose": "pose_walking" | "pose_climbing_stairs" | "pose_balancing_bridge" }.
 5. Xuất ra một JSON ARRAY gồm đúng ${sceneSpecs.length} đối tượng DirectorSceneScript:
@@ -1435,9 +1435,12 @@ KHO TÀI NGUYÊN HOẠT HÌNH 2D SẴN CÓ TRONG HỆ THỐNG (CHỈ ĐƯỢC CH
 3. BIỂU CẢM KHUÔN MẶT (Faces - 14 mặt):
    - "face_calm", "face_scared", "face_creepy_smile", "face_bleeding_eyes", "face_old_wrinkled", "face_rage_furious", "face_pale_corpse", "face_weeping_ghost", "face_sewn_mouth", "face_haggard_gaunt", "face_faceless", "face_glowing_hollow", "face_talisman_covered", "face_headless"
 
-4. ĐỒ VẬT CẦM TAY (Held Items - 18 món):
+4. ĐỒ VẬT CẦM TAY (Held Items - 21 món):
    - "none"
    - "item_oil_lamp" (đèn dầu hột vịt cầm tay soi bóng đêm)
+   - "item_incense_sticks" (ba nén nhang đang cháy cầm tay khấn vái)
+   - "item_book" (cuốn sách giấy bìa cũ mở đôi)
+   - "item_betel_quid" (miếng trầu têm cánh phượng)
    - "item_areca_palm_fan" (quạt mo cau phe phẩy khi oi nóng)
    - "item_fresh_ginger" (lát gừng tươi giữ khí trừ tà)
    - "item_offering_toys" (nải chuối & đồ chơi đất nung cúng cô hồn)
@@ -1480,7 +1483,7 @@ KHO TÀI NGUYÊN HOẠT HÌNH 2D SẴN CÓ TRONG HỆ THỐNG (CHỈ ĐƯỢC CH
    - Bối cảnh Đô Thị / Hiện Đại (CHỈ DÙNG KHI CỐT TRUYỆN THUỘC THỂ LOẠI ĐÔ THỊ HIỆN ĐẠI):
      * "hospital_operating_bed", "hotel_reception_desk", "supermarket_shelf_aisle", "creepy_elevator_doors", "dining_table_chairs", "bus_interior", "creepy_bathtub", "market_stall_tent", "abandoned_subway_station", "rusty_train_tracks_tunnel", "structure_old_apartment_gate"
 
-6. ĐẠO CỤ BỐI CẢNH (Details - 17 đạo cụ):
+6. ĐẠO CỤ BỐI CẢNH (Details - 19 đạo cụ):
    - "detail_black_crow" (Quạ đen)
    - "detail_will_o_wisp" (Đốm ma trơi xanh lân tinh)
    - "detail_blood_lantern" (Lồng đèn máu / ngọn đèn dầu)
@@ -1489,6 +1492,8 @@ KHO TÀI NGUYÊN HOẠT HÌNH 2D SẴN CÓ TRONG HỆ THỐNG (CHỈ ĐƯỢC CH
    - "detail_hanging_talisman" (Dây bùa treo)
    - "detail_muddy_water_puddle" (Vũng nước ướt sũng lẫn bùn non)
    - "detail_oil_lamp" (Đèn dầu hột vịt cổ)
+   - "detail_matchbox" (Hộp quẹt diêm cổ để bàn)
+   - "detail_water_droplets" (Giọt nước nhỏ tí tách bên ngoài cửa sổ)
    - "detail_vintage_radio" (Đài radio cassette cổ chạy pin)
    - "detail_water_hyacinth" (Bụi lục bình trôi nổi)
    - "detail_child_sandals" (Đôi dép trẻ con bỏ lại trên mặt đất đầu cầu khỉ vương bùn)
@@ -1681,9 +1686,12 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
 3. BIỂU CẢM KHUÔN MẶT & ĐẶC ĐIỂM ĐẦU (Faces - 14 mặt):
    - "face_calm", "face_scared", "face_creepy_smile", "face_bleeding_eyes", "face_old_wrinkled", "face_rage_furious", "face_pale_corpse", "face_weeping_ghost", "face_sewn_mouth", "face_haggard_gaunt", "face_faceless", "face_glowing_hollow", "face_talisman_covered", "face_headless" (Cổ đứt lìa / Không đầu)
 
-4. ĐỒ VẬT CẦM TAY (Held Items - 18 món):
+4. ĐỒ VẬT CẦM TAY (Held Items - 21 món):
    - "none" (tay không)
    - "item_oil_lamp" (đèn dầu hột vịt cầm tay)
+   - "item_incense_sticks" (ba nén nhang đang cháy cầm tay khấn vái)
+   - "item_book" (cuốn sách giấy bìa cũ mở đôi)
+   - "item_betel_quid" (miếng trầu têm cánh phượng)
    - "item_storm_lantern" (đèn bão sắt)
    - "item_paper_lantern" (lồng đèn giấy)
    - "item_soul_candle" (nến triệu hồn)
@@ -1737,7 +1745,7 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "structure_ancestor_altar" (Bàn thờ tổ tiên vách lá)
    - "structure_wooden_stairs" (Cầu thang gỗ cũ kỹ rùng rợn dẫn lên gác lửng)
 
-6. ĐẠO CỤ BỐI CẢNH (Details - 17 đạo cụ):
+6. ĐẠO CỤ BỐI CẢNH (Details - 19 đạo cụ):
    - "detail_black_crow" (Quạ đen)
    - "detail_will_o_wisp" (Đốm ma trơi)
    - "detail_blood_lantern" (Lồng đèn máu)
@@ -1746,6 +1754,8 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "detail_hanging_talisman" (Dây bùa treo)
    - "detail_muddy_water_puddle" (Vũng nước ướt sũng lẫn bùn non)
    - "detail_oil_lamp" (Đèn dầu hột vịt)
+   - "detail_matchbox" (Hộp quẹt diêm cổ để bàn)
+   - "detail_water_droplets" (Giọt nước nhỏ tí tách bên ngoài cửa sổ)
    - "detail_vintage_radio" (Đài radio cassette cổ)
    - "detail_water_hyacinth" (Bụi lục bình trôi nổi)
    - "detail_child_sandals" (Đôi dép trẻ con bỏ lại trên mặt đất)
@@ -1765,6 +1775,7 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - Khi kịch bản nhắc đến ngồi xếp bằng/khoanh chân/niệm chú trên giường: "interact_with": "structure_bamboo_bed_net" / "structure_wooden_bed", "pose": "pose_sitting_bed", "offsetY": -80.
    - Khi kịch bản nhắc đến nằm đung đưa trên võng dù miền quê: "interact_with": "structure_hammock", "pose": "pose_lying_hammock", "offsetY": -60.
    - Khi kịch bản nhắc đến ngồi ghế: "interact_with": "structure_wooden_chair", "pose": "pose_sitting", "offsetY": 0.
+   - Khi kịch bản nhắc đến cửa gỗ rung lên bần bật / ma quỷ đập cửa dồn dập: gán 'isShaking': true vào công trình structure_wooden_latch_door trong environment_items (mặc định cửa sẽ đứng yên tĩnh nếu không gán cờ này).
    - Khi kịch bản nhắc đến leo cầu thang / bước lên gác lửng: "interact_with": "structure_wooden_stairs", "pose": "pose_climbing_stairs" (kèm motion di chuyển lên cao targetOffsetY: -180), hoặc đứng trên gác lửng "offsetY": -180.
    - Khi kịch bản nhắc đến đi/bước chênh vênh qua cầu khỉ / cầu tre / cầu gãy: "interact_with": "structure_monkey_bridge" / "broken_wooden_bridge", "pose": "pose_balancing_bridge", "offsetY": -115 (cầu khỉ) hoặc -110 (cầu gãy).
    - Khi kịch bản nhắc đến quỳ lạy / khấn vái / xin tha mạng: "pose": "pose_kneeling", "offsetY": 0.

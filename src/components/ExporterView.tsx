@@ -19,18 +19,23 @@ import {
   Sparkles,
   Bot,
   RefreshCw,
+  CircleDot,
 } from "lucide-react";
 
 interface ExporterViewProps {
   currentScene: DirectorSceneScript;
   onImportScene: (newScene: DirectorSceneScript) => void;
   onOpenAiDirector?: (mode?: "full_film" | "re_direct_scene" | "append_scene") => void;
+  showVignette?: boolean;
+  onToggleVignette?: () => void;
 }
 
 export const ExporterView: React.FC<ExporterViewProps> = ({
   currentScene,
   onImportScene,
   onOpenAiDirector,
+  showVignette = true,
+  onToggleVignette,
 }) => {
   const [svgRef, setSvgRef] = useState<SVGSVGElement | null>(null);
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -127,7 +132,7 @@ Hệ thống đồ họa 2D thuần code có các tài nguyên và tọa độ c
 - Themes: "rural_graveyard" | "abandoned_village" | "cursed_swamp" | "modern_indoor" | "vehicle_interior" | "urban_night_market" | "thatched_house_interior"
 - Sky presets: "blood_moon" | "foggy_night" | "stormy_dark" | "eclipse_abyss"
 - Structures: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "structure_wooden_sampan" | "structure_monkey_bridge"
-- Details (Props): "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_muddy_water_puddle" | "detail_oil_lamp" | "detail_vintage_radio" | "detail_water_hyacinth" | "detail_child_sandals" | "detail_offering_tray_toys"
+- Details (Props): "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_muddy_water_puddle" | "detail_oil_lamp" | "detail_vintage_radio" | "detail_water_hyacinth" | "detail_child_sandals" | "detail_offering_tray_toys" | "detail_matchbox" | "detail_water_droplets"
 - Ground Slots (Y=800): "far_left" (250), "mid_left" (600), "center" (960), "mid_right" (1320), "far_right" (1670)
 - Air Slots: "air_left" (400, 350), "air_center" (960, 280), "air_right" (1520, 350)
 - Placement Constraints:
@@ -142,7 +147,7 @@ Hệ thống đồ họa 2D thuần code có các tài nguyên và tọa độ c
 - Actor Poses: "pose_standing" | "pose_sitting" | "pose_sitting_twisted_legs" | "pose_shivering" | "pose_walking" | "pose_floating" | "pose_crawling" | "pose_reaching" | "pose_hanging" | "pose_holding"
 - Actor Facing: "left" | "right"
 - Actor Handheld Items (Gắn vào Hand Socket):
-  "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger" | "item_oil_lamp"
+  "heldItem": "none" | "item_storm_lantern" | "item_paper_lantern" | "item_soul_candle" | "item_peach_wood_sword" | "item_yellow_talisman" | "item_rusty_sickle" | "item_ritual_bell" | "item_tattered_doll" | "item_tattered_umbrella" | "item_flashlight" | "item_scalpel" | "item_smartphone" | "item_severed_head" | "item_mysterious_note" | "item_offering_toys" | "item_areca_palm_fan" | "item_fresh_ginger" | "item_oil_lamp" | "item_incense_sticks" | "item_book" | "item_betel_quid"
   "heldHand": "right" | "left" (mặc định "right")
 - Actor Motion (Tùy chọn di chuyển từ Điểm A -> Điểm B trong cảnh):
   "motion": { "targetSlot": SlotId, "targetOffsetX": number, "targetOffsetY": number, "startTimeSec": number, "endTimeSec": number, "easing": "linear"|"ease_in_out"|"ease_in"|"ease_out", "autoFaceTarget": true, "movingPose": CharacterPoseId }
@@ -214,9 +219,25 @@ HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc Direct
             <Video className="w-5 h-5 text-red-500" />
             <h3 className="font-semibold text-neutral-100">Cửa Sổ Nguồn Xuất Film (1920x1080 ViewBox)</h3>
           </div>
-          <span className="text-xs text-neutral-400 font-mono">
-            {currentScene.scene_id} ({currentScene.lighting.sky_preset})
-          </span>
+          <div className="flex items-center gap-3">
+            {onToggleVignette && (
+              <button
+                onClick={onToggleVignette}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                  showVignette
+                    ? "bg-neutral-800 hover:bg-neutral-700 text-purple-300 border border-purple-600/40"
+                    : "bg-neutral-850 hover:bg-neutral-800 text-neutral-400 opacity-60 border border-neutral-700/50"
+                }`}
+                title="Bật/Tắt hiệu ứng tối 4 góc màn hình điện ảnh khi xuất film"
+              >
+                <CircleDot className={`w-3.5 h-3.5 ${showVignette ? "text-purple-400" : "text-neutral-500"}`} />
+                <span>{showVignette ? "Tối Góc: Bật" : "Tối Góc: Tắt"}</span>
+              </button>
+            )}
+            <span className="text-xs text-neutral-400 font-mono">
+              {currentScene.scene_id} ({currentScene.lighting.sky_preset})
+            </span>
+          </div>
         </div>
 
         <div className="w-full max-w-4xl mx-auto rounded-xl overflow-hidden border border-neutral-800 shadow-xl">
@@ -226,6 +247,7 @@ HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc Direct
               script={currentScene}
               showGizmo={false}
               showSubtitles={true}
+              showVignette={showVignette}
               currentTime={isRecording ? exportTime : undefined}
               interactiveDrag={false}
               svgRef={{

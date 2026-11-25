@@ -32,6 +32,8 @@ export const DetailRenderer: React.FC<DetailRendererProps> = ({
       {id === "detail_water_hyacinth" && <WaterHyacinthClump />}
       {id === "detail_child_sandals" && <ChildSandals />}
       {id === "detail_offering_tray_toys" && <OfferingTrayToys />}
+      {id === "detail_matchbox" && <Matchbox />}
+      {id === "detail_water_droplets" && <WaterDroplets />}
 
       {showAnchor && (
         <g className="detail-debug-anchor" pointerEvents="none">
@@ -1076,6 +1078,130 @@ const OfferingTrayToys: React.FC = () => {
         <circle cx="34" cy="-2" r="0.7" fill="#F8FAFC" />
         <circle cx="38" cy="1" r="0.8" fill="#F8FAFC" />
         <circle cx="43" cy="-1.5" r="0.7" fill="#F8FAFC" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 18. VINTAGE MATCHBOX (Hộp Quẹt Diêm Cổ Để Bàn)
+ * Small aged brownish-yellow paper matchbox slightly slid open with red-tipped matches.
+ * Anchored at [bottom-center] (0, 0) — supports negative offsetY to sit on wooden table.
+ */
+const Matchbox: React.FC = () => {
+  return (
+    <g className="detail-matchbox">
+      {/* Subtle contact shadow */}
+      <ellipse cx="0" cy="0" rx="20" ry="3.5" fill="#000000" opacity="0.55" />
+
+      {/* Slid-out inner wooden/cardboard tray on the right */}
+      <g transform="translate(8, -2)">
+        <polygon
+          points="-6,-6 12,-6 14,0 -4,0"
+          fill="#78350F"
+          stroke="#271406"
+          strokeWidth="1"
+        />
+        {/* Tiny matchsticks inside tray */}
+        <line x1="-1" y1="-4" x2="8" y2="-4" stroke="#E7E5E4" strokeWidth="1.3" strokeLinecap="round" />
+        <circle cx="8.5" cy="-4" r="1.4" fill="#991B1B" />
+        <line x1="0" y1="-2" x2="10" y2="-2" stroke="#D6D3D1" strokeWidth="1.3" strokeLinecap="round" />
+        <circle cx="10.5" cy="-2" r="1.4" fill="#DC2626" />
+      </g>
+
+      {/* Outer aged brownish-yellow paper matchbox sleeve */}
+      <polygon
+        points="-16,-9 6,-9 8,-1 -14,-1"
+        fill="#B45309"
+        stroke="#451A03"
+        strokeWidth="1.1"
+      />
+      {/* Front striker strip (dark brown/charcoal phosphorus) */}
+      <rect x="-15" y="-5" width="21" height="4" rx="0.6" fill="#1C1917" stroke="#0A0A0C" strokeWidth="0.8" />
+      {/* Vintage faded cream label on top */}
+      <polygon
+        points="-12,-8.2 3,-8.2 4,-5.5 -11,-5.5"
+        fill="#FDE68A"
+        opacity="0.78"
+      />
+      {/* Tiny silhouette flame emblem on label */}
+      <circle cx="-4" cy="-6.8" r="1" fill="#991B1B" />
+
+      {/* One stray matchstick resting beside the box on surface y=0 */}
+      <line x1="-18" y1="0" x2="-7" y2="1.5" stroke="#D6D3D1" strokeWidth="1.4" strokeLinecap="round" />
+      <circle cx="-6.5" cy="1.5" r="1.4" fill="#991B1B" />
+    </g>
+  );
+};
+
+/**
+ * 19. WATER DROPLETS OUTSIDE WINDOW (Giọt Nước Nhỏ Tí Tách Bên Ngoài Cửa Sổ)
+ * Dripping water droplets forming small concentric ripples in the dark, hinting at a wet entity lurking outside.
+ * Anchored at [bottom-center] (0, 0).
+ */
+const WaterDroplets: React.FC = () => {
+  return (
+    <g className="detail-water-droplets">
+      {/* Dark wet dampness & concentric water ripples at [0, 0] */}
+      <ellipse cx="0" cy="0" rx="28" ry="6" fill="#0F172A" opacity="0.65" />
+      <ellipse
+        cx="0"
+        cy="0"
+        rx="22"
+        ry="4.5"
+        fill="none"
+        stroke="#94A3B8"
+        strokeWidth="1"
+        opacity="0.5"
+        className="anim-moon-pulse"
+      />
+      <ellipse
+        cx="0"
+        cy="0"
+        rx="12"
+        ry="2.5"
+        fill="none"
+        stroke="#CBD5E1"
+        strokeWidth="1.1"
+        opacity="0.7"
+      />
+      <ellipse cx="-14" cy="2" rx="7" ry="1.8" fill="none" stroke="#64748B" strokeWidth="0.8" opacity="0.45" />
+
+      {/* Vertical trail of falling cold water droplets */}
+      <g className="anim-sway-subtle">
+        {/* Top droplet */}
+        <path
+          d="M -2 -88 C -5 -81, -5 -76, -2 -76 C 1 -76, 1 -81, -2 -88 Z"
+          fill="#CBD5E1"
+          fillOpacity="0.75"
+          stroke="#64748B"
+          strokeWidth="0.8"
+        />
+        <circle cx="-2.8" cy="-79" r="0.7" fill="#FFFFFF" opacity="0.85" />
+
+        {/* Middle droplet */}
+        <path
+          d="M 4 -58 C 1 -50, 1 -44, 4 -44 C 7 -44, 7 -50, 4 -58 Z"
+          fill="#E2E8F0"
+          fillOpacity="0.82"
+          stroke="#64748B"
+          strokeWidth="0.8"
+        />
+        <circle cx="3.2" cy="-47" r="0.8" fill="#FFFFFF" opacity="0.9" />
+
+        {/* Bottom droplet about to hit surface */}
+        <path
+          d="M 0 -24 C -3.5 -16, -3.5 -10, 0 -10 C 3.5 -10, 3.5 -16, 0 -24 Z"
+          fill="#CBD5E1"
+          fillOpacity="0.85"
+          stroke="#475569"
+          strokeWidth="0.9"
+        />
+        <circle cx="-1" cy="-13.5" r="0.9" fill="#FFFFFF" opacity="0.9" />
+
+        {/* Tiny side splash droplets */}
+        <circle cx="-12" cy="-34" r="1.4" fill="#94A3B8" opacity="0.65" />
+        <circle cx="11" cy="-18" r="1.2" fill="#CBD5E1" opacity="0.6" />
       </g>
     </g>
   );

@@ -28,6 +28,9 @@ export const HELD_ITEM_CATALOG: HeldItemMeta[] = [
   { id: "item_areca_palm_fan", name: "Quạt mo cau", desc: "Chiếc quạt mo cau quê nhà khô sạm, phe phẩy trong đêm hè oi bức" },
   { id: "item_fresh_ginger", name: "Lát gừng tươi", desc: "Lát gừng vàng tươi tỏa hơi ấm giữ khí chống lại tà khí ban đêm" },
   { id: "item_oil_lamp", name: "Đèn dầu hột vịt cầm tay", desc: "Đèn dầu hột vịt thủy tinh thon eo cầm tay, ngọn lửa vàng cam leo lét soi tỏ bóng đêm" },
+  { id: "item_incense_sticks", name: "Nén / Bó nhang đang cháy cầm tay khấn vái", desc: "Ba nén nhang mảnh cầm thẳng đứng, đầu nhang đốm lửa đỏ hồng lập lòe kèm làn khói trắng mỏng" },
+  { id: "item_book", name: "Cuốn sách giấy bìa cũ", desc: "Cuốn sách mở đôi cầm tay đọc sách, trang giấy trắng ngà đổ bóng tối giản 2D silhouette" },
+  { id: "item_betel_quid", name: "Miếng trầu têm cánh phượng", desc: "Miếng trầu xanh têm vôi trắng nhỏ gọn cầm trên tay cụ bà nông thôn Nam Bộ" },
 ];
 
 interface HandheldItemRendererProps {
@@ -744,6 +747,131 @@ function renderHeldItemSvg(itemId: Exclude<HeldItemId, "none">) {
             strokeLinecap="round"
             opacity="0.65"
           />
+        </g>
+      );
+
+    case "item_incense_sticks":
+      return (
+        <g className="held-incense-sticks">
+          {/* 3 thin incense sticks held upright at Hand Socket [0, 0] */}
+          {/* Stick 1 (left-tilted) */}
+          <line x1="-1.5" y1="6" x2="-3.5" y2="-10" stroke="#991B1B" strokeWidth="1.4" strokeLinecap="round" />
+          <line x1="-3.5" y1="-10" x2="-7" y2="-48" stroke="#44403C" strokeWidth="1.6" strokeLinecap="round" />
+          {/* Stick 2 (center upright) */}
+          <line x1="0" y1="6" x2="0" y2="-10" stroke="#991B1B" strokeWidth="1.4" strokeLinecap="round" />
+          <line x1="0" y1="-10" x2="0" y2="-52" stroke="#292524" strokeWidth="1.7" strokeLinecap="round" />
+          {/* Stick 3 (right-tilted) */}
+          <line x1="1.5" y1="6" x2="3.5" y2="-10" stroke="#991B1B" strokeWidth="1.4" strokeLinecap="round" />
+          <line x1="3.5" y1="-10" x2="7" y2="-47" stroke="#44403C" strokeWidth="1.6" strokeLinecap="round" />
+
+          {/* Glowing red-pink burning ember tips */}
+          <g className="anim-flicker-ember">
+            <circle cx="-7" cy="-48" r="5" fill="#EF4444" opacity="0.28" pointerEvents="none" />
+            <circle cx="-7" cy="-48" r="2" fill="#DC2626" />
+            <circle cx="-7" cy="-48" r="1" fill="#FCA5A5" />
+
+            <circle cx="0" cy="-52" r="5.5" fill="#EF4444" opacity="0.32" pointerEvents="none" />
+            <circle cx="0" cy="-52" r="2.2" fill="#DC2626" />
+            <circle cx="0" cy="-52" r="1.1" fill="#FCA5A5" />
+
+            <circle cx="7" cy="-47" r="5" fill="#EF4444" opacity="0.28" pointerEvents="none" />
+            <circle cx="7" cy="-47" r="2" fill="#DC2626" />
+            <circle cx="7" cy="-47" r="1" fill="#FCA5A5" />
+          </g>
+
+          {/* Thin wispy white smoke tendrils rising up */}
+          <g className="anim-smoke-rise" fill="none" strokeLinecap="round">
+            <path
+              d="M -7 -50 C -11 -62, -3 -74, -8 -88 C -12 -98, -5 -108, -9 -116"
+              stroke="#E2E8F0"
+              strokeWidth="1.1"
+              opacity="0.55"
+            />
+            <path
+              d="M 0 -54 C 5 -66, -4 -78, 2 -92 C 6 -102, -2 -112, 1 -120"
+              stroke="#F1F5F9"
+              strokeWidth="1.2"
+              opacity="0.65"
+            />
+            <path
+              d="M 7 -49 C 11 -60, 4 -72, 9 -85 C 12 -94, 6 -104, 8 -112"
+              stroke="#CBD5E1"
+              strokeWidth="0.9"
+              opacity="0.45"
+            />
+          </g>
+        </g>
+      );
+
+    case "item_book":
+      return (
+        <g className="held-book" transform="rotate(-12)">
+          {/* Dark weathered hardcover outer shell anchored at spine [0, 0] */}
+          <path
+            d="M -22 -14 L 0 -6 L 22 -14 L 24 4 L 0 11 L -24 4 Z"
+            fill="#1C1917"
+            stroke="#0A0A0C"
+            strokeWidth="1.4"
+            strokeLinejoin="round"
+          />
+          {/* Left curved ivory page */}
+          <path
+            d="M -20 -13 C -13 -16, -5 -13, 0 -8 L 0 8 C -5 4, -13 2, -21 3 Z"
+            fill="#E7E5E4"
+            stroke="#78716C"
+            strokeWidth="0.9"
+          />
+          {/* Right curved ivory page */}
+          <path
+            d="M 0 -8 C 5 -13, 13 -16, 20 -13 L 21 3 C 13 2, 5 4, 0 8 Z"
+            fill="#D6D3D1"
+            stroke="#78716C"
+            strokeWidth="0.9"
+          />
+          {/* Center spine shadow crease */}
+          <line x1="0" y1="-8" x2="0" y2="8" stroke="#57534E" strokeWidth="1.3" />
+          {/* Minimalist text lines on left page */}
+          <g stroke="#57534E" strokeWidth="0.8" opacity="0.55">
+            <line x1="-16" y1="-9" x2="-4" y2="-6" />
+            <line x1="-16" y1="-5" x2="-4" y2="-2" />
+            <line x1="-17" y1="-1" x2="-4" y2="2" />
+          </g>
+          {/* Minimalist text lines on right page */}
+          <g stroke="#57534E" strokeWidth="0.8" opacity="0.55">
+            <line x1="4" y1="-6" x2="16" y2="-9" />
+            <line x1="4" y1="-2" x2="16" y2="-5" />
+            <line x1="4" y1="2" x2="17" y2="-1" />
+          </g>
+        </g>
+      );
+
+    case "item_betel_quid":
+      return (
+        <g className="held-betel-quid">
+          {/* Compact folded green betel leaf (trầu têm cánh phượng) anchored at [0, 0] */}
+          <path
+            d="M -5 4 C -10 -4, -6 -14, 0 -17 C 6 -14, 10 -4, 5 4 Z"
+            fill="#14532D"
+            stroke="#052E16"
+            strokeWidth="1.2"
+          />
+          {/* Stylized phoenix-wing folded inner flap */}
+          <path
+            d="M -6 -2 C -2 -9, 3 -9, 6 -2 C 2 2, -2 2, -6 -2 Z"
+            fill="#166534"
+            stroke="#052E16"
+            strokeWidth="0.9"
+          />
+          {/* White slaked lime dab (vôi trắng) */}
+          <ellipse cx="0" cy="-6" rx="3.2" ry="2" fill="#F8FAFC" opacity="0.92" />
+          {/* Small reddish-brown areca nut wedge & bark sliver */}
+          <path
+            d="M -2 -10 L 2 -13 L 3 -8 Z"
+            fill="#991B1B"
+            stroke="#450A0A"
+            strokeWidth="0.7"
+          />
+          <line x1="2" y1="-5" x2="6" y2="-11" stroke="#78350F" strokeWidth="1.4" strokeLinecap="round" />
         </g>
       );
   }

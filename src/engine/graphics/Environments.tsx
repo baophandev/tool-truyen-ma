@@ -1644,20 +1644,20 @@ export const ForegroundLayer: React.FC<{
 
   return (
     <g className="environment-layer-3-foreground" pointerEvents="none">
-      <g className="anim-fog-wave-slow" opacity={fogDensity * 0.85}>
+      <g className="anim-fog-wave-slow" opacity={fogDensity * 0.35}>
         <path
-          d={`M -200 ${GROUND_Y - 140} 
-             C 150 ${GROUND_Y - 220}, 450 ${GROUND_Y - 60}, 850 ${GROUND_Y - 180} 
-             C 1250 ${GROUND_Y - 240}, 1650 ${GROUND_Y - 90}, 2100 ${GROUND_Y - 190} 
+          d={`M -200 ${GROUND_Y - 70} 
+             C 150 ${GROUND_Y - 115}, 450 ${GROUND_Y - 30}, 850 ${GROUND_Y - 95} 
+             C 1250 ${GROUND_Y - 125}, 1650 ${GROUND_Y - 45}, 2100 ${GROUND_Y - 100} 
              L 2100 ${CANVAS_HEIGHT} L -200 ${CANVAS_HEIGHT} Z`}
           fill="url(#ground-fog-grad)"
         />
       </g>
-      <g className="anim-fog-wave-fast" opacity={fogDensity * 0.75}>
+      <g className="anim-fog-wave-fast" opacity={fogDensity * 0.28}>
         <path
-          d={`M -150 ${GROUND_Y - 80} 
-             C 200 ${GROUND_Y - 170}, 600 ${GROUND_Y - 40}, 1050 ${GROUND_Y - 150} 
-             C 1450 ${GROUND_Y - 200}, 1800 ${GROUND_Y - 70}, 2200 ${GROUND_Y - 140} 
+          d={`M -150 ${GROUND_Y - 40} 
+             C 200 ${GROUND_Y - 90}, 600 ${GROUND_Y - 20}, 1050 ${GROUND_Y - 75} 
+             C 1450 ${GROUND_Y - 105}, 1800 ${GROUND_Y - 35}, 2200 ${GROUND_Y - 70} 
              L 2200 ${CANVAS_HEIGHT} L -150 ${CANVAS_HEIGHT} Z`}
           fill="url(#ground-fog-grad)"
         />
@@ -1695,10 +1695,6 @@ export const ForegroundLayer: React.FC<{
         </g>
       ) : isIndoor ? (
         <g className="indoor-foreground-framing">
-          {/* Left Doorway Jamb Frame */}
-          <path d="M 0 0 L 70 0 L 50 1080 L 0 1080 Z" fill={COLOR_PALETTE.silhouette_primary} />
-          {/* Right Doorway Jamb Frame */}
-          <path d="M 1920 0 L 1850 0 L 1870 1080 L 1920 1080 Z" fill={COLOR_PALETTE.silhouette_primary} />
           {/* Top Hanging Ceiling Duct Silhouette */}
           <path d="M 0 0 L 320 0 L 260 70 L 0 50 Z" fill={COLOR_PALETTE.silhouette_primary} />
           <path d="M 1920 0 L 1600 0 L 1660 70 L 1920 50 Z" fill={COLOR_PALETTE.silhouette_primary} />
@@ -1719,15 +1715,7 @@ export const ForegroundLayer: React.FC<{
         </>
       )}
 
-      {/* Cinematic Vignette */}
-      <rect
-        x="0"
-        y="0"
-        width={CANVAS_WIDTH}
-        height={CANVAS_HEIGHT}
-        fill="url(#vignette-grad)"
-        style={{ mixBlendMode: "multiply" }}
-      />
+      {/* Note: Screen-space Cinematic Vignette is now rendered in SceneRenderer at screen-level with toggle support */}
     </g>
   );
 };
@@ -1787,28 +1775,14 @@ const UrbanForegroundFraming: React.FC = () => {
 };
 
 /**
- * THATCHED HOUSE FOREGROUND FRAMING (Cột Tiền Cảnh Đen Tuyền & Mái Tranh Rủ)
- * Creates extreme cinematic claustrophobic depth with massive silhouette wooden pillars
- * at extreme screen edges and straw fringes at the very top.
+ * THATCHED HOUSE FOREGROUND FRAMING (Mái Tranh Rủ & Vignette Mép Màn Hình)
+ * Creates subtle cinematic atmosphere at upper eaves and soft lateral edge vignette.
+ * Heavy columns separating spaces are now controlled in World Space via SpaceDivider to prevent parallax drift.
  */
 const ThatchedHouseForegroundFraming: React.FC = () => {
   return (
     <g className="thatched-house-foreground-framing" pointerEvents="none">
-      {/* 1. Extreme Left Foreground Wooden Pillar (Cột gỗ tiền cảnh sát mép trái X = 0..55) */}
-      <path
-        d="M 0 0 L 55 0 L 45 1080 L 0 1080 Z"
-        fill="#040507"
-      />
-      <line x1="45" y1="0" x2="35" y2="1080" stroke="#0E121A" strokeWidth="2" opacity="0.7" />
-
-      {/* 2. Extreme Right Foreground Wooden Pillar (Cột gỗ tiền cảnh sát mép phải X = 1865..1920) */}
-      <path
-        d="M 1920 0 L 1865 0 L 1875 1080 L 1920 1080 Z"
-        fill="#040507"
-      />
-      <line x1="1875" y1="0" x2="1885" y2="1080" stroke="#0E121A" strokeWidth="2" opacity="0.7" />
-
-      {/* 3. Top Hanging Thatch Eaves Fringe along upper frame edge (Y = 0..45px) */}
+      {/* 1. Top Hanging Thatch Eaves Fringe along upper frame edge (Y = 0..45px) */}
       <path
         d="M 0 0 L 1920 0 L 1920 30 
            Q 1800 55 1680 25 Q 1540 60 1420 30 Q 1280 55 1140 25 Q 1000 62 860 30
@@ -1816,9 +1790,9 @@ const ThatchedHouseForegroundFraming: React.FC = () => {
         fill="#040507"
       />
 
-      {/* 4. Claustrophobic Vignette Shadows at lateral edges */}
-      <rect x="0" y="0" width="100" height={CANVAS_HEIGHT} fill="url(#left-shadow-vignette)" opacity="0.8" />
-      <rect x={CANVAS_WIDTH - 100} y="0" width="100" height={CANVAS_HEIGHT} fill="url(#right-shadow-vignette)" opacity="0.8" />
+      {/* 2. Soft Vignette Shadows at lateral edges (does not block room when camera zooms) */}
+      <rect x="0" y="0" width="80" height={CANVAS_HEIGHT} fill="url(#left-shadow-vignette)" opacity="0.6" />
+      <rect x={CANVAS_WIDTH - 80} y="0" width="80" height={CANVAS_HEIGHT} fill="url(#right-shadow-vignette)" opacity="0.6" />
     </g>
   );
 };

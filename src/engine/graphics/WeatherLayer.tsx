@@ -293,29 +293,24 @@ export const WeatherLayer: React.FC<WeatherLayerProps> = ({
         <g className="weather-haunted-mist-group">
           {/* Dynamic Swirling Ground Mist Wave 1 */}
           <path
-            d={`M -200 ${GROUND_Y - 120} 
-               C 200 ${GROUND_Y - 200}, 500 ${GROUND_Y - 80}, 900 ${GROUND_Y - 170} 
-               C 1300 ${GROUND_Y - 240}, 1650 ${GROUND_Y - 90}, 2150 ${GROUND_Y - 160} 
+            d={`M -200 ${GROUND_Y - 70} 
+               C 200 ${GROUND_Y - 110}, 500 ${GROUND_Y - 40}, 900 ${GROUND_Y - 95} 
+               C 1300 ${GROUND_Y - 130}, 1650 ${GROUND_Y - 45}, 2150 ${GROUND_Y - 85} 
                L 2150 ${GROUND_Y + 60} L -200 ${GROUND_Y + 60} Z`}
             fill="url(#swirling-mist-grad)"
             className="anim-fog-wave-slow"
-            opacity="0.75"
+            opacity="0.35"
           />
           {/* Dynamic Swirling Ground Mist Wave 2 (Reversed & Lower) */}
           <path
-            d={`M -150 ${GROUND_Y - 60} 
-               C 250 ${GROUND_Y - 130}, 650 ${GROUND_Y - 30}, 1050 ${GROUND_Y - 120} 
-               C 1450 ${GROUND_Y - 180}, 1800 ${GROUND_Y - 50}, 2200 ${GROUND_Y - 90} 
+            d={`M -150 ${GROUND_Y - 35} 
+               C 250 ${GROUND_Y - 75}, 650 ${GROUND_Y - 15}, 1050 ${GROUND_Y - 65} 
+               C 1450 ${GROUND_Y - 95}, 1800 ${GROUND_Y - 25}, 2200 ${GROUND_Y - 50} 
                L 2200 ${GROUND_Y + 80} L -150 ${GROUND_Y + 80} Z`}
             fill="url(#swirling-mist-grad)"
             className="anim-fog-wave-fast"
-            opacity="0.85"
+            opacity="0.3"
           />
-          {/* Floating Mid-air Phantom Vapor */}
-          <g className="anim-pulse-eerie" opacity="0.45">
-            <ellipse cx="650" cy={GROUND_Y - 220} rx="320" ry="60" fill="url(#ground-fog-grad)" />
-            <ellipse cx="1400" cy={GROUND_Y - 260} rx="380" ry="75" fill="url(#ground-fog-grad)" />
-          </g>
         </g>
       )}
     </g>

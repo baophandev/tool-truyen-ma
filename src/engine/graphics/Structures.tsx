@@ -6,6 +6,7 @@ interface StructureProps {
   id: StructureId;
   scale?: number;
   facing?: FacingDirection;
+  isShaking?: boolean;
   showAnchor?: boolean;
 }
 
@@ -13,6 +14,7 @@ export const StructureRenderer: React.FC<StructureProps> = ({
   id,
   scale = 1,
   facing = "right",
+  isShaking = false,
   showAnchor = false,
 }) => {
   const flip = facing === "left" ? -1 : 1;
@@ -44,7 +46,7 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "structure_monkey_bridge" && <MonkeyBridge />}
       {id === "structure_wooden_coffin" && <WoodenCoffin />}
       {id === "structure_bamboo_bed_net" && <BambooBedNet />}
-      {id === "structure_wooden_latch_door" && <WoodenLatchDoor />}
+      {id === "structure_wooden_latch_door" && <WoodenLatchDoor isShaking={isShaking} />}
       {id === "structure_rural_passenger_bus" && <RuralPassengerBus />}
       {id === "structure_coconut_banana_grove" && <CoconutBananaGrove />}
       {id === "structure_wooden_chair" && <WoodenChair />}
@@ -2780,9 +2782,13 @@ const BambooBedNet: React.FC = () => {
  * Allows exterior night cold blue light & mud to seep through.
  * Anchored at [bottom-center] (0, 0) at Ground Y = 800px.
  */
-const WoodenLatchDoor: React.FC = () => {
+interface WoodenLatchDoorProps {
+  isShaking?: boolean;
+}
+
+const WoodenLatchDoor: React.FC<WoodenLatchDoorProps> = ({ isShaking = false }) => {
   return (
-    <g className="structure-wooden-latch-door anim-door-shake">
+    <g className={`structure-wooden-latch-door ${isShaking ? "anim-door-shake" : ""}`}>
       {/* 1. Heavy Outer Timber Door Jambs & Lintel (Khung bao cửa gỗ mít cổ) */}
       {/* Left Jamb */}
       <rect x="-132" y="-395" width="26" height="395" rx="2" fill="#090A0D" stroke="#1C1E26" strokeWidth="2" />
@@ -3982,7 +3988,7 @@ const AncestorAltar: React.FC = () => {
  */
 const Hammock: React.FC = () => {
   return (
-    <g className="structure-hammock">
+    <g className="structure-hammock" transform="scale(1.25)">
       {/* 1. Floor Shadows Under Posts & Hammock Belly */}
       <ellipse cx="-138" cy="-2" rx="22" ry="5" fill="#000000" opacity="0.6" />
       <ellipse cx="138" cy="-2" rx="22" ry="5" fill="#000000" opacity="0.6" />

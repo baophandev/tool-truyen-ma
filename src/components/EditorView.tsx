@@ -31,6 +31,8 @@ import type {
   CameraShakeIntensity,
   CameraKeyframe,
   CameraTransitionType,
+  SpaceDividerConfig,
+  SpaceDividerStyle,
 } from "../engine/types";
 import { CAMERA_SHOT_PRESETS } from "../engine/cameraUtils";
 import { generateTimedSubtitleCues } from "../engine/subtitleUtils";
@@ -87,6 +89,12 @@ import {
   ArrowRight,
   Compass,
   Camera,
+  CircleDot,
+  BringToFront,
+  SendToBack,
+  ArrowUp,
+  ArrowDown,
+  Layers,
 } from "lucide-react";
 
 interface EditorViewProps {
@@ -95,6 +103,8 @@ interface EditorViewProps {
   onResetScene: () => void;
   onOpenAiDirector?: (mode?: "description_film" | "environments_manager" | "re_direct_scene" | "full_film" | "append_scene") => void;
   onDisableAllShake?: () => void;
+  showVignette?: boolean;
+  onToggleVignette?: () => void;
 }
 
 export const EditorView: React.FC<EditorViewProps> = ({
@@ -103,6 +113,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
   onResetScene,
   onOpenAiDirector,
   onDisableAllShake,
+  showVignette = true,
+  onToggleVignette,
 }) => {
   const [activeTab, setActiveTab] = useState<"actors" | "structures" | "details" | "lighting" | "camera" | "story">("actors");
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity>(() => {
@@ -444,6 +456,29 @@ export const EditorView: React.FC<EditorViewProps> = ({
     }
   };
 
+  // Update Space Divider helper (chia 2 không gian kiến trúc độc lập)
+  const updateSpaceDivider = (updates: Partial<SpaceDividerConfig> | null) => {
+    if (updates === null) {
+      const next = { ...scene };
+      delete next.space_divider;
+      onChangeScene(next);
+      return;
+    }
+    const current: SpaceDividerConfig =
+      typeof scene.space_divider === "object" && scene.space_divider !== null
+        ? scene.space_divider
+        : typeof scene.space_divider === "string"
+        ? { enabled: true, slot: scene.space_divider as GroundSlotId, style: "wooden_pillar" }
+        : { enabled: true, slot: "mid_left", style: "wooden_pillar" };
+    onChangeScene({
+      ...scene,
+      space_divider: {
+        ...current,
+        ...updates,
+      },
+    });
+  };
+
   // Update Detail helper (auto-migrates slot if detail rule forbids current slot)
   const updateDetail = (detailId: string, updates: Partial<DetailItemConfig>) => {
     const updatedDetails = sceneDetails.map((dt) => {
@@ -532,6 +567,116 @@ export const EditorView: React.FC<EditorViewProps> = ({
   };
 
   // Resolve current selection's placement rules for UI banner & quick buttons
+  // Unified list of all entities in the scene sorted by effective Z-Index (ascending)
+  const allSceneEntitiesSorted = React.useMemo(() => {
+    type UnifiedSceneEntity = {
+      type: "actor" | "structure" | "detail";
+      idOrIndex: string | number;
+      name: string;
+      categoryLabel: string;
+      zIndex: number;
+    };
+
+    const list: UnifiedSceneEntity[] = [];
+
+    scene.environment_items.forEach((st, idx) => {
+      const z = st.zIndex !== undefined ? st.zIndex : 10 + idx * 0.05;
+      list.push({
+        type: "structure",
+        idOrIndex: idx,
+        name: STRUCTURE_RULES[st.asset_id]?.name || st.asset_id,
+        categoryLabel: "Công trình",
+        zIndex: z,
+      });
+    });
+
+    scene.actors.forEach((ac, idx) => {
+      const z = ac.zIndex !== undefined ? ac.zIndex : 20 + idx * 0.05;
+      list.push({
+        type: "actor",
+        idOrIndex: ac.id,
+        name: ac.name || ac.id,
+        categoryLabel: "Nhân vật",
+        zIndex: z,
+      });
+    });
+
+    sceneDetails.forEach((dt, idx) => {
+      const z = dt.zIndex !== undefined ? dt.zIndex : 30 + idx * 0.05;
+      list.push({
+        type: "detail",
+        idOrIndex: dt.id,
+        name: DETAIL_RULES[dt.asset_id]?.name || dt.asset_id,
+        categoryLabel: "Đạo cụ",
+        zIndex: z,
+      });
+    });
+
+    return list.sort((a, b) => a.zIndex - b.zIndex);
+  }, [scene.environment_items, scene.actors, sceneDetails]);
+
+  const selectedEntityOrderInfo = React.useMemo(() => {
+    if (!selectedEntity) return null;
+    const currentIndex = allSceneEntitiesSorted.findIndex((item) => {
+      if (selectedEntity.type === "actor" && item.type === "actor") return item.idOrIndex === selectedEntity.id;
+      if (selectedEntity.type === "structure" && item.type === "structure") return item.idOrIndex === selectedEntity.index;
+      if (selectedEntity.type === "detail" && item.type === "detail") return item.idOrIndex === selectedEntity.id;
+      return false;
+    });
+    if (currentIndex === -1) return null;
+
+    const currentItem = allSceneEntitiesSorted[currentIndex];
+    const entityBelow = currentIndex > 0 ? allSceneEntitiesSorted[currentIndex - 1] : null;
+    const entityAbove = currentIndex < allSceneEntitiesSorted.length - 1 ? allSceneEntitiesSorted[currentIndex + 1] : null;
+
+    return {
+      currentIndex,
+      total: allSceneEntitiesSorted.length,
+      currentZ: currentItem.zIndex,
+      entityBelow,
+      entityAbove,
+    };
+  }, [allSceneEntitiesSorted, selectedEntity]);
+
+  const handleReorderEntity = (action: "front" | "back" | "up" | "down" | number) => {
+    if (!selectedEntity || !selectedEntityOrderInfo) return;
+
+    const { currentIndex } = selectedEntityOrderInfo;
+    let targetZ: number;
+
+    if (typeof action === "number") {
+      targetZ = action;
+    } else if (action === "front") {
+      const maxZ = allSceneEntitiesSorted[allSceneEntitiesSorted.length - 1]?.zIndex ?? 30;
+      targetZ = Math.round(maxZ) + 5;
+    } else if (action === "back") {
+      const minZ = allSceneEntitiesSorted[0]?.zIndex ?? 10;
+      targetZ = Math.max(1, Math.round(minZ) - 5);
+    } else if (action === "up") {
+      if (currentIndex < allSceneEntitiesSorted.length - 1) {
+        const nextItem = allSceneEntitiesSorted[currentIndex + 1];
+        targetZ = Math.round(nextItem.zIndex) + 1;
+      } else {
+        targetZ = Math.round(allSceneEntitiesSorted[currentIndex].zIndex) + 1;
+      }
+    } else {
+      if (currentIndex > 0) {
+        const prevItem = allSceneEntitiesSorted[currentIndex - 1];
+        targetZ = Math.max(1, Math.round(prevItem.zIndex) - 1);
+      } else {
+        targetZ = Math.max(1, Math.round(allSceneEntitiesSorted[currentIndex].zIndex) - 1);
+      }
+    }
+
+    if (selectedEntity.type === "actor") {
+      updateActor(selectedEntity.id, { zIndex: targetZ });
+    } else if (selectedEntity.type === "structure") {
+      updateStructure(selectedEntity.index, { zIndex: targetZ });
+    } else if (selectedEntity.type === "detail") {
+      updateDetail(selectedEntity.id, { zIndex: targetZ });
+    }
+  };
+
   const currentRuleSummary: {
     label: string;
     currentSlot: SlotId;
@@ -629,6 +774,21 @@ export const EditorView: React.FC<EditorViewProps> = ({
             <span>{showGizmo ? "Ẩn Lưới Neo & Vùng Cho Phép" : "Hiện Lưới Neo & Vùng Cho Phép"}</span>
           </button>
 
+          {onToggleVignette && (
+            <button
+              onClick={onToggleVignette}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+                showVignette
+                  ? "bg-neutral-800 hover:bg-neutral-700 text-purple-300 border border-purple-600/40"
+                  : "bg-neutral-850 hover:bg-neutral-800 text-neutral-400 opacity-60 border border-neutral-700/50"
+              }`}
+              title="Bật/Tắt hiệu ứng tối 4 góc màn hình điện ảnh (Cinematic Vignette Filter)"
+            >
+              <CircleDot className={`w-3.5 h-3.5 ${showVignette ? "text-purple-400" : "text-neutral-500"}`} />
+              <span>{showVignette ? "Tối Góc: Bật" : "Tối Góc: Tắt"}</span>
+            </button>
+          )}
+
           <button
             onClick={onResetScene}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-300 transition-all border border-neutral-700"
@@ -693,6 +853,66 @@ export const EditorView: React.FC<EditorViewProps> = ({
               );
             })}
           </div>
+
+          {/* Layer Z-Index / Layer Depth Controls */}
+          {selectedEntityOrderInfo && (
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-emerald-800/40 mt-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-1.5 text-amber-300 font-semibold">
+                  <Layers className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Lớp Hiển Thị:</span>
+                </div>
+                <code className="px-2 py-0.5 bg-black/70 border border-amber-600/40 rounded text-amber-300 font-mono font-bold text-xs">
+                  Z = {Math.round(selectedEntityOrderInfo.currentZ)}
+                </code>
+                {selectedEntityOrderInfo.entityBelow && (
+                  <span className="text-[11px] text-neutral-300 bg-black/40 px-2 py-0.5 rounded border border-neutral-800">
+                    Đang đè lên: <strong className="text-emerald-300">{selectedEntityOrderInfo.entityBelow.name}</strong>
+                  </span>
+                )}
+                {selectedEntityOrderInfo.entityAbove && (
+                  <span className="text-[11px] text-neutral-300 bg-black/40 px-2 py-0.5 rounded border border-neutral-800">
+                    Nằm dưới: <strong className="text-purple-300">{selectedEntityOrderInfo.entityAbove.name}</strong>
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => handleReorderEntity("back")}
+                  title="Đưa xuống dưới cùng (Nằm sau tất cả các chi tiết khác)"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 border border-neutral-700 text-xs transition-all cursor-pointer"
+                >
+                  <SendToBack className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Dưới Cùng</span>
+                </button>
+                <button
+                  onClick={() => handleReorderEntity("down")}
+                  title="Lùi 1 lớp (Xuống dưới đối tượng kế cận)"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 border border-neutral-700 text-xs transition-all cursor-pointer"
+                >
+                  <ArrowDown className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Lùi 1 Lớp</span>
+                </button>
+                <button
+                  onClick={() => handleReorderEntity("up")}
+                  title="Tiến 1 lớp (Lên trên đối tượng kế cận)"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 border border-neutral-700 text-xs transition-all cursor-pointer"
+                >
+                  <ArrowUp className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Tiến 1 Lớp</span>
+                </button>
+                <button
+                  onClick={() => handleReorderEntity("front")}
+                  title="Đưa lên trên cùng (Đè lên trước tất cả các chi tiết khác)"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-neutral-200 border border-neutral-700 text-xs transition-all cursor-pointer"
+                >
+                  <BringToFront className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Trên Cùng</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="flex items-center gap-2 bg-red-950/40 border border-red-900/50 px-4 py-2.5 rounded-xl text-xs text-red-200">
@@ -709,6 +929,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
           script={scene}
           showGizmo={showGizmo}
           showSubtitles={true}
+          showVignette={showVignette}
           currentTime={previewTime ?? undefined}
           selectedEntity={selectedEntity}
           activeMotionHandle={activeMotionHandle}
@@ -1144,6 +1365,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="pose_balancing_bridge">Đi thăng bằng trên cầu khỉ / cầu tre (pose_balancing_bridge)</option>
                         <option value="pose_kneeling">Quỳ gối lạy / khấn vái / xin tha (pose_kneeling)</option>
                         <option value="pose_squatting">Ngồi xổm / chồm hổm góc tối (pose_squatting)</option>
+                        <option value="pose_lying_ground">Nằm sõng soài / gục ngã trên đất (pose_lying_ground)</option>
+                        <option value="pose_swimming">Bơi lội / rẽ nước sông đầm (pose_swimming)</option>
+                        <option value="pose_drowning">Chết đuối / ngoi ngóp chới với (pose_drowning)</option>
+                        <option value="pose_floating_corpse">Xác chết trôi sông / trôi dạt (pose_floating_corpse)</option>
                       </select>
                     </div>
 
@@ -1693,6 +1918,58 @@ export const EditorView: React.FC<EditorViewProps> = ({
                           >
                             🧘 Ngồi Xổm Góc Tối
                           </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              updateActor(selectedActor.id, {
+                                pose: "pose_lying_ground",
+                                offsetY: 0,
+                              });
+                            }}
+                            className="py-1 px-2 rounded text-[11px] font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-left truncate transition-colors"
+                            title="Nằm Sõng Soài / Gục Ngã Trên Mặt Đất (Y=0, pose_lying_ground)"
+                          >
+                            🛌 Nằm Sõng Soài Đất
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              updateActor(selectedActor.id, {
+                                pose: "pose_swimming",
+                                offsetY: 0,
+                              });
+                            }}
+                            className="py-1 px-2 rounded text-[11px] font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-left truncate transition-colors"
+                            title="Bơi Lội Rẽ Nước Sông Đầm (Y=0, pose_swimming)"
+                          >
+                            🏊 Bơi Lội Rẽ Nước
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              updateActor(selectedActor.id, {
+                                pose: "pose_drowning",
+                                offsetY: 0,
+                              });
+                            }}
+                            className="py-1 px-2 rounded text-[11px] font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-left truncate transition-colors"
+                            title="Chết Đuối Ngoi Ngóp Cầu Cứu (Y=0, pose_drowning)"
+                          >
+                            🌊 Chết Đuối Ngoi Ngóp
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              updateActor(selectedActor.id, {
+                                pose: "pose_floating_corpse",
+                                offsetY: 0,
+                              });
+                            }}
+                            className="py-1 px-2 rounded text-[11px] font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-left truncate transition-colors"
+                            title="Xác Chết Đuối Trôi Sông / Trôi Lờ Đờ (Y=0, pose_floating_corpse)"
+                          >
+                            🥀 Xác Trôi Sông
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -2002,6 +2279,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
                                       <option value="pose_balancing_bridge">Đi thăng bằng qua cầu khỉ (pose_balancing_bridge)</option>
                                       <option value="pose_kneeling">Bò / Quỳ tiến tới (pose_kneeling)</option>
                                       <option value="pose_squatting">Ngồi xổm / chồm hổm tiến tới (pose_squatting)</option>
+                                      <option value="pose_swimming">Bơi lội rẽ nước (pose_swimming)</option>
+                                      <option value="pose_floating_corpse">Xác trôi lờ đờ (pose_floating_corpse)</option>
+                                      <option value="pose_lying_ground">Trườn bệt trên sàn (pose_lying_ground)</option>
+                                      <option value="pose_drowning">Ngoi ngóp chìm dần (pose_drowning)</option>
                                     </>
                                   )}
                                 </select>
@@ -2264,6 +2545,144 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   Chưa có công trình nào. Bấm "Thêm Công Trình" để đặt bối cảnh.
                 </div>
               )}
+
+              {/* Space Divider Configuration Card */}
+              {(() => {
+                const dividerCfg: SpaceDividerConfig | null =
+                  typeof scene.space_divider === "object" && scene.space_divider !== null
+                    ? scene.space_divider
+                    : typeof scene.space_divider === "string"
+                    ? { enabled: true, slot: scene.space_divider as GroundSlotId, style: "wooden_pillar" }
+                    : scene.space_divider === true
+                    ? { enabled: true, slot: "mid_left", style: "wooden_pillar" }
+                    : null;
+                const isDividerActive = Boolean(dividerCfg && dividerCfg.enabled !== false);
+
+                return (
+                  <div className="mt-6 p-4 rounded-xl bg-neutral-900/80 border border-neutral-800 flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-neutral-200">
+                          Vách Ngăn Phân Chia 2 Không Gian (Space Divider):
+                        </span>
+                        <span className="text-[11px] text-neutral-400">
+                          Chia đôi sân khấu thành 2 không gian kiến trúc độc lập (vd: Ngoài hiên/bờ kênh vs Trong buồng nhà)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (isDividerActive) {
+                            updateSpaceDivider(null);
+                          } else {
+                            updateSpaceDivider({ enabled: true, slot: "mid_left", style: "wooden_pillar", width: 64 });
+                          }
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                          isDividerActive
+                            ? "bg-emerald-700 border-emerald-500 text-white shadow-md shadow-emerald-950/40"
+                            : "bg-neutral-800 border-neutral-700 text-neutral-300 hover:bg-neutral-700"
+                        }`}
+                      >
+                        {isDividerActive ? "✓ Đang Bật Chia 2 Không Gian" : "+ Bật Vách Ngăn Chia Không Gian"}
+                      </button>
+                    </div>
+
+                    {isDividerActive && dividerCfg && (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-neutral-800">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] font-semibold text-neutral-300">
+                            Vị trí vách chia (Slot):
+                          </label>
+                          <select
+                            value={dividerCfg.slot || "mid_left"}
+                            onChange={(e) => updateSpaceDivider({ slot: e.target.value as GroundSlotId })}
+                            className="bg-black border border-neutral-800 rounded-lg p-2 text-xs text-neutral-200"
+                          >
+                            <option value="far_left">far_left (X=250)</option>
+                            <option value="mid_left">mid_left (X=600 - Khuyên dùng)</option>
+                            <option value="center">center (X=960 - Chia đôi sân khấu)</option>
+                            <option value="mid_right">mid_right (X=1320)</option>
+                            <option value="far_right">far_right (X=1670)</option>
+                          </select>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] font-semibold text-neutral-300">
+                            Kiểu dáng vách ngăn:
+                          </label>
+                          <select
+                            value={dividerCfg.style || "wooden_pillar"}
+                            onChange={(e) => updateSpaceDivider({ style: e.target.value as SpaceDividerStyle })}
+                            className="bg-black border border-neutral-800 rounded-lg p-2 text-xs text-neutral-200"
+                          >
+                            <option value="wooden_pillar">Cột gỗ lim lớn có bóng đổ (wooden_pillar)</option>
+                            <option value="bamboo_partition">Vách nan nứa / liếp tre (bamboo_partition)</option>
+                            <option value="brick_wall">Vách tường gạch cũ (brick_wall)</option>
+                            <option value="black_silhouette">Cột silhouette đen Limbo (black_silhouette)</option>
+                          </select>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] font-semibold text-neutral-300">
+                            Bề rộng vách ({dividerCfg.width || 64}px):
+                          </label>
+                          <input
+                            type="range"
+                            min="32"
+                            max="140"
+                            step="4"
+                            value={dividerCfg.width || 64}
+                            onChange={(e) => updateSpaceDivider({ width: parseInt(e.target.value, 10) })}
+                            className="w-full accent-emerald-500"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] font-semibold text-neutral-300">
+                            Nhãn không gian bên TRÁI:
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Ví dụ: Ngoài Hiên / Bờ Kênh"
+                            value={dividerCfg.label_left || ""}
+                            onChange={(e) => updateSpaceDivider({ label_left: e.target.value })}
+                            className="bg-black border border-neutral-800 rounded-lg p-2 text-xs text-neutral-200"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] font-semibold text-neutral-300">
+                            Nhãn không gian bên PHẢI:
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Ví dụ: Trong Buồng / Gian Nhà"
+                            value={dividerCfg.label_right || ""}
+                            onChange={(e) => updateSpaceDivider({ label_right: e.target.value })}
+                            className="bg-black border border-neutral-800 rounded-lg p-2 text-xs text-neutral-200"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] font-semibold text-neutral-300">
+                            Tinh chỉnh X (Offset: {dividerCfg.offsetX || 0}px):
+                          </label>
+                          <input
+                            type="range"
+                            min="-150"
+                            max="150"
+                            step="5"
+                            value={dividerCfg.offsetX || 0}
+                            onChange={(e) => updateSpaceDivider({ offsetX: parseInt(e.target.value, 10) })}
+                            className="w-full accent-emerald-500"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           )}
 

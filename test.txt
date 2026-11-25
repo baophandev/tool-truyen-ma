@@ -118,13 +118,20 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
   },
   {
     "scene_id": "scene_02",
-    "title": "Leo Lên Gác Lửng Tối & Cầu Xin Trước Cầu Khỉ",
+    "title": "Phân Chia 2 Không Gian: Ngoài Bờ Kênh Cầu Khỉ & Trong Buồng Nhà Lá",
     "duration_sec": 12,
-    "theme": "cursed_swamp",
+    "theme": "thatched_house_interior",
     "weather": "haunted_mist",
     "lighting": {
       "sky_preset": "foggy_night",
       "fog_density": 0.65
+    },
+    "space_divider": {
+      "slot": "mid_left",
+      "style": "wooden_pillar",
+      "width": 68,
+      "label_left": "Ngoài Bờ Kênh Sương Mù",
+      "label_right": "Trong Buồng Nhà Lá"
     },
     "camera": {
       "shot": "medium_wide",
@@ -133,12 +140,13 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
         {
           "startTimeSec": 0,
           "transition": "cut",
-          "shot": "medium_wide",
-          "shake": "subtle"
+          "shot": "wide",
+          "shake": "none"
         },
         {
           "startTimeSec": 6.0,
-          "transition": "cut",
+          "transition": "smooth",
+          "transitionDurationSec": 1.2,
           "shot": "medium",
           "target_actor_id": "char_thanh",
           "shake": "subtle"
@@ -147,47 +155,24 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
     },
     "environment_items": [
       {
-        "asset_id": "structure_wooden_stairs",
-        "slot": "mid_left",
+        "asset_id": "structure_monkey_bridge",
+        "slot": "far_left",
+        "offsetX": 20,
+        "scale": 0.95
+      },
+      {
+        "asset_id": "structure_bamboo_bed_net",
+        "slot": "center",
         "scale": 1
       },
       {
-        "asset_id": "structure_monkey_bridge",
+        "asset_id": "structure_wooden_latch_door",
         "slot": "mid_right",
-        "scale": 1
+        "scale": 1,
+        "isShaking": true
       }
     ],
     "actors": [
-      {
-        "id": "char_thanh",
-        "name": "Thanh",
-        "base": "male_adult",
-        "costume": "outfit_modern_casual",
-        "face": "face_scared",
-        "facialAction": "darting_eyes",
-        "pose": "pose_climbing_stairs",
-        "heldItem": "item_flashlight",
-        "heldHand": "right",
-        "shoulderItem": "shoulder_sack",
-        "headItem": "none",
-        "legItem": "none",
-        "facing": "right",
-        "slot": "mid_left",
-        "offsetX": -45,
-        "offsetY": 0,
-        "interact_with": "structure_wooden_stairs",
-        "motion": {
-          "targetSlot": "mid_left",
-          "targetOffsetX": 65,
-          "targetOffsetY": -180,
-          "startTimeSec": 0.5,
-          "endTimeSec": 6.0,
-          "easing": "ease_in_out",
-          "autoFaceTarget": true,
-          "movingPose": "pose_climbing_stairs"
-        },
-        "layer": "actor"
-      },
       {
         "id": "char_oan_hon",
         "name": "Oan Hồn Cầu Khỉ",
@@ -201,42 +186,170 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
         "shoulderItem": "none",
         "headItem": "head_conical_hat",
         "legItem": "none",
-        "facing": "left",
-        "slot": "mid_right",
-        "offsetX": 0,
+        "facing": "right",
+        "slot": "far_left",
+        "offsetX": 20,
         "offsetY": -115,
         "interact_with": "structure_monkey_bridge",
         "layer": "actor"
       },
       {
-        "id": "char_nguoi_van_vai",
-        "name": "Người Dân Vái Lạy",
+        "id": "char_thanh",
+        "name": "Thanh",
         "base": "male_adult",
+        "costume": "outfit_modern_casual",
+        "face": "face_scared",
+        "facialAction": "darting_eyes",
+        "pose": "pose_sitting_bed",
+        "heldItem": "item_fresh_ginger",
+        "heldHand": "right",
+        "shoulderItem": "none",
+        "headItem": "none",
+        "legItem": "none",
+        "facing": "left",
+        "slot": "center",
+        "offsetX": 0,
+        "offsetY": -80,
+        "interact_with": "structure_bamboo_bed_net",
+        "layer": "actor"
+      }
+    ],
+    "details": [
+      {
+        "asset_id": "detail_water_hyacinth",
+        "slot": "far_left",
+        "offsetX": -50
+      },
+      {
+        "asset_id": "detail_child_sandals",
+        "slot": "far_left",
+        "offsetX": 40
+      },
+      {
+        "asset_id": "detail_oil_lamp",
+        "slot": "center",
+        "offsetX": 60,
+        "offsetY": -80
+      }
+    ],
+    "dialogue": "Ngăn cách giữa hai thế giới là cây cột gỗ lim sừng sững: một bên là bờ kênh sương độc mịt mùng với bóng trắng ma mị chênh vênh trên cầu khỉ, một bên là góc buồng kín nơi Thanh co ro khoanh chân trên giường tre nghe tiếng cửa gỗ rung bần bật...",
+    "narrative_note": "Cơ chế phân chia 2 không gian kiến trúc độc lập (space_divider): Cột gỗ lim wooden_pillar đặt tại slot mid_left có bóng đổ hai bên, tách biệt rõ ràng không gian bên trái (ngoài trời bờ kênh cầu khỉ, bóng ma thăng bằng) và không gian bên phải (trong buồng nhà lá, giường tre và cửa cài then rung lắc isShaking: true)."
+  },
+  {
+    "scene_id": "scene_03",
+    "title": "Phân Chia 2 Không Gian: Gian Thờ Gia Tiên & Cầu Thang Lên Gác Lửng",
+    "duration_sec": 12,
+    "theme": "thatched_house_interior",
+    "weather": "none",
+    "lighting": {
+      "sky_preset": "dim_indoor_night",
+      "fog_density": 0.2
+    },
+    "space_divider": {
+      "slot": "center",
+      "style": "bamboo_partition",
+      "width": 72,
+      "label_left": "Gian Thờ Gia Tiên",
+      "label_right": "Lối Cầu Thang Gác Lửng"
+    },
+    "camera": {
+      "shot": "medium_wide",
+      "shake": "none",
+      "keyframes": [
+        {
+          "startTimeSec": 0,
+          "transition": "cut",
+          "shot": "medium_wide",
+          "shake": "none"
+        },
+        {
+          "startTimeSec": 5.0,
+          "transition": "smooth",
+          "transitionDurationSec": 1.0,
+          "shot": "close_up",
+          "target_actor_id": "char_thanh_stairs",
+          "shake": "subtle"
+        }
+      ]
+    },
+    "environment_items": [
+      {
+        "asset_id": "structure_ancestor_altar",
+        "slot": "mid_left",
+        "scale": 1.0
+      },
+      {
+        "asset_id": "structure_wooden_stairs",
+        "slot": "mid_right",
+        "scale": 1.0
+      }
+    ],
+    "actors": [
+      {
+        "id": "char_nguoi_khan_vai",
+        "name": "Người Khấn Vái",
+        "base": "elder_hunched",
         "costume": "outfit_traditional_ba_ba",
         "face": "face_weeping_ghost",
         "facialAction": "tremble_jaw",
         "pose": "pose_kneeling",
         "heldItem": "item_yellow_talisman",
         "heldHand": "right",
-        "shoulderItem": "shoulder_carrying_pole",
+        "shoulderItem": "none",
         "headItem": "head_straw_hat",
-        "legItem": "leg_wooden_shackles",
+        "legItem": "none",
         "facing": "right",
-        "slot": "far_left",
-        "offsetX": 0,
+        "slot": "mid_left",
+        "offsetX": 40,
         "offsetY": 0,
-        "interact_with": "none",
+        "interact_with": "structure_ancestor_altar",
+        "layer": "actor"
+      },
+      {
+        "id": "char_thanh_stairs",
+        "name": "Thanh Leo Thang",
+        "base": "male_adult",
+        "costume": "outfit_modern_casual",
+        "face": "face_scared",
+        "facialAction": "darting_eyes",
+        "pose": "pose_climbing_stairs",
+        "heldItem": "item_flashlight",
+        "heldHand": "right",
+        "shoulderItem": "shoulder_sack",
+        "headItem": "none",
+        "legItem": "none",
+        "facing": "right",
+        "slot": "mid_right",
+        "offsetX": -45,
+        "offsetY": 0,
+        "interact_with": "structure_wooden_stairs",
+        "motion": {
+          "targetSlot": "mid_right",
+          "targetOffsetX": 65,
+          "targetOffsetY": -180,
+          "startTimeSec": 0.5,
+          "endTimeSec": 6.0,
+          "easing": "ease_in_out",
+          "autoFaceTarget": true,
+          "movingPose": "pose_climbing_stairs"
+        },
         "layer": "actor"
       }
     ],
     "details": [
       {
+        "asset_id": "detail_incense_bowl",
+        "slot": "mid_left",
+        "offsetX": -30
+      },
+      {
         "asset_id": "detail_oil_lamp",
-        "slot": "center"
+        "slot": "mid_right",
+        "offsetX": -20
       }
     ],
-    "dialogue": "Tiếng ván gỗ cầu thang rên rỉ từng nhịp dưới chân Thanh khi cậu vừa bám tay vịn vừa leo lên căn gác xép u tối... Phía ngoài bờ kênh mịt mù, một bóng trắng đang đứng chênh vênh thăng bằng giữa cầu khỉ, trong khi người dưới bến sụp quỳ lạy khấn vái xin tha mạng...",
-    "narrative_note": "Tương tác công trình trên cao & tư thế: Thanh bước leo cầu thang structure_wooden_stairs với motion lên độ cao targetOffsetY: -180 và movingPose: pose_climbing_stairs. Bóng trắng đứng thăng bằng trên thân tre cầu khỉ structure_monkey_bridge với pose_balancing_bridge và offsetY: -115. Nhân vật bờ kênh quỳ gối lạy khấn (pose_kneeling, offsetY: 0)."
+    "dialogue": "Bức vách nan nứa ngăn cách hai gian phòng u uất: bên gian thờ, bà lão quỳ sụp run rẩy chắp tay vái lạy trước di ảnh mờ mịt khói hương; trong khi ở buồng bên kia, Thanh đang nín thở bám bậc thang gỗ lần mò bước lên căn gác xép tối đen...",
+    "narrative_note": "Cơ chế phân chia 2 không gian bằng vách nứa bamboo_partition đặt tại center: gian thờ bên trái (bàn thờ tổ tiên, tư thế quỳ lạy pose_kneeling) và buồng bên phải (cầu thang gỗ gác lửng, bước leo thang pose_climbing_stairs lên cao targetOffsetY: -180)."
   }
 ]
 ```
@@ -257,6 +370,7 @@ Cấu trúc JSON trong skill **`tạo-cảnh-quay`** là một **mảng các đ�
 | **`environment_items`** | `array` | Danh sách các công trình/kiến trúc lớn trong cảnh, khóa theo Rắc-co Bối Cảnh, gồm `asset_id`, vị trí `slot` và tỷ lệ `scale` (tùy chọn). |
 | **`actors`** | `array` | Danh sách diễn viên xuất hiện trong cảnh (khóa `id`, `name`, `base`, `costume` từ Rắc-co Diễn Viên). Gồm các trường:<br>• `face`: Mã biểu cảm khuôn mặt.<br>• `facialAction`: Hành vi mắt/miệng động.<br>• `pose`: Tư thế (bao gồm các tư thế tương tác: `"pose_standing"`, `"pose_sitting"`, `"pose_sitting_twisted_legs"`, `"pose_sitting_bed"`, `"pose_lying_down"`, `"pose_lying_hammock"`, `"pose_climbing_stairs"` [bước leo thang], `"pose_balancing_bridge"` [thăng bằng cầu khỉ/cầu tre], `"pose_kneeling"` [quỳ gối lạy/khấn], `"pose_squatting"` [ngồi xổm/chồm hổm], v.v.).<br>• `heldItem`: Đồ vật cầm tay qua Hand Socket (`"item_storm_lantern"`, `"item_oil_lamp"`, `"item_fresh_ginger"`, v.v.).<br>• `heldHand`: `"right"` (tay trước) hoặc `"left"` (tay sau).<br>• **`shoulderItem`**: Đồ vật vác / gánh trên vai qua Shoulder Socket (`"shoulder_carrying_pole"`, `"shoulder_coffin_pole"`, `"shoulder_hoe"`, `"shoulder_sack"`, `"shoulder_firewood_bundle"`, `"none"`).<br>• **`headItem`**: Đồ vật đội / quấn trên đầu qua Head Socket (`"head_conical_hat"`, `"head_funeral_band"`, `"head_straw_hat"`, `"head_talisman_mask"`, `"head_basket"`, `"none"`).<br>• **`legItem`**: Cùm xích / thương tích ở chân qua Leg Socket (`"leg_iron_chains"`, `"leg_wooden_shackles"`, `"leg_bloody_bandage"`, `"leg_muddy_splatter"`, `"none"`).<br>• `facing`: `"left"` hoặc `"right"`.<br>• `slot`: Slot định vị (`"far_left"` -> `"far_right"` hoặc air slots).<br>• **`offsetY`**: Tọa độ bù trục Y (px) để đặt khớp bề mặt tiếp xúc (`-180` cho đỉnh cầu thang/gác lửng, `-115` cho cầu khỉ tre, `-110` cho cầu gãy, `-80` cho giường, `-60` cho võng, `0` cho ghế/quỳ/ngồi xổm/tiếp đất).<br>• **`interact_with`**: Mã ID công trình đặc biệt mà diễn viên tương tác trực tiếp (`"structure_wooden_stairs"`, `"structure_monkey_bridge"`, `"broken_wooden_bridge"`, `"structure_wooden_bed"`, `"structure_bamboo_bed_net"`, `"structure_wooden_chair"`, `"structure_hammock"` hoặc `null` / `"none"`).<br>• `layer`: Phân lớp vẽ (`"foreground"` / `"actor"` / `"background"`).<br>• **`motion`**: Chuyển động từ A sang B hỗ trợ cả trục X và trục Y trên cao (`targetSlot`, `targetOffsetX`, `targetOffsetY`: tọa độ cao đích đến như `-180` khi leo thang, `movingPose`: `"pose_climbing_stairs"` / `"pose_balancing_bridge"` / `"pose_walking"` / `"pose_kneeling"` / `"pose_squatting"`). |
 | **`details`** | `array` | Danh sách đạo cụ nhỏ trang trí trong bối cảnh (khóa từ Rắc-co Bối Cảnh), gồm `asset_id` và `slot`. |
+| **`space_divider`** | `object` / `string` / `boolean` | **Cột / Vách Ngăn Phân Chia 2 Không Gian Kiến Trúc Độc Lập:** *(tùy chọn)*<br>• Dùng khi kịch bản muốn phân tách rõ rệt 2 không gian khác nhau trên cùng sân khấu (vd: Ngoài hiên/bờ kênh vs Trong buồng nhà, hoặc Gian thờ vs Buồng ngủ gác lửng).<br>• Cấu trúc object: `{ "slot": "mid_left", "style": "wooden_pillar", "width": 64, "offsetX": 0, "label_left": "Ngoài Hiên", "label_right": "Trong Buồng" }`.<br>• `style`: `"wooden_pillar"` (cột gỗ lim to có bóng đổ), `"bamboo_partition"` (vách nan nứa liếp tre), `"brick_wall"` (vách gạch cũ), `"black_silhouette"` (cột đen Limbo tối giản).<br>• **LƯU Ý:** Khi cảnh diễn ra trong một căn phòng đơn liền mạch, **TUYỆT ĐỐI KHÔNG KHAI BÁO** trường này để giữ không gian mở 100% không bị vệt đen chắn ngang! |
 | **`dialogue`** | `string` | Nguyên văn đoạn lời dẫn hoặc lời thoại thuộc phạm vi phân cảnh này. |
 | **`narrative_note`** | `string` | Ghi chú kỹ thuật đạo diễn mô tả hành động gắn liền với các mã ID assets (`base`, `costume`, `pose`, `environment_items`, `details`, `interact_with`) và tọa độ `slot`. |
 

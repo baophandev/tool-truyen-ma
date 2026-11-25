@@ -158,9 +158,9 @@ export const SvgDefs: React.FC = () => {
 
       <linearGradient id="swirling-mist-grad" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stopColor="#E2E8F0" stopOpacity="0" />
-        <stop offset="25%" stopColor="#E2E8F0" stopOpacity="0.22" />
-        <stop offset="50%" stopColor="#CBD5E1" stopOpacity="0.32" />
-        <stop offset="75%" stopColor="#94A3B8" stopOpacity="0.18" />
+        <stop offset="25%" stopColor="#E2E8F0" stopOpacity="0.1" />
+        <stop offset="50%" stopColor="#CBD5E1" stopOpacity="0.15" />
+        <stop offset="75%" stopColor="#94A3B8" stopOpacity="0.08" />
         <stop offset="100%" stopColor="#E2E8F0" stopOpacity="0" />
       </linearGradient>
 
@@ -271,9 +271,9 @@ export const SvgDefs: React.FC = () => {
       {/* 4. FOREGROUND GROUND FOG GRADIENT */}
       <linearGradient id="ground-fog-grad" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stopColor="rgba(226, 232, 240, 0)" />
-        <stop offset="40%" stopColor="rgba(226, 232, 240, 0.22)" />
-        <stop offset="80%" stopColor="rgba(203, 213, 225, 0.32)" />
-        <stop offset="100%" stopColor="rgba(10, 10, 12, 0.85)" />
+        <stop offset="40%" stopColor="rgba(226, 232, 240, 0.1)" />
+        <stop offset="80%" stopColor="rgba(203, 213, 225, 0.16)" />
+        <stop offset="100%" stopColor="rgba(10, 10, 12, 0.45)" />
       </linearGradient>
 
       {/* 5. GHOST AURA & BLUR */}

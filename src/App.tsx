@@ -109,8 +109,28 @@ export function App() {
   const [scenes, setScenes] = useState<DirectorSceneScript[]>(DEFAULT_HORROR_SCENES);
   const [currentSceneIndex, setCurrentSceneIndex] = useState<number>(0);
   const [showGizmo, setShowGizmo] = useState<boolean>(false);
+  const [showVignette, setShowVignette] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem("limbo_show_vignette");
+      return saved !== null ? saved === "true" : true;
+    } catch {
+      return true;
+    }
+  });
   const [isAiModalOpen, setIsAiModalOpen] = useState<boolean>(false);
   const [aiModalMode, setAiModalMode] = useState<AiModalMode>("description_film");
+
+  const handleToggleVignette = () => {
+    setShowVignette((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("limbo_show_vignette", String(next));
+      } catch {
+        // safe catch
+      }
+      return next;
+    });
+  };
 
   const safeSceneIndex = Math.min(currentSceneIndex, Math.max(0, scenes.length - 1));
   const currentScene = scenes[safeSceneIndex] || scenes[0];
@@ -477,6 +497,8 @@ export function App() {
             onSelectScene={(idx) => setCurrentSceneIndex(idx)}
             showGizmo={showGizmo}
             onToggleGizmo={() => setShowGizmo(!showGizmo)}
+            showVignette={showVignette}
+            onToggleVignette={handleToggleVignette}
             onDisableAllShake={handleDisableAllShake}
           />
         )}
@@ -489,6 +511,8 @@ export function App() {
             onResetScene={handleResetCurrentScene}
             onOpenAiDirector={handleOpenAiDirector}
             onDisableAllShake={handleDisableAllShake}
+            showVignette={showVignette}
+            onToggleVignette={handleToggleVignette}
           />
         )}
 
@@ -498,6 +522,8 @@ export function App() {
             currentScene={currentScene}
             onImportScene={handleImportScene}
             onOpenAiDirector={handleOpenAiDirector}
+            showVignette={showVignette}
+            onToggleVignette={handleToggleVignette}
           />
         )}
       </main>

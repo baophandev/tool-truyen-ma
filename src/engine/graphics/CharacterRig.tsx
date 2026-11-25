@@ -43,6 +43,52 @@ function resolveHandSockets(
   heldItem?: HeldItemId,
   heldHand: HeldHand = "right"
 ): { left: HandSocketPoint; right: HandSocketPoint } {
+  // Horizontal / special-body poses use their own dedicated rigs regardless of base body type
+  if (pose === "pose_crawling") {
+    return {
+      left: { x: 14, y: -4, rot: 0 },
+      right: { x: 86, y: -6, rot: 15 },
+    };
+  }
+  if (pose === "pose_lying_down") {
+    const hasItem = Boolean(heldItem && heldItem !== "none");
+    return {
+      left: hasItem && heldHand === "left" ? { x: -4, y: -34, rot: -28 } : { x: -6, y: -20, rot: 0 },
+      right: hasItem && heldHand === "right" ? { x: 10, y: -34, rot: -28 } : { x: 14, y: -20, rot: 0 },
+    };
+  }
+  if (pose === "pose_lying_ground") {
+    return {
+      left: { x: -16, y: -6, rot: 5 },
+      right: { x: 26, y: -6, rot: -5 },
+    };
+  }
+  if (pose === "pose_swimming") {
+    return {
+      left: { x: -44, y: -36, rot: -20 },
+      right: { x: 58, y: -40, rot: 25 },
+    };
+  }
+  if (pose === "pose_drowning") {
+    return {
+      left: { x: -28, y: -130, rot: -15 },
+      right: { x: 26, y: -138, rot: 15 },
+    };
+  }
+  if (pose === "pose_floating_corpse") {
+    return {
+      left: { x: -18, y: -10, rot: 0 },
+      right: { x: 24, y: -12, rot: 0 },
+    };
+  }
+  if (pose === "pose_lying_hammock") {
+    const hasItem = Boolean(heldItem && heldItem !== "none");
+    return {
+      left: hasItem && heldHand === "left" ? { x: -6, y: -28, rot: -22 } : { x: -8, y: -18, rot: 0 },
+      right: hasItem && heldHand === "right" ? { x: 10, y: -28, rot: -22 } : { x: 14, y: -18, rot: 0 },
+    };
+  }
+
   if (base === "jiangshi_corpse") {
     return {
       left: { x: 75, y: -180, rot: 0 },
@@ -83,24 +129,6 @@ function resolveHandSockets(
     return {
       left: { x: -22, y: -92, rot: 0 },
       right: { x: 22, y: -92, rot: 0 },
-    };
-  }
-  if (pose === "pose_crawling") {
-    return {
-      left: { x: 14, y: -4, rot: 0 },
-      right: { x: 86, y: -6, rot: 15 },
-    };
-  }
-  if (pose === "pose_lying_down") {
-    return {
-      left: { x: -6, y: -22, rot: 0 },
-      right: { x: 16, y: -22, rot: 0 },
-    };
-  }
-  if (pose === "pose_lying_hammock") {
-    return {
-      left: { x: -8, y: -18, rot: 0 },
-      right: { x: 14, y: -18, rot: 0 },
     };
   }
   if (pose === "pose_sitting_bed") {
@@ -443,6 +471,106 @@ export const CharacterRig: React.FC<CharacterRigProps> = ({
         opacity={opacity}
         heldItem={heldItem}
         heldHand={heldHand}
+        showSockets={showSockets}
+        palette={palette}
+        appearance={appearance}
+        handSockets={handSockets}
+      />
+    );
+  }
+
+  // LYING GROUND HORIZONTAL FLAT PROFILE OVERRIDE (Dùng cho nhân vật ngất lịm / gục ngã / xác chết nằm bẹp trên mặt đất không có gối)
+  if (pose === "pose_lying_ground") {
+    return (
+      <LyingGroundRig
+        id={id}
+        base={base}
+        costume={activeCostume}
+        face={face}
+        facialAction={facialAction}
+        scale={finalScale}
+        flip={flip}
+        opacity={opacity}
+        heldItem={heldItem}
+        heldHand={heldHand}
+        shoulderItem={shoulderItem}
+        headItem={headItem}
+        legItem={legItem}
+        showSockets={showSockets}
+        palette={palette}
+        appearance={appearance}
+        handSockets={handSockets}
+      />
+    );
+  }
+
+  // SWIMMING WATER PROFILE OVERRIDE (Dùng cho nhân vật bơi lội rẽ nước trên sông rạch / đầm lầy u minh)
+  if (pose === "pose_swimming") {
+    return (
+      <SwimmingRig
+        id={id}
+        base={base}
+        costume={activeCostume}
+        face={face}
+        facialAction={facialAction}
+        scale={finalScale}
+        flip={flip}
+        opacity={opacity}
+        heldItem={heldItem}
+        heldHand={heldHand}
+        shoulderItem={shoulderItem}
+        headItem={headItem}
+        legItem={legItem}
+        showSockets={showSockets}
+        palette={palette}
+        appearance={appearance}
+        handSockets={handSockets}
+      />
+    );
+  }
+
+  // DROWNING STRUGGLING WATER PROFILE OVERRIDE (Dùng cho nhân vật chết đuối / ngoi ngóp chới với chìm dần tuyệt vọng)
+  if (pose === "pose_drowning") {
+    return (
+      <DrowningRig
+        id={id}
+        base={base}
+        costume={activeCostume}
+        face={face}
+        facialAction={facialAction}
+        scale={finalScale}
+        flip={flip}
+        opacity={opacity}
+        heldItem={heldItem}
+        heldHand={heldHand}
+        shoulderItem={shoulderItem}
+        headItem={headItem}
+        legItem={legItem}
+        showSockets={showSockets}
+        palette={palette}
+        appearance={appearance}
+        handSockets={handSockets}
+      />
+    );
+  }
+
+  // FLOATING CORPSE WATER PROFILE OVERRIDE (Dùng cho xác chết trôi sông / xác chết đuối nổi lờ đờ)
+  if (pose === "pose_floating_corpse") {
+    return (
+      <FloatingCorpseRig
+        id={id}
+        base={base}
+        costume={activeCostume}
+        face={face}
+        facialAction={facialAction}
+        scale={finalScale}
+        flip={flip}
+        opacity={opacity}
+        heldItem={heldItem}
+        heldHand={heldHand}
+        shoulderItem={shoulderItem}
+        headItem={headItem}
+        legItem={legItem}
         showSockets={showSockets}
         palette={palette}
         appearance={appearance}
@@ -3357,14 +3485,14 @@ const LyingDownSideRig: React.FC<LyingDownSideRigProps> = ({
         <ellipse cx={handSockets.left.x} cy={handSockets.left.y} rx="5" ry="3.5" fill={handColor} />
       </g>
 
-      {/* 5. MAIN TORSO & ABDOMEN (Horizontal chest rising gently with breath) */}
+      {/* 5. MAIN TORSO & ABDOMEN (Horizontal chest with natural rounded shoulder) */}
       <g className="lie-torso">
-        {/* Base Torso Shape: Shoulders (-38, -24) to Hips (22, -16) */}
         <path
-          d="M -38 -24 
-             C -25 -30, -5 -29, 20 -20 
+          d="M -40 -17 
+             C -38 -27, -24 -30, -6 -27 
+             C 8 -25, 16 -21, 22 -18 
              L 22 -6 
-             C -5 -5, -25 -6, -38 -10 Z"
+             C 2 -5, -22 -5, -40 -9 Z"
           fill={palette.primary}
           stroke={appearance.outline}
           strokeWidth="1.2"
@@ -3413,18 +3541,19 @@ const LyingDownSideRig: React.FC<LyingDownSideRigProps> = ({
         )}
       </g>
 
-      {/* 6. FRONT LEG (Right Leg - resting horizontally on top) */}
+      {/* 6. FRONT LEG (Right Leg - relaxed slight knee bend) */}
       <g className="lie-front-leg">
-        {/* Front Thigh from Hip (20, -18) to Knee (65, -14) */}
+        {/* Front Thigh from Hip (18, -19) to slightly raised Knee (64, -18) */}
         <path
-          d="M 18 -20 L 66 -16 L 64 -8 L 18 -11 Z"
+          d="M 18 -19 L 64 -19 L 62 -10 L 18 -9 Z"
           fill={palette.pantsPrimary}
           stroke={appearance.outline}
           strokeWidth="1"
         />
-        {/* Front Shin from Knee (65, -14) to Ankle (102, -10) */}
+        <ellipse cx="63" cy="-14.5" rx="4.5" ry="4.5" fill={palette.pantsPrimary} />
+        {/* Front Shin from Knee (64, -18) down to Ankle (102, -10) */}
         <path
-          d="M 64 -16 L 102 -11 L 100 -5 L 64 -8 Z"
+          d="M 63 -19 L 102 -11 L 100 -5 L 62 -10 Z"
           fill={palette.pantsPrimary}
           stroke={appearance.outline}
           strokeWidth="1"
@@ -3436,23 +3565,23 @@ const LyingDownSideRig: React.FC<LyingDownSideRigProps> = ({
         )}
       </g>
 
-      {/* 7. FRONT ARM (Right Arm - resting folded across chest) */}
+      {/* 7. FRONT ARM (Right Arm - resting on chest or raised slightly when holding item) */}
       <g className="lie-front-arm">
-        {/* Upper Arm from Shoulder (-30, -24) to Elbow (-6, -18) */}
+        {/* Upper Arm from Shoulder (-30, -22) to Elbow (-6, -17) */}
         <path
-          d="M -30 -24 L -6 -20 L -8 -13 L -30 -16 Z"
+          d="M -30 -23 L -6 -19 L -8 -12 L -30 -15 Z"
           fill={sleeveColor}
           stroke={appearance.outline}
           strokeWidth="1"
         />
-        {/* Forearm from Elbow (-6, -20) across chest to Hand (14, -22) */}
+        {/* Forearm from Elbow (-6, -17) to Hand socket */}
         <path
-          d="M -6 -20 L 14 -24 L 16 -19 L -6 -15 Z"
+          d={`M -6 -19 L ${handSockets.right.x} ${handSockets.right.y - 2} L ${handSockets.right.x + 2} ${handSockets.right.y + 3} L -6 -13 Z`}
           fill={sleeveColor}
           stroke={appearance.outline}
           strokeWidth="1"
         />
-        {/* Hand resting on chest */}
+        {/* Hand */}
         <ellipse cx={handSockets.right.x} cy={handSockets.right.y} rx="5.5" ry="3.8" fill={handColor} />
 
         {/* Attached handheld item if holding something while resting */}
@@ -3504,35 +3633,38 @@ const LyingDownSideRig: React.FC<LyingDownSideRigProps> = ({
             />
           )}
 
-          {/* Head ellipse */}
-          <ellipse
-            cx="0"
-            cy="0"
-            rx={isChild ? "18" : isElder ? "17" : "19"}
-            ry={isChild ? "17" : isElder ? "18" : "18"}
-            fill={appearance.skin}
-            stroke={appearance.outline}
-            strokeWidth="1.5"
-          />
+          {/* Rotated head resting naturally on pillow (chin toward neck, face looking upward) */}
+          <g transform="rotate(-78)">
+            {/* Head ellipse */}
+            <ellipse
+              cx="0"
+              cy="0"
+              rx={isChild ? "18" : isElder ? "17" : "19"}
+              ry={isChild ? "17" : isElder ? "18" : "18"}
+              fill={appearance.skin}
+              stroke={appearance.outline}
+              strokeWidth="1.5"
+            />
 
-          {/* Wrinkles for elder */}
-          {isElder && (
-            <g stroke="#3A2E24" strokeWidth="0.9" fill="none" opacity="0.65">
-              <path d="M -8 -6 C -4 -4, 4 -4, 8 -6" />
-              <path d="M -6 6 C -2 8, 4 8, 8 6" />
-            </g>
-          )}
+            {/* Wrinkles for elder */}
+            {isElder && (
+              <g stroke="#3A2E24" strokeWidth="0.9" fill="none" opacity="0.65">
+                <path d="M -8 -6 C -4 -4, 4 -4, 8 -6" />
+                <path d="M -6 6 C -2 8, 4 8, 8 6" />
+              </g>
+            )}
 
-          {/* White Funeral Mourning Headband when lying down */}
-          {costume === "outfit_funeral_white" && (
-            <g className="lie-funeral-headband">
-              <path d="M -16 -4 Q 0 -7 16 -4 L 15 2 Q 0 -1 -15 2 Z" fill="#F8FAFC" stroke="#94A3B8" strokeWidth="0.8" />
-              <path d="M -15 -2 Q -24 6 -20 18 L -17 17 Q -20 7 -13 -2 Z" fill="#F8FAFC" stroke="#CBD5E1" strokeWidth="0.8" opacity="0.9" />
-            </g>
-          )}
+            {/* White Funeral Mourning Headband when lying down */}
+            {costume === "outfit_funeral_white" && (
+              <g className="lie-funeral-headband">
+                <path d="M -16 -4 Q 0 -7 16 -4 L 15 2 Q 0 -1 -15 2 Z" fill="#F8FAFC" stroke="#94A3B8" strokeWidth="0.8" />
+                <path d="M -15 -2 Q -24 6 -20 18 L -17 17 Q -20 7 -13 -2 Z" fill="#F8FAFC" stroke="#CBD5E1" strokeWidth="0.8" opacity="0.9" />
+              </g>
+            )}
 
-          {/* Face Expression Rig */}
-          <FaceRig face={face} facialAction={facialAction} />
+            {/* Face Expression Rig */}
+            <FaceRig face={face} facialAction={facialAction} />
+          </g>
         </g>
       )}
 
@@ -3608,7 +3740,7 @@ const LyingHammockSideRig: React.FC<LyingHammockSideRigProps> = ({
   return (
     <g
       id={id ? `actor-${id}` : undefined}
-      transform={`scale(${flip * scale}, ${scale})`}
+      transform={`scale(${flip * scale * 1.22}, ${scale * 1.22})`}
       opacity={isGhost ? Math.min(opacity, 0.88) : opacity}
       className="character-rig rig-lying-hammock"
     >
@@ -3721,9 +3853,9 @@ const LyingHammockSideRig: React.FC<LyingHammockSideRigProps> = ({
           stroke={appearance.outline}
           strokeWidth="1"
         />
-        {/* Elbow (-2, -8) to Hand near stomach/chest (14, -18) */}
+        {/* Elbow (-2, -8) to Hand socket */}
         <path
-          d="M -2 -10 L 14 -19 L 16 -13 L 0 -2 Z"
+          d={`M -2 -10 L ${handSockets.right.x} ${handSockets.right.y - 2} L ${handSockets.right.x + 2} ${handSockets.right.y + 4} L 0 -2 Z`}
           fill={sleeveColor}
           stroke={appearance.outline}
           strokeWidth="1"
@@ -3737,8 +3869,8 @@ const LyingHammockSideRig: React.FC<LyingHammockSideRigProps> = ({
         <g id="hammock-head-group">
           {/* Neck */}
           <path d="M -36 -18 L -46 -24 L -44 -18 L -36 -12 Z" fill={appearance.skinShadow} />
-          {/* Head tilted resting */}
-          <g transform={`translate(${headPos.x}, ${headPos.y}) rotate(12)`}>
+          {/* Head tilted resting naturally in hammock */}
+          <g transform={`translate(${headPos.x}, ${headPos.y})`}>
             {/* Hair */}
             {base === "female_adult" && (
               <path
@@ -3752,36 +3884,38 @@ const LyingHammockSideRig: React.FC<LyingHammockSideRigProps> = ({
                 fill={appearance.hair}
               />
             )}
-            <ellipse
-              cx="0"
-              cy="0"
-              rx={isChild ? "18" : isElder ? "17" : "19"}
-              ry={isChild ? "17" : isElder ? "18" : "18"}
-              fill={appearance.skin}
-              stroke={appearance.outline}
-              strokeWidth="1.5"
-            />
-            {isElder && (
-              <g stroke="#3A2E24" strokeWidth="0.9" fill="none" opacity="0.65">
-                <path d="M -8 -6 C -4 -4, 4 -4, 8 -6" />
-                <path d="M -6 6 C -2 8, 4 8, 8 6" />
-              </g>
-            )}
-            <FaceRig face={face} facialAction={facialAction} />
+            <g transform="rotate(-72)">
+              <ellipse
+                cx="0"
+                cy="0"
+                rx={isChild ? "18" : isElder ? "17" : "19"}
+                ry={isChild ? "17" : isElder ? "18" : "18"}
+                fill={appearance.skin}
+                stroke={appearance.outline}
+                strokeWidth="1.5"
+              />
+              {isElder && (
+                <g stroke="#3A2E24" strokeWidth="0.9" fill="none" opacity="0.65">
+                  <path d="M -8 -6 C -4 -4, 4 -4, 8 -6" />
+                  <path d="M -6 6 C -2 8, 4 8, 8 6" />
+                </g>
+              )}
+              <FaceRig face={face} facialAction={facialAction} />
+            </g>
           </g>
         </g>
       )}
 
-      {/* 8. FRONT MESH OVERLAY: The front edge of the hammock wrapping softly over the character */}
+      {/* 8. FRONT MESH OVERLAY: The front edge of the hammock wrapping softly over torso/legs below face */}
       <path
-        d="M -80 -40 Q 0 -6 80 -40"
+        d="M -78 -24 Q 0 8 80 -34"
         stroke="#2E4A3B"
         strokeWidth="3.2"
         fill="none"
         opacity="0.85"
       />
       <path
-        d="M -78 -38 Q 0 -8 78 -38"
+        d="M -76 -22 Q 0 6 78 -32"
         stroke="#16261E"
         strokeWidth="1.2"
         fill="none"
@@ -3793,6 +3927,1039 @@ const LyingHammockSideRig: React.FC<LyingHammockSideRigProps> = ({
         <g className="debug-sockets" pointerEvents="none">
           <circle cx={handSockets.left.x} cy={handSockets.left.y} r="3" fill="#3B82F6" />
           <circle cx={handSockets.right.x} cy={handSockets.right.y} r="3" fill="#10B981" />
+        </g>
+      )}
+    </g>
+  );
+};
+
+/**
+ * =========================================================
+ * 1. LYING GROUND HORIZONTAL 2D RIG (TƯ THẾ NẰM SÕNG SOÀI / GỤC NGÃ TRÊN ĐẤT)
+ * =========================================================
+ * Flat profile view on the ground WITHOUT pillow.
+ * Used for knocked out, exhausted collapsed state, or corpse sprawled on the ground/floor.
+ */
+interface LyingGroundRigProps {
+  id?: string;
+  base: CharacterBaseId;
+  costume: CostumeId;
+  face: CharacterFaceId;
+  facialAction?: FacialActionId;
+  scale: number;
+  flip: number;
+  opacity: number;
+  heldItem?: HeldItemId;
+  heldHand?: HeldHand;
+  shoulderItem?: ShoulderItemId;
+  headItem?: HeadItemId;
+  legItem?: LegItemId;
+  showSockets?: boolean;
+  palette: CostumePalette;
+  appearance: BaseAppearance;
+  handSockets: { left: HandSocketPoint; right: HandSocketPoint };
+}
+
+const LyingGroundRig: React.FC<LyingGroundRigProps> = ({
+  id,
+  base,
+  costume,
+  face,
+  facialAction,
+  scale,
+  flip,
+  opacity,
+  heldItem = "none",
+  heldHand = "right",
+  headItem = "none",
+  showSockets = false,
+  palette,
+  appearance,
+  handSockets,
+}) => {
+  const isGhost = base === "ghost_wraith";
+  const isDemon = base === "demon_shadow";
+  const isChild = base === "creepy_child";
+  const isElder = base === "elder_hunched";
+  const isSkeletal = base === "skeletal_emaciated";
+  const isHeadless = face === "face_headless";
+
+  const sleeveColor = costume === "outfit_child_pajamas" ? appearance.skin : palette.sleeve;
+  const handColor = appearance.skin;
+  const activeSocket = heldHand === "left" ? handSockets.left : handSockets.right;
+
+  // Head center directly on ground line (NO PILLOW)
+  const headPos = { x: -62, y: -13 };
+
+  return (
+    <g
+      id={id ? `actor-${id}` : undefined}
+      transform={`scale(${flip * scale}, ${scale})`}
+      opacity={isGhost ? Math.min(opacity, 0.88) : opacity}
+      className="character-rig rig-lying-ground"
+    >
+      {/* 1. SURFACE CONTACT SHADOW DIRECTLY UNDER FLAT BODY */}
+      <ellipse cx="16" cy="-1.5" rx="108" ry="4.5" fill="#000000" opacity="0.65" />
+      <ellipse cx="-40" cy="-1" rx="46" ry="3.5" fill="#000000" opacity="0.5" />
+      {/* Cold damp / subtle dirt stain puddle on ground */}
+      <ellipse cx="-10" cy="-1" rx="80" ry="3" fill="#140E0E" opacity="0.35" />
+
+      {/* Ghost aura glow */}
+      {isGhost && (
+        <ellipse
+          cx="15"
+          cy="-16"
+          rx="110"
+          ry="28"
+          fill="url(#ghost-aura-grad)"
+          opacity="0.35"
+          className="anim-pulse-slow"
+        />
+      )}
+
+      {/* Demon dark smoky shadow aura */}
+      {isDemon && (
+        <g opacity="0.35" filter="url(#ghost-blur)">
+          <ellipse cx="15" cy="-16" rx="112" ry="26" fill="#000000" />
+        </g>
+      )}
+
+      {/* 2. REAR LEG (Left Leg - flat on the ground) */}
+      <g className="lie-ground-back-leg" opacity="0.88">
+        <path
+          d="M 18 -15 L 62 -11 L 60 -4 L 18 -6 Z"
+          fill={palette.pantsSecondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        <path
+          d="M 60 -11 L 98 -8 L 96 -2 L 60 -4 Z"
+          fill={palette.pantsSecondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        {/* Foot limp along floor */}
+        <polygon points="98,-8 108,-10 110,-6 96,-2" fill="#11131A" />
+      </g>
+
+      {/* 3. REAR ARM (Left Arm - sprawled limp) */}
+      <g className="lie-ground-back-arm" opacity="0.88">
+        <path
+          d="M -34 -16 L -10 -11 L -12 -6 L -34 -11 Z"
+          fill={palette.secondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        <path
+          d="M -10 -11 L -16 -6 L -14 -2 L -8 -7 Z"
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        <ellipse cx={handSockets.left.x} cy={handSockets.left.y} rx="5" ry="3.5" fill={handColor} />
+      </g>
+
+      {/* 4. MAIN TORSO (Flat low profile on ground) */}
+      <g className="lie-ground-torso">
+        <path
+          d="M -38 -18 
+             C -25 -22, -5 -21, 20 -14 
+             L 22 -3 
+             C -5 -3, -25 -3, -38 -5 Z"
+          fill={palette.primary}
+          stroke={appearance.outline}
+          strokeWidth="1.2"
+        />
+
+        {/* Costume Details */}
+        {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
+          <g>
+            <path d="M -34 -17 L 14 -10" stroke={palette.trim} strokeWidth="1.2" strokeDasharray="3,3" />
+            <rect x="-4" y="-10" width="7" height="6" rx="1" fill={palette.secondary} stroke={palette.trim} strokeWidth="0.8" />
+          </g>
+        )}
+
+        {costume === "outfit_modern_casual" && (
+          <g>
+            <line x1="-36" y1="-17" x2="16" y2="-11" stroke="#334155" strokeWidth="1.5" />
+            <circle cx="-32" cy="-15" r="1.5" fill="#E2E8F0" />
+          </g>
+        )}
+
+        {costume === "outfit_flowing_ao_dai" && (
+          <path
+            d="M -34 -17 C -10 -23, 20 -18, 48 -10 L 38 -3 C 15 -8, -10 -8, -34 -8 Z"
+            fill={palette.primary}
+            opacity="0.9"
+          />
+        )}
+
+        {costume === "outfit_patient_gown" && (
+          <line x1="-28" y1="-18" x2="12" y2="-11" stroke={palette.secondary} strokeWidth="1.8" />
+        )}
+
+        {isSkeletal && (
+          <g opacity="0.6">
+            <line x1="-22" y1="-19" x2="-22" y2="-7" stroke={appearance.outline} strokeWidth="1.5" />
+            <line x1="-10" y1="-20" x2="-10" y2="-6" stroke={appearance.outline} strokeWidth="1.5" />
+            <line x1="2" y1="-18" x2="2" y2="-5" stroke={appearance.outline} strokeWidth="1.5" />
+          </g>
+        )}
+      </g>
+
+      {/* 5. FRONT LEG (Right Leg - sprawled forward) */}
+      <g className="lie-ground-front-leg">
+        <path
+          d="M 18 -16 L 66 -13 L 64 -5 L 18 -7 Z"
+          fill={palette.pantsPrimary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        <path
+          d="M 64 -13 L 102 -9 L 100 -3 L 64 -5 Z"
+          fill={palette.pantsPrimary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        <polygon points="102,-9 112,-11 114,-7 100,-3" fill="#181512" />
+        {costume === "outfit_modern_casual" && (
+          <line x1="102" y1="-8" x2="112" y2="-10" stroke={palette.accent} strokeWidth="1.6" strokeLinecap="round" />
+        )}
+      </g>
+
+      {/* 6. FRONT ARM (Right Arm - resting limp across torso onto dirt) */}
+      <g className="lie-ground-front-arm">
+        <path
+          d="M -30 -18 L -6 -13 L -8 -7 L -30 -11 Z"
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        <path
+          d="M -6 -13 L 24 -9 L 26 -4 L -6 -8 Z"
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        <ellipse cx={handSockets.right.x} cy={handSockets.right.y} rx="5.5" ry="3.8" fill={handColor} />
+        {/* Attached prop if holding item */}
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+
+      {/* 7. NECK & HEAD & FACE (Resting directly on the ground at X = -62, Y = -13) */}
+      {isHeadless ? (
+        <g transform="translate(-50, -10)">
+          <ellipse cx="0" cy="0" rx="6" ry="7" fill="#7F1D1D" />
+          <path d="M 0 0 C -6 2, -12 4, -18 5" stroke="#DC2626" strokeWidth="2" fill="none" />
+        </g>
+      ) : (
+        <g className="lie-ground-head-group" transform={`translate(${headPos.x}, ${headPos.y})`}>
+          <path
+            d="M 16 2 L 6 0 L 8 9 L 18 10 Z"
+            fill={appearance.skinShadow}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+
+          {/* Hair splaying out onto cold floor/dirt */}
+          {base === "female_adult" && (
+            <g className="lie-female-hair">
+              <path
+                d="M 10 3 C -8 1, -26 -3, -34 -5 C -28 7, -12 16, 5 15 Z"
+                fill={appearance.hair}
+              />
+              <path
+                d="M 12 -7 C -4 -11, -20 -13, -30 -11 C -22 -5, -8 1, 8 2 Z"
+                fill={appearance.hair}
+              />
+            </g>
+          )}
+
+          {base === "male_adult" && (
+            <path
+              d="M 12 -4 C 4 -14, -10 -15, -20 -8 C -16 -2, -8 4, 6 6 Z"
+              fill={appearance.hair}
+            />
+          )}
+
+          {base === "creepy_child" && (
+            <path
+              d="M 10 -4 C 2 -14, -12 -14, -18 -6 C -14 -1, -6 4, 4 5 Z"
+              fill={appearance.hair}
+            />
+          )}
+
+          <g transform="rotate(-82)">
+            {/* Head Ellipse */}
+            <ellipse
+              cx="0"
+              cy="0"
+              rx={isChild ? "18" : isElder ? "17" : "19"}
+              ry={isChild ? "17" : isElder ? "18" : "18"}
+              fill={appearance.skin}
+              stroke={appearance.outline}
+              strokeWidth="1.5"
+            />
+
+            {isElder && (
+              <g stroke="#3A2E24" strokeWidth="0.9" fill="none" opacity="0.65">
+                <path d="M -8 -6 C -4 -4, 4 -4, 8 -6" />
+                <path d="M -6 6 C -2 8, 4 8, 8 6" />
+              </g>
+            )}
+
+            {/* White Funeral Mourning Headband */}
+            {costume === "outfit_funeral_white" && (
+              <g className="lie-funeral-headband">
+                <path d="M -16 -4 Q 0 -6 16 -4 L 15 2 Q 0 0 -15 2 Z" fill="#F8FAFC" stroke="#94A3B8" strokeWidth="0.8" />
+                <path d="M -15 -2 Q -24 5 -20 16 L -17 15 Q -20 6 -13 -2 Z" fill="#F8FAFC" stroke="#CBD5E1" strokeWidth="0.8" opacity="0.9" />
+              </g>
+            )}
+
+            {/* Face Expression Rig */}
+            <FaceRig face={face} facialAction={facialAction} />
+          </g>
+        </g>
+      )}
+
+      {/* Head Item */}
+      {!isHeadless && <HeadItemRenderer itemId={headItem} headPos={headPos} />}
+
+      {/* 8. DEBUG SOCKETS & GIZMO OVERLAY */}
+      {showSockets && (
+        <g className="rig-debug-gizmo" pointerEvents="none">
+          <circle cx="0" cy="0" r="5" fill="#10B981" />
+          <text x="10" y="-8" fill="#10B981" fontSize="10" fontFamily="monospace">Ground [0,0]</text>
+          <circle cx={headPos.x} cy={headPos.y} r="5" fill="#EF4444" />
+          <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4" fill="#A855F7" />
+          <circle cx={handSockets.right.x} cy={handSockets.right.y} r="5" fill="#22D3EE" />
+        </g>
+      )}
+    </g>
+  );
+};
+
+/**
+ * =========================================================
+ * 2. SWIMMING 2D WATER RIG (TƯ THẾ BƠI LỘI / RẼ NƯỚC SÔNG ĐẦM)
+ * =========================================================
+ * Water-level profile: lower body kicking underwater, upper torso gliding forward,
+ * rhythmic stroke arms with ripples and froth.
+ */
+interface SwimmingRigProps {
+  id?: string;
+  base: CharacterBaseId;
+  costume: CostumeId;
+  face: CharacterFaceId;
+  facialAction?: FacialActionId;
+  scale: number;
+  flip: number;
+  opacity: number;
+  heldItem?: HeldItemId;
+  heldHand?: HeldHand;
+  shoulderItem?: ShoulderItemId;
+  headItem?: HeadItemId;
+  legItem?: LegItemId;
+  showSockets?: boolean;
+  palette: CostumePalette;
+  appearance: BaseAppearance;
+  handSockets: { left: HandSocketPoint; right: HandSocketPoint };
+}
+
+const SwimmingRig: React.FC<SwimmingRigProps> = ({
+  id,
+  base,
+  costume,
+  face,
+  facialAction,
+  scale,
+  flip,
+  opacity,
+  heldItem = "none",
+  heldHand = "right",
+  headItem = "none",
+  showSockets = false,
+  palette,
+  appearance,
+  handSockets,
+}) => {
+  const isGhost = base === "ghost_wraith";
+  const isDemon = base === "demon_shadow";
+  const isChild = base === "creepy_child";
+  const isElder = base === "elder_hunched";
+  const isHeadless = face === "face_headless";
+
+  const sleeveColor = costume === "outfit_child_pajamas" ? appearance.skin : palette.sleeve;
+  const handColor = appearance.skin;
+  const activeSocket = heldHand === "left" ? handSockets.left : handSockets.right;
+
+  // Head tilted forward, scanning the water
+  const headPos = { x: 14, y: -62 };
+
+  return (
+    <g
+      id={id ? `actor-${id}` : undefined}
+      transform={`scale(${flip * scale}, ${scale})`}
+      opacity={isGhost ? Math.min(opacity, 0.88) : opacity}
+      className="character-rig rig-swimming anim-water-bob"
+    >
+      {/* 1. UNDERWATER FLUID SUBMERSION WASH (Dark murky river water covering lower body) */}
+      <g className="underwater-elements" opacity="0.75">
+        {/* Rear Kicking Leg underwater */}
+        <path
+          d="M -22 -28 L -68 -18 L -94 -24 L -92 -29 L -66 -24 Z"
+          fill={palette.pantsSecondary}
+          opacity="0.6"
+        />
+        {/* Front Kicking Leg underwater */}
+        <path
+          d="M -20 -30 L -62 -36 L -88 -42 L -86 -46 L -60 -40 Z"
+          fill={palette.pantsPrimary}
+          opacity="0.75"
+        />
+        {/* Underwater water tint veil */}
+        <path
+          d="M -115 -28 Q 0 -36 115 -28 L 115 50 L -115 50 Z"
+          fill="#031622"
+          opacity="0.7"
+        />
+      </g>
+
+      {/* Ghost aura glow */}
+      {isGhost && (
+        <ellipse
+          cx="0"
+          cy="-35"
+          rx="95"
+          ry="32"
+          fill="url(#ghost-aura-grad)"
+          opacity="0.38"
+          className="anim-pulse-slow"
+        />
+      )}
+
+      {/* Demon dark smoky shadow aura */}
+      {isDemon && (
+        <g opacity="0.35" filter="url(#ghost-blur)">
+          <ellipse cx="0" cy="-35" rx="98" ry="30" fill="#000000" />
+        </g>
+      )}
+
+      {/* 2. REAR ARM (Left arm - paddling/sweeping backward through water) */}
+      <g className="swimming-back-arm anim-swimming-arm" opacity="0.85">
+        <path
+          d="M -18 -36 C -38 -44, -58 -38, -74 -30 L -72 -24 C -56 -32, -38 -36, -18 -30 Z"
+          fill={palette.secondary}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        <ellipse cx={handSockets.left.x} cy={handSockets.left.y} rx="5.5" ry="3.8" fill={handColor} />
+      </g>
+
+      {/* 3. MAIN TORSO (Angled forward, slicing water surface) */}
+      <g className="swimming-torso">
+        <path
+          d="M -28 -34 
+             C -12 -42, 10 -42, 28 -36 
+             L 24 -18 
+             C 6 -22, -12 -22, -26 -18 Z"
+          fill={palette.primary}
+          stroke={appearance.outline}
+          strokeWidth="1.2"
+        />
+
+        {/* Costume Details */}
+        {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
+          <path d="M -24 -36 L 20 -33" stroke={palette.trim} strokeWidth="1.2" strokeDasharray="3,3" />
+        )}
+
+        {costume === "outfit_modern_casual" && (
+          <line x1="-24" y1="-36" x2="22" y2="-33" stroke="#334155" strokeWidth="1.5" />
+        )}
+      </g>
+
+      {/* 4. FRONT ARM (Right arm - outstretched forward cutting the water surface) */}
+      <g className="swimming-front-arm">
+        <path
+          d="M 18 -36 C 38 -46, 56 -44, 76 -36 L 74 -30 C 56 -38, 38 -38, 16 -30 Z"
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        <ellipse cx={handSockets.right.x} cy={handSockets.right.y} rx="6" ry="4" fill={handColor} />
+        {/* Attached prop (e.g. lantern held above water) */}
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+
+      {/* 5. NECK & HEAD & FACE (Raised out of water at X = 14, Y = -62) */}
+      {isHeadless ? (
+        <g transform="translate(18, -48)">
+          <ellipse cx="0" cy="0" rx="7" ry="6" fill="#7F1D1D" />
+          <path d="M 0 0 C 4 8, 8 14, 12 18" stroke="#DC2626" strokeWidth="2" fill="none" />
+        </g>
+      ) : (
+        <g className="swimming-head-group" transform={`translate(${headPos.x}, ${headPos.y}) rotate(8)`}>
+          {/* Neck */}
+          <path
+            d="M -8 16 L 4 14 L 6 25 L -6 27 Z"
+            fill={appearance.skinShadow}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+
+          {/* Wet hair swept backward */}
+          {base === "female_adult" && (
+            <g className="swimming-female-hair">
+              <path
+                d="M -12 -4 C -28 6, -46 14, -60 22 C -48 10, -30 2, -10 -8 Z"
+                fill={appearance.hair}
+              />
+              <path
+                d="M -8 -8 C -24 -2, -42 6, -56 12 C -42 2, -26 -4, -6 -10 Z"
+                fill={appearance.hair}
+              />
+            </g>
+          )}
+
+          {base === "male_adult" && (
+            <path
+              d="M -14 -4 C -22 2, -32 6, -40 8 C -30 2, -20 -2, -10 -8 Z"
+              fill={appearance.hair}
+            />
+          )}
+
+          {/* Head Ellipse */}
+          <ellipse
+            cx="0"
+            cy="0"
+            rx={isChild ? "18" : isElder ? "17" : "19"}
+            ry={isChild ? "17" : isElder ? "18" : "18"}
+            fill={appearance.skin}
+            stroke={appearance.outline}
+            strokeWidth="1.5"
+          />
+
+          {/* Face Expression Rig */}
+          <FaceRig face={face} facialAction={facialAction} />
+        </g>
+      )}
+
+      {/* Head Item (e.g. Conical Hat) */}
+      {!isHeadless && <HeadItemRenderer itemId={headItem} headPos={headPos} />}
+
+      {/* 6. WATER SURFACE DISTURBANCE & RIPPLES (Gợn sóng rẽ nước) */}
+      <g className="swimming-water-ripples" pointerEvents="none">
+        {/* Primary Expanding Ripple Ring */}
+        <ellipse
+          cx="0"
+          cy="-28"
+          rx="82"
+          ry="14"
+          fill="none"
+          stroke="#38BDF8"
+          strokeWidth="1.6"
+          opacity="0.45"
+          className="anim-water-ripple"
+        />
+        {/* Secondary Ripple Ring */}
+        <ellipse
+          cx="6"
+          cy="-28"
+          rx="52"
+          ry="9"
+          fill="none"
+          stroke="#7DD3FC"
+          strokeWidth="1.2"
+          opacity="0.55"
+        />
+        {/* Sharp Water Surface Horizon Line */}
+        <path
+          d="M -105 -28 Q -50 -35 0 -28 Q 50 -21 105 -28"
+          fill="none"
+          stroke="#E2E8F0"
+          strokeWidth="1.6"
+          opacity="0.65"
+        />
+        {/* Water Froth & Foam Bubbles */}
+        <circle cx="58" cy="-28" r="2.8" fill="#E2E8F0" opacity="0.8" />
+        <circle cx="70" cy="-26" r="2" fill="#BAE6FD" opacity="0.75" />
+        <circle cx="-68" cy="-26" r="2.2" fill="#BAE6FD" opacity="0.7" />
+        <circle cx="-82" cy="-27" r="1.8" fill="#E2E8F0" opacity="0.6" />
+      </g>
+
+      {/* 7. DEBUG SOCKETS */}
+      {showSockets && (
+        <g className="rig-debug-gizmo" pointerEvents="none">
+          <circle cx="0" cy="0" r="5" fill="#10B981" />
+          <circle cx={headPos.x} cy={headPos.y} r="5" fill="#EF4444" />
+          <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4" fill="#A855F7" />
+          <circle cx={handSockets.right.x} cy={handSockets.right.y} r="5" fill="#22D3EE" />
+        </g>
+      )}
+    </g>
+  );
+};
+
+/**
+ * =========================================================
+ * 3. DROWNING 2D WATER RIG (TƯ THẾ CHẾT ĐUỐI / NGOI NGÓP CHỚI VỚI)
+ * =========================================================
+ * Frantic struggling posture: head tilted far back gasping for breath,
+ * arms flailing high above turbulent swirling water with bursting bubbles.
+ */
+interface DrowningRigProps {
+  id?: string;
+  base: CharacterBaseId;
+  costume: CostumeId;
+  face: CharacterFaceId;
+  facialAction?: FacialActionId;
+  scale: number;
+  flip: number;
+  opacity: number;
+  heldItem?: HeldItemId;
+  heldHand?: HeldHand;
+  shoulderItem?: ShoulderItemId;
+  headItem?: HeadItemId;
+  legItem?: LegItemId;
+  showSockets?: boolean;
+  palette: CostumePalette;
+  appearance: BaseAppearance;
+  handSockets: { left: HandSocketPoint; right: HandSocketPoint };
+}
+
+const DrowningRig: React.FC<DrowningRigProps> = ({
+  id,
+  base,
+  costume,
+  face,
+  facialAction,
+  scale,
+  flip,
+  opacity,
+  heldItem = "none",
+  heldHand = "right",
+  headItem = "none",
+  showSockets = false,
+  palette,
+  appearance,
+  handSockets,
+}) => {
+  const isGhost = base === "ghost_wraith";
+  const isDemon = base === "demon_shadow";
+  const isChild = base === "creepy_child";
+  const isElder = base === "elder_hunched";
+  const isHeadless = face === "face_headless";
+
+  const sleeveColor = costume === "outfit_child_pajamas" ? appearance.skin : palette.sleeve;
+  const handColor = appearance.skin;
+  const activeSocket = heldHand === "left" ? handSockets.left : handSockets.right;
+
+  // Head tilted far back, gasping in horror
+  const headPos = { x: 0, y: -48 };
+
+  return (
+    <g
+      id={id ? `actor-${id}` : undefined}
+      transform={`scale(${flip * scale}, ${scale})`}
+      opacity={isGhost ? Math.min(opacity, 0.88) : opacity}
+      className="character-rig rig-drowning anim-drowning-body"
+    >
+      {/* 1. DEEP SUBMERGED BODY (Shadow sinking into the murky abyss) */}
+      <g className="drowning-underwater" opacity="0.85">
+        <path
+          d="M -22 -28 L -16 35 L 16 35 L 22 -28 Z"
+          fill="#020810"
+          opacity="0.8"
+        />
+        {/* Dark water abyss circle */}
+        <ellipse cx="0" cy="-25" rx="85" ry="18" fill="#03161C" opacity="0.85" />
+      </g>
+
+      {/* Ghost aura glow */}
+      {isGhost && (
+        <ellipse
+          cx="0"
+          cy="-30"
+          rx="88"
+          ry="30"
+          fill="url(#ghost-aura-grad)"
+          opacity="0.38"
+          className="anim-pulse-slow"
+        />
+      )}
+
+      {/* Demon dark smoky shadow aura */}
+      {isDemon && (
+        <g opacity="0.35" filter="url(#ghost-blur)">
+          <ellipse cx="0" cy="-30" rx="90" ry="28" fill="#000000" />
+        </g>
+      )}
+
+      {/* 2. SUBMERGED TORSO TOP */}
+      <g className="drowning-torso">
+        <path
+          d="M -22 -32 C -12 -36, 12 -36, 22 -32 L 20 -15 C 8 -18, -8 -18, -20 -15 Z"
+          fill={palette.primary}
+          stroke={appearance.outline}
+          strokeWidth="1.2"
+        />
+      </g>
+
+      {/* 3. DESPERATE FLAILING ARMS REACHING OUT OF WATER */}
+      <g className="drowning-arms anim-drowning-arms">
+        {/* LEFT ARM: Reaching high left with clawing fingers */}
+        <g className="flail-left-arm">
+          <path
+            d="M -16 -28 C -22 -65, -34 -102, -28 -135 L -20 -134 C -26 -102, -15 -65, -10 -28 Z"
+            fill={sleeveColor}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          {/* Splayed trembling fingers reaching toward the sky */}
+          <ellipse cx={handSockets.left.x} cy={handSockets.left.y} rx="5.5" ry="4" fill={handColor} />
+          <polygon points="-28,-135 -36,-148 -30,-142" fill={handColor} />
+          <polygon points="-25,-136 -28,-151 -21,-141" fill={handColor} />
+          <polygon points="-21,-134 -20,-149 -16,-140" fill={handColor} />
+        </g>
+
+        {/* RIGHT ARM: Reaching high right in frantic distress */}
+        <g className="flail-right-arm">
+          <path
+            d="M 14 -28 C 18 -68, 28 -108, 24 -142 L 32 -141 C 36 -108, 26 -68, 20 -28 Z"
+            fill={sleeveColor}
+            stroke={appearance.outline}
+            strokeWidth="1"
+          />
+          {/* Splayed fingers */}
+          <ellipse cx={handSockets.right.x} cy={handSockets.right.y} rx="5.5" ry="4" fill={handColor} />
+          <polygon points="24,-142 20,-156 26,-148" fill={handColor} />
+          <polygon points="28,-141 34,-155 32,-146" fill={handColor} />
+          <polygon points="31,-139 39,-150 36,-142" fill={handColor} />
+
+          {/* Attached prop if holding something */}
+          <AttachedProp socket={activeSocket} itemId={heldItem} />
+        </g>
+      </g>
+
+      {/* 4. NECK & HEAD & FACE (Submerged to chin, gasping for air) */}
+      {isHeadless ? (
+        <g transform="translate(0, -32)">
+          <ellipse cx="0" cy="0" rx="7" ry="5" fill="#7F1D1D" />
+          <path d="M 0 0 C 0 8, 4 14, 6 20" stroke="#DC2626" strokeWidth="2" fill="none" />
+        </g>
+      ) : (
+        <g className="drowning-head-group" transform={`translate(${headPos.x}, ${headPos.y}) rotate(-14)`}>
+          {/* Neck */}
+          <path
+            d="M -6 14 L 6 14 L 5 24 L -5 24 Z"
+            fill={appearance.skinShadow}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+
+          {/* Wet hair clinging and dripping */}
+          {base === "female_adult" && (
+            <g className="drowning-female-hair">
+              <path
+                d="M -14 0 C -20 12, -22 24, -20 32 C -16 22, -12 12, -8 0 Z"
+                fill={appearance.hair}
+              />
+              <path
+                d="M 12 0 C 18 12, 22 24, 22 32 C 16 22, 12 12, 8 0 Z"
+                fill={appearance.hair}
+              />
+            </g>
+          )}
+
+          {/* Head Ellipse */}
+          <ellipse
+            cx="0"
+            cy="0"
+            rx={isChild ? "18" : isElder ? "17" : "19"}
+            ry={isChild ? "17" : isElder ? "18" : "18"}
+            fill={appearance.skin}
+            stroke={appearance.outline}
+            strokeWidth="1.5"
+          />
+
+          {/* Face Expression Rig */}
+          <FaceRig face={face} facialAction={facialAction} />
+        </g>
+      )}
+
+      {/* Head Item */}
+      {!isHeadless && <HeadItemRenderer itemId={headItem} headPos={headPos} />}
+
+      {/* 5. TURBULENT WATER DISTURBANCES & CHURNING FOAM */}
+      <g className="drowning-water-effects" pointerEvents="none">
+        {/* Water Surface Cutting Edge */}
+        <path
+          d="M -80 -25 Q -40 -32 0 -25 Q 40 -18 80 -25"
+          fill="none"
+          stroke="#E0F2FE"
+          strokeWidth="2"
+          opacity="0.8"
+        />
+
+        {/* Bursting / Rising Water Bubbles */}
+        <circle cx="-16" cy="-35" r="3.5" fill="#BAE6FD" opacity="0.85" className="anim-bubble-rise" />
+        <circle cx="18" cy="-38" r="2.8" fill="#E0F2FE" opacity="0.8" className="anim-bubble-rise" />
+        <circle cx="-5" cy="-48" r="2.2" fill="#FFFFFF" opacity="0.9" className="anim-bubble-rise" />
+        <circle cx="8" cy="-32" r="3.6" fill="#BAE6FD" opacity="0.75" className="anim-bubble-rise" />
+        <circle cx="-28" cy="-30" r="2" fill="#E0F2FE" opacity="0.7" className="anim-bubble-rise" />
+        <circle cx="28" cy="-30" r="2.4" fill="#BAE6FD" opacity="0.7" className="anim-bubble-rise" />
+
+        {/* Splashing Droplets */}
+        <circle cx="-32" cy="-90" r="1.8" fill="#E0F2FE" opacity="0.75" />
+        <circle cx="-22" cy="-110" r="1.5" fill="#BAE6FD" opacity="0.7" />
+        <circle cx="28" cy="-100" r="1.8" fill="#E0F2FE" opacity="0.75" />
+        <circle cx="34" cy="-120" r="1.4" fill="#BAE6FD" opacity="0.7" />
+      </g>
+
+      {/* 6. DEBUG SOCKETS */}
+      {showSockets && (
+        <g className="rig-debug-gizmo" pointerEvents="none">
+          <circle cx="0" cy="0" r="5" fill="#10B981" />
+          <circle cx={headPos.x} cy={headPos.y} r="5" fill="#EF4444" />
+          <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4" fill="#A855F7" />
+          <circle cx={handSockets.right.x} cy={handSockets.right.y} r="5" fill="#22D3EE" />
+        </g>
+      )}
+    </g>
+  );
+};
+
+/**
+ * =========================================================
+ * 4. FLOATING CORPSE 2D WATER RIG (TƯ THẾ XÁC CHẾT TRÔI SÔNG / TRÔI NỔI LỜ ĐỜ)
+ * =========================================================
+ * Lifeless body floating gently on water surface: soft horizontal drift,
+ * limp submerged limbs, hair spreading freely like weed in current.
+ */
+interface FloatingCorpseRigProps {
+  id?: string;
+  base: CharacterBaseId;
+  costume: CostumeId;
+  face: CharacterFaceId;
+  facialAction?: FacialActionId;
+  scale: number;
+  flip: number;
+  opacity: number;
+  heldItem?: HeldItemId;
+  heldHand?: HeldHand;
+  shoulderItem?: ShoulderItemId;
+  headItem?: HeadItemId;
+  legItem?: LegItemId;
+  showSockets?: boolean;
+  palette: CostumePalette;
+  appearance: BaseAppearance;
+  handSockets: { left: HandSocketPoint; right: HandSocketPoint };
+}
+
+const FloatingCorpseRig: React.FC<FloatingCorpseRigProps> = ({
+  id,
+  base,
+  costume,
+  face,
+  facialAction,
+  scale,
+  flip,
+  opacity,
+  heldItem = "none",
+  heldHand = "right",
+  headItem = "none",
+  showSockets = false,
+  palette,
+  appearance,
+  handSockets,
+}) => {
+  const isGhost = base === "ghost_wraith";
+  const isDemon = base === "demon_shadow";
+  const isChild = base === "creepy_child";
+  const isElder = base === "elder_hunched";
+  const isHeadless = face === "face_headless";
+
+  const sleeveColor = costume === "outfit_child_pajamas" ? appearance.skin : palette.sleeve;
+  const handColor = appearance.skin;
+  const activeSocket = heldHand === "left" ? handSockets.left : handSockets.right;
+
+  // Head resting back limply in water
+  const headPos = { x: -56, y: -16 };
+
+  return (
+    <g
+      id={id ? `actor-${id}` : undefined}
+      transform={`scale(${flip * scale}, ${scale})`}
+      opacity={isGhost ? Math.min(opacity, 0.88) : opacity}
+      className="character-rig rig-floating-corpse anim-corpse-drift"
+    >
+      {/* 1. UNDERWATER LIMP LIMBS TRAILING IN CURRENT */}
+      <g className="corpse-submerged-limbs" opacity="0.75">
+        {/* Limp Rear Leg trailing downward */}
+        <path
+          d="M 14 -14 C 32 -6, 48 14, 58 35 L 52 38 C 42 18, 28 -2, 10 -10 Z"
+          fill={palette.pantsSecondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        {/* Limp Front Leg trailing downward */}
+        <path
+          d="M 18 -16 C 38 -8, 56 12, 68 32 L 62 35 C 50 16, 34 -4, 14 -12 Z"
+          fill={palette.pantsPrimary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+        {/* Limp Rear Arm trailing down */}
+        <path
+          d="M -22 -14 C -20 4, -16 20, -18 32 L -14 31 C -12 20, -16 4, -18 -14 Z"
+          fill={palette.secondary}
+          stroke={appearance.outline}
+          strokeWidth="0.8"
+        />
+      </g>
+
+      {/* Ghost aura glow */}
+      {isGhost && (
+        <ellipse
+          cx="0"
+          cy="-18"
+          rx="105"
+          ry="32"
+          fill="url(#ghost-aura-grad)"
+          opacity="0.38"
+          className="anim-pulse-slow"
+        />
+      )}
+
+      {/* Demon dark smoky shadow aura */}
+      {isDemon && (
+        <g opacity="0.35" filter="url(#ghost-blur)">
+          <ellipse cx="0" cy="-18" rx="108" ry="30" fill="#000000" />
+        </g>
+      )}
+
+      {/* 2. FLOATING HORIZONTAL TORSO */}
+      <g className="corpse-torso">
+        <path
+          d="M -34 -18 
+             C -18 -24, 8 -24, 24 -16 
+             L 22 -6 
+             C 6 -8, -18 -8, -34 -8 Z"
+          fill={palette.primary}
+          stroke={appearance.outline}
+          strokeWidth="1.2"
+        />
+
+        {/* Costume Details */}
+        {(costume === "outfit_traditional_ba_ba" || costume === "outfit_funeral_white") && (
+          <path d="M -30 -18 L 18 -13" stroke={palette.trim} strokeWidth="1.2" strokeDasharray="3,3" />
+        )}
+
+        {costume === "outfit_flowing_ao_dai" && (
+          <path
+            d="M -32 -18 C -10 -24, 18 -18, 42 -10 L 32 -4 C 14 -8, -10 -8, -32 -8 Z"
+            fill={palette.primary}
+            opacity="0.85"
+          />
+        )}
+      </g>
+
+      {/* 3. FRONT ARM (Dangling limply into current) */}
+      <g className="corpse-front-arm">
+        <path
+          d="M 12 -14 C 18 2, 22 18, 20 28 L 16 27 C 18 18, 14 2, 8 -14 Z"
+          fill={sleeveColor}
+          stroke={appearance.outline}
+          strokeWidth="1"
+        />
+        <ellipse cx={handSockets.right.x} cy={handSockets.right.y} rx="5" ry="3.5" fill={handColor} />
+        <AttachedProp socket={activeSocket} itemId={heldItem} />
+      </g>
+
+      {/* 4. NECK & HEAD & FACE (Resting back in water at X = -56, Y = -16) */}
+      {isHeadless ? (
+        <g transform="translate(-46, -12)">
+          <ellipse cx="0" cy="0" rx="6" ry="6" fill="#7F1D1D" />
+          <path d="M 0 0 C -6 4, -12 6, -18 8" stroke="#DC2626" strokeWidth="2" fill="none" />
+        </g>
+      ) : (
+        <g className="corpse-head-group" transform={`translate(${headPos.x}, ${headPos.y}) rotate(-10)`}>
+          {/* Neck */}
+          <path
+            d="M 14 2 L 4 0 L 6 9 L 16 10 Z"
+            fill={appearance.skinShadow}
+            stroke={appearance.outline}
+            strokeWidth="0.8"
+          />
+
+          {/* Floating dark hair drifting on water surface */}
+          <g className="corpse-floating-hair" opacity="0.9">
+            <path
+              d="M 10 2 C -8 -2, -26 -4, -38 -2 C -28 6, -12 12, 4 12 Z"
+              fill={appearance.hair}
+            />
+            <path
+              d="M 12 -6 C -6 -10, -22 -10, -34 -6 C -24 0, -10 2, 8 2 Z"
+              fill={appearance.hair}
+            />
+            <path
+              d="M -12 2 C -24 6, -36 12, -45 20 C -36 14, -24 8, -10 4 Z"
+              fill={appearance.hair}
+              opacity="0.8"
+            />
+          </g>
+
+          {/* Head Ellipse */}
+          <ellipse
+            cx="0"
+            cy="0"
+            rx={isChild ? "18" : isElder ? "17" : "19"}
+            ry={isChild ? "17" : isElder ? "18" : "18"}
+            fill={appearance.skin}
+            stroke={appearance.outline}
+            strokeWidth="1.5"
+          />
+
+          {/* Face Expression Rig */}
+          <FaceRig face={face} facialAction={facialAction} />
+        </g>
+      )}
+
+      {/* Head Item */}
+      {!isHeadless && <HeadItemRenderer itemId={headItem} headPos={headPos} />}
+
+      {/* 5. GENTLE RIVER SURFACE WAKES & RIVER WEEDS */}
+      <g className="corpse-water-surface" pointerEvents="none">
+        {/* Soft Surface Ripple */}
+        <ellipse
+          cx="0"
+          cy="-14"
+          rx="90"
+          ry="11"
+          fill="none"
+          stroke="#334155"
+          strokeWidth="1.3"
+          opacity="0.45"
+        />
+        <path
+          d="M -100 -14 Q -50 -18 0 -14 Q 50 -10 100 -14"
+          fill="none"
+          stroke="#64748B"
+          strokeWidth="1"
+          opacity="0.5"
+        />
+        {/* Small riverweed / floating scum specks */}
+        <ellipse cx="-20" cy="-14" rx="6" ry="2" fill="#14532D" opacity="0.6" />
+        <ellipse cx="40" cy="-13" rx="5" ry="1.8" fill="#166534" opacity="0.55" />
+      </g>
+
+      {/* 6. DEBUG SOCKETS */}
+      {showSockets && (
+        <g className="rig-debug-gizmo" pointerEvents="none">
+          <circle cx="0" cy="0" r="5" fill="#10B981" />
+          <circle cx={headPos.x} cy={headPos.y} r="5" fill="#EF4444" />
+          <circle cx={handSockets.left.x} cy={handSockets.left.y} r="4" fill="#A855F7" />
+          <circle cx={handSockets.right.x} cy={handSockets.right.y} r="5" fill="#22D3EE" />
         </g>
       )}
     </g>
