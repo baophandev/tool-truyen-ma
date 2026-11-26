@@ -154,6 +154,7 @@ const VALID_STRUCTURES: StructureId[] = [
   "structure_ancestor_altar",
   "structure_hammock",
   "structure_wooden_stairs",
+  "structure_overgrown_ruins",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -301,6 +302,7 @@ const VALID_DETAILS: DetailId[] = [
   "detail_offering_tray_toys",
   "detail_matchbox",
   "detail_water_droplets",
+  "detail_porridge_bowl",
 ];
 const VALID_FACINGS: FacingDirection[] = ["left", "right"];
 const VALID_SLOTS: SlotId[] = [

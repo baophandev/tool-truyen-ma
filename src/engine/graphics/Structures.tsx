@@ -56,6 +56,7 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "structure_ancestor_altar" && <AncestorAltar />}
       {id === "structure_hammock" && <Hammock />}
       {id === "structure_wooden_stairs" && <WoodenStairs />}
+      {id === "structure_overgrown_ruins" && <OvergrownRuins />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -4342,6 +4343,130 @@ const WoodenStairs: React.FC = () => {
           strokeLinecap="round"
           opacity="0.8"
         />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 34. OVERGROWN RUINS (Nền Nhà Hoang Um Tùm Cỏ Dại)
+ * Collapsed rural thatched house foundation along a canal bank:
+ * rotting snapped wooden posts, mossy crumbled bricks, fallen bamboo/thatch debris,
+ * and knee-high wild weeds & swaying reeds in 2D minimalist silhouette style.
+ * Anchored at [bottom-center] (0, 0) on Ground Y=800px.
+ */
+const OvergrownRuins: React.FC = () => {
+  return (
+    <g className="structure-overgrown-ruins">
+      {/* 1. Uneven earthen mound & ruined foundation base */}
+      <path
+        d="M -175 0 L -150 -14 L -95 -24 L -35 -18 L 25 -26 L 90 -19 L 152 -11 L 175 0 Z"
+        fill={COLOR_PALETTE.silhouette_primary}
+      />
+      <path
+        d="M -135 -12 Q -70 -30, 0 -22 Q 70 -28, 138 -10 L 145 0 L -145 0 Z"
+        fill="#0D0F13"
+      />
+
+      {/* 2. Rotting & snapped wooden house posts (cột gỗ mục gãy đổ) */}
+      <g className="ruins-broken-posts">
+        {/* Left tilted snapped post */}
+        <path
+          d="M -118 -8 L -112 -142 L -106 -130 L -102 -148 L -98 -134 L -103 -8 Z"
+          fill="#0B0D11"
+          stroke="#1E242E"
+          strokeWidth="0.9"
+        />
+        {/* Wood rot & grain cracks */}
+        <line x1="-110" y1="-125" x2="-109" y2="-45" stroke="#1E293B" strokeWidth="1" opacity="0.6" />
+        <line x1="-106" y1="-90" x2="-105" y2="-20" stroke="#1E293B" strokeWidth="0.8" opacity="0.5" />
+
+        {/* Center-left short charred/rotted stump */}
+        <path
+          d="M -38 -14 L -41 -86 L -34 -76 L -29 -92 L -25 -78 L -27 -14 Z"
+          fill="#0A0C10"
+          stroke="#1C222B"
+          strokeWidth="0.8"
+        />
+
+        {/* Right leaning taller broken pillar */}
+        <path
+          d="M 76 -12 L 86 -156 L 92 -140 L 97 -152 L 99 -134 L 90 -12 Z"
+          fill="#0B0D11"
+          stroke="#1E242E"
+          strokeWidth="0.9"
+        />
+        <line x1="88" y1="-135" x2="83" y2="-38" stroke="#1E293B" strokeWidth="1" opacity="0.55" />
+
+        {/* Fallen collapsed roof beam / bamboo rafter resting diagonally */}
+        <path
+          d="M -105 -52 L 42 -12 L 38 -5 L -108 -44 Z"
+          fill="#11141B"
+          stroke="#1F2937"
+          strokeWidth="0.8"
+        />
+        {/* Broken cross-lath bamboo pieces */}
+        <line x1="-68" y1="-40" x2="-42" y2="-65" stroke="#141820" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="12" y1="-18" x2="64" y2="-52" stroke="#12161E" strokeWidth="3" strokeLinecap="round" />
+      </g>
+
+      {/* 3. Crumbled mossy bricks & scattered rubble (gạch vụn rêu phong) */}
+      <g className="ruins-mossy-bricks">
+        <rect x="-82" y="-22" width="22" height="10" rx="1" fill="#13161C" stroke="#08090C" strokeWidth="0.8" transform="rotate(-6 -71 -17)" />
+        <rect x="-74" y="-31" width="18" height="9" rx="1" fill="#161A22" stroke="#08090C" strokeWidth="0.8" transform="rotate(8 -65 -26)" />
+        <rect x="-12" y="-20" width="24" height="11" rx="1" fill="#12151B" stroke="#08090C" strokeWidth="0.8" transform="rotate(3 0 -14)" />
+        <rect x="8" y="-29" width="17" height="9" rx="1" fill="#181C24" stroke="#08090C" strokeWidth="0.8" transform="rotate(-11 16 -24)" />
+        <rect x="44" y="-17" width="20" height="10" rx="1" fill="#141820" stroke="#08090C" strokeWidth="0.8" transform="rotate(5 54 -12)" />
+        <polygon points="-138,-6 -125,-15 -118,-5" fill="#141820" />
+        <polygon points="116,-5 129,-16 142,-6" fill="#141820" />
+
+        {/* Subtle damp moss patches on bricks & mound */}
+        <path d="M -82 -23 Q -74 -27, -64 -22" fill="none" stroke="#2D4236" strokeWidth="2.2" opacity="0.55" strokeLinecap="round" />
+        <path d="M -10 -21 Q 2 -25, 14 -20" fill="none" stroke="#2D4236" strokeWidth="2" opacity="0.5" strokeLinecap="round" />
+        <path d="M 45 -18 Q 56 -22, 65 -16" fill="none" stroke="#26382E" strokeWidth="2" opacity="0.5" strokeLinecap="round" />
+      </g>
+
+      {/* 4. Overgrown knee-high weeds & swaying reeds (cỏ dại & lau sậy mọc um tùm) */}
+      <g className="ruins-overgrown-weeds">
+        {/* Dense static foreground/midground grass tufts */}
+        <path
+          d="M -158 0 Q -166 -42, -172 -68 Q -158 -40, -150 0
+             M -150 0 Q -148 -58, -142 -92 Q -140 -52, -138 0
+             M -136 0 Q -124 -48, -112 -74 Q -122 -38, -126 0
+             M -94 0 Q -102 -54, -108 -88 Q -92 -46, -84 0
+             M -82 0 Q -76 -66, -68 -104 Q -70 -54, -72 0
+             M -64 0 Q -52 -46, -42 -78 Q -50 -40, -54 0
+             M -22 0 Q -30 -52, -36 -86 Q -20 -44, -12 0
+             M -8 0 Q 2 -68, 12 -106 Q 4 -52, 2 0
+             M 18 0 Q 28 -48, 42 -82 Q 30 -40, 26 0
+             M 56 0 Q 48 -56, 40 -95 Q 56 -48, 66 0
+             M 68 0 Q 78 -62, 92 -98 Q 80 -48, 76 0
+             M 104 0 Q 112 -52, 126 -88 Q 114 -42, 112 0
+             M 124 0 Q 138 -46, 152 -72 Q 136 -36, 132 0
+             M 142 0 Q 154 -36, 166 -56 Q 150 -28, 148 0 Z"
+          fill={COLOR_PALETTE.silhouette_primary}
+        />
+
+        {/* Taller swaying reed stalks & feathery plumes (lau sậy đung đưa) */}
+        <g className="anim-sway-subtle">
+          {/* Left reed cluster */}
+          <path d="M -126 -6 Q -134 -68, -144 -128" fill="none" stroke="#0A0A0C" strokeWidth="2.4" strokeLinecap="round" />
+          <ellipse cx="-146" cy="-134" rx="4.5" ry="15" transform="rotate(-12 -146 -134)" fill="#1E293B" opacity="0.85" />
+          <path d="M -118 -8 Q -114 -72, -118 -136" fill="none" stroke="#0A0A0C" strokeWidth="2.2" strokeLinecap="round" />
+          <ellipse cx="-118" cy="-142" rx="4" ry="14" transform="rotate(-3 -118 -142)" fill="#334155" opacity="0.75" />
+
+          {/* Center-left reed cluster */}
+          <path d="M -52 -10 Q -48 -78, -40 -142" fill="none" stroke="#0A0A0C" strokeWidth="2.3" strokeLinecap="round" />
+          <ellipse cx="-39" cy="-148" rx="4.2" ry="14" transform="rotate(8 -39 -148)" fill="#273244" opacity="0.8" />
+          <path d="M -44 -8 Q -32 -64, -22 -118" fill="none" stroke="#0A0A0C" strokeWidth="2" strokeLinecap="round" />
+          <ellipse cx="-20" cy="-124" rx="3.5" ry="12" transform="rotate(14 -20 -124)" fill="#334155" opacity="0.7" />
+
+          {/* Right reed cluster */}
+          <path d="M 62 -8 Q 68 -74, 64 -138" fill="none" stroke="#0A0A0C" strokeWidth="2.3" strokeLinecap="round" />
+          <ellipse cx="64" cy="-144" rx="4" ry="15" transform="rotate(-4 64 -144)" fill="#273244" opacity="0.8" />
+          <path d="M 106 -6 Q 118 -68, 132 -126" fill="none" stroke="#0A0A0C" strokeWidth="2.4" strokeLinecap="round" />
+          <ellipse cx="134" cy="-132" rx="4.5" ry="14" transform="rotate(13 134 -132)" fill="#334155" opacity="0.75" />
+        </g>
       </g>
     </g>
   );

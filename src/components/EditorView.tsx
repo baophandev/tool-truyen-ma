@@ -2419,6 +2419,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                         <option value="structure_ancestor_altar">Bàn thờ tổ tiên vách lá (structure_ancestor_altar)</option>
                         <option value="structure_hammock">Võng dù miền quê đung đưa (structure_hammock)</option>
                         <option value="structure_wooden_stairs">Cầu thang gỗ cũ kỹ rùng rợn (structure_wooden_stairs)</option>
+                        <option value="structure_overgrown_ruins">Nền nhà hoang um tùm cỏ dại (structure_overgrown_ruins)</option>
                       </select>
                     </div>
 

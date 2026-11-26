@@ -72,7 +72,8 @@ export type StructureId =
   | "structure_wooden_window"
   | "structure_ancestor_altar"
   | "structure_hammock"
-  | "structure_wooden_stairs";
+  | "structure_wooden_stairs"
+  | "structure_overgrown_ruins";
 
 export type DetailId =
   | "detail_black_crow"
@@ -93,7 +94,8 @@ export type DetailId =
   | "detail_child_sandals"
   | "detail_offering_tray_toys"
   | "detail_matchbox"
-  | "detail_water_droplets";
+  | "detail_water_droplets"
+  | "detail_porridge_bowl";
 
 export type CharacterBaseId =
   | "male_adult"

@@ -519,6 +519,7 @@ export function App() {
         {/* VIEW 3: FILM EXPORTER */}
         {activeTab === "exporter" && (
           <ExporterView
+            scenes={scenes}
             currentScene={currentScene}
             onImportScene={handleImportScene}
             onOpenAiDirector={handleOpenAiDirector}

@@ -34,6 +34,7 @@ export const DetailRenderer: React.FC<DetailRendererProps> = ({
       {id === "detail_offering_tray_toys" && <OfferingTrayToys />}
       {id === "detail_matchbox" && <Matchbox />}
       {id === "detail_water_droplets" && <WaterDroplets />}
+      {id === "detail_porridge_bowl" && <PorridgeBowl />}
 
       {showAnchor && (
         <g className="detail-debug-anchor" pointerEvents="none">
@@ -1202,6 +1203,113 @@ const WaterDroplets: React.FC = () => {
         {/* Tiny side splash droplets */}
         <circle cx="-12" cy="-34" r="1.4" fill="#94A3B8" opacity="0.65" />
         <circle cx="11" cy="-18" r="1.2" fill="#CBD5E1" opacity="0.6" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 20. PORRIDGE BOWL & CERAMIC SPOON (Bát Cháo Trắng & Muỗng Sứ)
+ * Rural white rice porridge bowl with a ceramic spoon and thin rising warm steam.
+ * Anchored at [bottom-center] (0, 0), supports negative offsetY (e.g. -75) to sit on wooden table.
+ */
+const PorridgeBowl: React.FC = () => {
+  return (
+    <g className="detail-porridge-bowl">
+      {/* Subtle contact shadow on table/ground at y=0 */}
+      <ellipse cx="0" cy="0" rx="22" ry="3.2" fill="#050507" opacity="0.55" />
+
+      {/* Bowl foot ring (đế bát sứ) */}
+      <path
+        d="M -12 -3 L 12 -3 L 10 0 L -10 0 Z"
+        fill="#64748B"
+        stroke="#0F172A"
+        strokeWidth="0.9"
+      />
+
+      {/* Outer ceramic bowl body (thân tô/bát sứ) */}
+      <path
+        d="M -25 -20 C -24 -9, -17 -3, -11 -3 L 11 -3 C 17 -3, 24 -9, 25 -20 Z"
+        fill="#94A3B8"
+        stroke="#0F172A"
+        strokeWidth="1.2"
+      />
+      {/* Left-side soft shading on bowl */}
+      <path
+        d="M -25 -20 C -24 -9, -17 -3, -11 -3 L -3 -3 C -9 -6, -13 -12, -14 -20 Z"
+        fill="#475569"
+        opacity="0.45"
+      />
+
+      {/* Bowl rim & white rice porridge surface */}
+      <ellipse
+        cx="0"
+        cy="-20"
+        rx="25"
+        ry="5.5"
+        fill="#CBD5E1"
+        stroke="#0F172A"
+        strokeWidth="1.1"
+      />
+      <ellipse cx="0" cy="-19.5" rx="22" ry="4.2" fill="#F1F5F9" />
+      {/* Subtle porridge texture ripples */}
+      <path
+        d="M -13 -19 Q -5 -17.5, 4 -19.5 M -7 -21 Q 3 -20, 12 -21"
+        fill="none"
+        stroke="#CBD5E1"
+        strokeWidth="0.9"
+        strokeLinecap="round"
+        opacity="0.8"
+      />
+
+      {/* Ceramic spoon resting inside the bowl (muỗng sứ) */}
+      <g className="porridge-ceramic-spoon">
+        {/* Spoon handle leaning out to the upper-right */}
+        <path
+          d="M 4 -19 L 23 -32 C 25 -33.5, 27.5 -31.5, 26 -29.5 L 9 -17.5 Z"
+          fill="#E2E8F0"
+          stroke="#1E293B"
+          strokeWidth="0.9"
+        />
+        {/* Spoon scoop dipped into porridge */}
+        <ellipse
+          cx="3"
+          cy="-18.8"
+          rx="5.5"
+          ry="2.3"
+          transform="rotate(-12 3 -18.8)"
+          fill="#F8FAFC"
+          stroke="#334155"
+          strokeWidth="0.8"
+        />
+      </g>
+
+      {/* Thin rising warm steam wisps (làn khói ấm mỏng) */}
+      <g className="anim-sway-subtle" opacity="0.55">
+        <path
+          d="M -8 -25 C -12 -33, -4 -39, -9 -47 C -12 -52, -7 -57, -9 -62"
+          fill="none"
+          stroke="#E2E8F0"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          opacity="0.65"
+        />
+        <path
+          d="M 1 -24 C 5 -32, -2 -40, 3 -48 C 6 -54, 1 -59, 3 -65"
+          fill="none"
+          stroke="#F8FAFC"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+          opacity="0.55"
+        />
+        <path
+          d="M 10 -24 C 14 -31, 8 -37, 12 -45"
+          fill="none"
+          stroke="#CBD5E1"
+          strokeWidth="1.1"
+          strokeLinecap="round"
+          opacity="0.45"
+        />
       </g>
     </g>
   );

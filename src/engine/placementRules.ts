@@ -192,6 +192,11 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ALL_GROUND_SLOT_IDS,
     reason: "Cầu thang gỗ cũ kỹ rùng rợn dẫn lên gác lửng / tầng trên, neo tiếp đất Y=800px với các bậc thang nâng cao dần lên chiếu nghỉ Y=-180px, tương tác với bước leo thang pose_climbing_stairs và đứng trên cao.",
   },
+  structure_overgrown_ruins: {
+    name: "Nền nhà hoang um tùm cỏ dại",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Phế tích nền đất cũ của căn nhà lá đã sụp đổ hoàn toàn bên mé kênh, chỉ còn cột gỗ mục gãy đổ, gạch vụn rêu phong và cỏ dại lau sậy mọc um tùm, đặt tại mọi vị trí tiếp đất Y=800px.",
+  },
 };
 
 export interface DetailRule {
@@ -295,6 +300,11 @@ export const DETAIL_RULES: Record<DetailId, DetailRule> = {
     name: "Giọt nước nhỏ tí tách bên ngoài cửa sổ",
     allowedSlots: ALL_SLOT_IDS,
     reason: "Chuỗi giọt nước đọng và rơi tí tách tạo gợn sóng nhỏ ngay bên ngoài bệ cửa sổ gỗ hoặc trên mặt đất đêm khuya, hỗ trợ mọi slot và offsetY.",
+  },
+  detail_porridge_bowl: {
+    name: "Bát cháo trắng & muỗng sứ",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Tô/bát cháo trắng bốc làn khói ấm mỏng cùng chiếc muỗng sứ đặt trên mặt bàn gỗ nông thôn (hỗ trợ offsetY âm, ví dụ -75 để đặt khớp mặt bàn) hoặc tiếp đất Y=800px.",
   },
 };
 

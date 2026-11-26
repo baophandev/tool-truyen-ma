@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { flushSync } from "react-dom";
 import type { DirectorSceneScript } from "../engine/types";
 import { SceneRenderer } from "../engine/SceneRenderer";
 import {
   downloadJson,
   exportSvgFile,
   exportPngSnapshot,
-  recordSvgToVideo,
+  recordScenesToVideo,
 } from "../engine/exportUtils";
 import { validateDirectorScript } from "../engine/layoutRouter";
 import {
@@ -23,6 +24,7 @@ import {
 } from "lucide-react";
 
 interface ExporterViewProps {
+  scenes?: DirectorSceneScript[];
   currentScene: DirectorSceneScript;
   onImportScene: (newScene: DirectorSceneScript) => void;
   onOpenAiDirector?: (mode?: "full_film" | "re_direct_scene" | "append_scene") => void;
@@ -31,15 +33,20 @@ interface ExporterViewProps {
 }
 
 export const ExporterView: React.FC<ExporterViewProps> = ({
+  scenes,
   currentScene,
   onImportScene,
   onOpenAiDirector,
   showVignette = true,
   onToggleVignette,
 }) => {
-  const [svgRef, setSvgRef] = useState<SVGSVGElement | null>(null);
+  const sceneList = scenes && scenes.length > 0 ? scenes : [currentScene];
+  const totalFilmDuration = sceneList.reduce((sum, s) => sum + (s.duration_sec || 6), 0);
+
+  const svgElementRef = useRef<SVGSVGElement | null>(null);
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [recordProgress, setRecordProgress] = useState<number>(0);
+  const [exportMode, setExportMode] = useState<"all_scenes" | "current_scene">("all_scenes");
   const sceneDuration = currentScene.duration_sec || 6;
   const [recordDuration, setRecordDuration] = useState<number>(sceneDuration);
   const [copiedScript, setCopiedScript] = useState<boolean>(false);
@@ -49,6 +56,7 @@ export const ExporterView: React.FC<ExporterViewProps> = ({
   const [importSuccess, setImportSuccess] = useState<boolean>(false);
 
   const [exportTime, setExportTime] = useState<number>(0);
+  const [exportSceneIndex, setExportSceneIndex] = useState<number>(0);
 
   // Sync export duration when switching scenes or changing duration_sec
   useEffect(() => {
@@ -59,25 +67,46 @@ export const ExporterView: React.FC<ExporterViewProps> = ({
 
   // Handle Video Recording
   const handleRecordVideo = async () => {
-    if (!svgRef) return;
+    if (!svgElementRef.current) return;
     try {
       setIsRecording(true);
       setRecordProgress(0);
       setExportTime(0);
+      setExportSceneIndex(0);
 
-      const videoBlob = await recordSvgToVideo(
-        svgRef,
-        recordDuration,
+      const segments =
+        exportMode === "all_scenes"
+          ? sceneList.map((sc) => ({
+              scene: sc,
+              durationSec: sc.duration_sec || 6,
+            }))
+          : [
+              {
+                scene: currentScene,
+                durationSec: recordDuration,
+              },
+            ];
+
+      const { blob: videoBlob, extension } = await recordScenesToVideo(
+        () => svgElementRef.current,
+        segments,
         (pct) => {
           setRecordProgress(pct);
         },
-        (timeSec) => {
-          setExportTime(timeSec);
-        },
-        currentScene.dialogue
+        (sceneIdx, localTimeSec) => {
+          flushSync(() => {
+            setExportSceneIndex(sceneIdx);
+            setExportTime(localTimeSec);
+          });
+        }
       );
 
-      const filename = `${currentScene.scene_id || "horror_film"}_${recordDuration}s.webm`;
+      const totalSec = segments.reduce((sum, s) => sum + s.durationSec, 0);
+      const filename =
+        exportMode === "all_scenes" && sceneList.length > 1
+          ? `horror_film_full_${sceneList.length}canh_${totalSec}s.${extension}`
+          : `${currentScene.scene_id || "horror_film"}_${totalSec}s.${extension}`;
+
       const url = URL.createObjectURL(videoBlob);
       const a = document.createElement("a");
       a.href = url;
@@ -97,10 +126,10 @@ export const ExporterView: React.FC<ExporterViewProps> = ({
 
   // Handle PNG Snapshot
   const handleSnapshotPng = async () => {
-    if (!svgRef) return;
+    if (!svgElementRef.current) return;
     try {
       await exportPngSnapshot(
-        svgRef,
+        svgElementRef.current,
         `${currentScene.scene_id || "scene"}_frame.png`,
         1920,
         1080,
@@ -114,8 +143,8 @@ export const ExporterView: React.FC<ExporterViewProps> = ({
 
   // Handle SVG Export
   const handleExportSvg = () => {
-    if (!svgRef) return;
-    exportSvgFile(svgRef, `${currentScene.scene_id || "scene"}.svg`);
+    if (!svgElementRef.current) return;
+    exportSvgFile(svgElementRef.current, `${currentScene.scene_id || "scene"}.svg`);
   };
 
   // Handle JSON Copy
@@ -244,20 +273,18 @@ HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc Direct
           {/* Custom renderer that captures SVG ref */}
           <div className="relative w-full aspect-video">
             <SceneRenderer
-              script={currentScene}
+              script={
+                isRecording && exportMode === "all_scenes"
+                  ? sceneList[exportSceneIndex] || currentScene
+                  : currentScene
+              }
               showGizmo={false}
               showSubtitles={true}
               showVignette={showVignette}
+              showCameraHud={false}
               currentTime={isRecording ? exportTime : undefined}
               interactiveDrag={false}
-              svgRef={{
-                get current() {
-                  return svgRef;
-                },
-                set current(val) {
-                  if (val !== svgRef) setSvgRef(val);
-                },
-              }}
+              svgRef={svgElementRef}
             />
           </div>
         </div>
@@ -270,33 +297,72 @@ HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc Direct
           <div>
             <div className="flex items-center gap-2 text-red-400 font-semibold mb-2">
               <Video className="w-5 h-5" />
-              <h4>Xuất Video (WebM / MP4)</h4>
+              <h4>Xuất Video (MP4 H.264)</h4>
             </div>
             <p className="text-xs text-neutral-400 leading-relaxed">
-              Ghi hình trực tiếp luồng chuyển động SVG ở chuẩn 30 FPS bằng HTML5 Canvas và MediaRecorder.
+              Render từng khung hình SVG 1920x1080 ở chuẩn 30 FPS bằng WebCodecs H.264 &amp; MP4 Muxer (tự động dự phòng WebM nếu trình duyệt cũ).
             </p>
           </div>
 
           <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-300">
-              <span>Thời lượng ghi hình:</span>
-              <div className="flex items-center gap-1 font-mono">
-                {Array.from(new Set([sceneDuration, 3, 5, 10])).map((sec) => (
-                  <button
-                    key={sec}
-                    onClick={() => setRecordDuration(sec)}
-                    className={`px-2 py-0.5 rounded ${
-                      recordDuration === sec
-                        ? "bg-red-700 text-white font-bold"
-                        : "bg-neutral-800 text-neutral-400 hover:text-white"
-                    }`}
-                    title={sec === sceneDuration ? "Đúng bằng duration_sec của cảnh hiện tại" : undefined}
-                  >
-                    {sec === sceneDuration ? `Cảnh (${sec}s)` : `${sec}s`}
-                  </button>
-                ))}
-              </div>
+            {/* Export Mode Selector */}
+            <div className="grid grid-cols-2 gap-1.5 bg-neutral-950/70 p-1 rounded-xl border border-neutral-800">
+              <button
+                type="button"
+                disabled={isRecording}
+                onClick={() => setExportMode("all_scenes")}
+                className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
+                  exportMode === "all_scenes"
+                    ? "bg-red-700 text-white shadow"
+                    : "text-neutral-400 hover:text-neutral-200"
+                }`}
+                title="Gộp toàn bộ các cảnh đang dàn dựng thành 1 video duy nhất"
+              >
+                Gộp tất cả ({sceneList.length} cảnh · {totalFilmDuration}s)
+              </button>
+              <button
+                type="button"
+                disabled={isRecording}
+                onClick={() => setExportMode("current_scene")}
+                className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
+                  exportMode === "current_scene"
+                    ? "bg-red-700 text-white shadow"
+                    : "text-neutral-400 hover:text-neutral-200"
+                }`}
+                title="Chỉ xuất riêng cảnh hiện tại đang chọn"
+              >
+                Cảnh hiện tại ({sceneDuration}s)
+              </button>
             </div>
+
+            {exportMode === "current_scene" ? (
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-300">
+                <span>Thời lượng ghi hình:</span>
+                <div className="flex items-center gap-1 font-mono">
+                  {Array.from(new Set([sceneDuration, 3, 5, 10])).map((sec) => (
+                    <button
+                      key={sec}
+                      onClick={() => setRecordDuration(sec)}
+                      className={`px-2 py-0.5 rounded ${
+                        recordDuration === sec
+                          ? "bg-red-700 text-white font-bold"
+                          : "bg-neutral-800 text-neutral-400 hover:text-white"
+                      }`}
+                      title={sec === sceneDuration ? "Đúng bằng duration_sec của cảnh hiện tại" : undefined}
+                    >
+                      {sec === sceneDuration ? `Cảnh (${sec}s)` : `${sec}s`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="text-[11px] text-neutral-400 bg-neutral-950/50 border border-neutral-800/80 rounded-lg px-3 py-2 flex items-center justify-between">
+                <span>Tổng thời lượng gộp:</span>
+                <span className="font-mono font-semibold text-cyan-300">
+                  {sceneList.length} cảnh = {totalFilmDuration}s
+                </span>
+              </div>
+            )}
 
             {isRecording && (
               <div className="flex flex-col gap-1">
@@ -307,7 +373,9 @@ HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc Direct
                   />
                 </div>
                 <span className="text-[11px] text-center text-red-400 font-mono">
-                  Đang ghi hình: {recordProgress}%...
+                  {exportMode === "all_scenes" && sceneList.length > 1
+                    ? `Đang xuất Cảnh ${exportSceneIndex + 1}/${sceneList.length}: ${recordProgress}%...`
+                    : `Đang ghi hình: ${recordProgress}%...`}
                 </span>
               </div>
             )}
@@ -318,7 +386,13 @@ HÃY XUẤT RA CHÍNH XÁC MỘT ĐOẠN JSON DUY NHẤT theo cấu trúc Direct
               className="w-full py-2.5 px-4 rounded-xl bg-red-700 hover:bg-red-600 disabled:opacity-50 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30"
             >
               <Download className="w-4 h-4" />
-              <span>{isRecording ? "Đang xuất phim..." : `Quay & Tải Video (${recordDuration}s)`}</span>
+              <span>
+                {isRecording
+                  ? "Đang xuất phim..."
+                  : exportMode === "all_scenes"
+                  ? `Quay & Tải Phim Gộp (${totalFilmDuration}s)`
+                  : `Quay & Tải Cảnh (${recordDuration}s)`}
+              </span>
             </button>
           </div>
         </div>

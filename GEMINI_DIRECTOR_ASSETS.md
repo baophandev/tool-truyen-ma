@@ -128,6 +128,7 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `structure_ancestor_altar` | Bàn thờ tổ tiên vách lá (Án gian cổ) | Án gian gỗ ba tầng chạm khắc cổ kính đặt sát vách nứa căn nhà lá, có yếm đỏ rách mép tua rua, khung di ảnh tổ tiên cổ kính phủ gương mờ, bài vị chữ Nho, bát hương gốm men rạn nghi ngút ba làn khói hương u uất và đôi chân nến đồng le lói ánh vàng ma mị | `["mid_left", "center", "mid_right"]` |
 | `structure_hammock` | Võng dù / võng lưới miền quê đung đưa | Chiếc võng dù truyền thống mắc giữa hai cột nhà gỗ, đung đưa kẽo kẹt chậm rãi giữa đêm tối tĩnh mịch; **tương tác hoàn hảo với tư thế nằm võng `pose_lying_hammock` (kèm `offsetY: -60`) hoặc tư thế ngồi** (đùi gập trên mép võng, cẳng chân đung đưa). Thiết kế lọt lòng bao bọc trọn vẹn thân người nhân vật | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `structure_wooden_stairs` | Cầu thang gỗ cũ kỹ rùng rợn | Cầu thang ván gỗ cũ kỹ dẫn lên gác lửng / tầng trên căn nhà, các bậc thang ván gỗ nâng cao từ Y=0 đến chiếu nghỉ gác lửng Y=-180px, lan can tay vịn gỗ và chấn song cổ quái, gầm cầu thang tối om có màng nhện; **tương tác hoàn hảo với bước leo thang `pose_climbing_stairs` (motion lên gác lửng `targetOffsetY: -180`) hoặc đứng trên gác lửng (`offsetY: -180`)** | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `structure_overgrown_ruins` | Nền nhà hoang um tùm cỏ dại | Phế tích nền đất cũ của căn nhà lá đã sụp đổ hoàn toàn bên mé kênh, chỉ còn vài cột gỗ mục gãy đổ, xà tre sập, gạch vụn rêu phong và những bụi cỏ dại, lau sậy mọc um tùm cao ngang gối đung đưa trong gió đêm | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 
 ---
 
@@ -156,6 +157,7 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `detail_offering_tray_toys` | Mẹt đồ cúng cô hồn trên đất (Nải chuối, nhang & đồ chơi đất nung) | Mẹt tre lót lá chuối đựng nải chuối chín, bộ đồ chơi con nít bằng đất nung nhỏ (nồi đất, chén con, con giống) và nén nhang cháy đỏ khói trắng mỏng cuộn bay | Cả 5 Ground Slots (Ground only Y=800px) |
 | `detail_matchbox` | Hộp quẹt diêm cổ để bàn | Bao diêm giấy nhỏ màu vàng nâu cũ kỹ kéo hé lộ que diêm đầu đỏ đặt trên mặt bàn gỗ cạnh đèn dầu hột vịt (hỗ trợ `offsetY` âm để đặt trên bàn) | Cả 5 Ground Slots |
 | `detail_water_droplets` | Giọt nước nhỏ tí tách bên ngoài cửa sổ | Chuỗi giọt nước đọng và rơi tí tách tạo vòng gợn sóng nhỏ ngay bên ngoài bệ cửa sổ gỗ trong đêm khuya, gợi dấu vết thực thể ướt sũng đứng rình rập | Cả 5 Ground Slots và 3 Air Slots |
+| `detail_porridge_bowl` | Bát cháo trắng & muỗng sứ | Tô/bát cháo trắng bốc làn khói ấm mỏng cùng chiếc muỗng sứ đặt trên mặt bàn gỗ nông thôn (hỗ trợ `offsetY` âm như `-75` để đặt khớp mặt bàn `structure_small_wooden_table`) hoặc tiếp đất Y=800px | Cả 5 Ground Slots |
 
 ---
 
@@ -378,7 +380,7 @@ export interface DirectorSceneScript {
     weather?: "none" | "heavy_rain" | "storm_thunder" | "blood_rain" | "floating_embers" | "drifting_ash" | "haunted_mist"; // Hiệu ứng thời tiết & hạt khí quyển thuần code
   };
   environment_items: Array<{
-    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub" | "market_stall_tent" | "abandoned_subway_station" | "rusty_train_tracks_tunnel" | "structure_old_apartment_gate" | "structure_wooden_sampan" | "structure_monkey_bridge" | "structure_wooden_coffin" | "structure_bamboo_bed_net" | "structure_wooden_latch_door" | "structure_rural_passenger_bus" | "structure_coconut_banana_grove" | "structure_wooden_chair" | "structure_wooden_bed" | "structure_small_wooden_table" | "structure_wooden_window" | "structure_ancestor_altar";
+    asset_id: "creepy_banyan_tree" | "ancient_tomb" | "dilapidated_hut" | "abandoned_shrine" | "broken_wooden_bridge" | "scarecrow_of_the_damned" | "creepy_well" | "haunted_gallows_tree" | "hospital_operating_bed" | "hotel_reception_desk" | "supermarket_shelf_aisle" | "creepy_elevator_doors" | "dining_table_chairs" | "bus_interior" | "creepy_bathtub" | "market_stall_tent" | "abandoned_subway_station" | "rusty_train_tracks_tunnel" | "structure_old_apartment_gate" | "structure_wooden_sampan" | "structure_monkey_bridge" | "structure_wooden_coffin" | "structure_bamboo_bed_net" | "structure_wooden_latch_door" | "structure_rural_passenger_bus" | "structure_coconut_banana_grove" | "structure_wooden_chair" | "structure_wooden_bed" | "structure_small_wooden_table" | "structure_wooden_window" | "structure_ancestor_altar" | "structure_hammock" | "structure_wooden_stairs" | "structure_overgrown_ruins";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right";
     offsetX?: number;
     offsetY?: number;
@@ -419,7 +421,7 @@ export interface DirectorSceneScript {
   }>;
   details?: Array<{
     id: string;
-    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp" | "detail_broken_mirror" | "detail_muddy_water_puddle" | "detail_oil_lamp" | "detail_vintage_radio" | "detail_water_hyacinth" | "detail_child_sandals" | "detail_offering_tray_toys" | "detail_matchbox" | "detail_water_droplets";
+    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp" | "detail_broken_mirror" | "detail_muddy_water_puddle" | "detail_oil_lamp" | "detail_vintage_radio" | "detail_water_hyacinth" | "detail_child_sandals" | "detail_offering_tray_toys" | "detail_matchbox" | "detail_water_droplets" | "detail_porridge_bowl";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
     offsetX?: number;
     offsetY?: number;

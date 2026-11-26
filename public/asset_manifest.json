@@ -523,6 +523,16 @@
         "width": 260,
         "height": 280,
         "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_overgrown_ruins",
+        "name": "Nền nhà hoang um tùm cỏ dại",
+        "semantic_role": "Phế tích nền đất cũ của căn nhà lá đã sụp đổ hoàn toàn bên mé kênh, chỉ còn vài cột gỗ mục gãy đổ, gạch vụn rêu phong và những bụi cỏ dại, lau sậy mọc um tùm cao ngang gối",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 350,
+        "height": 165,
+        "anchor": "bottom-center"
       }
     ]
   },
@@ -1083,6 +1093,13 @@
       "name": "Giọt nước nhỏ tí tách bên ngoài cửa sổ",
       "semantic_role": "Chuỗi giọt nước đọng và rơi tí tách tạo vòng gợn sóng nhỏ ngay bên ngoài bệ cửa sổ gỗ trong đêm khuya, gợi dấu vết thực thể ướt sũng đứng rình rập",
       "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right", "air_left", "air_center", "air_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_porridge_bowl",
+      "name": "Bát cháo trắng & muỗng sứ",
+      "semantic_role": "Tô/bát cháo trắng bốc làn khói ấm mỏng cùng chiếc muỗng sứ đặt trên mặt bàn gỗ nông thôn (hỗ trợ offsetY âm để đặt khớp mặt bàn)",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
       "anchor": "bottom-center"
     }
   ],

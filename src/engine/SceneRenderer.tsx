@@ -45,6 +45,7 @@ interface SceneRendererProps {
   showGizmo?: boolean;
   showSubtitles?: boolean;
   showVignette?: boolean;
+  showCameraHud?: boolean;
   currentTime?: number;
   selectedEntity?: SelectedEntity;
   activeActorId?: string | null;
@@ -84,6 +85,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
   showGizmo = false,
   showSubtitles = true,
   showVignette = true,
+  showCameraHud = true,
   currentTime,
   selectedEntity,
   activeActorId = null,
@@ -1326,11 +1328,12 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
           </g>
         )}
 
-        {/* CINEMATIC CAMERA HUD OVERLAY (Visible when Gizmo is on or custom/multi-shot camera is active) */}
-        {(showGizmo ||
-          (script.camera &&
-            (script.camera.shot !== "wide" ||
-              (script.camera.keyframes && script.camera.keyframes.length > 1)))) && (
+        {/* CINEMATIC CAMERA HUD OVERLAY (Visible when Gizmo is on or custom/multi-shot camera is active, unless hidden for export) */}
+        {showCameraHud &&
+          (showGizmo ||
+            (script.camera &&
+              (script.camera.shot !== "wide" ||
+                (script.camera.keyframes && script.camera.keyframes.length > 1)))) && (
           <g id="camera-hud-group" pointerEvents="none">
             {/* Top-Left Lens Status Badge */}
             <g transform="translate(24, 24)">
