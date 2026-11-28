@@ -129,6 +129,7 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `structure_hammock` | Võng dù / võng lưới miền quê đung đưa | Chiếc võng dù truyền thống mắc giữa hai cột nhà gỗ, đung đưa kẽo kẹt chậm rãi giữa đêm tối tĩnh mịch; **tương tác hoàn hảo với tư thế nằm võng `pose_lying_hammock` (kèm `offsetY: -60`) hoặc tư thế ngồi** (đùi gập trên mép võng, cẳng chân đung đưa). Thiết kế lọt lòng bao bọc trọn vẹn thân người nhân vật | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `structure_wooden_stairs` | Cầu thang gỗ cũ kỹ rùng rợn | Cầu thang ván gỗ cũ kỹ dẫn lên gác lửng / tầng trên căn nhà, các bậc thang ván gỗ nâng cao từ Y=0 đến chiếu nghỉ gác lửng Y=-180px, lan can tay vịn gỗ và chấn song cổ quái, gầm cầu thang tối om có màng nhện; **tương tác hoàn hảo với bước leo thang `pose_climbing_stairs` (motion lên gác lửng `targetOffsetY: -180`) hoặc đứng trên gác lửng (`offsetY: -180`)** | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 | `structure_overgrown_ruins` | Nền nhà hoang um tùm cỏ dại | Phế tích nền đất cũ của căn nhà lá đã sụp đổ hoàn toàn bên mé kênh, chỉ còn vài cột gỗ mục gãy đổ, xà tre sập, gạch vụn rêu phong và những bụi cỏ dại, lau sậy mọc um tùm cao ngang gối đung đưa trong gió đêm | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
+| `structure_thatched_tile_house` | Căn nhà lá lợp ngói máng cũ miền Tây | Ngôi nhà cấp bốn nông thôn Nam Bộ kết hợp vách lá dừa nước và phần mái lợp ngói máng âm dương cũ kỹ rêu phong, có hàng hiên thấp và bậu cửa gỗ, neo mặt đất `Y=800px` | `["far_left", "mid_left", "center", "mid_right", "far_right"]` |
 
 ---
 
@@ -158,6 +159,27 @@ Mỗi công trình có kích thước và vai trò thị giác riêng, **chỉ �
 | `detail_matchbox` | Hộp quẹt diêm cổ để bàn | Bao diêm giấy nhỏ màu vàng nâu cũ kỹ kéo hé lộ que diêm đầu đỏ đặt trên mặt bàn gỗ cạnh đèn dầu hột vịt (hỗ trợ `offsetY` âm để đặt trên bàn) | Cả 5 Ground Slots |
 | `detail_water_droplets` | Giọt nước nhỏ tí tách bên ngoài cửa sổ | Chuỗi giọt nước đọng và rơi tí tách tạo vòng gợn sóng nhỏ ngay bên ngoài bệ cửa sổ gỗ trong đêm khuya, gợi dấu vết thực thể ướt sũng đứng rình rập | Cả 5 Ground Slots và 3 Air Slots |
 | `detail_porridge_bowl` | Bát cháo trắng & muỗng sứ | Tô/bát cháo trắng bốc làn khói ấm mỏng cùng chiếc muỗng sứ đặt trên mặt bàn gỗ nông thôn (hỗ trợ `offsetY` âm như `-75` để đặt khớp mặt bàn `structure_small_wooden_table`) hoặc tiếp đất Y=800px | Cả 5 Ground Slots |
+| `detail_npc_silhouette_standing` | Bóng người NPC đứng (Cơ thể thuần) | Bóng đen cơ thể người đơn giản không gương mặt, không quần áo, dùng để xếp thêm người đứng trong các cảnh đông đúc (hỗ trợ chỉnh `scale`, `offsetX`, `zIndex`) | Cả 5 Ground Slots (Ground only Y=800px) |
+| `detail_npc_silhouette_walking` | Bóng người NPC bước đi (Cơ thể thuần) | Bóng đen cơ thể người đang sải bước (không gương mặt, không quần áo), dùng để mô tả người qua đường hoặc dòng người đi lại | Cả 5 Ground Slots (Ground only Y=800px) |
+| `detail_npc_crowd_group` | Nhóm đông người NPC đứng tụ tập (4 người) | Cụm 4 bóng người cơ thể thuần không gương mặt, không quần áo đứng tụ tập với chiều cao và tư thế khác nhau để tạo nhanh cảnh đám đông | Cả 5 Ground Slots (Ground only Y=800px) |
+| `detail_npc_crowd_walking` | Đoàn người NPC di chuyển (4 người) | Cụm 4 bóng người cơ thể thuần không gương mặt, không quần áo đang bước đi cùng chiều cho cảnh chợ đêm đông đúc hoặc đoàn người di chuyển | Cả 5 Ground Slots (Ground only Y=800px) |
+| `detail_fish_splash` | Cá lóc quẫy nước dưới kênh đêm | Bóng đen thân cá lóc uốn cong vọt nhẹ trên mặt nước kênh tối kèm các vòng sóng lan tỏa và giọt nước bắn tung tóe trắng bạc, neo mặt nước `Y=800px` | Cả 5 Ground Slots (Ground/Mặt nước Y=800px) |
+| `detail_falling_coconut` | Trái dừa khô rụng bịch xuống đất | Trái dừa khô vỏ sẫm màu nằm lăn trên nền đất ven gốc dừa kèm vệt chuyển động rơi thẳng đứng từ trên cao xuống và bụi đất nhẹ bắn lên ở `Y=800px` | Cả 5 Ground Slots (Ground only Y=800px) |
+| `detail_rooster_crowing` | Bóng gà trống gáy sáng phía xa | Bóng đen con gà trống vươn cổ cất tiếng gáy sáng đầu tiên trên bờ rào/mái rơm với sóng âm thanh mờ nhạt lan tỏa trong sương sớm | Cả 5 Ground Slots và 3 Air Slots |
+
+#### Cấu trúc JSON mẫu cho cụm bối cảnh miền Tây đêm & rạng sáng:
+```json
+{
+  "environment_items": [
+    { "asset_id": "structure_thatched_tile_house", "slot": "mid_left", "facing": "right", "scale": 1 }
+  ],
+  "details": [
+    { "asset_id": "detail_fish_splash", "slot": "far_right", "scale": 1 },
+    { "asset_id": "detail_falling_coconut", "slot": "far_left", "scale": 1 },
+    { "asset_id": "detail_rooster_crowing", "slot": "air_right", "offsetY": 110, "scale": 0.75 }
+  ]
+}
+```
 
 ---
 
@@ -421,7 +443,7 @@ export interface DirectorSceneScript {
   }>;
   details?: Array<{
     id: string;
-    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp" | "detail_broken_mirror" | "detail_muddy_water_puddle" | "detail_oil_lamp" | "detail_vintage_radio" | "detail_water_hyacinth" | "detail_child_sandals" | "detail_offering_tray_toys" | "detail_matchbox" | "detail_water_droplets" | "detail_porridge_bowl";
+    asset_id: "detail_black_crow" | "detail_will_o_wisp" | "detail_blood_lantern" | "detail_incense_bowl" | "detail_skull_pile" | "detail_hanging_talisman" | "detail_iv_drip_stand" | "detail_shopping_cart" | "detail_surveillance_camera" | "detail_flickering_ceiling_lamp" | "detail_broken_mirror" | "detail_muddy_water_puddle" | "detail_oil_lamp" | "detail_vintage_radio" | "detail_water_hyacinth" | "detail_child_sandals" | "detail_offering_tray_toys" | "detail_matchbox" | "detail_water_droplets" | "detail_porridge_bowl" | "detail_npc_silhouette_standing" | "detail_npc_silhouette_walking" | "detail_npc_crowd_group" | "detail_npc_crowd_walking";
     slot: "far_left" | "mid_left" | "center" | "mid_right" | "far_right" | "air_left" | "air_center" | "air_right";
     offsetX?: number;
     offsetY?: number;

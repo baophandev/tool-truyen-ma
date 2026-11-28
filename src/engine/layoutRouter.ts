@@ -155,6 +155,7 @@ const VALID_STRUCTURES: StructureId[] = [
   "structure_hammock",
   "structure_wooden_stairs",
   "structure_overgrown_ruins",
+  "structure_thatched_tile_house",
 ];
 const VALID_BASES: CharacterBaseId[] = [
   "male_adult",
@@ -303,6 +304,13 @@ const VALID_DETAILS: DetailId[] = [
   "detail_matchbox",
   "detail_water_droplets",
   "detail_porridge_bowl",
+  "detail_npc_silhouette_standing",
+  "detail_npc_silhouette_walking",
+  "detail_npc_crowd_group",
+  "detail_npc_crowd_walking",
+  "detail_fish_splash",
+  "detail_falling_coconut",
+  "detail_rooster_crowing",
 ];
 const VALID_FACINGS: FacingDirection[] = ["left", "right"];
 const VALID_SLOTS: SlotId[] = [

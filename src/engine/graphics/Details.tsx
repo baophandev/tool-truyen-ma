@@ -35,6 +35,13 @@ export const DetailRenderer: React.FC<DetailRendererProps> = ({
       {id === "detail_matchbox" && <Matchbox />}
       {id === "detail_water_droplets" && <WaterDroplets />}
       {id === "detail_porridge_bowl" && <PorridgeBowl />}
+      {id === "detail_npc_silhouette_standing" && <NpcSilhouetteStanding />}
+      {id === "detail_npc_silhouette_walking" && <NpcSilhouetteWalking />}
+      {id === "detail_npc_crowd_group" && <NpcCrowdGroup />}
+      {id === "detail_npc_crowd_walking" && <NpcCrowdWalking />}
+      {id === "detail_fish_splash" && <FishSplash />}
+      {id === "detail_falling_coconut" && <FallingCoconut />}
+      {id === "detail_rooster_crowing" && <RoosterCrowing />}
 
       {showAnchor && (
         <g className="detail-debug-anchor" pointerEvents="none">
@@ -1310,6 +1317,479 @@ const PorridgeBowl: React.FC = () => {
           strokeLinecap="round"
           opacity="0.45"
         />
+      </g>
+    </g>
+  );
+};
+
+interface HumanBodySilhouetteProps {
+  fill?: string;
+  rimStroke?: string;
+  pose?: "standing" | "walking" | "standing_alt";
+  x?: number;
+  y?: number;
+  scaleX?: number;
+  scaleY?: number;
+  opacity?: number;
+}
+
+/**
+ * Reusable pure human body silhouette (no face, no clothes) anchored at [0, 0] feet.
+ */
+const HumanBodySilhouette: React.FC<HumanBodySilhouetteProps> = ({
+  fill = COLOR_PALETTE.silhouette_primary,
+  rimStroke = "#1E1E26",
+  pose = "standing",
+  x = 0,
+  y = 0,
+  scaleX = 1,
+  scaleY = 1,
+  opacity = 1,
+}) => {
+  return (
+    <g transform={`translate(${x}, ${y}) scale(${scaleX}, ${scaleY})`} opacity={opacity}>
+      {/* Head & Neck (pure smooth silhouette, no face) */}
+      <ellipse cx="0" cy="-242" rx="16" ry="20" fill={fill} stroke={rimStroke} strokeWidth="0.9" />
+      <rect x="-6.5" y="-225" width="13" height="16" rx="4" fill={fill} />
+
+      {pose === "standing" && (
+        <g>
+          {/* Back Arm */}
+          <path
+            d="M -22 -204 C -28 -172, -30 -142, -26 -112 C -25 -105, -18 -105, -17 -112 C -16 -138, -15 -168, -12 -194 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.8"
+          />
+          {/* Torso */}
+          <path
+            d="M -24 -206 C -26 -212, 26 -212, 24 -206 L 19 -122 C 18 -112, -18 -112, -19 -122 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.9"
+          />
+          {/* Legs */}
+          <path
+            d="M -17 -118 L -19 -58 L -17 -4 C -17 0, -6 0, -6 -4 L -4 -62 L -1 -112 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.8"
+          />
+          <path
+            d="M 1 -112 L 5 -60 L 7 -4 C 7 0, 18 0, 18 -4 L 19 -58 L 17 -118 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.8"
+          />
+          {/* Front Arm */}
+          <path
+            d="M 21 -204 C 28 -170, 29 -140, 25 -110 C 24 -103, 17 -103, 16 -110 C 16 -138, 15 -168, 13 -194 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.8"
+          />
+        </g>
+      )}
+
+      {pose === "standing_alt" && (
+        <g>
+          {/* Slightly turned torso & relaxed arms */}
+          <path
+            d="M -22 -205 C -24 -211, 23 -211, 21 -205 L 17 -122 C 16 -112, -16 -112, -17 -122 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.9"
+          />
+          {/* Arms slightly bent */}
+          <path
+            d="M -20 -202 C -26 -175, -24 -150, -14 -132 C -11 -127, -6 -130, -9 -136 C -15 -150, -16 -172, -12 -194 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.8"
+          />
+          <path
+            d="M 19 -202 C 25 -172, 24 -144, 18 -114 C 17 -108, 10 -109, 11 -115 C 14 -142, 14 -170, 11 -194 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.8"
+          />
+          {/* Legs */}
+          <path
+            d="M -16 -118 L -18 -58 L -15 -4 C -15 0, -5 0, -5 -4 L -3 -62 L 0 -112 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.8"
+          />
+          <path
+            d="M 1 -112 L 6 -60 L 11 -4 C 11 0, 21 0, 20 -4 L 18 -58 L 16 -118 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.8"
+          />
+        </g>
+      )}
+
+      {pose === "walking" && (
+        <g>
+          {/* Back Arm swinging backward */}
+          <path
+            d="M -18 -202 C -32 -174, -42 -148, -46 -122 C -47 -116, -39 -114, -37 -120 C -31 -144, -22 -170, -11 -193 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.8"
+          />
+          {/* Back Leg trailing */}
+          <path
+            d="M -14 -118 L -28 -62 L -42 -6 C -43 -1, -33 1, -31 -4 L -16 -58 L -2 -112 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.8"
+          />
+          {/* Slightly leaned forward Torso */}
+          <path
+            d="M -21 -206 C -22 -212, 24 -211, 23 -205 L 17 -121 C 15 -112, -17 -112, -18 -121 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.9"
+          />
+          {/* Front Leg striding forward */}
+          <path
+            d="M 1 -112 L 18 -60 L 33 -4 C 35 0, 44 -1, 42 -6 L 27 -62 L 15 -118 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.8"
+          />
+          {/* Front Arm swinging forward */}
+          <path
+            d="M 19 -202 C 30 -174, 38 -148, 40 -122 C 41 -116, 33 -115, 31 -121 C 28 -146, 20 -170, 11 -193 Z"
+            fill={fill}
+            stroke={rimStroke}
+            strokeWidth="0.8"
+          />
+        </g>
+      )}
+    </g>
+  );
+};
+
+/**
+ * 21. NPC SILHOUETTE STANDING (Bóng người NPC đứng - Cơ thể thuần)
+ */
+const NpcSilhouetteStanding: React.FC = () => {
+  return (
+    <g>
+      <HumanBodySilhouette pose="standing" />
+    </g>
+  );
+};
+
+/**
+ * 22. NPC SILHOUETTE WALKING (Bóng người NPC bước đi - Cơ thể thuần)
+ */
+const NpcSilhouetteWalking: React.FC = () => {
+  return (
+    <g>
+      <HumanBodySilhouette pose="walking" />
+    </g>
+  );
+};
+
+/**
+ * 23. NPC CROWD GROUP (Nhóm đông người NPC đứng tụ tập - 4 bóng người)
+ */
+const NpcCrowdGroup: React.FC = () => {
+  return (
+    <g>
+      {/* Back row (slightly smaller & lighter silhouette for depth separation) */}
+      <HumanBodySilhouette
+        pose="standing_alt"
+        x={-48}
+        y={-4}
+        scaleX={0.92}
+        scaleY={0.92}
+        fill="#191922"
+        rimStroke="#2A2A36"
+        opacity={0.92}
+      />
+      <HumanBodySilhouette
+        pose="standing"
+        x={38}
+        y={-6}
+        scaleX={-0.95}
+        scaleY={0.95}
+        fill="#16161E"
+        rimStroke="#272732"
+        opacity={0.95}
+      />
+      {/* Front row */}
+      <HumanBodySilhouette
+        pose="standing"
+        x={-16}
+        y={0}
+        scaleX={1}
+        scaleY={1}
+        fill={COLOR_PALETTE.silhouette_primary}
+        rimStroke="#22222B"
+      />
+      <HumanBodySilhouette
+        pose="standing_alt"
+        x={66}
+        y={0}
+        scaleX={-0.88}
+        scaleY={0.88}
+        fill={COLOR_PALETTE.silhouette_secondary}
+        rimStroke="#24242E"
+      />
+    </g>
+  );
+};
+
+/**
+ * 24. NPC CROWD WALKING (Đoàn người NPC di chuyển - 4 bóng người bước đi)
+ */
+const NpcCrowdWalking: React.FC = () => {
+  return (
+    <g>
+      {/* Back row walkers */}
+      <HumanBodySilhouette
+        pose="walking"
+        x={-68}
+        y={-5}
+        scaleX={0.9}
+        scaleY={0.9}
+        fill="#191922"
+        rimStroke="#2A2A36"
+        opacity={0.92}
+      />
+      <HumanBodySilhouette
+        pose="walking"
+        x={22}
+        y={-4}
+        scaleX={0.94}
+        scaleY={0.94}
+        fill="#16161E"
+        rimStroke="#272732"
+        opacity={0.95}
+      />
+      {/* Front row walkers */}
+      <HumanBodySilhouette
+        pose="walking"
+        x={-22}
+        y={0}
+        scaleX={1}
+        scaleY={1}
+        fill={COLOR_PALETTE.silhouette_primary}
+        rimStroke="#22222B"
+      />
+      <HumanBodySilhouette
+        pose="walking"
+        x={72}
+        y={0}
+        scaleX={0.87}
+        scaleY={0.87}
+        fill={COLOR_PALETTE.silhouette_secondary}
+        rimStroke="#24242E"
+      />
+    </g>
+  );
+};
+
+/**
+ * 25. FISH SPLASH (Cá lóc quẫy nước dưới kênh đêm)
+ * Curved snakehead fish silhouette leaping from dark canal water with concentric ripples & silver-white splashes.
+ * Anchored at [bottom-center] (0, 0) = Water surface Y=800px.
+ */
+const FishSplash: React.FC = () => {
+  return (
+    <g className="detail-fish-splash">
+      {/* Concentric water ripples on dark canal surface */}
+      <ellipse cx="0" cy="0" rx="54" ry="11" fill="#090D14" opacity="0.72" />
+      <ellipse
+        cx="0"
+        cy="0"
+        rx="48"
+        ry="9.5"
+        fill="none"
+        stroke="#94A3B8"
+        strokeWidth="1.2"
+        opacity="0.55"
+        className="anim-moon-pulse"
+      />
+      <ellipse
+        cx="0"
+        cy="0"
+        rx="32"
+        ry="6.5"
+        fill="none"
+        stroke="#CBD5E1"
+        strokeWidth="1.3"
+        opacity="0.7"
+      />
+      <ellipse
+        cx="-4"
+        cy="1"
+        rx="18"
+        ry="3.8"
+        fill="none"
+        stroke="#E2E8F0"
+        strokeWidth="1"
+        opacity="0.78"
+      />
+
+      {/* Leaping snakehead fish silhouette (cá lóc uốn cong vọt lên) */}
+      <g className="anim-sway-subtle">
+        <path
+          d="M -26 -4 C -24 -28, -6 -46, 16 -42 C 28 -40, 36 -30, 38 -22 C 30 -24, 22 -26, 12 -28 C -2 -30, -14 -20, -16 -3 Z"
+          fill={COLOR_PALETTE.silhouette_primary}
+          stroke="#334155"
+          strokeWidth="1"
+        />
+        {/* Dorsal fin (vây lưng dài đặc trưng cá lóc) */}
+        <path
+          d="M -14 -26 Q 2 -42, 18 -36 L 14 -31 Q 2 -33, -10 -22 Z"
+          fill="#141820"
+        />
+        {/* Caudal tail fin (vây đuôi) */}
+        <path
+          d="M -22 -5 L -34 -12 L -30 -2 L -35 4 L -19 -2 Z"
+          fill={COLOR_PALETTE.silhouette_primary}
+        />
+        {/* Faint moonlit rim highlight on arched back */}
+        <path
+          d="M -18 -20 C -8 -36, 10 -41, 28 -33"
+          fill="none"
+          stroke="#94A3B8"
+          strokeWidth="1.1"
+          opacity="0.65"
+          strokeLinecap="round"
+        />
+      </g>
+
+      {/* Silver-white water splash arcs & droplets */}
+      <g fill="#E2E8F0" opacity="0.82">
+        <path d="M -22 -4 Q -36 -24, -44 -34 Q -32 -20, -18 -4 Z" fill="#CBD5E1" opacity="0.75" />
+        <path d="M 22 -3 Q 36 -20, 44 -28 Q 30 -16, 18 -2 Z" fill="#CBD5E1" opacity="0.7" />
+        <circle cx="-38" cy="-40" r="2.2" />
+        <circle cx="-46" cy="-24" r="1.6" />
+        <circle cx="-12" cy="-52" r="1.8" />
+        <circle cx="8" cy="-55" r="1.5" />
+        <circle cx="34" cy="-38" r="2" />
+        <circle cx="46" cy="-22" r="1.6" />
+        <circle cx="26" cy="-14" r="1.4" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 26. FALLING COCONUT (Trái dừa khô rụng bịch xuống đất)
+ * Dried dark-husked coconut resting on ground with vertical falling motion streaks & impact dust.
+ * Anchored at [bottom-center] (0, 0) = Ground Y=800px.
+ */
+const FallingCoconut: React.FC = () => {
+  return (
+    <g className="detail-falling-coconut">
+      {/* Vertical falling motion streaks from above (vệt chuyển động rơi thẳng đứng) */}
+      <g stroke="#CBD5E1" strokeLinecap="round" opacity="0.45">
+        <line x1="-10" y1="-152" x2="-10" y2="-36" strokeWidth="1.4" strokeDasharray="18 8 10 6" />
+        <line x1="0" y1="-168" x2="0" y2="-32" strokeWidth="1.8" strokeDasharray="24 7 12 5" />
+        <line x1="11" y1="-142" x2="11" y2="-34" strokeWidth="1.2" strokeDasharray="14 9 8 6" />
+      </g>
+
+      {/* Ground impact shadow */}
+      <ellipse cx="0" cy="0" rx="26" ry="5.5" fill="#040507" opacity="0.8" />
+
+      {/* Light dust puffs kicking up from ground impact (bụi đất nhẹ bắn lên) */}
+      <g fill="#94A3B8" opacity="0.42">
+        <path d="M -18 -1 Q -28 -8, -34 -3 Q -29 -14, -18 -7 Z" />
+        <path d="M 18 -1 Q 29 -9, 36 -3 Q 30 -15, 19 -7 Z" />
+        <circle cx="-27" cy="-14" r="2.8" />
+        <circle cx="28" cy="-13" r="2.4" />
+        <circle cx="-35" cy="-7" r="1.8" />
+        <circle cx="37" cy="-6" r="1.6" />
+      </g>
+
+      {/* Dried dark-husked coconut (trái dừa khô vỏ sẫm màu) */}
+      <g transform="rotate(-14 0 -13)">
+        <ellipse
+          cx="0"
+          cy="-13"
+          rx="18"
+          ry="14.5"
+          fill="#141110"
+          stroke="#2A2421"
+          strokeWidth="1.1"
+        />
+        {/* Fibrous husk ridges */}
+        <path d="M -13 -18 Q 0 -22, 13 -16" fill="none" stroke="#292320" strokeWidth="1.2" opacity="0.75" />
+        <path d="M -15 -11 Q 0 -14, 15 -9" fill="none" stroke="#292320" strokeWidth="1.1" opacity="0.65" />
+        <path d="M -12 -5 Q 0 -6, 12 -4" fill="none" stroke="#080706" strokeWidth="1.2" opacity="0.8" />
+        {/* Dried stem cap */}
+        <path d="M -19 -14 L -22 -16 L -21 -11 L -18 -10 Z" fill="#1F1A17" />
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 27. ROOSTER CROWING (Bóng gà trống gáy sáng phía xa)
+ * Silhouette of a crowing rooster stretching its neck at dawn with faint sound wave arcs in morning mist.
+ * Anchored at [bottom-center] (0, 0).
+ */
+const RoosterCrowing: React.FC = () => {
+  return (
+    <g className="detail-rooster-crowing">
+      {/* Subtle perch / fence rail base at [0, 0] */}
+      <rect x="-32" y="-3" width="64" height="4" rx="1.5" fill="#12141A" opacity="0.85" />
+
+      {/* Rooster legs & claws */}
+      <g stroke={COLOR_PALETTE.silhouette_primary} strokeWidth="2" strokeLinecap="round">
+        <line x1="-4" y1="-20" x2="-6" y2="-2" />
+        <line x1="5" y1="-20" x2="7" y2="-2" />
+        <line x1="-9" y1="-2" x2="-2" y2="-2" />
+        <line x1="4" y1="-2" x2="11" y2="-2" />
+      </g>
+
+      {/* Rooster body, puffed chest & stretched crowing neck */}
+      <path
+        d="M -18 -26
+           C -16 -38, -2 -44, 10 -40
+           C 14 -52, 18 -64, 21 -72
+           L 26 -72
+           C 26 -62, 23 -50, 22 -38
+           C 20 -26, 10 -18, -4 -19
+           C -14 -20, -19 -22, -18 -26 Z"
+        fill={COLOR_PALETTE.silhouette_primary}
+        stroke="#1E293B"
+        strokeWidth="0.9"
+      />
+
+      {/* Sweeping curved tail feathers (lông đuôi cong vút) */}
+      <path
+        d="M -14 -31 C -28 -44, -40 -46, -44 -34 C -36 -38, -26 -35, -18 -25 Z"
+        fill={COLOR_PALETTE.silhouette_primary}
+      />
+      <path
+        d="M -16 -27 C -30 -35, -42 -32, -46 -22 C -37 -26, -28 -25, -17 -22 Z"
+        fill="#0D0F14"
+      />
+
+      {/* Jagged rooster comb & wattle (mào & tích gà trống) */}
+      <path
+        d="M 19 -72 L 18 -79 L 22 -76 L 25 -81 L 27 -75 L 30 -78 L 28 -71 Z"
+        fill="#1E1418"
+      />
+      <ellipse cx="26" cy="-66" rx="2" ry="3.2" fill="#1E1418" />
+
+      {/* Open crowing beak pointing up-right */}
+      <polygon points="26,-72 35,-76 27,-70" fill={COLOR_PALETTE.silhouette_primary} />
+      <polygon points="27,-69 34,-69 26,-67" fill={COLOR_PALETTE.silhouette_primary} />
+
+      {/* Faint dawn sound waves radiating from beak in morning mist */}
+      <g fill="none" stroke="#CBD5E1" strokeLinecap="round" className="anim-moon-pulse">
+        <path d="M 39 -79 Q 45 -73, 40 -66" strokeWidth="1.4" opacity="0.65" />
+        <path d="M 45 -84 Q 54 -73, 46 -61" strokeWidth="1.2" opacity="0.45" />
+        <path d="M 51 -89 Q 63 -73, 52 -56" strokeWidth="1" opacity="0.28" />
       </g>
     </g>
   );

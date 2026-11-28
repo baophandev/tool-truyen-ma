@@ -1744,6 +1744,7 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "structure_wooden_window" (Cửa sổ gỗ ván nông thôn)
    - "structure_ancestor_altar" (Bàn thờ tổ tiên vách lá)
    - "structure_wooden_stairs" (Cầu thang gỗ cũ kỹ rùng rợn dẫn lên gác lửng)
+   - "structure_thatched_tile_house" (Căn nhà lá lợp ngói máng cũ miền Tây)
 
 6. ĐẠO CỤ BỐI CẢNH (Details - 19 đạo cụ):
    - "detail_black_crow" (Quạ đen)
@@ -1765,6 +1766,9 @@ DANH MỤC TOÀN BỘ ASSETS HIỆN CÓ TRONG GEMINI_DIRECTOR_ASSETS.md:
    - "detail_surveillance_camera" (Camera an ninh)
    - "detail_flickering_ceiling_lamp" (Đèn huỳnh quang trần)
    - "detail_broken_mirror" (Gương nhà tắm vỡ nứt vấy máu)
+   - "detail_fish_splash" (Cá lóc quẫy nước dưới kênh đêm)
+   - "detail_falling_coconut" (Trái dừa khô rụng bịch xuống đất)
+   - "detail_rooster_crowing" (Bóng gà trống gáy sáng phía xa)
 
 7. THEMES & SKY PRESETS:
    - Themes: rural_graveyard, abandoned_village, cursed_swamp, modern_indoor, vehicle_interior, urban_night_market, thatched_house_interior (Chợ đêm & phố xá đô thị ngoài trời dùng urban_night_market, bên trong xe buýt/tàu xe dùng vehicle_interior, bên trong nhà lá dùng thatched_house_interior)

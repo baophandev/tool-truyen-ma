@@ -73,7 +73,8 @@ export type StructureId =
   | "structure_ancestor_altar"
   | "structure_hammock"
   | "structure_wooden_stairs"
-  | "structure_overgrown_ruins";
+  | "structure_overgrown_ruins"
+  | "structure_thatched_tile_house";
 
 export type DetailId =
   | "detail_black_crow"
@@ -95,7 +96,14 @@ export type DetailId =
   | "detail_offering_tray_toys"
   | "detail_matchbox"
   | "detail_water_droplets"
-  | "detail_porridge_bowl";
+  | "detail_porridge_bowl"
+  | "detail_npc_silhouette_standing"
+  | "detail_npc_silhouette_walking"
+  | "detail_npc_crowd_group"
+  | "detail_npc_crowd_walking"
+  | "detail_fish_splash"
+  | "detail_falling_coconut"
+  | "detail_rooster_crowing";
 
 export type CharacterBaseId =
   | "male_adult"

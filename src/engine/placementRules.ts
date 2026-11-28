@@ -197,6 +197,11 @@ export const STRUCTURE_RULES: Record<StructureId, StructureRule> = {
     allowedSlots: ALL_GROUND_SLOT_IDS,
     reason: "Phế tích nền đất cũ của căn nhà lá đã sụp đổ hoàn toàn bên mé kênh, chỉ còn cột gỗ mục gãy đổ, gạch vụn rêu phong và cỏ dại lau sậy mọc um tùm, đặt tại mọi vị trí tiếp đất Y=800px.",
   },
+  structure_thatched_tile_house: {
+    name: "Căn nhà lá lợp ngói máng cũ miền Tây",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Ngôi nhà cấp bốn nông thôn Nam Bộ kết hợp vách lá dừa nước và mái lợp ngói máng âm dương cũ kỹ rêu phong, có hàng hiên thấp và bậu cửa gỗ, đặt tại mọi vị trí tiếp đất Y=800px.",
+  },
 };
 
 export interface DetailRule {
@@ -305,6 +310,41 @@ export const DETAIL_RULES: Record<DetailId, DetailRule> = {
     name: "Bát cháo trắng & muỗng sứ",
     allowedSlots: ALL_GROUND_SLOT_IDS,
     reason: "Tô/bát cháo trắng bốc làn khói ấm mỏng cùng chiếc muỗng sứ đặt trên mặt bàn gỗ nông thôn (hỗ trợ offsetY âm, ví dụ -75 để đặt khớp mặt bàn) hoặc tiếp đất Y=800px.",
+  },
+  detail_npc_silhouette_standing: {
+    name: "Bóng người NPC đứng (Cơ thể thuần)",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Bóng đen cơ thể người đơn giản không gương mặt, không quần áo, tiếp đất Y=800px tại mọi vị trí mặt đất để ghép cảnh đông người hoặc người qua đường.",
+  },
+  detail_npc_silhouette_walking: {
+    name: "Bóng người NPC bước đi (Cơ thể thuần)",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Bóng đen cơ thể người đang sải bước (không gương mặt, không quần áo), tiếp đất Y=800px tại mọi vị trí mặt đất cho cảnh phố xá, chợ đêm hoặc dòng người di chuyển.",
+  },
+  detail_npc_crowd_group: {
+    name: "Nhóm đông người NPC đứng tụ tập (4 người)",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Cụm 4 bóng người cơ thể thuần không gương mặt, không quần áo đứng tụ tập với chiều cao và tư thế khác nhau, tiếp đất Y=800px để tạo nhanh cảnh đám đông.",
+  },
+  detail_npc_crowd_walking: {
+    name: "Đoàn người NPC di chuyển (4 người)",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Cụm 4 bóng người cơ thể thuần không gương mặt, không quần áo đang bước đi cùng chiều, tiếp đất Y=800px cho cảnh chợ đêm đông đúc, lễ hội hoặc đoàn người sơ tán.",
+  },
+  detail_fish_splash: {
+    name: "Cá lóc quẫy nước dưới kênh đêm",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Bóng đen thân cá lóc uốn cong vọt nhẹ trên mặt nước kênh tối kèm vòng sóng lan tỏa và giọt nước bắn tung tóe trắng bạc, neo mặt nước Y=800px.",
+  },
+  detail_falling_coconut: {
+    name: "Trái dừa khô rụng bịch xuống đất",
+    allowedSlots: ALL_GROUND_SLOT_IDS,
+    reason: "Trái dừa khô vỏ sẫm màu nằm lăn trên nền đất ven gốc dừa kèm vệt chuyển động rơi thẳng đứng và bụi đất nhẹ bắn lên, bắt buộc tiếp đất tại Y=800px.",
+  },
+  detail_rooster_crowing: {
+    name: "Bóng gà trống gáy sáng phía xa",
+    allowedSlots: ALL_SLOT_IDS,
+    reason: "Bóng đen con gà trống vươn cổ cất tiếng gáy sáng đầu tiên trên bờ rào hoặc mái rơm với sóng âm thanh mờ nhạt lan tỏa trong sương sớm (hỗ trợ mọi Ground & Air Slots).",
   },
 };
 

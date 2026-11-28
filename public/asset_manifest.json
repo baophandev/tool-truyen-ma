@@ -533,6 +533,16 @@
         "width": 350,
         "height": 165,
         "anchor": "bottom-center"
+      },
+      {
+        "id": "structure_thatched_tile_house",
+        "name": "Căn nhà lá lợp ngói máng cũ miền Tây",
+        "semantic_role": "Ngôi nhà cấp bốn nông thôn Nam Bộ kết hợp vách lá dừa nước và phần mái lợp ngói máng âm dương cũ kỹ rêu phong, có hàng hiên thấp và bậu cửa gỗ",
+        "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+        "layer": "midground",
+        "width": 448,
+        "height": 260,
+        "anchor": "bottom-center"
       }
     ]
   },
@@ -1100,6 +1110,55 @@
       "name": "Bát cháo trắng & muỗng sứ",
       "semantic_role": "Tô/bát cháo trắng bốc làn khói ấm mỏng cùng chiếc muỗng sứ đặt trên mặt bàn gỗ nông thôn (hỗ trợ offsetY âm để đặt khớp mặt bàn)",
       "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_npc_silhouette_standing",
+      "name": "Bóng người NPC đứng (Cơ thể thuần)",
+      "semantic_role": "Bóng đen cơ thể người đơn giản không gương mặt, không quần áo, dùng để xếp thêm người đứng trong cảnh đông đúc",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_npc_silhouette_walking",
+      "name": "Bóng người NPC bước đi (Cơ thể thuần)",
+      "semantic_role": "Bóng đen cơ thể người đang sải bước (không gương mặt, không quần áo), dùng để mô tả người qua đường hoặc dòng người đi lại",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_npc_crowd_group",
+      "name": "Nhóm đông người NPC đứng tụ tập (4 người)",
+      "semantic_role": "Cụm 4 bóng người cơ thể thuần không gương mặt, không quần áo đứng tụ tập với chiều cao và tư thế khác nhau để tạo nhanh cảnh đám đông",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_npc_crowd_walking",
+      "name": "Đoàn người NPC di chuyển (4 người)",
+      "semantic_role": "Cụm 4 bóng người cơ thể thuần không gương mặt, không quần áo đang bước đi cùng chiều cho cảnh chợ đêm đông đúc hoặc đoàn người di chuyển",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_fish_splash",
+      "name": "Cá lóc quẫy nước dưới kênh đêm",
+      "semantic_role": "Bóng đen thân cá lóc uốn cong vọt nhẹ trên mặt nước kênh tối kèm các vòng sóng lan tỏa và giọt nước bắn tung tóe trắng bạc, neo mặt nước Y=800px",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_falling_coconut",
+      "name": "Trái dừa khô rụng bịch xuống đất",
+      "semantic_role": "Trái dừa khô vỏ sẫm màu nằm lăn trên nền đất ven gốc dừa kèm vệt chuyển động rơi thẳng đứng từ trên cao xuống và bụi đất nhẹ bắn lên ở Y=800px",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right"],
+      "anchor": "bottom-center"
+    },
+    {
+      "id": "detail_rooster_crowing",
+      "name": "Bóng gà trống gáy sáng phía xa",
+      "semantic_role": "Bóng đen con gà trống vươn cổ cất tiếng gáy sáng đầu tiên trên bờ rào/mái rơm với sóng âm thanh mờ nhạt lan tỏa trong sương sớm",
+      "allowed_slots": ["far_left", "mid_left", "center", "mid_right", "far_right", "air_left", "air_center", "air_right"],
       "anchor": "bottom-center"
     }
   ],

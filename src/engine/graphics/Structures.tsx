@@ -57,6 +57,7 @@ export const StructureRenderer: React.FC<StructureProps> = ({
       {id === "structure_hammock" && <Hammock />}
       {id === "structure_wooden_stairs" && <WoodenStairs />}
       {id === "structure_overgrown_ruins" && <OvergrownRuins />}
+      {id === "structure_thatched_tile_house" && <ThatchedTileHouse />}
 
       {/* Debug anchor visualization */}
       {showAnchor && (
@@ -4467,6 +4468,124 @@ const OvergrownRuins: React.FC = () => {
           <path d="M 106 -6 Q 118 -68, 132 -126" fill="none" stroke="#0A0A0C" strokeWidth="2.4" strokeLinecap="round" />
           <ellipse cx="134" cy="-132" rx="4.5" ry="14" transform="rotate(13 134 -132)" fill="#334155" opacity="0.75" />
         </g>
+      </g>
+    </g>
+  );
+};
+
+/**
+ * 35. THATCHED TILE HOUSE (Căn nhà lá lợp ngói máng cũ miền Tây)
+ * Southern Vietnamese rural house combining nipa palm thatch walls (vách lá dừa nước),
+ * weathered mossy yin-yang roof tiles (ngói máng âm dương), low verandah & wooden threshold.
+ * Anchored at [bottom-center] (0, 0).
+ */
+const ThatchedTileHouse: React.FC = () => {
+  const tileRibs = [-190, -162, -134, -106, -78, -50, -22, 6, 34, 62, 90, 118, 146, 174];
+  const thatchStrips = [-165, -148, -131, -114, -97, -80, -63, 45, 62, 79, 96, 113, 130, 147, 164];
+
+  return (
+    <g className="structure-thatched-tile-house">
+      {/* 1. Cracked earthen/cement foundation plinth (nền đất & bậc thềm cũ) */}
+      <polygon
+        points="-215,0 -205,-14 205,-14 215,0"
+        fill={COLOR_PALETTE.silhouette_primary}
+      />
+      <rect x="-192" y="-18" width="384" height="6" fill="#11141B" />
+
+      {/* 2. Main house body with nipa palm thatch walls (vách lá dừa nước) */}
+      <path
+        d="M -182 -16 L -186 -168 L 186 -168 L 182 -16 Z"
+        fill={COLOR_PALETTE.silhouette_secondary}
+        stroke="#06070A"
+        strokeWidth="1.2"
+      />
+
+      {/* Vertical nipa palm leaf ribs & woven bamboo lath texture */}
+      <g stroke="#080A0E" strokeWidth="1.3" opacity="0.78">
+        {thatchStrips.map((x) => (
+          <line key={`thatch-${x}`} x1={x} y1="-166" x2={x + (x < 0 ? -2 : 2)} y2="-18" />
+        ))}
+      </g>
+      {/* Horizontal bamboo clamping battens (nẹp tre ngang giữ vách lá) */}
+      <line x1="-184" y1="-126" x2="184" y2="-126" stroke="#1E242E" strokeWidth="2.4" opacity="0.7" />
+      <line x1="-183" y1="-72" x2="183" y2="-72" stroke="#1E242E" strokeWidth="2.4" opacity="0.7" />
+
+      {/* 3. Dark doorway & wooden threshold (cửa chính tối om & bậu cửa gỗ) */}
+      <rect x="-46" y="-142" width="76" height="126" fill="#020204" stroke="#1C2029" strokeWidth="2" />
+      {/* Wooden threshold / sill (bậu cửa gỗ thấp) */}
+      <rect x="-52" y="-22" width="88" height="8" rx="1" fill="#181C24" stroke="#0A0A0C" strokeWidth="1" />
+      {/* Half-open wooden door leaf */}
+      <polygon points="10,-140 30,-142 30,-22 10,-26" fill="#12151C" stroke="#262C38" strokeWidth="0.9" />
+
+      {/* 4. Small wooden-barred window on the right wall (cửa sổ song gỗ) */}
+      <rect x="78" y="-122" width="64" height="48" fill="#030407" stroke="#1E242E" strokeWidth="2" />
+      <line x1="94" y1="-122" x2="94" y2="-74" stroke="#141820" strokeWidth="2.5" />
+      <line x1="110" y1="-122" x2="110" y2="-74" stroke="#141820" strokeWidth="2.5" />
+      <line x1="126" y1="-122" x2="126" y2="-74" stroke="#141820" strokeWidth="2.5" />
+      {/* Wooden window sill */}
+      <rect x="72" y="-76" width="76" height="5" fill="#1C222D" />
+
+      {/* 5. Low verandah & slender wooden porch posts (hàng hiên thấp & cột hiên gỗ) */}
+      <g className="verandah-posts">
+        {/* Left outer porch post */}
+        <polygon points="-196,-14 -194,-152 -186,-152 -188,-14" fill="#0B0D11" stroke="#1E242E" strokeWidth="0.8" />
+        {/* Inner porch post left of door */}
+        <polygon points="-76,-14 -75,-152 -68,-152 -69,-14" fill="#0B0D11" stroke="#1E242E" strokeWidth="0.8" />
+        {/* Right outer porch post */}
+        <polygon points="188,-14 186,-152 194,-152 196,-14" fill="#0B0D11" stroke="#1E242E" strokeWidth="0.8" />
+        {/* Low wooden verandah railing / bench on left side */}
+        <rect x="-188" y="-44" width="112" height="5" fill="#161A22" />
+        <line x1="-156" y1="-40" x2="-156" y2="-16" stroke="#12161E" strokeWidth="3" />
+        <line x1="-114" y1="-40" x2="-114" y2="-16" stroke="#12161E" strokeWidth="3" />
+      </g>
+
+      {/* 6. Pitched roof with weathered yin-yang pantiles (mái ngói máng âm dương cũ kỹ rêu phong) */}
+      <g className="roof-yin-yang-tiles">
+        {/* Main roof silhouette (slightly sagging ridge line) */}
+        <path
+          d="M -218 -144 L -152 -252 Q 0 -244, 152 -252 L 218 -144 Q 0 -152, -218 -144 Z"
+          fill={COLOR_PALETTE.silhouette_primary}
+          stroke="#050507"
+          strokeWidth="1.5"
+        />
+        {/* Lower overhanging verandah eave (mái hiên thấp đua ra) */}
+        <path
+          d="M -224 -146 Q 0 -154, 224 -146 L 212 -136 Q 0 -144, -212 -136 Z"
+          fill="#090B0F"
+        />
+        {/* Ridge beam tiles (hàng ngói nóc hơi võng) */}
+        <path
+          d="M -154 -252 Q 0 -243, 154 -252 L 158 -260 Q 0 -250, -158 -260 Z"
+          fill="#181C24"
+          stroke="#0A0A0C"
+          strokeWidth="1"
+        />
+
+        {/* Undulating yin-yang tile ribs running down the slope */}
+        <g stroke="#1E2530" strokeWidth="2.2" opacity="0.82">
+          {tileRibs.map((x) => {
+            const topX = x * 0.72;
+            return (
+              <line
+                key={`tile-rib-${x}`}
+                x1={topX}
+                y1="-247"
+                x2={x}
+                y2="-147"
+              />
+            );
+          })}
+        </g>
+
+        {/* Horizontal tile overlap courses */}
+        <path d="M -172 -222 Q 0 -216, 172 -222" fill="none" stroke="#151A22" strokeWidth="1.3" opacity="0.7" />
+        <path d="M -190 -194 Q 0 -189, 190 -194" fill="none" stroke="#151A22" strokeWidth="1.3" opacity="0.7" />
+        <path d="M -206 -168 Q 0 -164, 206 -168" fill="none" stroke="#151A22" strokeWidth="1.3" opacity="0.7" />
+
+        {/* Subtle moss patches & chipped tile gaps (rêu phong cũ kỹ) */}
+        <path d="M -125 -212 Q -95 -220, -68 -208" fill="none" stroke="#283D32" strokeWidth="3.5" opacity="0.52" strokeLinecap="round" />
+        <path d="M 38 -186 Q 76 -194, 112 -180" fill="none" stroke="#26382E" strokeWidth="3.2" opacity="0.48" strokeLinecap="round" />
+        <path d="M -42 -162 Q -10 -167, 18 -158" fill="none" stroke="#2D4236" strokeWidth="2.6" opacity="0.45" strokeLinecap="round" />
       </g>
     </g>
   );
